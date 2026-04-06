@@ -21,5 +21,10 @@ class AppImages {
   static const String companyProfile5 = 'assets/company/profile/5.png';
   static const String companyProfile6 = 'assets/company/profile/6.png';
   static const String companyProfile7 = 'assets/company/profile/7.png';
-}
 
+  static const String companyProfileStats =
+      'assets/company/profile/company_profile_stats.png';
+
+  // Single source of truth for company profile image across app.
+  static const String companyProfileImage = companyProfile1;
+}
