@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../app/router/app_router.dart';
 import '../../../constants/app_images.dart';
 import '../../../shared/mock/mock_data.dart';
+import '../../../shared/l10n/app_localizations.dart';
 import '../../../shared/models/message_thread.dart';
 import '../../../shared/widgets/app_scaffold.dart';
 import '../widgets/company_app_bar_actions.dart';
@@ -14,8 +15,9 @@ class CompanyMessagesListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final threads = MockData.threads();
+    final t = AppLocalizations.of(context);
     return AppScaffold(
-      title: 'Messages',
+      title: t.tr(en: 'Messages', ar: 'الرسائل'),
       showBack: false,
       leading: const CompanyProfileLeading(),
       actions: const [CompanyAppBarActions()],

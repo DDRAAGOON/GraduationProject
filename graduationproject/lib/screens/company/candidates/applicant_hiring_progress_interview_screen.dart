@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';
+import '../../../shared/l10n/app_localizations.dart';
 import '../../../shared/models/applicant.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_scaffold.dart';
@@ -17,8 +18,9 @@ class CompanyApplicantHiringProgressInterviewScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return AppScaffold(
-      title: 'Hiring Progress',
+      title: t.hiringProgress,
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -32,9 +34,9 @@ class CompanyApplicantHiringProgressInterviewScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          const SectionTitle('Current Stage'),
+          SectionTitle(t.currentStage),
           const SizedBox(height: 10),
-          _StagePill(label: 'Interview', selected: true),
+          _StagePill(label: t.interview, selected: true),
           const SizedBox(height: 12),
           _InfoRow(label: 'Interview Date', value: '10 - 13 July 2021'),
           _InfoRow(
@@ -44,14 +46,14 @@ class CompanyApplicantHiringProgressInterviewScreen extends StatelessWidget {
           _InfoRow(label: 'Assigned to', value: 'Maria Kelly'),
           const SizedBox(height: 16),
           AppButton(
-            label: 'Move To Next Step',
+            label: t.moveToNextStep,
             onPressed: () => Navigator.of(context).pushNamed(
               AppRoutes.companyApplicantHiringHiredDeclined,
               arguments: applicant,
             ),
           ),
           const SizedBox(height: 16),
-          const SectionTitle('Notes'),
+          SectionTitle(t.notes),
           const SizedBox(height: 10),
           ...[
             _NoteCard(
@@ -149,6 +151,7 @@ class _NoteCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: Padding(
@@ -179,8 +182,8 @@ class _NoteCard extends StatelessWidget {
             Text(text),
             const SizedBox(height: 10),
             Align(
-              alignment: Alignment.centerRight,
-              child: TextButton(onPressed: () {}, child: const Text('Reply')),
+              alignment: t.isAr ? Alignment.centerLeft : Alignment.centerRight,
+              child: TextButton(onPressed: () {}, child: Text(t.reply)),
             ),
           ],
         ),

@@ -12,6 +12,29 @@ class CompanyStore extends ChangeNotifier {
   String get companyName => 'Nomad';
   String get companyProfileImage => AppImages.companyProfileImage;
 
+  String _aboutEn =
+      'Nomad is a software platform for starting and running internet businesses. '
+      'Millions of businesses rely on Stripe’s software tools to accept payments, '
+      'expand globally, and manage their businesses online.\n\n'
+      'Stripe has been at the forefront of expanding internet commerce. '
+      'Our mission is to increase the GDP of the internet...';
+
+  String _aboutAr =
+      'تُعد Nomad منصّة برمجية لإطلاق وإدارة الأعمال عبر الإنترنت. يعتمد ملايين '
+      'الشركات على أدوات Stripe لقبول المدفوعات والتوسّع عالميًا وإدارة أعمالها '
+      'رقميًا بكفاءة.\n\n'
+      'ظلّ Stripe في مقدمة توسيع التجارة الإلكترونية، ورسالتنا هي دعم ازدهار '
+      'اقتصاد الإنترنت عبر حلول موثوقة وقابلة للتوسّع.';
+
+  String get companyAboutEn => _aboutEn;
+  String get companyAboutAr => _aboutAr;
+
+  void setCompanyIntro({required String english, required String arabic}) {
+    _aboutEn = english;
+    _aboutAr = arabic;
+    notifyListeners();
+  }
+
   final List<Job> _jobs = [...Job.mockList()];
   final List<ContactEntry> _contacts = [
     const ContactEntry(name: 'Twitter', value: 'twitter.com/Nomad'),

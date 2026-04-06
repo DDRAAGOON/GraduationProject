@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../shared/models/contact_entry.dart';
+import '../../../shared/l10n/app_localizations.dart';
 import '../../../shared/state/company_store.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_scaffold.dart';
@@ -18,20 +19,22 @@ class _CompanyProfileSettingsSocialLinksScreenState
   bool _loading = false;
 
   Future<void> _save() async {
+    final t = AppLocalizations.of(context);
     setState(() => _loading = true);
     await Future<void>.delayed(const Duration(milliseconds: 600));
     if (!mounted) return;
     setState(() => _loading = false);
     ScaffoldMessenger.of(
       context,
-    ).showSnackBar(const SnackBar(content: Text('Saved')));
+    ).showSnackBar(SnackBar(content: Text(t.saved)));
   }
 
   Future<void> _addMore() async {
+    final t = AppLocalizations.of(context);
     final name = TextEditingController();
     final value = TextEditingController();
     final created = await _showContactDialog(
-      title: 'Add social/contact link',
+      title: t.addSocialLink,
       nameController: name,
       valueController: value,
     );
@@ -40,10 +43,11 @@ class _CompanyProfileSettingsSocialLinksScreenState
   }
 
   Future<void> _edit(int index, ContactEntry entry) async {
+    final t = AppLocalizations.of(context);
     final name = TextEditingController(text: entry.name);
     final value = TextEditingController(text: entry.value);
     final updated = await _showContactDialog(
-      title: 'Edit social/contact link',
+      title: t.editSocialLink,
       nameController: name,
       valueController: value,
     );
@@ -56,6 +60,7 @@ class _CompanyProfileSettingsSocialLinksScreenState
     required TextEditingController nameController,
     required TextEditingController valueController,
   }) {
+    final t = AppLocalizations.of(context);
     return showDialog<ContactEntry>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -65,19 +70,19 @@ class _CompanyProfileSettingsSocialLinksScreenState
           children: [
             TextField(
               controller: nameController,
-              decoration: const InputDecoration(labelText: 'Name'),
+              decoration: InputDecoration(labelText: t.nameLabel),
             ),
             const SizedBox(height: 10),
             TextField(
               controller: valueController,
-              decoration: const InputDecoration(labelText: 'URL / handle'),
+              decoration: InputDecoration(labelText: t.urlHandle),
             ),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel'),
+            child: Text(t.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(ctx).pop(
@@ -86,7 +91,7 @@ class _CompanyProfileSettingsSocialLinksScreenState
                 value: valueController.text.trim(),
               ),
             ),
-            child: const Text('Save'),
+            child: Text(t.save),
           ),
         ],
       ),
@@ -95,20 +100,21 @@ class _CompanyProfileSettingsSocialLinksScreenState
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return AppScaffold(
-      title: 'Profile Settings',
+      title: t.profileSettings,
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           Text(
-            'Social Links',
+            t.socialLinks,
             style: Theme.of(
               context,
             ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900),
           ),
           const SizedBox(height: 16),
           Text(
-            'Add elsewhere links to your company profile. You can add only username without full https links.',
+            t.socialLinksHint,
             style: TextStyle(
               color: Theme.of(
                 context,
@@ -146,20 +152,20 @@ class _CompanyProfileSettingsSocialLinksScreenState
                   ),
                 ),
                 Align(
-                  alignment: Alignment.centerLeft,
+                  alignment: t.isAr ? Alignment.centerRight : Alignment.centerLeft,
                   child: OutlinedButton.icon(
                     onPressed: _addMore,
                     icon: const Icon(Icons.add),
-                    label: const Text('Add more'),
+                    label: Text(t.addMore),
                   ),
                 ),
               ],
             ),
           ),
           const SizedBox(height: 18),
-          AppButton(label: 'Save Change', loading: _loading, onPressed: _save),
+          AppButton(label: t.saveChange, loading: _loading, onPressed: _save),
           const SizedBox(height: 6),
-          TextButton(onPressed: () {}, child: const Text('Help Center')),
+          TextButton(onPressed: () {}, child: Text(t.helpCenterBtn)),
         ],
       ),
     );

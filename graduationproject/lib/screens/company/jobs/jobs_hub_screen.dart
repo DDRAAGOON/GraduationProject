@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';
+import '../../../shared/l10n/app_localizations.dart';
 import '../../../shared/state/company_store.dart';
 import '../../../shared/widgets/app_scaffold.dart';
 import '../widgets/company_app_bar_actions.dart';
@@ -17,9 +18,10 @@ class _CompanyJobsHubScreenState extends State<CompanyJobsHubScreen> {
   @override
   Widget build(BuildContext context) {
     final store = CompanyStore.instance;
+    final t = AppLocalizations.of(context);
 
     return AppScaffold(
-      title: 'Job',
+      title: t.job,
       showBack: false,
       leading: const CompanyProfileLeading(),
       actions: const [CompanyAppBarActions()],
@@ -53,18 +55,16 @@ class _CompanyJobsHubScreenState extends State<CompanyJobsHubScreen> {
                           final confirmed = await showDialog<bool>(
                             context: context,
                             builder: (ctx) => AlertDialog(
-                              title: const Text('Delete job post?'),
-                              content: Text(
-                                'This will permanently delete "${j.title}".',
-                              ),
+                              title: Text(t.deleteJobTitle),
+                              content: Text(t.deleteJobContent(j.title)),
                               actions: [
                                 TextButton(
                                   onPressed: () => Navigator.of(ctx).pop(false),
-                                  child: const Text('Cancel'),
+                                  child: Text(t.cancel),
                                 ),
                                 FilledButton(
                                   onPressed: () => Navigator.of(ctx).pop(true),
-                                  child: const Text('Delete'),
+                                  child: Text(t.delete),
                                 ),
                               ],
                             ),
@@ -72,14 +72,14 @@ class _CompanyJobsHubScreenState extends State<CompanyJobsHubScreen> {
                           if (confirmed != true) return;
                           store.deleteJob(j.id);
                         },
-                        itemBuilder: (ctx) => const [
+                        itemBuilder: (ctx) => [
                           PopupMenuItem<String>(
                             value: 'edit',
-                            child: Text('Edit'),
+                            child: Text(t.edit),
                           ),
                           PopupMenuItem<String>(
                             value: 'delete',
-                            child: Text('Delete'),
+                            child: Text(t.delete),
                           ),
                         ],
                       ),
@@ -93,7 +93,7 @@ class _CompanyJobsHubScreenState extends State<CompanyJobsHubScreen> {
                   Padding(
                     padding: const EdgeInsets.only(top: 14),
                     child: Text(
-                      'No jobs yet',
+                      t.noJobsYet,
                       style: Theme.of(context).textTheme.bodyLarge,
                     ),
                   ),

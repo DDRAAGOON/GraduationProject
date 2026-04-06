@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/router/app_router.dart';
+import '../../../../shared/l10n/app_localizations.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_scaffold.dart';
 import '../../../../shared/widgets/app_text_field.dart';
@@ -32,8 +33,9 @@ class _CompanyPostJobStep1InformationV2ScreenState
   }
 
   bool _validate() {
+    final t = AppLocalizations.of(context);
     setState(
-      () => _titleError = _jobTitle.text.trim().isEmpty ? 'Required' : null,
+      () => _titleError = _jobTitle.text.trim().isEmpty ? t.required : null,
     );
     return _titleError == null;
   }
@@ -63,22 +65,23 @@ class _CompanyPostJobStep1InformationV2ScreenState
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return AppScaffold(
-      title: 'Post a Job',
+      title: t.postJob,
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          Text('Step 1/3', style: Theme.of(context).textTheme.labelLarge),
+          Text(t.step1Short, style: Theme.of(context).textTheme.labelLarge),
           const SizedBox(height: 14),
           AppTextField(
-            label: 'Job title',
+            label: t.jobTitle,
             controller: _jobTitle,
-            hint: 'e.g. Software Engineer',
+            hint: t.jobTitleHint,
             validatorText: _titleError,
           ),
           const SizedBox(height: 16),
           Text(
-            'Type of Employment',
+            t.typeOfEmployment,
             style: Theme.of(context).textTheme.titleSmall,
           ),
           const SizedBox(height: 8),
@@ -108,10 +111,10 @@ class _CompanyPostJobStep1InformationV2ScreenState
             onChanged: (v) => setState(() => _intern = v),
           ),
           const SizedBox(height: 12),
-          Text('Salary', style: Theme.of(context).textTheme.titleSmall),
+          Text(t.salary, style: Theme.of(context).textTheme.titleSmall),
           const SizedBox(height: 8),
           Text(
-            '\$${_salary.start.toStringAsFixed(0)} to \$${_salary.end.toStringAsFixed(0)}',
+            '\$${_salary.start.toStringAsFixed(0)} - \$${_salary.end.toStringAsFixed(0)}',
           ),
           RangeSlider(
             values: _salary,
@@ -121,7 +124,7 @@ class _CompanyPostJobStep1InformationV2ScreenState
             onChanged: (v) => setState(() => _salary = v),
           ),
           const SizedBox(height: 18),
-          AppButton(label: 'Next Step', loading: _loading, onPressed: _next),
+          AppButton(label: t.nextStep, loading: _loading, onPressed: _next),
         ],
       ),
     );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';
+import '../../../shared/l10n/app_localizations.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_scaffold.dart';
 import '../../../shared/widgets/app_text_field.dart';
@@ -53,43 +54,47 @@ class _CompanyForgotPasswordScreenState
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return AppScaffold(
-      title: 'Forgot Password',
+      title: t.tr(en: 'Forgot Password', ar: 'نسيت كلمة المرور'),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
           Text(
-            'Forgot Password?',
+            t.tr(en: 'Forgot Password?', ar: 'نسيت كلمة المرور؟'),
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.w800,
                 ),
           ),
           const SizedBox(height: 8),
           Text(
-            'Enter your email address to receive a confirmation\ncode resetting your password.',
+            t.tr(
+              en: 'Enter your email address to receive a confirmation\ncode resetting your password.',
+              ar: 'أدخل بريدك الإلكتروني لاستلام رمز التأكيد\nلإعادة تعيين كلمة المرور.',
+            ),
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
           ),
           const SizedBox(height: 22),
           AppTextField(
-            label: 'Email Address',
+            label: t.tr(en: 'Email Address', ar: 'البريد الإلكتروني'),
             controller: _email,
-            hint: 'Enter your email',
+            hint: t.tr(en: 'Enter your email', ar: 'أدخل بريدك الإلكتروني'),
             keyboardType: TextInputType.emailAddress,
             validatorText: _emailError,
           ),
           const SizedBox(height: 16),
           AppTextField(
-            label: 'Mobile Number',
+            label: t.tr(en: 'Mobile Number', ar: 'رقم الهاتف'),
             controller: _mobile,
-            hint: 'Enter mobile number',
+            hint: t.tr(en: 'Enter mobile number', ar: 'أدخل رقم الهاتف'),
             keyboardType: TextInputType.phone,
             validatorText: _mobileError,
           ),
           const SizedBox(height: 20),
           AppButton(
-            label: 'Continue',
+            label: t.tr(en: 'Continue', ar: 'متابعة'),
             loading: _loading,
             onPressed: _submit,
           ),

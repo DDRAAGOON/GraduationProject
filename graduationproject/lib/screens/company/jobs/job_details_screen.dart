@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';
+import '../../../shared/l10n/app_localizations.dart';
 import '../../../shared/mock/mock_data.dart';
 import '../../../shared/models/applicant.dart';
 import '../../../shared/models/job.dart';
@@ -29,18 +30,19 @@ class _CompanyJobDetailsScreenState extends State<CompanyJobDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     final job = _job;
     return AppScaffold(
       title: job.title,
       showBack: true,
       actions: [
         IconButton(
-          tooltip: 'Edit job',
+          tooltip: t.editJobTooltip,
           onPressed: () => _editJob(context, job),
           icon: const Icon(Icons.edit_outlined),
         ),
         IconButton(
-          tooltip: 'Delete job',
+          tooltip: t.deleteJobTooltip,
           onPressed: () => _deleteJob(job),
           icon: const Icon(Icons.delete_outline),
         ),
@@ -73,9 +75,9 @@ class _CompanyJobDetailsScreenState extends State<CompanyJobDetailsScreen> {
               ),
               const SizedBox(height: 16),
               SectionTitle(
-                'Description',
+                t.descriptionSection,
                 trailing: IconButton(
-                  tooltip: 'Edit',
+                  tooltip: t.edit,
                   onPressed: () => _editJob(context, job),
                   icon: const Icon(Icons.edit_outlined),
                 ),
@@ -83,31 +85,31 @@ class _CompanyJobDetailsScreenState extends State<CompanyJobDetailsScreen> {
               const SizedBox(height: 8),
               Text(
                 job.description.isEmpty
-                    ? 'No description yet.'
+                    ? t.noDescriptionYet
                     : job.description,
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
               const SizedBox(height: 16),
-              const SectionTitle('Responsibilities'),
+              SectionTitle(t.responsibilities),
               const SizedBox(height: 10),
               _Bullets(items: job.responsibilities),
               const SizedBox(height: 16),
-              const SectionTitle('Nice-To-Haves'),
+              SectionTitle(t.niceToHavesSection),
               const SizedBox(height: 10),
               _Bullets(items: job.niceToHaves),
               const SizedBox(height: 16),
-              const SectionTitle('About this role'),
+              SectionTitle(t.aboutThisRole),
               const SizedBox(height: 10),
-              _InfoRow(label: 'Salary', value: job.salaryRange),
-              _InfoRow(label: 'Job Type', value: job.employmentType),
-              _InfoRow(label: 'Category', value: job.category),
+              _InfoRow(label: t.salaryLabel, value: job.salaryRange),
+              _InfoRow(label: t.jobTypeLabel, value: job.employmentType),
+              _InfoRow(label: t.categoryLabel, value: job.category),
               const SizedBox(height: 18),
               SegmentedButton<_JobViewTab>(
-                segments: const [
-                  ButtonSegment(value: _JobViewTab.table, label: Text('Table')),
+                segments: [
+                  ButtonSegment(value: _JobViewTab.table, label: Text(t.tableView)),
                   ButtonSegment(
                     value: _JobViewTab.pipeline,
-                    label: Text('Pipeline'),
+                    label: Text(t.pipelineView),
                   ),
                 ],
                 selected: {_tab},
@@ -118,8 +120,8 @@ class _CompanyJobDetailsScreenState extends State<CompanyJobDetailsScreen> {
               const SizedBox(height: 14),
               AppButton(
                 label: _tab == _JobViewTab.table
-                    ? 'Open Full Table View'
-                    : 'Open Full Pipeline View',
+                    ? t.openFullTable
+                    : t.openFullPipeline,
                 onPressed: () => Navigator.of(context).pushNamed(
                   _tab == _JobViewTab.table
                       ? AppRoutes.companyApplicantsTable
@@ -138,19 +140,20 @@ class _CompanyJobDetailsScreenState extends State<CompanyJobDetailsScreen> {
   }
 
   Future<void> _deleteJob(Job job) async {
+    final t = AppLocalizations.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Delete job post?'),
-        content: Text('This will permanently delete "${job.title}".'),
+        title: Text(t.deleteJobTitle),
+        content: Text(t.deleteJobContent(job.title)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancel'),
+            child: Text(t.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('Delete'),
+            child: Text(t.delete),
           ),
         ],
       ),
@@ -162,11 +165,12 @@ class _CompanyJobDetailsScreenState extends State<CompanyJobDetailsScreen> {
       Navigator.of(context).pop();
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Job deleted')));
+      ).showSnackBar(SnackBar(content: Text(t.jobDeleted)));
     }
   }
 
   Future<void> _editJob(BuildContext context, Job job) async {
+    final t = AppLocalizations.of(context);
     final title = TextEditingController(text: job.title);
     final location = TextEditingController(text: job.location);
     final employmentType = TextEditingController(text: job.employmentType);
@@ -186,44 +190,42 @@ class _CompanyJobDetailsScreenState extends State<CompanyJobDetailsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text('Edit Job', style: Theme.of(ctx).textTheme.titleLarge),
+                Text(t.editJobTitle, style: Theme.of(ctx).textTheme.titleLarge),
                 const SizedBox(height: 12),
                 TextField(
                   controller: title,
-                  decoration: const InputDecoration(labelText: 'Title'),
+                  decoration: InputDecoration(labelText: t.titleLabel),
                 ),
                 const SizedBox(height: 10),
                 TextField(
                   controller: location,
-                  decoration: const InputDecoration(labelText: 'Location'),
+                  decoration: InputDecoration(labelText: t.locationLabel),
                 ),
                 const SizedBox(height: 10),
                 TextField(
                   controller: employmentType,
-                  decoration: const InputDecoration(
-                    labelText: 'Employment type',
-                  ),
+                  decoration: InputDecoration(labelText: t.employmentTypeLabel),
                 ),
                 const SizedBox(height: 10),
                 TextField(
                   controller: category,
-                  decoration: const InputDecoration(labelText: 'Category'),
+                  decoration: InputDecoration(labelText: t.categoryLabel),
                 ),
                 const SizedBox(height: 10),
                 TextField(
                   controller: salaryRange,
-                  decoration: const InputDecoration(labelText: 'Salary range'),
+                  decoration: InputDecoration(labelText: t.salaryRangeLabel),
                 ),
                 const SizedBox(height: 10),
                 TextField(
                   controller: description,
                   maxLines: 4,
-                  decoration: const InputDecoration(labelText: 'Description'),
+                  decoration: InputDecoration(labelText: t.descriptionSection),
                 ),
                 const SizedBox(height: 12),
                 FilledButton(
                   onPressed: () => Navigator.of(ctx).pop(true),
-                  child: const Text('Save'),
+                  child: Text(t.save),
                 ),
               ],
             ),
@@ -254,16 +256,17 @@ class _Bullets extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     if (items.isEmpty) {
       return Text(
-        'No items yet',
+        t.noItemsYet,
         style: Theme.of(context).textTheme.bodyMedium,
       );
     }
     return Column(
       children: items
           .map(
-            (t) => Padding(
+            (text) => Padding(
               padding: const EdgeInsets.only(bottom: 10),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -273,7 +276,7 @@ class _Bullets extends StatelessWidget {
                     child: Icon(Icons.circle, size: 6),
                   ),
                   const SizedBox(width: 10),
-                  Expanded(child: Text(t)),
+                  Expanded(child: Text(text)),
                 ],
               ),
             ),
@@ -290,6 +293,7 @@ class _JobApplicantsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     final applicants = MockData.applicants();
     if (tab == _JobViewTab.table) {
       return Card(
@@ -310,13 +314,13 @@ class _JobApplicantsSection extends StatelessWidget {
     }
 
     final stages = <String, List<Applicant>>{
-      'In Review': applicants
+      t.inReview: applicants
           .where((a) => a.stage.toLowerCase().contains('review'))
           .toList(),
-      'Shortlisted': applicants
+      t.shortlisted: applicants
           .where((a) => a.stage.toLowerCase().contains('short'))
           .toList(),
-      'Interview': applicants
+      t.interview: applicants
           .where((a) => a.stage.toLowerCase().contains('interview'))
           .toList(),
     };

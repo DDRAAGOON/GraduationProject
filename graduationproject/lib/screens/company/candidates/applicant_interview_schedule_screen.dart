@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../shared/l10n/app_localizations.dart';
 import '../../../shared/models/applicant.dart';
 import '../../../shared/widgets/app_scaffold.dart';
 import '../../../shared/widgets/section_title.dart';
@@ -12,8 +13,9 @@ class CompanyApplicantInterviewScheduleScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return AppScaffold(
-      title: 'Interview Schedule',
+      title: t.interviewSchedule,
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -25,12 +27,12 @@ class CompanyApplicantInterviewScheduleScreen extends StatelessWidget {
               trailing: IconButton(
                 onPressed: () {},
                 icon: const Icon(Icons.add),
-                tooltip: 'Add schedule interview',
+                tooltip: t.addScheduleInterview,
               ),
             ),
           ),
           const SizedBox(height: 16),
-          const SectionTitle('Interview List'),
+          SectionTitle(t.interviewList),
           const SizedBox(height: 10),
           ...[
             _ScheduleTile(
@@ -73,6 +75,7 @@ class _ScheduleTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: Padding(
@@ -97,10 +100,10 @@ class _ScheduleTile extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Align(
-              alignment: Alignment.centerLeft,
+              alignment: t.isAr ? Alignment.centerRight : Alignment.centerLeft,
               child: OutlinedButton(
                 onPressed: () {},
-                child: const Text('Add Feedback'),
+                child: Text(t.addFeedback),
               ),
             ),
           ],
@@ -109,4 +112,3 @@ class _ScheduleTile extends StatelessWidget {
     );
   }
 }
-

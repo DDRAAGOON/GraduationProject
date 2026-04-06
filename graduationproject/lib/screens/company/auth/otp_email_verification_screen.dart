@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';
+import '../../../shared/l10n/app_localizations.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_scaffold.dart';
 
@@ -50,8 +51,9 @@ class _CompanyOtpEmailVerificationScreenState
   String get _otp => '${_c1.text}${_c2.text}${_c3.text}${_c4.text}';
 
   Future<void> _submit() async {
+    final t = AppLocalizations.of(context);
     if (_otp.length != 4) {
-      setState(() => _error = 'Enter the 4-digit code');
+      setState(() => _error = t.enterCode4);
       return;
     }
     setState(() {
@@ -73,6 +75,7 @@ class _CompanyOtpEmailVerificationScreenState
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     final minutes = (_seconds ~/ 60).toString().padLeft(2, '0');
     final seconds = (_seconds % 60).toString().padLeft(2, '0');
 
@@ -82,14 +85,14 @@ class _CompanyOtpEmailVerificationScreenState
         padding: const EdgeInsets.all(20),
         children: [
           Text(
-            'Email verification',
+            t.otpTitle,
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.w800,
                 ),
           ),
           const SizedBox(height: 8),
           Text(
-            'Enter the verification code we send you on:\n${widget.email}',
+            '${t.otpSubtitle}\n${widget.email}',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
@@ -118,19 +121,19 @@ class _CompanyOtpEmailVerificationScreenState
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                "Didn't receive code? ",
+                t.didntReceiveCode,
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
               ),
-              TextButton(onPressed: _resend, child: const Text('Resend')),
+              TextButton(onPressed: _resend, child: Text(t.resend)),
             ],
           ),
           const SizedBox(height: 10),
           Center(child: Text('$minutes:$seconds')),
           const SizedBox(height: 18),
           AppButton(
-            label: 'Continue',
+            label: t.continueBtn,
             loading: _loading,
             onPressed: _submit,
           ),
@@ -158,4 +161,3 @@ class _OtpBox extends StatelessWidget {
     );
   }
 }
-

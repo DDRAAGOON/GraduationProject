@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';
+import '../../../shared/l10n/app_localizations.dart';
 import '../../../shared/models/applicant.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_scaffold.dart';
@@ -17,8 +18,9 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return AppScaffold(
-      title: 'Applicant Details',
+      title: t.applicantDetails,
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -32,8 +34,8 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
                   Text(
                     applicant.fullName,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w900,
-                    ),
+                          fontWeight: FontWeight.w900,
+                        ),
                   ),
                   const SizedBox(height: 4),
                   Text(
@@ -46,7 +48,7 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 14),
                   AppButton(
-                    label: 'Schedule Interview',
+                    label: t.scheduleInterview,
                     onPressed: () => Navigator.of(context).pushNamed(
                       AppRoutes.companyApplicantInterviewSchedule,
                       arguments: applicant,
@@ -57,13 +59,13 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          const SectionTitle('Contact'),
+          SectionTitle(t.contactSection),
           const SizedBox(height: 10),
-          _Info(label: 'Email', value: applicant.email),
-          _Info(label: 'Phone', value: applicant.phone),
-          _Info(label: 'Location', value: applicant.location),
+          _Info(label: t.email, value: applicant.email),
+          _Info(label: t.phone, value: applicant.phone),
+          _Info(label: t.locationInfo, value: applicant.location),
           const SizedBox(height: 16),
-          const SectionTitle('Quick actions'),
+          SectionTitle(t.quickActions),
           const SizedBox(height: 10),
           Row(
             children: [
@@ -73,7 +75,7 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
                     AppRoutes.companyApplicantDetailsResume,
                     arguments: applicant,
                   ),
-                  child: const Text('Resume'),
+                  child: Text(t.resumeLabel),
                 ),
               ),
               const SizedBox(width: 12),
@@ -83,7 +85,7 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
                     AppRoutes.companyApplicantHiringInterview,
                     arguments: applicant,
                   ),
-                  child: const Text('Hiring Progress'),
+                  child: Text(t.hiringProgress),
                 ),
               ),
             ],

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';
 import '../../../constants/app_images.dart';
+import '../../../shared/l10n/app_localizations.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_scaffold.dart';
 import '../../../shared/widgets/app_text_field.dart';
@@ -39,39 +40,41 @@ class _CompanyProfileSettingsOverviewScreenState
   }
 
   Future<void> _save() async {
+    final t = AppLocalizations.of(context);
     setState(() => _loading = true);
     await Future<void>.delayed(const Duration(milliseconds: 600));
     if (!mounted) return;
     setState(() => _loading = false);
     ScaffoldMessenger.of(
       context,
-    ).showSnackBar(const SnackBar(content: Text('Saved')));
+    ).showSnackBar(SnackBar(content: Text(t.saved)));
   }
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return AppScaffold(
-      title: 'Profile Settings',
+      title: t.profileSettings,
       showBack: false,
       actions: [
         TextButton(
           onPressed: () => Navigator.of(
             context,
           ).pushNamed(AppRoutes.companyProfileSocialLinks),
-          child: const Text('Social Links'),
+          child: Text(t.socialLinks),
         ),
       ],
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           Text(
-            'Overview',
+            t.overviewSection,
             style: Theme.of(
               context,
             ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900),
           ),
           const SizedBox(height: 16),
-          Text('Company Logo', style: Theme.of(context).textTheme.titleSmall),
+          Text(t.companyLogo, style: Theme.of(context).textTheme.titleSmall),
           const SizedBox(height: 10),
           Card(
             child: Padding(
@@ -89,33 +92,33 @@ class _CompanyProfileSettingsOverviewScreenState
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      'Click to replace or drag and drop\nSVG, PNG, JPG or GIF (max. 400 x 400px)',
+                      t.logoHint,
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ),
-                  OutlinedButton(onPressed: () {}, child: const Text('Upload')),
+                  OutlinedButton(onPressed: () {}, child: Text(t.upload)),
                 ],
               ),
             ),
           ),
           const SizedBox(height: 16),
-          AppTextField(label: 'Company Name', controller: _companyName),
+          AppTextField(label: t.companyName, controller: _companyName),
           const SizedBox(height: 16),
-          AppTextField(label: 'Website', controller: _website),
+          AppTextField(label: t.website, controller: _website),
           const SizedBox(height: 16),
           Row(
             children: [
               Expanded(
-                child: AppTextField(label: 'Employee', controller: _employee),
+                child: AppTextField(label: t.employee, controller: _employee),
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: AppTextField(label: 'Industry', controller: _industry),
+                child: AppTextField(label: t.industry, controller: _industry),
               ),
             ],
           ),
           const SizedBox(height: 16),
-          Text('Date Founded', style: Theme.of(context).textTheme.labelLarge),
+          Text(t.dateFounded, style: Theme.of(context).textTheme.labelLarge),
           const SizedBox(height: 8),
           Card(
             child: ListTile(
@@ -135,15 +138,15 @@ class _CompanyProfileSettingsOverviewScreenState
             ),
           ),
           const SizedBox(height: 16),
-          AppTextField(label: 'About Company', controller: _about, maxLines: 4),
+          AppTextField(label: t.aboutCompany, controller: _about, maxLines: 4),
           const SizedBox(height: 18),
-          AppButton(label: 'Save Change', loading: _loading, onPressed: _save),
+          AppButton(label: t.saveChange, loading: _loading, onPressed: _save),
           const SizedBox(height: 10),
           TextButton(
             onPressed: () => Navigator.of(
               context,
             ).pushNamed(AppRoutes.companyCompanyProfile),
-            child: const Text('Preview Company Profile'),
+            child: Text(t.previewProfile),
           ),
         ],
       ),

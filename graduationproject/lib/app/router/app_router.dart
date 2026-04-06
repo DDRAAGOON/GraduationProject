@@ -28,6 +28,7 @@ import '../../screens/company/messages/messages_list_screen.dart';
 import '../../screens/company/onboarding/onboarding_future_starts_screen.dart';
 import '../../screens/company/onboarding/onboarding_next_job_closer_screen.dart';
 import '../../screens/company/onboarding/onboarding_smart_search_screen.dart';
+import '../../screens/company/profile/company_edit_intro_screen.dart';
 import '../../screens/company/profile/company_profile_screen.dart';
 import '../../screens/company/profile/profile_settings_overview_screen.dart';
 import '../../screens/company/profile/profile_settings_social_links_screen.dart';
@@ -81,6 +82,7 @@ final class AppRoutes {
   static const companyProfileOverview = '/company/profile/overview';
   static const companyProfileSocialLinks = '/company/profile/social_links';
   static const companyCompanyProfile = '/company/profile/company_profile';
+  static const companyEditIntro = '/company/profile/edit_intro';
 
   static const companyAppearanceDark = '/company/settings/appearance_dark';
   static const companyAppearanceLight = '/company/settings/appearance_light';
@@ -176,6 +178,12 @@ final class AppRouter {
         page = const CompanyProfileSettingsSocialLinksScreen();
       case AppRoutes.companyCompanyProfile:
         page = const CompanyCompanyProfileScreen();
+      case AppRoutes.companyEditIntro:
+        final intro = args is CompanyEditIntroArgs ? args : null;
+        page = CompanyEditIntroScreen(
+          initialEnglish: intro?.english ?? '',
+          initialArabic: intro?.arabic ?? '',
+        );
       case AppRoutes.companyAppearanceDark:
         page = const CompanyAppearanceSettingsDarkScreen();
       case AppRoutes.companyAppearanceLight:

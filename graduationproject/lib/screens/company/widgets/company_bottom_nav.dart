@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';
+import '../../../shared/l10n/app_localizations.dart';
 
-enum CompanyTab { home, chat, applicants, companyProfile, analytics }
+enum CompanyTab { home, chat, applicants, profile, analytics }
 
 class CompanyBottomNav extends StatelessWidget {
   const CompanyBottomNav({super.key, required this.current});
@@ -13,7 +14,7 @@ class CompanyBottomNav extends StatelessWidget {
     CompanyTab.home => 0,
     CompanyTab.chat => 1,
     CompanyTab.applicants => 2,
-    CompanyTab.companyProfile => 3,
+    CompanyTab.profile => 3,
     CompanyTab.analytics => 4,
   };
 
@@ -31,24 +32,31 @@ class CompanyBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return NavigationBar(
       selectedIndex: _index,
       labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
       onDestinationSelected: (i) => _go(context, i),
-      destinations: const [
-        NavigationDestination(icon: Icon(Icons.home_outlined), label: 'Home'),
+      destinations: [
         NavigationDestination(
-          icon: Icon(Icons.chat_bubble_outline),
-          label: 'Chat',
-        ),
-        NavigationDestination(icon: Icon(Icons.groups_outlined), label: 'Job'),
-        NavigationDestination(
-          icon: Icon(Icons.business_outlined),
-          label: 'Company Profile',
+          icon: const Icon(Icons.home_outlined),
+          label: t.home,
         ),
         NavigationDestination(
-          icon: Icon(Icons.bar_chart_outlined),
-          label: 'Stats',
+          icon: const Icon(Icons.chat_bubble_outline),
+          label: t.chat,
+        ),
+        NavigationDestination(
+          icon: const Icon(Icons.groups_outlined),
+          label: t.job,
+        ),
+        NavigationDestination(
+          icon: const Icon(Icons.business_outlined),
+          label: t.profile,
+        ),
+        NavigationDestination(
+          icon: const Icon(Icons.bar_chart_outlined),
+          label: t.stats,
         ),
       ],
     );

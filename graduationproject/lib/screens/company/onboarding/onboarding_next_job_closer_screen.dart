@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';
 import '../../../constants/app_images.dart';
+import '../../../shared/l10n/app_localizations.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_scaffold.dart';
 
@@ -10,6 +11,7 @@ class CompanyOnboardingNextJobCloserScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return AppScaffold(
       showBack: true,
       body: Padding(
@@ -24,20 +26,20 @@ class CompanyOnboardingNextJobCloserScreen extends StatelessWidget {
             ),
             const SizedBox(height: 22),
             Text(
-              'Smart Search & Better\nOpportunities',
+              t.smartSearchTitle,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.w700,
-                fontSize: 24,
+                    fontSize: 24,
                   ),
             ),
             const SizedBox(height: 10),
             Text(
-              'Save time and focus on what \nmatters',
+              t.smartSearchSub,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-                fontSize: 16,
+                    fontSize: 16,
                   ),
             ),
             const Spacer(),
@@ -45,7 +47,7 @@ class CompanyOnboardingNextJobCloserScreen extends StatelessWidget {
               children: [
                 Expanded(
                   child: AppButton(
-                    label: 'Next',
+                    label: t.next,
                     onPressed: () => Navigator.of(context).pushNamed(
                       AppRoutes.companyOnboardingFutureStarts,
                     ),

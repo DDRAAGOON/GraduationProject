@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../shared/l10n/app_localizations.dart';
 import '../../../shared/models/message_thread.dart';
 import '../../../shared/widgets/app_scaffold.dart';
 import '../widgets/company_applicant_avatar.dart';
@@ -47,6 +48,7 @@ class _CompanyChatThreadScreenState extends State<CompanyChatThreadScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return AppScaffold(
       title: widget.thread.title,
       body: Column(
@@ -103,9 +105,9 @@ class _CompanyChatThreadScreenState extends State<CompanyChatThreadScreen> {
                 Expanded(
                   child: TextField(
                     controller: _input,
-                    decoration: const InputDecoration(
-                      hintText: 'Reply message',
-                      prefixIcon: Icon(Icons.attach_file),
+                    decoration: InputDecoration(
+                      hintText: t.replyMessage,
+                      prefixIcon: const Icon(Icons.attach_file),
                     ),
                     onSubmitted: (_) => _send(),
                   ),
@@ -141,7 +143,7 @@ class _ChatBubble extends StatelessWidget {
     final bg = bubble.fromMe
         ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.25)
         : Colors.white.withValues(alpha: 0.10);
-    final align = bubble.fromMe ? Alignment.centerRight : Alignment.centerLeft;
+    final align = bubble.fromMe ? AlignmentDirectional.centerEnd : AlignmentDirectional.centerStart;
     final maxBubbleWidth = MediaQuery.of(context).size.width * 0.72;
 
     return Align(

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../app/router/app_router.dart';
+import '../../../shared/l10n/app_localizations.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_scaffold.dart';
 import '../../../shared/widgets/app_text_field.dart';
@@ -28,11 +30,12 @@ class _CompanySignInScreenState extends State<CompanySignInScreen> {
   }
 
   bool _validate() {
+    final t = AppLocalizations.of(context);
     final email = _email.text.trim();
     final pass = _password.text;
     setState(() {
-      _emailError = email.contains('@') ? null : 'Enter a valid email';
-      _passwordError = pass.length >= 8 ? null : 'Minimum 8 characters';
+      _emailError = email.contains('@') ? null : t.enterValidEmail;
+      _passwordError = pass.length >= 8 ? null : t.min8Chars;
     });
     return _emailError == null && _passwordError == null;
   }
@@ -48,6 +51,7 @@ class _CompanySignInScreenState extends State<CompanySignInScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return AppScaffold(
       title: null,
       showBack: true,
@@ -56,26 +60,27 @@ class _CompanySignInScreenState extends State<CompanySignInScreen> {
         children: [
           const SizedBox(height: 18),
           Text(
-            'Sign in to your\naccount',
+            t.signInToAccount,
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.w800,
-              fontSize: 32,
-            ),
+                  fontSize: 32,
+                ),
           ),
           const SizedBox(height: 30),
           AppTextField(
-            label: 'Company Email Address',
+            label: t.companyEmailAddress,
             controller: _email,
-            hint: 'Enter your email',
+            hint: t.enterYourEmail,
             keyboardType: TextInputType.emailAddress,
             validatorText: _emailError,
-            onChanged: (_) => _emailError == null ? null : setState(() => _emailError = null),
+            onChanged: (_) =>
+                _emailError == null ? null : setState(() => _emailError = null),
           ),
           const SizedBox(height: 16),
           AppTextField(
-            label: 'Password',
+            label: t.password,
             controller: _password,
-            hint: 'Enter your password',
+            hint: t.enterYourPassword,
             obscureText: _obscure,
             validatorText: _passwordError,
             onChanged: (_) =>
@@ -86,17 +91,17 @@ class _CompanySignInScreenState extends State<CompanySignInScreen> {
             ),
           ),
           Align(
-            alignment: Alignment.centerRight,
+            alignment: t.isAr ? Alignment.centerLeft : Alignment.centerRight,
             child: TextButton(
               onPressed: () => Navigator.of(context).pushNamed(
                 AppRoutes.companyForgotPassword,
               ),
-              child: const Text('Forgot password?'),
+              child: Text(t.forgotPassword),
             ),
           ),
           const SizedBox(height: 10),
           AppButton(
-            label: 'Continue',
+            label: t.continueBtn,
             loading: _loading,
             onPressed: _submit,
           ),
@@ -104,9 +109,9 @@ class _CompanySignInScreenState extends State<CompanySignInScreen> {
           Row(
             children: [
               Expanded(child: Divider(color: Colors.white.withValues(alpha: 0.15))),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 12),
-                child: Text('Or sign in with'),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Text(t.orSignInWith),
               ),
               Expanded(child: Divider(color: Colors.white.withValues(alpha: 0.15))),
             ],
@@ -114,7 +119,11 @@ class _CompanySignInScreenState extends State<CompanySignInScreen> {
           const SizedBox(height: 14),
           OutlinedButton.icon(
             onPressed: _loading ? null : _submit,
-            icon: const Icon(Icons.g_mobiledata),
+            icon: SvgPicture.asset(
+              'assets/company/icon/google_g.svg',
+              width: 18,
+              height: 18,
+            ),
             label: const Text('Google'),
           ),
           const SizedBox(height: 18),
@@ -122,14 +131,15 @@ class _CompanySignInScreenState extends State<CompanySignInScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                "Don't have an account? ",
+                t.dontHaveAccount,
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
               ),
               TextButton(
-                onPressed: () => Navigator.of(context).pushNamed(AppRoutes.companySignUp),
-                child: const Text('Sign up'),
+                onPressed: () =>
+                    Navigator.of(context).pushNamed(AppRoutes.companySignUp),
+                child: Text(t.signUpBtn),
               ),
             ],
           ),
@@ -138,4 +148,3 @@ class _CompanySignInScreenState extends State<CompanySignInScreen> {
     );
   }
 }
-

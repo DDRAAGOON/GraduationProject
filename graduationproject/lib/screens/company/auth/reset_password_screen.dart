@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';
+import '../../../shared/l10n/app_localizations.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_scaffold.dart';
 import '../../../shared/widgets/app_text_field.dart';
@@ -30,11 +31,12 @@ class _CompanyResetPasswordScreenState extends State<CompanyResetPasswordScreen>
   }
 
   bool _validate() {
+    final t = AppLocalizations.of(context);
     final p1 = _newPassword.text;
     final p2 = _confirmPassword.text;
     setState(() {
-      _newError = p1.length >= 8 ? null : 'Must be at least 8 characters';
-      _confirmError = p2 == p1 ? null : 'Both passwords must match';
+      _newError = p1.length >= 8 ? null : t.mustBe8Chars;
+      _confirmError = p2 == p1 ? null : t.mustMatch;
     });
     return _newError == null && _confirmError == null;
   }
@@ -50,29 +52,30 @@ class _CompanyResetPasswordScreenState extends State<CompanyResetPasswordScreen>
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return AppScaffold(
-      title: 'Reset Password',
+      title: t.resetPassword,
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
           Text(
-            'Reset Password',
+            t.resetPassword,
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.w800,
                 ),
           ),
           const SizedBox(height: 8),
           Text(
-            'Your new password must be different from the\npreviously used password',
+            t.resetPasswordSub,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
           ),
           const SizedBox(height: 24),
           AppTextField(
-            label: 'New Password',
+            label: t.newPassword,
             controller: _newPassword,
-            hint: 'Enter new password',
+            hint: t.enterNewPassword,
             obscureText: _obscure1,
             validatorText: _newError,
             suffix: IconButton(
@@ -82,9 +85,9 @@ class _CompanyResetPasswordScreenState extends State<CompanyResetPasswordScreen>
           ),
           const SizedBox(height: 16),
           AppTextField(
-            label: 'Confirm Password',
+            label: t.confirmPassword,
             controller: _confirmPassword,
-            hint: 'Confirm password',
+            hint: t.confirmPasswordHint,
             obscureText: _obscure2,
             validatorText: _confirmError,
             suffix: IconButton(
@@ -94,7 +97,7 @@ class _CompanyResetPasswordScreenState extends State<CompanyResetPasswordScreen>
           ),
           const SizedBox(height: 24),
           AppButton(
-            label: 'Verify Account',
+            label: t.verifyAccount,
             loading: _loading,
             onPressed: _submit,
           ),
@@ -103,4 +106,3 @@ class _CompanyResetPasswordScreenState extends State<CompanyResetPasswordScreen>
     );
   }
 }
-

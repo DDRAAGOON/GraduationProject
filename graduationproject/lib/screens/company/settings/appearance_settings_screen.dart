@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../shared/l10n/app_localizations.dart';
+import '../../../shared/state/locale_controller.dart';
 import '../../../shared/state/theme_controller.dart';
 import '../../../shared/widgets/app_scaffold.dart';
 
@@ -19,7 +21,7 @@ class CompanyAppearanceSettingsScreen extends StatefulWidget {
 class _CompanyAppearanceSettingsScreenState
     extends State<CompanyAppearanceSettingsScreen> {
   late String _theme = widget.initialTheme;
-  String _lang = 'English';
+  late String _lang;
 
   @override
   void initState() {
@@ -27,18 +29,23 @@ class _CompanyAppearanceSettingsScreenState
     _theme = ThemeController.instance.themeMode.value == ThemeMode.light
         ? 'Light'
         : 'Dark';
+    _lang = LocaleController.instance.locale.value.languageCode == 'ar'
+        ? 'العربية'
+        : 'English';
   }
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return AppScaffold(
-      title: 'Appearance',
+      title: t.tr(en: 'Appearance', ar: 'المظهر'),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Theme', style: Theme.of(context).textTheme.titleSmall),
+            Text(t.tr(en: 'Theme', ar: 'المظهر العام'),
+                style: Theme.of(context).textTheme.titleSmall),
             const SizedBox(height: 10),
             SegmentedButton<String>(
               segments: const [
@@ -57,7 +64,8 @@ class _CompanyAppearanceSettingsScreenState
               },
             ),
             const SizedBox(height: 20),
-            Text('Language', style: Theme.of(context).textTheme.titleSmall),
+            Text(t.tr(en: 'Language', ar: 'اللغة'),
+                style: Theme.of(context).textTheme.titleSmall),
             const SizedBox(height: 10),
             SegmentedButton<String>(
               segments: const [
@@ -65,11 +73,22 @@ class _CompanyAppearanceSettingsScreenState
                 ButtonSegment(value: 'العربية', label: Text('العربية')),
               ],
               selected: {_lang},
-              onSelectionChanged: (s) => setState(() => _lang = s.first),
+              onSelectionChanged: (s) {
+                final selected = s.first;
+                setState(() => _lang = selected);
+                if (selected == 'العربية') {
+                  LocaleController.instance.locale.value = const Locale('ar');
+                } else {
+                  LocaleController.instance.locale.value = const Locale('en');
+                }
+              },
             ),
             const Spacer(),
             Text(
-              'Default theme is Dark. Light applies only when selected here.',
+              t.tr(
+                en: 'Default theme is Dark. Light applies only when selected here.',
+                ar: 'المظهر الافتراضي هو الداكن. المظهر الفاتح يتم تطبيقه فقط عند اختياره من هنا.',
+              ),
               style: Theme.of(context).textTheme.bodySmall,
             ),
           ],

@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 
+import '../../../app/router/app_router.dart';
 import '../../../shared/models/contact_entry.dart';
+import '../../../shared/l10n/app_localizations.dart';
 import '../../../shared/state/company_store.dart';
 import '../../../shared/widgets/app_scaffold.dart';
 import '../../../shared/widgets/section_title.dart';
 import '../widgets/company_app_bar_actions.dart';
 import '../widgets/company_bottom_nav.dart';
+import 'company_edit_intro_screen.dart';
 
 class CompanyCompanyProfileScreen extends StatefulWidget {
   const CompanyCompanyProfileScreen({super.key});
@@ -18,127 +21,90 @@ class CompanyCompanyProfileScreen extends StatefulWidget {
 class _CompanyCompanyProfileScreenState
     extends State<CompanyCompanyProfileScreen> {
   final _store = CompanyStore.instance;
-  String _about =
-      'Nomad is a software platform for starting and running internet businesses. '
-      'Millions of businesses rely on Stripe’s software tools to accept payments, '
-      'expand globally, and manage their businesses online.\n\n'
-      'Stripe has been at the forefront of expanding internet commerce. '
-      'Our mission is to increase the GDP of the internet...';
+
+  Future<void> _openEditIntro() async {
+    await Navigator.of(context).pushNamed(
+      AppRoutes.companyEditIntro,
+      arguments: CompanyEditIntroArgs(
+        english: _store.companyAboutEn,
+        arabic: _store.companyAboutAr,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return AppScaffold(
-      title: 'Company Profile',
+      title: t.profile,
       showBack: true,
       leading: const CompanyProfileLeading(),
       actions: const [CompanyAppBarActions()],
       showAppBarDivider: true,
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          const _CompanyStatsBar(),
-          const SizedBox(height: 14),
-          Divider(
-            height: 1,
-            thickness: 1,
-            color: Theme.of(context).dividerColor.withValues(alpha: 0.2),
-          ),
-          const SizedBox(height: 16),
-          SectionTitle(
-            'Company Profile',
-            trailing: IconButton(
-              tooltip: 'Edit',
-              icon: const Icon(Icons.edit_outlined),
-              onPressed: _editAbout,
-            ),
-          ),
-          const SizedBox(height: 10),
-          Text(_about, style: Theme.of(context).textTheme.bodyMedium),
-          const SizedBox(height: 16),
-          SectionTitle('Contact'),
-          const SizedBox(height: 10),
-          AnimatedBuilder(
-            animation: _store,
-            builder: (context, _) => Column(
-              children: [
-                ..._store.contacts.asMap().entries.map(
-                  (entry) => _EditableLinkTile(
-                    icon: Icons.link_outlined,
-                    title: entry.value.name,
-                    value: entry.value.value,
-                    onEdit: () => _editContact(entry.key, entry.value),
-                    onDelete: () => _store.removeContact(entry.key),
-                  ),
-                ),
-                OutlinedButton.icon(
-                  onPressed: _addContact,
-                  icon: const Icon(Icons.add),
-                  label: const Text('Add more'),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-      bottomNavigationBar: const CompanyBottomNav(
-        current: CompanyTab.companyProfile,
-      ),
-    );
-  }
-
-  Future<void> _editAbout() async {
-    final controller = TextEditingController(text: _about);
-    final saved = await showModalBottomSheet<String>(
-      context: context,
-      isScrollControlled: true,
-      showDragHandle: true,
-      builder: (ctx) {
-        final viewInsets = MediaQuery.of(ctx).viewInsets.bottom;
-        return Padding(
-          padding: EdgeInsets.fromLTRB(16, 8, 16, 16 + viewInsets),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+      body: AnimatedBuilder(
+        animation: _store,
+        builder: (context, _) {
+          return ListView(
+            padding: const EdgeInsets.all(16),
             children: [
-              Text(
-                'Edit Company Profile',
-                style: Theme.of(
-                  ctx,
-                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w900),
+              const _CompanyStatsBar(),
+              const SizedBox(height: 14),
+              Divider(
+                height: 1,
+                thickness: 1,
+                color: Theme.of(context).dividerColor.withValues(alpha: 0.2),
               ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: controller,
-                maxLines: 8,
-                decoration: const InputDecoration(
-                  labelText: 'About',
-                  border: OutlineInputBorder(),
+              const SizedBox(height: 16),
+              SectionTitle(
+                t.about,
+                trailing: IconButton(
+                  tooltip: t.editIntroTooltip,
+                  icon: const Icon(Icons.edit_outlined),
+                  onPressed: _openEditIntro,
                 ),
               ),
-              const SizedBox(height: 12),
-              FilledButton(
-                onPressed: () => Navigator.of(ctx).pop(controller.text.trim()),
-                child: const Text('Save'),
+              const SizedBox(height: 10),
+              Text(
+                t.isAr
+                    ? (_store.companyAboutAr.trim().isNotEmpty
+                        ? _store.companyAboutAr
+                        : _store.companyAboutEn) // Fallback to English if Arabic is not provided
+                    : _store.companyAboutEn,
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+              const SizedBox(height: 16),
+              SectionTitle(t.contactSectionLabel),
+              const SizedBox(height: 10),
+              ..._store.contacts.asMap().entries.map(
+                (entry) => _EditableLinkTile(
+                  icon: Icons.link_outlined,
+                  title: entry.value.name,
+                  value: entry.value.value,
+                  onEdit: () => _editContact(entry.key, entry.value),
+                  onDelete: () => _store.removeContact(entry.key),
+                ),
+              ),
+              OutlinedButton.icon(
+                onPressed: _addContact,
+                icon: const Icon(Icons.add),
+                label: Text(t.addMoreContact),
               ),
             ],
-          ),
-        );
-      },
+          );
+        },
+      ),
+      bottomNavigationBar: const CompanyBottomNav(
+        current: CompanyTab.profile,
+      ),
     );
-    if (saved == null) return;
-    setState(() => _about = saved);
-    if (mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Updated')));
-    }
   }
 
   Future<void> _addContact() async {
+    final t = AppLocalizations.of(context);
     final nameController = TextEditingController();
     final valueController = TextEditingController();
     final contact = await _showContactDialog(
-      title: 'Add contact',
+      title: t.addContactTitle,
       nameController: nameController,
       valueController: valueController,
     );
@@ -147,10 +113,11 @@ class _CompanyCompanyProfileScreenState
   }
 
   Future<void> _editContact(int index, ContactEntry entry) async {
+    final t = AppLocalizations.of(context);
     final nameController = TextEditingController(text: entry.name);
     final valueController = TextEditingController(text: entry.value);
     final updated = await _showContactDialog(
-      title: 'Edit contact',
+      title: t.editContactTitle,
       nameController: nameController,
       valueController: valueController,
     );
@@ -163,6 +130,7 @@ class _CompanyCompanyProfileScreenState
     required TextEditingController nameController,
     required TextEditingController valueController,
   }) async {
+    final t = AppLocalizations.of(context);
     return showDialog<ContactEntry>(
       context: context,
       builder: (ctx) {
@@ -173,17 +141,17 @@ class _CompanyCompanyProfileScreenState
             children: [
               TextField(
                 controller: nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Name',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: t.nameLabel,
+                  border: const OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 10),
               TextField(
                 controller: valueController,
-                decoration: const InputDecoration(
-                  labelText: 'URL or handle',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: t.urlOrHandle,
+                  border: const OutlineInputBorder(),
                 ),
               ),
             ],
@@ -191,7 +159,7 @@ class _CompanyCompanyProfileScreenState
           actions: [
             TextButton(
               onPressed: () => Navigator.of(ctx).pop(),
-              child: const Text('Cancel'),
+              child: Text(t.cancel),
             ),
             FilledButton(
               onPressed: () => Navigator.of(ctx).pop(
@@ -200,7 +168,7 @@ class _CompanyCompanyProfileScreenState
                   value: valueController.text.trim(),
                 ),
               ),
-              child: const Text('Save'),
+              child: Text(t.save),
             ),
           ],
         );
@@ -226,6 +194,7 @@ class _EditableLinkTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Card(
       margin: const EdgeInsets.only(bottom: 10),
       child: ListTile(
@@ -236,12 +205,12 @@ class _EditableLinkTile extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             IconButton(
-              tooltip: 'Edit',
+              tooltip: t.edit,
               onPressed: onEdit,
               icon: const Icon(Icons.edit_outlined),
             ),
             IconButton(
-              tooltip: 'Delete',
+              tooltip: t.delete,
               onPressed: onDelete,
               icon: const Icon(Icons.delete_outline),
             ),
@@ -258,6 +227,7 @@ class _CompanyStatsBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     final cs = Theme.of(context).colorScheme;
     final labelColor = Theme.of(
       context,
@@ -328,14 +298,14 @@ class _CompanyStatsBar extends StatelessWidget {
               children: [
                 item(
                   icon: Icons.local_fire_department_outlined,
-                  label: 'Founded',
-                  value: 'July 31, 2011',
+                  label: t.tr(en: 'Founded', ar: 'تاريخ التأسيس'),
+                  value: t.tr(en: 'July 31, 2011', ar: '٣١ يوليو ٢٠١١'),
                 ),
                 const SizedBox(width: 14),
                 item(
                   icon: Icons.location_on_outlined,
-                  label: 'Location',
-                  value: '20 countries',
+                  label: t.locationInfo,
+                  value: t.tr(en: '20 countries', ar: '٢٠ دولة'),
                 ),
               ],
             ),
@@ -344,14 +314,14 @@ class _CompanyStatsBar extends StatelessWidget {
               children: [
                 item(
                   icon: Icons.groups_outlined,
-                  label: 'Employees',
+                  label: t.employee,
                   value: '4000+',
                 ),
                 const SizedBox(width: 14),
                 item(
                   icon: Icons.account_balance_outlined,
-                  label: 'Industry',
-                  value: 'Social & Non-Profit',
+                  label: t.industry,
+                  value: t.tr(en: 'Social & Non-Profit', ar: 'اجتماعي وحقوقي'),
                 ),
               ],
             ),

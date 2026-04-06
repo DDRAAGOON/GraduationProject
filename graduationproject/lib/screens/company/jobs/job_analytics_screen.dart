@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 
+import '../../../shared/l10n/app_localizations.dart';
 import '../../../shared/models/job.dart';
 import '../../../shared/widgets/app_scaffold.dart';
 import '../../../shared/widgets/section_title.dart';
@@ -14,8 +15,9 @@ class CompanyJobAnalyticsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return AppScaffold(
-      title: 'Analytics',
+      title: t.stats,
       showBack: false,
       leading: const CompanyProfileLeading(),
       actions: const [CompanyAppBarActions()],
@@ -32,37 +34,37 @@ class CompanyJobAnalyticsScreen extends StatelessWidget {
           LayoutBuilder(
             builder: (context, constraints) {
               if (constraints.maxWidth < 640) {
-                return const Column(
+                return Column(
                   children: [
                     _BigMetric(
-                      title: 'Total Views',
-                      value: '23,564',
-                      delta: '+6.4%',
+                      title: t.tr(en: 'Total Views', ar: 'إجمالي المشاهدات'),
+                      value: t.tr(en: '23,564', ar: '٢٣,٥٦٤'),
+                      delta: t.tr(en: '+6.4%', ar: '٦.٤%+'),
                     ),
-                    SizedBox(height: 12),
+                    const SizedBox(height: 12),
                     _BigMetric(
-                      title: 'Total Applied',
-                      value: '132',
-                      delta: '-0.4%',
+                      title: t.tr(en: 'Total Applied', ar: 'إجمالي المتقدمين'),
+                      value: t.tr(en: '132', ar: '١٣٢'),
+                      delta: t.tr(en: '-0.4%', ar: '٠.٤%-'),
                     ),
                   ],
                 );
               }
-              return const Row(
+              return Row(
                 children: [
                   Expanded(
                     child: _BigMetric(
-                      title: 'Total Views',
-                      value: '23,564',
-                      delta: '+6.4%',
+                      title: t.tr(en: 'Total Views', ar: 'إجمالي المشاهدات'),
+                      value: t.tr(en: '23,564', ar: '٢٣,٥٦٤'),
+                      delta: t.tr(en: '+6.4%', ar: '٦.٤%+'),
                     ),
                   ),
-                  SizedBox(width: 12),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: _BigMetric(
-                      title: 'Total Applied',
-                      value: '132',
-                      delta: '-0.4%',
+                      title: t.tr(en: 'Total Applied', ar: 'إجمالي المتقدمين'),
+                      value: t.tr(en: '132', ar: '١٣٢'),
+                      delta: t.tr(en: '-0.4%', ar: '٠.٤%-'),
                     ),
                   ),
                 ],
@@ -70,11 +72,11 @@ class CompanyJobAnalyticsScreen extends StatelessWidget {
             },
           ),
           const SizedBox(height: 18),
-          const SectionTitle('Job listing view stats'),
+          SectionTitle(t.tr(en: 'Job listing view stats', ar: 'إحصائيات مشاهدات إعلان الوظيفة')),
           const SizedBox(height: 10),
           const RepaintBoundary(child: _ApplicationsLineChart()),
           const SizedBox(height: 18),
-          const SectionTitle('Traffic channel'),
+          SectionTitle(t.tr(en: 'Traffic channel', ar: 'قنوات الزيارات')),
           const SizedBox(height: 10),
           const RepaintBoundary(child: _TrafficDonutChart()),
           const SizedBox(height: 10),
@@ -100,7 +102,7 @@ class _BigMetric extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final positive = delta.startsWith('+');
+    final positive = delta.contains('+');
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(14),
@@ -126,6 +128,7 @@ class _BigMetric extends StatelessWidget {
                     style: TextStyle(
                       color: positive ? Colors.tealAccent : Colors.redAccent,
                     ),
+                    textDirection: TextDirection.ltr,
                   ),
                 ),
               ],
@@ -142,6 +145,7 @@ class _ApplicationsLineChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     const points = <FlSpot>[
       FlSpot(0, 18),
       FlSpot(1, 22),
@@ -159,7 +163,7 @@ class _ApplicationsLineChart extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Applications (last 7 days)',
+              t.tr(en: 'Applications (last 7 days)', ar: 'الطلبات (لآخر ٧ أيام)'),
               style: Theme.of(
                 context,
               ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
@@ -191,7 +195,7 @@ class _ApplicationsLineChart extends StatelessWidget {
                       getTooltipItems: (spots) => spots
                           .map(
                             (spot) => LineTooltipItem(
-                              '${_dayLabel(spot.x.toInt())}\n${spot.y.toStringAsFixed(0)} applicants',
+                              '${_dayLabel(spot.x.toInt(), t.isAr)}\n${spot.y.toStringAsFixed(0)} ${t.tr(en: 'applicants', ar: 'متقدم')}',
                               const TextStyle(
                                 color: Colors.black87,
                                 fontSize: 12,
@@ -215,7 +219,7 @@ class _ApplicationsLineChart extends StatelessWidget {
                         reservedSize: 34,
                         interval: 10,
                         getTitlesWidget: (value, _) => Text(
-                          value.toInt().toString(),
+                          t.tr(en: value.toInt().toString(), ar: value.toInt().toString().replaceAll('0', '٠').replaceAll('1', '١').replaceAll('2', '٢').replaceAll('3', '٣').replaceAll('4', '٤').replaceAll('5', '٥').replaceAll('6', '٦').replaceAll('7', '٧').replaceAll('8', '٨').replaceAll('9', '٩')),
                           style: Theme.of(context).textTheme.bodySmall,
                         ),
                       ),
@@ -225,7 +229,7 @@ class _ApplicationsLineChart extends StatelessWidget {
                         showTitles: true,
                         reservedSize: 28,
                         getTitlesWidget: (value, _) => Text(
-                          _dayLabel(value.toInt()),
+                          _dayLabel(value.toInt(), t.isAr),
                           style: Theme.of(context).textTheme.bodySmall,
                         ),
                       ),
@@ -268,11 +272,12 @@ class _TrafficDonutChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     final channels = <_ChannelSection>[
-      const _ChannelSection('Direct', 48, Color(0xFF2F6FDB)),
-      const _ChannelSection('Social', 23, Color(0xFF22C55E)),
-      const _ChannelSection('Organic', 24, Color(0xFFF59E0B)),
-      const _ChannelSection('Other', 5, Color(0xFF6B7280)),
+      _ChannelSection(t.tr(en: 'Direct', ar: 'مباشر'), 48, const Color(0xFF2F6FDB)),
+      _ChannelSection(t.tr(en: 'Social', ar: 'تواصل إجتماعي'), 23, const Color(0xFF22C55E)),
+      _ChannelSection(t.tr(en: 'Organic', ar: 'عضوي (بحث)'), 24, const Color(0xFFF59E0B)),
+      _ChannelSection(t.tr(en: 'Other', ar: 'أخرى'), 5, const Color(0xFF6B7280)),
     ];
 
     return Card(
@@ -291,7 +296,7 @@ class _TrafficDonutChart extends StatelessWidget {
                         (channel) => PieChartSectionData(
                           color: channel.color,
                           value: channel.value.toDouble(),
-                          title: '${channel.value}%',
+                          title: t.tr(en: '${channel.value}%', ar: '٪${channel.value.toString().replaceAll('0', '٠').replaceAll('1', '١').replaceAll('2', '٢').replaceAll('3', '٣').replaceAll('4', '٤').replaceAll('5', '٥').replaceAll('6', '٦').replaceAll('7', '٧').replaceAll('8', '٨').replaceAll('9', '٩')}'),
                           radius: 56,
                           titleStyle: const TextStyle(
                             color: Colors.white,
@@ -311,7 +316,7 @@ class _TrafficDonutChart extends StatelessWidget {
               children: channels
                   .map(
                     (channel) => _LegendDot(
-                      label: '${channel.label} ${channel.value}%',
+                      label: t.tr(en: '${channel.label} ${channel.value}%', ar: '${channel.label} ٪${channel.value.toString().replaceAll('0', '٠').replaceAll('1', '١').replaceAll('2', '٢').replaceAll('3', '٣').replaceAll('4', '٤').replaceAll('5', '٥').replaceAll('6', '٦').replaceAll('7', '٧').replaceAll('8', '٨').replaceAll('9', '٩')}'),
                       color: channel.color,
                     ),
                   )
@@ -331,22 +336,22 @@ class _ChannelSection {
   final Color color;
 }
 
-String _dayLabel(int value) {
+String _dayLabel(int value, bool isAr) {
   switch (value) {
     case 0:
-      return 'Mon';
+      return isAr ? 'الإثنين' : 'Mon';
     case 1:
-      return 'Tue';
+      return isAr ? 'الثلاثاء' : 'Tue';
     case 2:
-      return 'Wed';
+      return isAr ? 'الأربعاء' : 'Wed';
     case 3:
-      return 'Thu';
+      return isAr ? 'الخميس' : 'Thu';
     case 4:
-      return 'Fri';
+      return isAr ? 'الجمعة' : 'Fri';
     case 5:
-      return 'Sat';
+      return isAr ? 'السبت' : 'Sat';
     case 6:
-      return 'Sun';
+      return isAr ? 'الأحد' : 'Sun';
     default:
       return '';
   }

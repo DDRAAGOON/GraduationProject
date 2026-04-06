@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../shared/l10n/app_localizations.dart';
 import '../../../shared/models/applicant.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_scaffold.dart';
@@ -31,8 +32,9 @@ class _CompanyApplicantHiringProgressHiredDeclinedScreenState
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return AppScaffold(
-      title: 'Hiring Progress',
+      title: t.hiringProgress,
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -44,13 +46,13 @@ class _CompanyApplicantHiringProgressHiredDeclinedScreenState
             ),
           ),
           const SizedBox(height: 16),
-          const SectionTitle('Current Stage'),
+          SectionTitle(t.currentStage),
           const SizedBox(height: 10),
           SegmentedButton<String>(
-            segments: const [
-              ButtonSegment(value: 'Interview', label: Text('Interview')),
-              ButtonSegment(value: 'Hired', label: Text('Hired')),
-              ButtonSegment(value: 'Declined', label: Text('Declined')),
+            segments: [
+              ButtonSegment(value: 'Interview', label: Text(t.interview)),
+              ButtonSegment(value: 'Hired', label: Text(t.hired)),
+              ButtonSegment(value: 'Declined', label: Text(t.declined)),
             ],
             selected: {_stage},
             onSelectionChanged: (s) => setState(() => _stage = s.first),
@@ -61,18 +63,17 @@ class _CompanyApplicantHiringProgressHiredDeclinedScreenState
               padding: const EdgeInsets.all(14),
               child: Text(
                 _stage == 'Hired'
-                    ? 'Candidate has been marked as hired.'
+                    ? t.candidateHiredMsg
                     : _stage == 'Declined'
-                        ? 'Candidate has been declined.'
-                        : 'Candidate is currently in interview stage.',
+                        ? t.candidateDeclinedMsg
+                        : t.candidateInterviewMsg,
               ),
             ),
           ),
           const SizedBox(height: 16),
-          AppButton(label: 'Save', loading: _loading, onPressed: _save),
+          AppButton(label: t.save, loading: _loading, onPressed: _save),
         ],
       ),
     );
   }
 }
-

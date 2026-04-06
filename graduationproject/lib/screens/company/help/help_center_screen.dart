@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../shared/l10n/app_localizations.dart';
 import '../../../shared/widgets/app_scaffold.dart';
 import '../../../shared/widgets/section_title.dart';
 
@@ -8,8 +9,9 @@ class CompanyHelpCenterScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return AppScaffold(
-      title: 'Help Center',
+      title: t.helpCenter,
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -17,18 +19,18 @@ class CompanyHelpCenterScreen extends StatelessWidget {
             children: [
               Expanded(
                 child: TextField(
-                  decoration: const InputDecoration(
-                    hintText: 'Search help',
-                    prefixIcon: Icon(Icons.search),
+                  decoration: InputDecoration(
+                    hintText: t.searchHelp,
+                    prefixIcon: const Icon(Icons.search),
                   ),
                 ),
               ),
               const SizedBox(width: 12),
-              OutlinedButton(onPressed: () {}, child: const Text('Most relevant')),
+              OutlinedButton(onPressed: () {}, child: Text(t.mostRelevant)),
             ],
           ),
           const SizedBox(height: 16),
-          const SectionTitle('Popular articles'),
+          SectionTitle(t.popularArticles),
           const SizedBox(height: 10),
           const _FaqTile(
             title: 'What is My Applications?',
@@ -56,14 +58,14 @@ class CompanyHelpCenterScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Didn't find what you were looking for?",
+                          t.didntFindWhat,
                           style: Theme.of(context).textTheme.titleSmall?.copyWith(
                                 fontWeight: FontWeight.w800,
                               ),
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          'Contact our customer service',
+                          t.contactCustomerService,
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                           ),
@@ -71,7 +73,7 @@ class CompanyHelpCenterScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  FilledButton(onPressed: () {}, child: const Text('Contact Us')),
+                  FilledButton(onPressed: () {}, child: Text(t.contactUs)),
                 ],
               ),
             ),
@@ -96,6 +98,7 @@ class _FaqTileState extends State<_FaqTile> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: InkWell(
@@ -123,11 +126,11 @@ class _FaqTileState extends State<_FaqTile> {
                 const SizedBox(height: 10),
                 Row(
                   children: [
-                    Text('Was this article helpful?', style: Theme.of(context).textTheme.bodySmall),
+                    Text(t.wasArticleHelpful, style: Theme.of(context).textTheme.bodySmall),
                     const Spacer(),
-                    OutlinedButton(onPressed: () {}, child: const Text('Yes')),
+                    OutlinedButton(onPressed: () {}, child: Text(t.yes)),
                     const SizedBox(width: 10),
-                    OutlinedButton(onPressed: () {}, child: const Text('No')),
+                    OutlinedButton(onPressed: () {}, child: Text(t.no)),
                   ],
                 ),
               ],
@@ -138,4 +141,3 @@ class _FaqTileState extends State<_FaqTile> {
     );
   }
 }
-

@@ -5,6 +5,8 @@ class AppScaffold extends StatelessWidget {
     super.key,
     this.title,
     this.titleWidget,
+    this.titlePadding,
+    this.titleAlignment,
     this.leading,
     required this.body,
     this.actions,
@@ -17,6 +19,8 @@ class AppScaffold extends StatelessWidget {
 
   final String? title;
   final Widget? titleWidget;
+  final EdgeInsetsGeometry? titlePadding;
+  final AlignmentGeometry? titleAlignment;
   final Widget? leading;
   final Widget body;
   final List<Widget>? actions;
@@ -32,6 +36,18 @@ class AppScaffold extends StatelessWidget {
     final showLeading = showBack && canPop;
     final hasActions = actions != null && actions!.isNotEmpty;
     final hasTitle = title != null || titleWidget != null;
+    final effectiveCenterTitle =
+        centerTitle ?? (title != null || titleWidget != null);
+    final effectiveTitleWidget = titleWidget ??
+        (title == null
+            ? null
+            : Align(
+                alignment: titleAlignment ?? Alignment.center,
+                child: Padding(
+                  padding: titlePadding ?? EdgeInsets.zero,
+                  child: Text(title!),
+                ),
+              ));
     final safeBottomNavigationBar = bottomNavigationBar == null
         ? null
         : SafeArea(
@@ -49,8 +65,8 @@ class AppScaffold extends StatelessWidget {
           : AppBar(
               automaticallyImplyLeading: showLeading,
               leading: showLeading ? null : leading,
-              centerTitle: centerTitle,
-              title: titleWidget ?? (title == null ? null : Text(title!)),
+              centerTitle: effectiveCenterTitle,
+              title: effectiveTitleWidget,
               actions: actions,
               bottom: showAppBarDivider
                   ? PreferredSize(

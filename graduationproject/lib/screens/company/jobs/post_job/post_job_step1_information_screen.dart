@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/router/app_router.dart';
+import '../../../../shared/l10n/app_localizations.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_scaffold.dart';
 import '../../../../shared/widgets/app_text_field.dart';
@@ -34,10 +35,11 @@ class _CompanyPostJobStep1InformationScreenState
   }
 
   bool _validate() {
+    final t = AppLocalizations.of(context);
     setState(
       () => _titleError = _jobTitle.text.trim().length >= 3
           ? null
-          : 'At least 3 characters',
+          : t.at3Chars,
     );
     return _titleError == null;
   }
@@ -59,24 +61,35 @@ class _CompanyPostJobStep1InformationScreenState
     );
   }
 
+  void _toggle(String type) {
+    setState(() {
+      if (_types.contains(type)) {
+        _types.remove(type);
+      } else {
+        _types.add(type);
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return AppScaffold(
-      title: 'Post a Job',
+      title: t.postJob,
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          const SectionTitle('Step 1/3 • Job Information'),
+          SectionTitle(t.step1Label),
           const SizedBox(height: 16),
           AppTextField(
-            label: 'Job title',
+            label: t.jobTitle,
             controller: _jobTitle,
-            hint: 'e.g. Software Engineer',
+            hint: t.jobTitleHint,
             validatorText: _titleError,
           ),
           const SizedBox(height: 16),
           Text(
-            'Type of Employment',
+            t.typeOfEmployment,
             style: Theme.of(context).textTheme.titleSmall,
           ),
           const SizedBox(height: 10),
@@ -112,10 +125,10 @@ class _CompanyPostJobStep1InformationScreenState
             ],
           ),
           const SizedBox(height: 16),
-          Text('Salary', style: Theme.of(context).textTheme.titleSmall),
+          Text(t.salary, style: Theme.of(context).textTheme.titleSmall),
           const SizedBox(height: 8),
           Text(
-            '\$${_salary.start.toStringAsFixed(0)} to \$${_salary.end.toStringAsFixed(0)}',
+            '\$${_salary.start.toStringAsFixed(0)} - \$${_salary.end.toStringAsFixed(0)}',
           ),
           RangeSlider(
             values: _salary,
@@ -126,7 +139,7 @@ class _CompanyPostJobStep1InformationScreenState
           ),
           const SizedBox(height: 12),
           Text(
-            'Required skills',
+            t.requiredSkills,
             style: Theme.of(context).textTheme.titleSmall,
           ),
           const SizedBox(height: 10),
@@ -142,27 +155,17 @@ class _CompanyPostJobStep1InformationScreenState
                 .toList(),
           ),
           const SizedBox(height: 16),
-          AppButton(label: 'Next Step', loading: _loading, onPressed: _next),
+          AppButton(label: t.nextStep, loading: _loading, onPressed: _next),
           const SizedBox(height: 10),
           TextButton(
             onPressed: () => Navigator.of(
               context,
             ).pushNamed(AppRoutes.companyPostJobStep1v2),
-            child: const Text('Open v2 of Step 1'),
+            child: Text(t.openV2Step1),
           ),
         ],
       ),
     );
-  }
-
-  void _toggle(String type) {
-    setState(() {
-      if (_types.contains(type)) {
-        _types.remove(type);
-      } else {
-        _types.add(type);
-      }
-    });
   }
 }
 

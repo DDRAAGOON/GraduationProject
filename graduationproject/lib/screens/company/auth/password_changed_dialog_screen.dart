@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';
+import '../../../shared/l10n/app_localizations.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_scaffold.dart';
 
@@ -9,6 +10,7 @@ class CompanyPasswordChangedDialogScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return AppScaffold(
       showBack: false,
       body: Center(
@@ -36,14 +38,14 @@ class CompanyPasswordChangedDialogScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Password Changed',
+                    t.passwordChanged,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.w800,
                         ),
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    'Password changed successfully, you can login again\nwith a new password',
+                    t.passwordChangedMsg,
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
@@ -51,7 +53,7 @@ class CompanyPasswordChangedDialogScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 18),
                   AppButton(
-                    label: 'Back to Sign in',
+                    label: t.backToSignIn,
                     onPressed: () => Navigator.of(context).pushNamedAndRemoveUntil(
                       AppRoutes.companySignIn,
                       (r) => false,
@@ -66,4 +68,3 @@ class CompanyPasswordChangedDialogScreen extends StatelessWidget {
     );
   }
 }
-

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../shared/l10n/app_localizations.dart';
 import '../../../shared/models/applicant.dart';
 import '../../../shared/widgets/app_scaffold.dart';
 import '../widgets/company_applicant_avatar.dart';
@@ -11,8 +12,9 @@ class CompanyApplicantDetailsResumeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return AppScaffold(
-      title: 'Resume',
+      title: t.resumeLabel,
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -45,7 +47,7 @@ class CompanyApplicantDetailsResumeScreen extends StatelessWidget {
             child: ListTile(
               leading: const Icon(Icons.picture_as_pdf_outlined),
               title: const Text('my_cv.pdf'),
-              subtitle: Text('498 kB • Last used'),
+              subtitle: Text('498 kB • ${t.lastUsed}'),
               trailing: const Icon(Icons.check_circle_outline),
               onTap: () {},
             ),
@@ -55,4 +57,3 @@ class CompanyApplicantDetailsResumeScreen extends StatelessWidget {
     );
   }
 }
-

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';
 import '../../../constants/app_images.dart';
+import '../../../shared/l10n/app_localizations.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_scaffold.dart';
 
@@ -10,6 +11,7 @@ class CompanyOnboardingSmartSearchScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return AppScaffold(
       showBack: false,
       body: Padding(
@@ -24,7 +26,10 @@ class CompanyOnboardingSmartSearchScreen extends StatelessWidget {
             ),
             const SizedBox(height: 22),
             Text(
-              'Your Next Job Is Closer Than\nYou Think',
+              t.tr(
+                en: 'Your Next Job Is Closer Than\nYou Think',
+                ar: 'وظيفتك القادمة أقرب مما\nتتوقع',
+              ),
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.w700,
@@ -33,7 +38,10 @@ class CompanyOnboardingSmartSearchScreen extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              'Thousands of job opportunities are waiting\nfor you',
+              t.tr(
+                en: 'Thousands of job opportunities are waiting\nfor you',
+                ar: 'آلاف فرص العمل في انتظارك',
+              ),
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
@@ -42,7 +50,7 @@ class CompanyOnboardingSmartSearchScreen extends StatelessWidget {
             ),
             const Spacer(),
             AppButton(
-              label: 'Next',
+              label: t.tr(en: 'Next', ar: 'التالي'),
               onPressed: () => Navigator.of(context).pushNamed(
                 AppRoutes.companyOnboardingNextJobCloser,
               ),

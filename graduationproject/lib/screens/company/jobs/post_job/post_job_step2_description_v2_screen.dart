@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/router/app_router.dart';
+import '../../../../shared/l10n/app_localizations.dart';
 import '../../../../shared/models/job.dart';
 import '../../../../shared/state/company_store.dart';
 import '../../../../shared/widgets/app_button.dart';
@@ -76,35 +77,36 @@ class _CompanyPostJobStep2DescriptionV2ScreenState
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return AppScaffold(
-      title: 'Post a Job',
+      title: t.postJob,
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          Text('Step 2/3', style: Theme.of(context).textTheme.labelLarge),
+          Text(t.step2Short, style: Theme.of(context).textTheme.labelLarge),
           const SizedBox(height: 14),
           AppTextField(
-            label: 'Details',
+            label: t.details,
             controller: _description,
-            hint: 'Add the description of the job...',
+            hint: t.addDescription,
             maxLines: 4,
           ),
           const SizedBox(height: 16),
           AppTextField(
-            label: 'Nice-To-Haves',
+            label: t.niceToHaves,
             controller: _niceToHave,
-            hint: 'Add nice-to-have skills and qualifications',
+            hint: t.niceToHavesHint,
             maxLines: 2,
           ),
           const SizedBox(height: 16),
           AppTextField(
-            label: 'Perks and Benefits',
+            label: t.perksAndBenefits,
             controller: _perks,
-            hint: 'List perks and benefits (comma separated)',
+            hint: t.listPerks,
             maxLines: 2,
           ),
           const SizedBox(height: 18),
-          AppButton(label: 'Save', loading: _loading, onPressed: _save),
+          AppButton(label: t.save, loading: _loading, onPressed: _save),
         ],
       ),
     );

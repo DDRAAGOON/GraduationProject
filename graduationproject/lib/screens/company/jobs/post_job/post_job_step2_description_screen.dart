@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/router/app_router.dart';
+import '../../../../shared/l10n/app_localizations.dart';
 import '../../../../shared/models/job.dart';
 import '../../../../shared/state/company_store.dart';
 import '../../../../shared/widgets/app_button.dart';
@@ -82,53 +83,54 @@ class _CompanyPostJobStep2DescriptionScreenState
   }
 
   void _addBenefit() {
-    final t = _benefitTitle.text.trim();
-    if (t.isEmpty) return;
+    final text = _benefitTitle.text.trim();
+    if (text.isEmpty) return;
     setState(() {
-      _benefits.add(t);
+      _benefits.add(text);
       _benefitTitle.clear();
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return AppScaffold(
-      title: 'Post a Job',
+      title: t.postJob,
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          const SectionTitle('Step 2/3 • Job Description'),
+          SectionTitle(t.step2Label),
           const SizedBox(height: 16),
           AppTextField(
-            label: 'Job Descriptions',
+            label: t.jobDescriptions,
             controller: _jobDescription,
-            hint: 'Add the description of the job...',
+            hint: t.addDescription,
             maxLines: 3,
           ),
           const SizedBox(height: 16),
           AppTextField(
-            label: 'What we provide (optional)',
+            label: t.whatWeProvide,
             controller: _preferred,
-            hint: 'Add preferred candidate qualifications',
+            hint: t.addPreferredQual,
             maxLines: 2,
           ),
           const SizedBox(height: 16),
           AppTextField(
-            label: 'Nice-To-Haves',
+            label: t.niceToHaves,
             controller: _niceToHave,
-            hint: 'Add nice-to-have skills and qualifications',
+            hint: t.niceToHavesHint,
             maxLines: 2,
           ),
           const SizedBox(height: 16),
           AppTextField(
-            label: 'Basic Information',
+            label: t.basicInfo,
             controller: _basicInfo,
-            hint: 'Basic info about role and company',
+            hint: t.basicInfoHint,
             maxLines: 2,
           ),
           const SizedBox(height: 16),
           Text(
-            'Perks and Benefits',
+            t.perksAndBenefits,
             style: Theme.of(context).textTheme.titleSmall,
           ),
           const SizedBox(height: 10),
@@ -137,7 +139,7 @@ class _CompanyPostJobStep2DescriptionScreenState
               Expanded(
                 child: TextField(
                   controller: _benefitTitle,
-                  decoration: const InputDecoration(hintText: 'title'),
+                  decoration: InputDecoration(hintText: t.titleLabel),
                   onSubmitted: (_) => _addBenefit(),
                 ),
               ),
@@ -163,13 +165,13 @@ class _CompanyPostJobStep2DescriptionScreenState
                   .toList(),
             ),
           const SizedBox(height: 18),
-          AppButton(label: 'Save', loading: _loading, onPressed: _save),
+          AppButton(label: t.save, loading: _loading, onPressed: _save),
           const SizedBox(height: 10),
           TextButton(
             onPressed: () => Navigator.of(
               context,
             ).pushNamed(AppRoutes.companyPostJobStep2v2),
-            child: const Text('Open v2 of Step 2'),
+            child: Text(t.openV2Step2),
           ),
         ],
       ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';
 import '../../../constants/app_images.dart';
+import '../../../shared/l10n/app_localizations.dart';
 import '../../../shared/models/job.dart';
 import '../../../shared/state/company_store.dart';
 import '../../../shared/widgets/app_scaffold.dart';
@@ -27,11 +28,15 @@ class CompanyDashboardScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 10),
-          Text(
-            companyStore.companyName,
-            style: Theme.of(
-              context,
-            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w900),
+          Flexible(
+            child: Text(
+              companyStore.companyName,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context)
+                  .textTheme
+                  .titleMedium
+                  ?.copyWith(fontWeight: FontWeight.w900),
+            ),
           ),
         ],
       ),
@@ -42,24 +47,43 @@ class CompanyDashboardScreen extends StatelessWidget {
         animation: companyStore,
         builder: (context, _) {
           final jobs = companyStore.jobs;
+          final t = AppLocalizations.of(context);
           return Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 980),
-              child: ListView(
-                padding: const EdgeInsets.all(16),
-                children: [
-                  _StatsGrid(
-                    onTapNewCandidates: () => Navigator.of(context).pushNamed(
-                      AppRoutes.companyApplicantsTable,
-                      arguments: jobs.isNotEmpty ? jobs.first : Job.mock(),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return ListView(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: constraints.maxWidth < 400 ? 12 : 16,
+                      vertical: 16,
                     ),
-                  ),
-                  const SizedBox(height: 18),
-                  const SectionTitle('Job Updates'),
-                  const SizedBox(height: 10),
-                  ...jobs.map((j) => _JobUpdateCard(job: j)),
-                  const SizedBox(height: 10),
-                ],
+                    children: [
+                      _StatsGrid(
+                        availableWidth: constraints.maxWidth,
+                        onTapNewCandidates: () =>
+                            Navigator.of(context).pushNamed(
+                              AppRoutes.companyApplicantsTable,
+                              arguments:
+                              jobs.isNotEmpty ? jobs.first : Job.mock(),
+                            ),
+                      ),
+                      const SizedBox(height: 18),
+                      SectionTitle(t.jobUpdates),
+                      const SizedBox(height: 10),
+                      ...jobs.map((j) => _JobUpdateCard(job: j)),
+                      if (jobs.isEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 14),
+                          child: Text(
+                            t.noJobsYet,
+                            style: Theme.of(context).textTheme.bodyLarge,
+                          ),
+                        ),
+                      const SizedBox(height: 10),
+                    ],
+                  );
+                },
               ),
             ),
           );
@@ -71,44 +95,62 @@ class CompanyDashboardScreen extends StatelessWidget {
 }
 
 class _StatsGrid extends StatelessWidget {
-  const _StatsGrid({required this.onTapNewCandidates});
+  const _StatsGrid({
+    required this.onTapNewCandidates,
+    required this.availableWidth,
+  });
 
   final VoidCallback onTapNewCandidates;
+  final double availableWidth;
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final t = AppLocalizations.of(context);
+
+    final int crossAxisCount = availableWidth < 360
+        ? 1
+        : availableWidth >= 700
+        ? 3
+        : 2;
+
+    final double aspectRatio = availableWidth < 360
+        ? 2.8
+        : availableWidth >= 700
+        ? 1.9
+        : 1.5;
+
+    final cards = [
+      _MetricCard(
+        title: t.newCandidates,
+        value: t.tr(en: '76', ar: '٧٦'),
+        color: cs.primary.withValues(alpha: 0.2),
+        onTap: onTapNewCandidates,
+      ),
+      _MetricCard(
+        title: t.scheduleToday,
+        value: t.tr(en: '3', ar: '٣'),
+        color: Colors.teal.withValues(alpha: 0.25),
+        onTap: () => Navigator.of(context)
+            .pushNamed(AppRoutes.companyApplicantInterviewSchedule),
+      ),
+      _MetricCard(
+        title: t.messagesReceived,
+        value: t.tr(en: '24', ar: '٢٤'),
+        color: Colors.orange.withValues(alpha: 0.25),
+        onTap: () => Navigator.of(context)
+            .pushReplacementNamed(AppRoutes.companyMessagesList),
+      ),
+    ];
+
     return GridView.count(
-      crossAxisCount: 2,
+      crossAxisCount: crossAxisCount,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       crossAxisSpacing: 12,
       mainAxisSpacing: 12,
-      childAspectRatio: 1.7,
-      children: [
-        _MetricCard(
-          title: 'New candidates\nto review',
-          value: '76',
-          color: cs.primary.withValues(alpha: 0.2),
-          onTap: onTapNewCandidates,
-        ),
-        _MetricCard(
-          title: 'Schedule\nfor today',
-          value: '3',
-          color: Colors.teal.withValues(alpha: 0.25),
-          onTap: () => Navigator.of(
-            context,
-          ).pushNamed(AppRoutes.companyApplicantInterviewSchedule),
-        ),
-        _MetricCard(
-          title: 'Messages\nreceived',
-          value: '24',
-          color: Colors.orange.withValues(alpha: 0.25),
-          onTap: () => Navigator.of(
-            context,
-          ).pushReplacementNamed(AppRoutes.companyMessagesList),
-        ),
-      ],
+      childAspectRatio: aspectRatio,
+      children: cards,
     );
   }
 }
@@ -139,17 +181,31 @@ class _MetricCard extends StatelessWidget {
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(title, style: Theme.of(context).textTheme.labelLarge),
-                    const Spacer(),
-                    Text(
-                      value,
-                      style: Theme.of(context).textTheme.headlineSmall
-                          ?.copyWith(fontWeight: FontWeight.w900),
+                    Flexible(
+                      child: Text(
+                        title,
+                        style: Theme.of(context).textTheme.labelLarge,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
+                      ),
+                    ),
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: AlignmentDirectional.centerStart,
+                      child: Text(
+                        value,
+                        style: Theme.of(context)
+                            .textTheme
+                            .headlineSmall
+                            ?.copyWith(fontWeight: FontWeight.w900),
+                      ),
                     ),
                   ],
                 ),
               ),
+              const SizedBox(width: 8),
               Container(
                 width: 38,
                 height: 38,
@@ -174,12 +230,12 @@ class _JobUpdateCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: InkWell(
-        onTap: () => Navigator.of(
-          context,
-        ).pushNamed(AppRoutes.companyJobDetails, arguments: job),
+        onTap: () => Navigator.of(context)
+            .pushNamed(AppRoutes.companyJobDetails, arguments: job),
         borderRadius: BorderRadius.circular(18),
         child: Card(
           child: Padding(
@@ -193,17 +249,28 @@ class _JobUpdateCard extends StatelessWidget {
                       child: Text(
                         job.title,
                         style: Theme.of(context).textTheme.titleMedium,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
                       ),
                     ),
                     IconButton(
-                      tooltip: 'Edit',
-                      onPressed: () => Navigator.of(
-                        context,
-                      ).pushNamed(AppRoutes.companyJobDetails, arguments: job),
+                      tooltip: t.edit,
+                      constraints: const BoxConstraints(
+                        minWidth: 36,
+                        minHeight: 36,
+                      ),
+                      padding: EdgeInsets.zero,
+                      onPressed: () => Navigator.of(context)
+                          .pushNamed(AppRoutes.companyJobDetails, arguments: job),
                       icon: const Icon(Icons.edit_outlined, size: 20),
                     ),
                     IconButton(
-                      tooltip: 'Delete',
+                      tooltip: t.delete,
+                      constraints: const BoxConstraints(
+                        minWidth: 36,
+                        minHeight: 36,
+                      ),
+                      padding: EdgeInsets.zero,
                       onPressed: () => _confirmDelete(context),
                       icon: const Icon(Icons.delete_outline, size: 20),
                     ),
@@ -213,25 +280,30 @@ class _JobUpdateCard extends StatelessWidget {
                 Text(
                   '${job.companyName} • ${job.location} • ${job.employmentType}',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.onSurface.withValues(alpha: 0.7),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.7),
                   ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
                 ),
                 const SizedBox(height: 10),
-                Row(
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 6,
+                  alignment: WrapAlignment.spaceBetween,
                   children: [
                     _Chip(job.category),
-                    const SizedBox(width: 8),
                     _Chip(job.employmentType),
-                    const Spacer(),
                     if (job.appliedCount != null && job.capacity != null)
                       Text(
-                        '${job.appliedCount} applied of ${job.capacity}',
+                        '${job.appliedCount} ${t.appliedOf} ${job.capacity}',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.onSurface.withValues(alpha: 0.7),
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.7),
                         ),
                       ),
                   ],
@@ -245,19 +317,20 @@ class _JobUpdateCard extends StatelessWidget {
   }
 
   Future<void> _confirmDelete(BuildContext context) async {
+    final t = AppLocalizations.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Delete job post?'),
-        content: Text('This will permanently delete "${job.title}".'),
+        title: Text(t.deleteJobTitle),
+        content: Text(t.deleteJobContent(job.title)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancel'),
+            child: Text(t.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('Delete'),
+            child: Text(t.delete),
           ),
         ],
       ),
@@ -265,9 +338,8 @@ class _JobUpdateCard extends StatelessWidget {
     if (confirmed != true) return;
     CompanyStore.instance.deleteJob(job.id);
     if (context.mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Job deleted')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(t.jobDeleted)));
     }
   }
 }
@@ -285,7 +357,11 @@ class _Chip extends StatelessWidget {
         color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(14),
       ),
-      child: Text(text, style: Theme.of(context).textTheme.labelSmall),
+      child: Text(
+        text,
+        style: Theme.of(context).textTheme.labelSmall,
+        overflow: TextOverflow.ellipsis,
+      ),
     );
   }
 }
