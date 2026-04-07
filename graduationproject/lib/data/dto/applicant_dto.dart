@@ -1,3 +1,5 @@
+// Map/JSON helpers around [Applicant] for API integration.
+
 import '../../shared/models/applicant.dart';
 
 final class ApplicantDto {

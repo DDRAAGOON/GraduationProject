@@ -1,3 +1,5 @@
+// Avatar chip for applicants in lists and chat headers.
+
 import 'package:flutter/material.dart';
 
 import '../../../constants/app_images.dart';

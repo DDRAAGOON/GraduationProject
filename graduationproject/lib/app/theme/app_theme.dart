@@ -1,3 +1,5 @@
+// Light/dark [ThemeData], color tokens, and component themes.
+
 import 'package:flutter/material.dart';
 
 final class AppTheme {

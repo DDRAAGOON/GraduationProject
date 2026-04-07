@@ -1,3 +1,5 @@
+// In-memory [CompanyRepository] for UI development and tests.
+
 import '../../shared/mock/mock_data.dart';
 import '../../shared/models/applicant.dart';
 import '../../shared/models/job.dart';

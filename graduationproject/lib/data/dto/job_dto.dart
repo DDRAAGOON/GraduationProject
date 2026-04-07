@@ -1,3 +1,5 @@
+// Map/JSON helpers around [Job] for API integration.
+
 import '../../shared/models/job.dart';
 
 final class JobDto {

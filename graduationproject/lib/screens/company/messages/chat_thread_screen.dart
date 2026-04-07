@@ -1,3 +1,5 @@
+// Message thread between company and candidate.
+
 import 'package:flutter/material.dart';
 
 import '../../../shared/l10n/app_localizations.dart';

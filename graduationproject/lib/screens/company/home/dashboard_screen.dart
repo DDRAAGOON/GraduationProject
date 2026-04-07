@@ -1,3 +1,5 @@
+// Company home: KPIs, shortcuts, and recent jobs.
+
 import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';

@@ -1,3 +1,5 @@
+// Profile settings hub for the company account.
+
 import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';

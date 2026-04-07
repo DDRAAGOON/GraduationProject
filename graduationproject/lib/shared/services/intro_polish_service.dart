@@ -1,3 +1,5 @@
+// Offline intro polish; replace with a remote LLM for production.
+
 import 'dart:convert';
 
 /// Offline “LinkedIn-style” polish: improves English and builds a professional

@@ -1,3 +1,5 @@
+// Onboarding carousel / value prop screen.
+
 import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';

@@ -1,3 +1,5 @@
+// Primary filled button used across flows.
+
 import 'package:flutter/material.dart';
 
 class AppButton extends StatelessWidget {

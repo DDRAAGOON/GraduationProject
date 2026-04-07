@@ -1,4 +1,7 @@
+// Company flow: collect email/phone and continue to OTP or reset.
+
 import 'package:flutter/material.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
 
 import '../../../app/router/app_router.dart';
 import '../../../shared/l10n/app_localizations.dart';
@@ -17,7 +20,7 @@ class CompanyForgotPasswordScreen extends StatefulWidget {
 class _CompanyForgotPasswordScreenState
     extends State<CompanyForgotPasswordScreen> {
   final _email = TextEditingController();
-  final _mobile = TextEditingController(text: '+92');
+  final _mobile = TextEditingController();
   bool _loading = false;
 
   String? _emailError;
@@ -85,12 +88,59 @@ class _CompanyForgotPasswordScreenState
             validatorText: _emailError,
           ),
           const SizedBox(height: 16),
-          AppTextField(
-            label: t.tr(en: 'Mobile Number', ar: 'رقم الهاتف'),
-            controller: _mobile,
-            hint: t.tr(en: 'Enter mobile number', ar: 'أدخل رقم الهاتف'),
-            keyboardType: TextInputType.phone,
-            validatorText: _mobileError,
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                t.tr(en: 'Mobile Number', ar: 'رقم الهاتف'),
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+              ),
+              const SizedBox(height: 8),
+              IntlPhoneField(
+                controller: _mobile,
+                decoration: InputDecoration(
+                  hintText: t.tr(en: 'Enter mobile number', ar: 'أدخل رقم الهاتف'),
+                  errorText: _mobileError,
+                  filled: true,
+                  fillColor: Theme.of(context).colorScheme.surfaceBright,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: Theme.of(context).colorScheme.primary,
+                      width: 1.5,
+                    ),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 16,
+                  ),
+                ),
+                initialCountryCode: 'EG',
+                flagsButtonPadding: const EdgeInsets.symmetric(horizontal: 8),
+                dropdownDecoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+                  ),
+                ),
+                onChanged: (phone) {
+                  if (_mobileError != null) {
+                    setState(() => _mobileError = null);
+                  }
+                },
+              ),
+            ],
           ),
           const SizedBox(height: 20),
           AppButton(

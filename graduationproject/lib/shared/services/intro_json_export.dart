@@ -1,3 +1,5 @@
+// Writes intro JSON files next to app documents (matches asset shape).
+
 import 'dart:convert';
 import 'dart:io';
 

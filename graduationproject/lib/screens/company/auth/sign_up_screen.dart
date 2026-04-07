@@ -1,5 +1,8 @@
+// Company registration form and navigation to next steps.
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
 
 import '../../../app/router/app_router.dart';
 import '../../../shared/l10n/app_localizations.dart';
@@ -17,7 +20,7 @@ class CompanySignUpScreen extends StatefulWidget {
 class _CompanySignUpScreenState extends State<CompanySignUpScreen> {
   final _companyName = TextEditingController();
   final _email = TextEditingController();
-  final _companyNumber = TextEditingController(text: '+92');
+  final _companyNumber = TextEditingController();
   final _password = TextEditingController();
   final _confirmPassword = TextEditingController();
   final _address = TextEditingController();
@@ -113,15 +116,59 @@ class _CompanySignUpScreenState extends State<CompanySignUpScreen> {
                 _emailError == null ? null : setState(() => _emailError = null),
           ),
           const SizedBox(height: 16),
-          AppTextField(
-            label: t.companyNumber,
-            controller: _companyNumber,
-            hint: t.enterCompanyNumberHint,
-            keyboardType: TextInputType.phone,
-            validatorText: _companyNumberError,
-            onChanged: (_) => _companyNumberError == null
-                ? null
-                : setState(() => _companyNumberError = null),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                t.companyNumber,
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+              ),
+              const SizedBox(height: 8),
+              IntlPhoneField(
+                controller: _companyNumber,
+                decoration: InputDecoration(
+                  hintText: t.enterCompanyNumberHint,
+                  errorText: _companyNumberError,
+                  filled: true,
+                  fillColor: Theme.of(context).colorScheme.surfaceBright,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: Theme.of(context).colorScheme.primary,
+                      width: 1.5,
+                    ),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 16,
+                  ),
+                ),
+                initialCountryCode: 'EG',
+                flagsButtonPadding: const EdgeInsets.symmetric(horizontal: 8),
+                dropdownDecoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+                  ),
+                ),
+                onChanged: (phone) {
+                  if (_companyNumberError != null) {
+                    setState(() => _companyNumberError = null);
+                  }
+                },
+              ),
+            ],
           ),
           const SizedBox(height: 16),
           AppTextField(

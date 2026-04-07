@@ -1,3 +1,5 @@
+// Shared [Scaffold] with app bar, back behavior, and optional bottom bar.
+
 import 'package:flutter/material.dart';
 
 import '../../app/router/app_router.dart';

@@ -1,3 +1,5 @@
+// Alternate chat layout for a candidate conversation.
+
 import 'package:flutter/material.dart';
 
 import '../../../shared/l10n/app_localizations.dart';

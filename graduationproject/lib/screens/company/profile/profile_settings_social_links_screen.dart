@@ -1,3 +1,5 @@
+// Edit social and external links on the company profile.
+
 import 'package:flutter/material.dart';
 
 import '../../../shared/models/contact_entry.dart';

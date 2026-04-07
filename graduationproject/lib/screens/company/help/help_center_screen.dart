@@ -1,3 +1,5 @@
+// Company help topics and support entry points.
+
 import 'package:flutter/material.dart';
 
 import '../../../shared/l10n/app_localizations.dart';

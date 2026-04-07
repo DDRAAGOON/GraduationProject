@@ -1,3 +1,5 @@
+// Kanban-style pipeline of applicants by stage.
+
 import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';

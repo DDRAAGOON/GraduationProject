@@ -1,3 +1,5 @@
+// Central asset paths for illustrations and icons.
+
 class AppImages {
   const AppImages._();
 

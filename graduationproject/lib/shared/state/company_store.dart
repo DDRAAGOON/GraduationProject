@@ -1,32 +1,46 @@
+// [ChangeNotifier] holding company profile, jobs, and contacts.
+
 import 'package:flutter/foundation.dart';
 
 import '../../constants/app_images.dart';
 import '../models/contact_entry.dart';
 import '../models/job.dart';
 
+/// The [CompanyStore] acts as the central state management layer for the application.
+/// It uses the [ChangeNotifier] mixin to broadcast updates to the UI whenever
+/// the company's profile, job listings, or contact details change.
 class CompanyStore extends ChangeNotifier {
   CompanyStore._();
 
+  /// The static singleton instance of [CompanyStore].
+  /// This prevents multiple and conflicting instances from being created.
   static final CompanyStore instance = CompanyStore._();
 
+  // --- Company Basic Details ---
   String _companyName = 'Nomad';
   String _website = 'https://www.nomad.com';
   String _employee = '1 - 50';
   String _industry = 'Technology';
 
+  // --- Company Extended Details ---
   List<String> _locations = ['England', 'Japan', 'Australia'];
   List<String> _techStack = ['HTML 5', 'CSS 3', 'Javascript'];
 
+  // --- Date Founded ---
   int _foundedDay = 31;
   int _foundedMonth = 7;
   int _foundedYear = 2021;
 
+  // Public getters to access state securely
   String get companyName => _companyName;
   String get website => _website;
   String get employee => _employee;
   String get industry => _industry;
   
+  /// Returns an unmodifiable list of locations to prevent accidental mutations.
   List<String> get locations => List.unmodifiable(_locations);
+  
+  /// Returns an unmodifiable list of the underlying technology stack.
   List<String> get techStack => List.unmodifiable(_techStack);
   
   int get foundedDay => _foundedDay;
@@ -52,12 +66,17 @@ class CompanyStore extends ChangeNotifier {
   String get companyAboutEn => _aboutEn;
   String get companyAboutAr => _aboutAr;
 
+  /// Updates the localized company introduction and notifies UI listeners.
+  /// 
+  /// [english] The introduction text in English.
+  /// [arabic] The introduction text in Arabic.
   void setCompanyIntro({required String english, required String arabic}) {
     _aboutEn = english;
     _aboutAr = arabic;
     notifyListeners();
   }
 
+  /// Updates the master profile variables and alerts the app to redraw.
   void updateProfile({
     required String name,
     required String website,
@@ -85,7 +104,12 @@ class CompanyStore extends ChangeNotifier {
     notifyListeners();
   }
 
+  // --- Associated Entities: Jobs & Contacts ---
+  
+  /// Holds the list of dynamically managed jobs for the company.
   final List<Job> _jobs = [...Job.mockList()];
+  
+  /// Holds contact details like social links and emails.
   final List<ContactEntry> _contacts = [
     const ContactEntry(name: 'Twitter', value: 'twitter.com/Nomad'),
     const ContactEntry(name: 'Facebook', value: 'facebook.com/NomadHQ'),
@@ -96,10 +120,12 @@ class CompanyStore extends ChangeNotifier {
   List<Job> get jobs => List<Job>.unmodifiable(_jobs);
   List<ContactEntry> get contacts => List<ContactEntry>.unmodifiable(_contacts);
 
+  /// Retrieves a specific job by its ID, returning a mock fallback if not found.
   Job jobById(String id) {
     return _jobs.firstWhere((job) => job.id == id, orElse: Job.mock);
   }
 
+  /// Inserts a new job at the top of the list or updates an existing one if ID matches.
   void saveJob(Job job) {
     final index = _jobs.indexWhere((j) => j.id == job.id);
     if (index >= 0) {
@@ -110,6 +136,8 @@ class CompanyStore extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Deletes a job from the current list using its unique ID.
+  /// Returns `true` if the deletion triggered an item removal and UI update.
   bool deleteJob(String id) {
     final before = _jobs.length;
     _jobs.removeWhere((job) => job.id == id);

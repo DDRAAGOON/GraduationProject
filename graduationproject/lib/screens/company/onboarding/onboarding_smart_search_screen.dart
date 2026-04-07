@@ -1,3 +1,5 @@
+// Onboarding: smart search positioning before app shell.
+
 import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';

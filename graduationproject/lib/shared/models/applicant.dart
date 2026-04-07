@@ -1,4 +1,7 @@
+/// The [Applicant] model contains details about a candidate moving through
+/// the hiring pipeline stages (e.g. In Review, Interview, Hired).
 final class Applicant {
+  /// Constructs a new [Applicant] instance.
   Applicant({
     required this.id,
     required this.fullName,
@@ -21,6 +24,7 @@ final class Applicant {
   final String location;
   final String appliedDateLabel;
 
+  /// Generates a static mock [Applicant] to populate the UI templates.
   static Applicant mock() => Applicant(
         id: 'app_1',
         fullName: 'Jerome Bell',

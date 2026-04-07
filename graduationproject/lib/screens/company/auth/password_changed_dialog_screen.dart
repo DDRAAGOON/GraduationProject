@@ -1,3 +1,5 @@
+// Confirmation UI after a successful password change.
+
 import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';

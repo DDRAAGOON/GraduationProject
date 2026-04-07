@@ -1,3 +1,5 @@
+// Bold section title for form and list screens.
+
 import 'package:flutter/material.dart';
 
 class SectionTitle extends StatelessWidget {

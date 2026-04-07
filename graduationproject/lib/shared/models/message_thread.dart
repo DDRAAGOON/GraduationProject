@@ -1,4 +1,7 @@
+/// The [MessageThread] model represents a distinct conversation summary.
+/// It tracks the sender, latest subtitle, and localized timestamps.
 final class MessageThread {
+  /// Consructs a new [MessageThread].
   const MessageThread({
     required this.id,
     required this.title,

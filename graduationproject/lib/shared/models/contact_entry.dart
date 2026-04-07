@@ -1,3 +1,5 @@
+// Key-value pair for a labeled company contact field.
+
 final class ContactEntry {
   const ContactEntry({required this.name, required this.value});
 

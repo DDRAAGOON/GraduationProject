@@ -1,3 +1,5 @@
+// Theme and language appearance settings.
+
 import 'package:flutter/material.dart';
 
 import '../../../shared/l10n/app_localizations.dart';

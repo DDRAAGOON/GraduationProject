@@ -1,3 +1,5 @@
+// Per-channel notification toggles.
+
 import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';

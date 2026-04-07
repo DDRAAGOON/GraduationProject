@@ -1,3 +1,5 @@
+// List and search all jobs for the signed-in company.
+
 import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';

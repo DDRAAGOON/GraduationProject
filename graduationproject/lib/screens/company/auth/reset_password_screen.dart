@@ -1,3 +1,5 @@
+// Company flow: enter and confirm a new password.
+
 import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';

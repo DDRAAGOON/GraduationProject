@@ -1,3 +1,5 @@
+// Read-only applicant profile details for recruiters.
+
 import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';

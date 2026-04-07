@@ -1,3 +1,5 @@
+// Persists and exposes the active app [Locale].
+
 import 'package:flutter/widgets.dart';
 
 class LocaleController {

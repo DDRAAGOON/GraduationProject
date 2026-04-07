@@ -1,3 +1,5 @@
+// Interview stage summary inside the hiring funnel.
+
 import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';

@@ -1,3 +1,5 @@
+// Base URL placeholder and REST path constants for the backend.
+
 final class ApiEndpoints {
   const ApiEndpoints._();
 

@@ -1,3 +1,5 @@
+// Skeleton HTTP client for company API calls (extend when wiring `http`).
+
 import 'api_endpoints.dart';
 
 // Skeleton API client.

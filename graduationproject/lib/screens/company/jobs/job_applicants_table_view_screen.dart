@@ -1,3 +1,5 @@
+// Tabular list of applicants for a job.
+
 import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';

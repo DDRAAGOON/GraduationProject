@@ -1,3 +1,5 @@
+// Styled text field with label, hint, and inline validation text.
+
 import 'package:flutter/material.dart';
 
 class AppTextField extends StatelessWidget {

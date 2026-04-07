@@ -1,3 +1,5 @@
+// Shared sample lists for jobs, applicants, and message threads.
+
 import '../models/applicant.dart';
 import '../models/job.dart';
 import '../models/message_thread.dart';

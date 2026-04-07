@@ -1,3 +1,5 @@
+// Named routes ([AppRoutes]) and [AppRouter.onGenerateRoute] for the whole app.
+
 import 'package:flutter/material.dart';
 
 import '../../screens/company/auth/forgot_password_screen.dart';
@@ -39,13 +41,17 @@ import '../../shared/models/applicant.dart';
 import '../../shared/models/job.dart';
 import '../../shared/models/message_thread.dart';
 
+/// The [AppRoutes] class serves as a centralized registry for all named route string constants
+/// used to navigate through the application. Using this class avoids hard-coded strings.
 final class AppRoutes {
+  // --- Company Onboarding Routes ---
   static const companyOnboardingSmartSearch = '/company/onboarding/smart_search';
   static const companyOnboardingNextJobCloser =
       '/company/onboarding/next_job_closer';
   static const companyOnboardingFutureStarts =
       '/company/onboarding/future_starts';
 
+  // --- Company Authentication Routes ---
   static const companySignIn = '/company/auth/sign_in';
   static const companySignUp = '/company/auth/sign_up';
   static const companyForgotPassword = '/company/auth/forgot_password';
@@ -89,7 +95,10 @@ final class AppRoutes {
   static const companyHelpCenter = '/company/help/center';
 }
 
+/// The [AppRouter] is responsible for generating route transitions and providing
+/// the requested screen widget mapped to [RouteSettings.name].
 final class AppRouter {
+  /// Resolves a named route to a [MaterialPageRoute] containing the requested screen.
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     final name = settings.name;
     final args = settings.arguments;

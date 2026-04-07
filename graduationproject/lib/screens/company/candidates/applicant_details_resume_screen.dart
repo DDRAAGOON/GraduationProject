@@ -1,3 +1,5 @@
+// Resume / document view for an applicant.
+
 import 'package:flutter/material.dart';
 
 import '../../../shared/l10n/app_localizations.dart';

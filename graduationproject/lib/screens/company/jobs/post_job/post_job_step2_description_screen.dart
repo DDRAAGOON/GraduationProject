@@ -1,3 +1,5 @@
+// Post job wizard — step 2: description and publish.
+
 import 'package:flutter/material.dart';
 
 import '../../../../app/router/app_router.dart';

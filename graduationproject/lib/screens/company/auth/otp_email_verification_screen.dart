@@ -1,3 +1,5 @@
+// Company flow: OTP input, resend timer, and success navigation.
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -23,7 +25,7 @@ class _CompanyOtpEmailVerificationScreenState
   final _c2 = TextEditingController();
   final _c3 = TextEditingController();
   final _c4 = TextEditingController();
-  int _seconds = 540;
+  int _seconds = 120;
   Timer? _timer;
   bool _loading = false;
   String? _error;
@@ -68,7 +70,7 @@ class _CompanyOtpEmailVerificationScreenState
 
   void _resend() {
     setState(() {
-      _seconds = 540;
+      _seconds = 120;
       _error = null;
     });
   }

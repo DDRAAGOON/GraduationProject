@@ -1,3 +1,5 @@
+// Persists and exposes light/dark/system [ThemeMode].
+
 import 'package:flutter/material.dart';
 
 class ThemeController {

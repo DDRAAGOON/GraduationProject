@@ -1,3 +1,5 @@
+// Bilingual company “about” editor with polish/export helpers.
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 

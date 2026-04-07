@@ -1,3 +1,5 @@
+// [CompanyRepository] backed by the network layer.
+
 import '../api/company_api_client.dart';
 import '../../shared/models/applicant.dart';
 import '../../shared/models/job.dart';

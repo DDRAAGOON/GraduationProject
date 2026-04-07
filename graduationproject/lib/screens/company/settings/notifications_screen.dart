@@ -1,3 +1,5 @@
+// Notifications overview and deep links to detail settings.
+
 import 'package:flutter/material.dart';
 
 import '../../../shared/widgets/app_scaffold.dart';

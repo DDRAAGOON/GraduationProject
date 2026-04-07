@@ -1,3 +1,5 @@
+// Dark theme preview and related appearance options.
+
 import 'package:flutter/material.dart';
 
 import 'appearance_settings_screen.dart';

@@ -1,3 +1,5 @@
+// Simple AR/EN strings and [LocalizationsDelegate] (no codegen).
+
 import 'package:flutter/widgets.dart';
 
 class AppLocalizations {

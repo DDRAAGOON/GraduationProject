@@ -1,3 +1,5 @@
+// Shared app-bar icons (e.g. messages) for company shell screens.
+
 import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';

@@ -1,3 +1,5 @@
+// Company settings root: account, appearance, help, sign out.
+
 import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';
@@ -12,9 +14,12 @@ class CompanySettingsScreen extends StatelessWidget {
     final t = AppLocalizations.of(context);
     return AppScaffold(
       title: t.settings,
-      body: ListView(
-        padding: const EdgeInsets.all(16),
+      body: Column(
         children: [
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
           _SettingTile(
             title: t.profileSettings,
             icon: Icons.person_outline,
@@ -26,11 +31,43 @@ class CompanySettingsScreen extends StatelessWidget {
             icon: Icons.palette_outlined,
             onTap: () => Navigator.of(context).pushNamed(AppRoutes.companyAppearanceLight),
           ),
-          const SizedBox(height: 8),
-          _SettingTile(
-            title: t.helpCenter,
-            icon: Icons.help_outline,
-            onTap: () => Navigator.of(context).pushNamed(AppRoutes.companyHelpCenter),
+        ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextButton.icon(
+                  onPressed: () => Navigator.of(context).pushNamed(AppRoutes.companyHelpCenter),
+                  icon: const Icon(Icons.info_outline),
+                  label: Text(
+                    t.helpCenter,
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  style: TextButton.styleFrom(
+                    foregroundColor: const Color(0xFFFF6C52),
+                    padding: EdgeInsets.zero,
+                  ),
+                ),
+                TextButton.icon(
+                  onPressed: () {
+                    // TODO: Implement actual logout
+                    Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.companySignIn, (route) => false);
+                  },
+                  icon: const Icon(Icons.logout),
+                  label: Text(
+                    t.tr(en: 'Logout', ar: 'تسجيل خروج'),
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  style: TextButton.styleFrom(
+                    foregroundColor: const Color(0xFFFF6C52),
+                    padding: EdgeInsets.zero,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),

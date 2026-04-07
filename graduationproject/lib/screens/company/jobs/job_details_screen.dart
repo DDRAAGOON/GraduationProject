@@ -1,3 +1,5 @@
+// Full job posting details and management actions.
+
 import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';

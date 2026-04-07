@@ -1,3 +1,5 @@
+// Map/JSON helpers around [MessageThread] for API integration.
+
 import '../../shared/models/message_thread.dart';
 
 final class MessageThreadDto {

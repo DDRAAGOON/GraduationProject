@@ -1,3 +1,5 @@
+// Charts and stats for a single job posting.
+
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 

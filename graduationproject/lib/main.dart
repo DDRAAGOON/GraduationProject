@@ -1,3 +1,5 @@
+// Application entrypoint: initializes Flutter bindings and runs the root [App].
+
 import 'package:flutter/widgets.dart';
 
 import 'app/app.dart';

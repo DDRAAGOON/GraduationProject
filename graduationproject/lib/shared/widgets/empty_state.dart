@@ -1,3 +1,5 @@
+// Illustration + title + subtitle empty state.
+
 import 'package:flutter/material.dart';
 
 class EmptyState extends StatelessWidget {

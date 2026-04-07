@@ -1,4 +1,7 @@
+/// The [Job] model represents a job posting created by a company.
+/// It holds critical details used across the jobs hub and analytics screens.
 final class Job {
+  /// Constructs a new [Job] instance.
   Job({
     required this.id,
     required this.title,
@@ -27,6 +30,7 @@ final class Job {
   final int? appliedCount;
   final int? capacity;
 
+  /// Creates a copy of the current [Job] while allowing specific fields to be updated.
   Job copyWith({
     String? id,
     String? title,
@@ -57,6 +61,7 @@ final class Job {
     );
   }
 
+  /// Generates a mock [Job] instance primarily for UI testing purposes.
   static Job mock() => Job(
     id: 'job_1',
     title: 'Social Media Assistant',

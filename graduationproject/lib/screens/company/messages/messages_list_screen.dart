@@ -1,3 +1,5 @@
+// Inbox of recruiter message threads.
+
 import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';

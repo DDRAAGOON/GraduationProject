@@ -1,3 +1,5 @@
+// Onboarding screen leading toward sign-in or sign-up.
+
 import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';

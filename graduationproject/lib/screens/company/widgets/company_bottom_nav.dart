@@ -1,3 +1,5 @@
+// Bottom navigation for the recruiter main tabs.
+
 import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';

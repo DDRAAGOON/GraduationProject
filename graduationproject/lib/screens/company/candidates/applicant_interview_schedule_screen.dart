@@ -1,3 +1,5 @@
+// Schedule or edit interview slots for a candidate.
+
 import 'package:flutter/material.dart';
 
 import '../../../shared/l10n/app_localizations.dart';
