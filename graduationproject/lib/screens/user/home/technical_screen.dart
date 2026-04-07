@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import '../core/app_colors.dart';
-import '../../../constants/app_images.dart';
-import '../jobs/jobs_filters_screen.dart';
 import '../notifications/notifications_screen.dart';
 import '../settings/setting_screen.dart';
 
@@ -160,14 +158,26 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
   }
 
   Widget _buildCategoryTabs() {
+    const tabBarHorizontalPadding = 5.0;
+    const tabBarVerticalPadding = 6.0;
+    const betweenTabs = 10.0;
+
     return Container(
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(color: Colors.white.withOpacity(0.05), borderRadius: BorderRadius.circular(30)),
+      padding: const EdgeInsets.symmetric(
+        horizontal: tabBarHorizontalPadding,
+        vertical: tabBarVerticalPadding,
+      ),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(30),
+      ),
       child: Row(
         children: [
-          _buildTabItem("technical"),
-          _buildTabItem("NonTechnical"),
-          _buildTabItem("Serves"),
+          Expanded(child: _buildTabItem("Technical")),
+          const SizedBox(width: betweenTabs),
+          Expanded(child: _buildTabItem("NonTechnical")),
+          const SizedBox(width: betweenTabs),
+          Expanded(child: _buildTabItem("Serves")),
         ],
       ),
     );
@@ -175,23 +185,21 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
 
   Widget _buildTabItem(String label) {
     bool isSelected = _selectedCategory == label;
-    return Expanded(
-      child: GestureDetector(
-        onTap: () => setState(() => _selectedCategory = label),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          decoration: BoxDecoration(
-            color: isSelected ? const Color(0xFF001E3A) : const Color(0xFFBDD8E9),
-            borderRadius: BorderRadius.circular(25),
-          ),
-          child: Text(
-            label,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: isSelected ? Colors.white : const Color(0xFF094174),
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.bold,
-              fontSize: 12,
-            ),
+    return GestureDetector(
+      onTap: () => setState(() => _selectedCategory = label),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFF001E3A) : const Color(0xFFBDD8E9),
+          borderRadius: BorderRadius.circular(25),
+        ),
+        child: Text(
+          label,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: isSelected ? Colors.white : const Color(0xFF094174),
+            fontWeight: FontWeight.bold,
+            fontSize: 11,
           ),
         ),
       ),
@@ -217,7 +225,7 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
           Column(
             children: [
               const SizedBox(height: 10),
-              ...items.map((item) => _buildCheckbox(item)).toList(),
+              ...items.map((item) => _buildCheckbox(item)),
             ],
           ),
       ],
