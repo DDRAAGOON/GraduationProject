@@ -60,7 +60,7 @@ class CompanyApplicantInterviewScheduleScreen extends StatelessWidget {
   }
 }
 
-class _ScheduleTile extends StatelessWidget {
+class _ScheduleTile extends StatefulWidget {
   const _ScheduleTile({
     required this.name,
     required this.time,
@@ -74,6 +74,55 @@ class _ScheduleTile extends StatelessWidget {
   final String stage;
 
   @override
+  State<_ScheduleTile> createState() => _ScheduleTileState();
+}
+
+class _ScheduleTileState extends State<_ScheduleTile> {
+  String? _feedback;
+
+  Future<void> _addFeedbackDialog(AppLocalizations t) async {
+    final controller = TextEditingController(text: _feedback);
+    final formKey = GlobalKey<FormState>();
+
+    final result = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(t.addFeedback),
+        content: Form(
+          key: formKey,
+          child: TextFormField(
+            controller: controller,
+            decoration: InputDecoration(
+              hintText: t.tr(en: 'Enter your feedback', ar: 'أدخل تعليقك'),
+              border: const OutlineInputBorder(),
+            ),
+            maxLines: 3,
+            validator: (v) => (v == null || v.trim().isEmpty) ? '*' : null,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(t.cancel),
+          ),
+          FilledButton(
+            onPressed: () {
+              if (formKey.currentState!.validate()) {
+                Navigator.pop(ctx, controller.text.trim());
+              }
+            },
+            child: Text(t.save),
+          ),
+        ],
+      ),
+    );
+
+    if (result != null) {
+      setState(() => _feedback = result);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     return Card(
@@ -85,27 +134,66 @@ class _ScheduleTile extends StatelessWidget {
           children: [
             Row(
               children: [
-                Expanded(child: Text(name, style: const TextStyle(fontWeight: FontWeight.w700))),
-                Text(time, style: Theme.of(context).textTheme.bodySmall),
+                Expanded(child: Text(widget.name, style: const TextStyle(fontWeight: FontWeight.w700))),
+                Text(widget.time, style: Theme.of(context).textTheme.bodySmall),
               ],
             ),
             const SizedBox(height: 6),
-            Text(stage, style: Theme.of(context).textTheme.bodySmall),
+            Text(widget.stage, style: Theme.of(context).textTheme.bodySmall),
             const SizedBox(height: 10),
             Text(
-              place,
+              widget.place,
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
               ),
             ),
-            const SizedBox(height: 10),
-            Align(
-              alignment: t.isAr ? Alignment.centerRight : Alignment.centerLeft,
-              child: OutlinedButton(
-                onPressed: () {},
-                child: Text(t.addFeedback),
+            if (_feedback != null) ...[
+              const SizedBox(height: 14),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          t.tr(en: 'Feedback', ar: 'التعليقات'),
+                          style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 12),
+                        ),
+                        InkWell(
+                          onTap: () => _addFeedbackDialog(t),
+                          child: Text(
+                            t.tr(en: 'Edit', ar: 'تعديل'),
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.primary,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(_feedback!, style: Theme.of(context).textTheme.bodyMedium),
+                  ],
+                ),
               ),
-            ),
+            ] else ...[
+              const SizedBox(height: 10),
+              Align(
+                alignment: t.isAr ? Alignment.centerRight : Alignment.centerLeft,
+                child: OutlinedButton(
+                  onPressed: () => _addFeedbackDialog(t),
+                  child: Text(t.addFeedback),
+                ),
+              ),
+            ],
           ],
         ),
       ),

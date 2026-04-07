@@ -3,13 +3,16 @@ import 'package:flutter/material.dart';
 import '../../../app/router/app_router.dart';
 import '../../../constants/app_images.dart';
 
+import '../../../shared/l10n/app_localizations.dart';
+
 class CompanyProfileLeading extends StatelessWidget {
   const CompanyProfileLeading({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return IconButton(
-      tooltip: 'Company profile',
+      tooltip: t.profile,
       onPressed: () =>
           Navigator.of(context).pushNamed(AppRoutes.companyProfileOverview),
       icon: ClipOval(
@@ -29,26 +32,27 @@ class CompanyAppBarActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         IconButton(
-          tooltip: 'Post a job',
+          tooltip: t.tr(en: 'Post a job', ar: 'إضافة وظيفة'),
           onPressed: () =>
               Navigator.of(context).pushNamed(AppRoutes.companyPostJobStep1),
           icon: const Icon(Icons.add_circle_outline),
         ),
         IconButton(
-          tooltip: 'Notifications',
+          tooltip: t.tr(en: 'Notifications', ar: 'الإشعارات'),
           onPressed: () =>
               Navigator.of(context).pushNamed(AppRoutes.companyNotifications),
           icon: const Icon(Icons.notifications_none),
         ),
         IconButton(
-          tooltip: 'Settings',
+          tooltip: t.settings,
           onPressed: () => Navigator.of(
             context,
-          ).pushNamed(AppRoutes.companyNotificationSetting),
+          ).pushNamed(AppRoutes.companySettings),
           icon: const Icon(Icons.settings_outlined),
         ),
       ],

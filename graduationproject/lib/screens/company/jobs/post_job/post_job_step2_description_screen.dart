@@ -166,13 +166,6 @@ class _CompanyPostJobStep2DescriptionScreenState
             ),
           const SizedBox(height: 18),
           AppButton(label: t.save, loading: _loading, onPressed: _save),
-          const SizedBox(height: 10),
-          TextButton(
-            onPressed: () => Navigator.of(
-              context,
-            ).pushNamed(AppRoutes.companyPostJobStep2v2),
-            child: Text(t.openV2Step2),
-          ),
         ],
       ),
     );

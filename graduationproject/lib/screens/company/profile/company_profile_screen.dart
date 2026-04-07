@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 
-import '../../../app/router/app_router.dart';
-import '../../../shared/models/contact_entry.dart';
 import '../../../shared/l10n/app_localizations.dart';
 import '../../../shared/state/company_store.dart';
 import '../../../shared/widgets/app_scaffold.dart';
 import '../../../shared/widgets/section_title.dart';
 import '../widgets/company_app_bar_actions.dart';
 import '../widgets/company_bottom_nav.dart';
-import 'company_edit_intro_screen.dart';
 
 class CompanyCompanyProfileScreen extends StatefulWidget {
   const CompanyCompanyProfileScreen({super.key});
@@ -22,22 +19,12 @@ class _CompanyCompanyProfileScreenState
     extends State<CompanyCompanyProfileScreen> {
   final _store = CompanyStore.instance;
 
-  Future<void> _openEditIntro() async {
-    await Navigator.of(context).pushNamed(
-      AppRoutes.companyEditIntro,
-      arguments: CompanyEditIntroArgs(
-        english: _store.companyAboutEn,
-        arabic: _store.companyAboutAr,
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     return AppScaffold(
       title: t.profile,
-      showBack: true,
+      showBack: false,
       leading: const CompanyProfileLeading(),
       actions: const [CompanyAppBarActions()],
       showAppBarDivider: true,
@@ -47,7 +34,14 @@ class _CompanyCompanyProfileScreenState
           return ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              const _CompanyStatsBar(),
+              _CompanyStatsBar(
+                foundedDay: _store.foundedDay,
+                foundedMonth: _store.foundedMonth,
+                foundedYear: _store.foundedYear,
+                countriesCount: _store.locations.length,
+                employee: _store.employee,
+                industry: _store.industry,
+              ),
               const SizedBox(height: 14),
               Divider(
                 height: 1,
@@ -55,14 +49,7 @@ class _CompanyCompanyProfileScreenState
                 color: Theme.of(context).dividerColor.withValues(alpha: 0.2),
               ),
               const SizedBox(height: 16),
-              SectionTitle(
-                t.about,
-                trailing: IconButton(
-                  tooltip: t.editIntroTooltip,
-                  icon: const Icon(Icons.edit_outlined),
-                  onPressed: _openEditIntro,
-                ),
-              ),
+              SectionTitle(t.about),
               const SizedBox(height: 10),
               Text(
                 t.isAr
@@ -73,6 +60,28 @@ class _CompanyCompanyProfileScreenState
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
               const SizedBox(height: 16),
+              SectionTitle(t.locationInfo),
+              const SizedBox(height: 10),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: _store.locations.map((item) => Chip(
+                  label: Text(item, style: const TextStyle(fontSize: 12)),
+                  visualDensity: VisualDensity.compact,
+                )).toList(),
+              ),
+              const SizedBox(height: 16),
+              SectionTitle(t.tr(en: 'Tech Stack', ar: 'التقنيات المستخدمة')),
+              const SizedBox(height: 10),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: _store.techStack.map((item) => Chip(
+                  label: Text(item, style: const TextStyle(fontSize: 12)),
+                  visualDensity: VisualDensity.compact,
+                )).toList(),
+              ),
+              const SizedBox(height: 16),
               SectionTitle(t.contactSectionLabel),
               const SizedBox(height: 10),
               ..._store.contacts.asMap().entries.map(
@@ -80,14 +89,7 @@ class _CompanyCompanyProfileScreenState
                   icon: Icons.link_outlined,
                   title: entry.value.name,
                   value: entry.value.value,
-                  onEdit: () => _editContact(entry.key, entry.value),
-                  onDelete: () => _store.removeContact(entry.key),
                 ),
-              ),
-              OutlinedButton.icon(
-                onPressed: _addContact,
-                icon: const Icon(Icons.add),
-                label: Text(t.addMoreContact),
               ),
             ],
           );
@@ -98,83 +100,6 @@ class _CompanyCompanyProfileScreenState
       ),
     );
   }
-
-  Future<void> _addContact() async {
-    final t = AppLocalizations.of(context);
-    final nameController = TextEditingController();
-    final valueController = TextEditingController();
-    final contact = await _showContactDialog(
-      title: t.addContactTitle,
-      nameController: nameController,
-      valueController: valueController,
-    );
-    if (contact == null) return;
-    _store.addContact(contact);
-  }
-
-  Future<void> _editContact(int index, ContactEntry entry) async {
-    final t = AppLocalizations.of(context);
-    final nameController = TextEditingController(text: entry.name);
-    final valueController = TextEditingController(text: entry.value);
-    final updated = await _showContactDialog(
-      title: t.editContactTitle,
-      nameController: nameController,
-      valueController: valueController,
-    );
-    if (updated == null) return;
-    _store.updateContact(index, updated);
-  }
-
-  Future<ContactEntry?> _showContactDialog({
-    required String title,
-    required TextEditingController nameController,
-    required TextEditingController valueController,
-  }) async {
-    final t = AppLocalizations.of(context);
-    return showDialog<ContactEntry>(
-      context: context,
-      builder: (ctx) {
-        return AlertDialog(
-          title: Text(title),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: nameController,
-                decoration: InputDecoration(
-                  labelText: t.nameLabel,
-                  border: const OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: valueController,
-                decoration: InputDecoration(
-                  labelText: t.urlOrHandle,
-                  border: const OutlineInputBorder(),
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(ctx).pop(),
-              child: Text(t.cancel),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.of(ctx).pop(
-                ContactEntry(
-                  name: nameController.text.trim(),
-                  value: valueController.text.trim(),
-                ),
-              ),
-              child: Text(t.save),
-            ),
-          ],
-        );
-      },
-    );
-  }
 }
 
 class _EditableLinkTile extends StatelessWidget {
@@ -182,40 +107,20 @@ class _EditableLinkTile extends StatelessWidget {
     required this.icon,
     required this.title,
     required this.value,
-    required this.onEdit,
-    required this.onDelete,
   });
 
   final IconData icon;
   final String title;
   final String value;
-  final VoidCallback onEdit;
-  final VoidCallback onDelete;
 
   @override
   Widget build(BuildContext context) {
-    final t = AppLocalizations.of(context);
     return Card(
       margin: const EdgeInsets.only(bottom: 10),
       child: ListTile(
         leading: Icon(icon),
         title: Text(title),
         subtitle: Text(value),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
-              tooltip: t.edit,
-              onPressed: onEdit,
-              icon: const Icon(Icons.edit_outlined),
-            ),
-            IconButton(
-              tooltip: t.delete,
-              onPressed: onDelete,
-              icon: const Icon(Icons.delete_outline),
-            ),
-          ],
-        ),
         onTap: () {},
       ),
     );
@@ -223,7 +128,21 @@ class _EditableLinkTile extends StatelessWidget {
 }
 
 class _CompanyStatsBar extends StatelessWidget {
-  const _CompanyStatsBar();
+  const _CompanyStatsBar({
+    required this.foundedDay,
+    required this.foundedMonth,
+    required this.foundedYear,
+    required this.countriesCount,
+    required this.employee,
+    required this.industry,
+  });
+
+  final int foundedDay;
+  final int foundedMonth;
+  final int foundedYear;
+  final int countriesCount;
+  final String employee;
+  final String industry;
 
   @override
   Widget build(BuildContext context) {
@@ -299,13 +218,19 @@ class _CompanyStatsBar extends StatelessWidget {
                 item(
                   icon: Icons.local_fire_department_outlined,
                   label: t.tr(en: 'Founded', ar: 'تاريخ التأسيس'),
-                  value: t.tr(en: 'July 31, 2011', ar: '٣١ يوليو ٢٠١١'),
+                  value: t.tr(
+                    en: '$foundedMonth/$foundedDay/$foundedYear', 
+                    ar: '$foundedYear/$foundedMonth/$foundedDay'.replaceAll('0', '٠').replaceAll('1', '١').replaceAll('2', '٢').replaceAll('3', '٣').replaceAll('4', '٤').replaceAll('5', '٥').replaceAll('6', '٦').replaceAll('7', '٧').replaceAll('8', '٨').replaceAll('9', '٩')
+                  ),
                 ),
                 const SizedBox(width: 14),
                 item(
                   icon: Icons.location_on_outlined,
                   label: t.locationInfo,
-                  value: t.tr(en: '20 countries', ar: '٢٠ دولة'),
+                  value: t.tr(
+                    en: '$countriesCount countries', 
+                    ar: '${countriesCount.toString().replaceAll('0', '٠').replaceAll('1', '١').replaceAll('2', '٢').replaceAll('3', '٣').replaceAll('4', '٤').replaceAll('5', '٥').replaceAll('6', '٦').replaceAll('7', '٧').replaceAll('8', '٨').replaceAll('9', '٩')} دولة'
+                  ),
                 ),
               ],
             ),
@@ -315,13 +240,13 @@ class _CompanyStatsBar extends StatelessWidget {
                 item(
                   icon: Icons.groups_outlined,
                   label: t.employee,
-                  value: '4000+',
+                  value: employee,
                 ),
                 const SizedBox(width: 14),
                 item(
                   icon: Icons.account_balance_outlined,
                   label: t.industry,
-                  value: t.tr(en: 'Social & Non-Profit', ar: 'اجتماعي وحقوقي'),
+                  value: industry,
                 ),
               ],
             ),

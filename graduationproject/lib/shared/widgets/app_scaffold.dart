@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../app/router/app_router.dart';
+
 class AppScaffold extends StatelessWidget {
   const AppScaffold({
     super.key,
@@ -33,7 +35,12 @@ class AppScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final canPop = Navigator.of(context).canPop();
-    final showLeading = showBack && canPop;
+    final isHomeTab =
+        ModalRoute.of(context)?.settings.name == AppRoutes.companyDashboard;
+
+    // Show back button if we can pop OR if we're on a replacement tab (like Chat) that needs to go to Dashboard
+    final showLeading = showBack && (canPop || !isHomeTab);
+
     final hasActions = actions != null && actions!.isNotEmpty;
     final hasTitle = title != null || titleWidget != null;
     final effectiveCenterTitle =
@@ -59,7 +66,8 @@ class AppScaffold extends StatelessWidget {
           );
 
     final hasBottomNav = safeBottomNavigationBar != null;
-    return Scaffold(
+
+    Widget scaffold = Scaffold(
       appBar: (!hasTitle && !showLeading && !hasActions)
           ? null
           : AppBar(
@@ -100,5 +108,21 @@ class AppScaffold extends StatelessWidget {
       bottomNavigationBar: safeBottomNavigationBar,
       floatingActionButton: floatingActionButton,
     );
+
+    if (hasBottomNav) {
+      return PopScope(
+        canPop: false, // Intercept to handle redirection manually
+        onPopInvokedWithResult: (didPop, _) {
+          if (didPop) return;
+          if (!isHomeTab) {
+            Navigator.of(context)
+                .pushReplacementNamed(AppRoutes.companyDashboard);
+          }
+        },
+        child: scaffold,
+      );
+    }
+
+    return scaffold;
   }
 }

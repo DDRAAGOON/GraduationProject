@@ -1,37 +1,41 @@
 final class MessageThread {
-  MessageThread({
+  const MessageThread({
     required this.id,
     required this.title,
     required this.subtitle,
-    required this.lastTimeLabel,
+    required this.lastTimeLabelEn,
+    required this.lastTimeLabelAr,
   });
 
   final String id;
   final String title;
   final String subtitle;
-  final String lastTimeLabel;
+  final String lastTimeLabelEn;
+  final String lastTimeLabelAr;
 
-  static MessageThread mock() => MessageThread(
+  static MessageThread mock() => const MessageThread(
         id: 'thread_1',
         title: 'Jan Mayer',
         subtitle: 'We want to invite you for a quick interview...',
-        lastTimeLabel: '12 mins ago',
+        lastTimeLabelEn: '12 mins ago',
+        lastTimeLabelAr: 'منذ ١٢ دقيقة',
       );
 
   static List<MessageThread> mockList() => [
         mock(),
-        MessageThread(
+        const MessageThread(
           id: 'thread_2',
           title: 'Angelina Swann',
           subtitle: 'Hey thanks for your interview...',
-          lastTimeLabel: '3:40 PM',
+          lastTimeLabelEn: '3:40 PM',
+          lastTimeLabelAr: '٣:٤٠ م',
         ),
-        MessageThread(
+        const MessageThread(
           id: 'thread_3',
           title: 'James Gardner',
           subtitle: 'Hey thanks for your interview...',
-          lastTimeLabel: '3:40 PM',
+          lastTimeLabelEn: '11:15 AM',
+          lastTimeLabelAr: '١١:١٥ ص',
         ),
       ];
 }
-

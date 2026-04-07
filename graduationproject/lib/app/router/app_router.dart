@@ -19,9 +19,7 @@ import '../../screens/company/jobs/job_applicants_table_view_screen.dart';
 import '../../screens/company/jobs/job_details_screen.dart';
 import '../../screens/company/jobs/jobs_hub_screen.dart';
 import '../../screens/company/jobs/post_job/post_job_step1_information_screen.dart';
-import '../../screens/company/jobs/post_job/post_job_step1_information_v2_screen.dart';
 import '../../screens/company/jobs/post_job/post_job_step2_description_screen.dart';
-import '../../screens/company/jobs/post_job/post_job_step2_description_v2_screen.dart';
 import '../../screens/company/messages/chat_thread_candidate_v2_screen.dart';
 import '../../screens/company/messages/chat_thread_screen.dart';
 import '../../screens/company/messages/messages_list_screen.dart';
@@ -36,6 +34,7 @@ import '../../screens/company/settings/appearance_settings_dark_screen.dart';
 import '../../screens/company/settings/appearance_settings_light_screen.dart';
 import '../../screens/company/settings/notification_setting_screen.dart';
 import '../../screens/company/settings/notifications_screen.dart';
+import '../../screens/company/settings/settings_screen.dart';
 import '../../shared/models/applicant.dart';
 import '../../shared/models/job.dart';
 import '../../shared/models/message_thread.dart';
@@ -67,8 +66,6 @@ final class AppRoutes {
   static const companyJobAnalytics = '/company/jobs/analytics';
   static const companyPostJobStep1 = '/company/jobs/post/step1';
   static const companyPostJobStep2 = '/company/jobs/post/step2';
-  static const companyPostJobStep1v2 = '/company/jobs/post/step1_v2';
-  static const companyPostJobStep2v2 = '/company/jobs/post/step2_v2';
 
   static const companyApplicantDetailsProfile = '/company/candidates/profile';
   static const companyApplicantDetailsResume = '/company/candidates/resume';
@@ -84,6 +81,7 @@ final class AppRoutes {
   static const companyCompanyProfile = '/company/profile/company_profile';
   static const companyEditIntro = '/company/profile/edit_intro';
 
+  static const companySettings = '/company/settings';
   static const companyAppearanceDark = '/company/settings/appearance_dark';
   static const companyAppearanceLight = '/company/settings/appearance_light';
   static const companyNotificationSetting = '/company/settings/notification';
@@ -148,10 +146,6 @@ final class AppRouter {
         page = const CompanyPostJobStep1InformationScreen();
       case AppRoutes.companyPostJobStep2:
         page = const CompanyPostJobStep2DescriptionScreen();
-      case AppRoutes.companyPostJobStep1v2:
-        page = const CompanyPostJobStep1InformationV2Screen();
-      case AppRoutes.companyPostJobStep2v2:
-        page = const CompanyPostJobStep2DescriptionV2Screen();
       case AppRoutes.companyApplicantDetailsProfile:
         page = CompanyApplicantDetailsProfileScreen(
           applicant: args is Applicant ? args : Applicant.mock(),
@@ -184,6 +178,8 @@ final class AppRouter {
           initialEnglish: intro?.english ?? '',
           initialArabic: intro?.arabic ?? '',
         );
+      case AppRoutes.companySettings:
+        page = const CompanySettingsScreen();
       case AppRoutes.companyAppearanceDark:
         page = const CompanyAppearanceSettingsDarkScreen();
       case AppRoutes.companyAppearanceLight:

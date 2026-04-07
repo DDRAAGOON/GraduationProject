@@ -27,7 +27,8 @@ final class MessageThreadDto {
       id: id,
       title: title,
       subtitle: subtitle,
-      lastTimeLabel: lastTimeLabel,
+      lastTimeLabelEn: lastTimeLabel,
+      lastTimeLabelAr: lastTimeLabel,
     );
   }
 }

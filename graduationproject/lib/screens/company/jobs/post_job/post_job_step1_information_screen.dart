@@ -61,6 +61,39 @@ class _CompanyPostJobStep1InformationScreenState
     );
   }
 
+  Future<void> _addSkill() async {
+    final t = AppLocalizations.of(context);
+    final controller = TextEditingController();
+    final newSkill = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(t.tr(en: 'Add Skill', ar: 'إضافة مهارة')),
+        content: TextField(
+          controller: controller,
+          decoration: InputDecoration(
+            hintText: t.tr(en: 'Enter skill', ar: 'أدخل المهارة'),
+            border: const OutlineInputBorder(),
+          ),
+          autofocus: true,
+          onSubmitted: (val) => Navigator.of(ctx).pop(val),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(t.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(controller.text),
+            child: Text(t.save),
+          ),
+        ],
+      ),
+    );
+    if (newSkill != null && newSkill.trim().isNotEmpty) {
+      setState(() => _skills.add(newSkill.trim()));
+    }
+  }
+
   void _toggle(String type) {
     setState(() {
       if (_types.contains(type)) {
@@ -145,24 +178,26 @@ class _CompanyPostJobStep1InformationScreenState
           const SizedBox(height: 10),
           Wrap(
             spacing: 10,
-            children: _skills
-                .map(
-                  (s) => InputChip(
-                    label: Text(s),
-                    onDeleted: () => setState(() => _skills.remove(s)),
-                  ),
-                )
-                .toList(),
+            runSpacing: 10,
+            children: [
+              ..._skills.map(
+                (s) => InputChip(
+                  label: Text(s),
+                  onDeleted: () => setState(() => _skills.remove(s)),
+                ),
+              ),
+              ActionChip(
+                label: Text(t.tr(en: '+ Add', ar: '+ إضافة'), style: const TextStyle(fontSize: 12)),
+                onPressed: _addSkill,
+                visualDensity: VisualDensity.compact,
+                backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                side: BorderSide.none,
+              ),
+            ],
           ),
           const SizedBox(height: 16),
           AppButton(label: t.nextStep, loading: _loading, onPressed: _next),
           const SizedBox(height: 10),
-          TextButton(
-            onPressed: () => Navigator.of(
-              context,
-            ).pushNamed(AppRoutes.companyPostJobStep1v2),
-            child: Text(t.openV2Step1),
-          ),
         ],
       ),
     );
@@ -182,20 +217,28 @@ class _TypeChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     final color = selected
-        ? Theme.of(context).colorScheme.primary
-        : Colors.white.withValues(alpha: 0.12);
+        ? cs.primary
+        : cs.onSurface.withValues(alpha: 0.12);
+    
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(14),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
-          color: color.withValues(alpha: selected ? 0.25 : 1),
+          color: selected ? color.withValues(alpha: 0.15) : Colors.transparent,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: color.withValues(alpha: 0.5)),
+          border: Border.all(color: color.withValues(alpha: selected ? 0.3 : 0.5)),
         ),
-        child: Text(label),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: selected ? color : cs.onSurface,
+            fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+          ),
+        ),
       ),
     );
   }

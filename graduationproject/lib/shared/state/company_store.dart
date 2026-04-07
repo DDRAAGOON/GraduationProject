@@ -9,7 +9,30 @@ class CompanyStore extends ChangeNotifier {
 
   static final CompanyStore instance = CompanyStore._();
 
-  String get companyName => 'Nomad';
+  String _companyName = 'Nomad';
+  String _website = 'https://www.nomad.com';
+  String _employee = '1 - 50';
+  String _industry = 'Technology';
+
+  List<String> _locations = ['England', 'Japan', 'Australia'];
+  List<String> _techStack = ['HTML 5', 'CSS 3', 'Javascript'];
+
+  int _foundedDay = 31;
+  int _foundedMonth = 7;
+  int _foundedYear = 2021;
+
+  String get companyName => _companyName;
+  String get website => _website;
+  String get employee => _employee;
+  String get industry => _industry;
+  
+  List<String> get locations => List.unmodifiable(_locations);
+  List<String> get techStack => List.unmodifiable(_techStack);
+  
+  int get foundedDay => _foundedDay;
+  int get foundedMonth => _foundedMonth;
+  int get foundedYear => _foundedYear;
+
   String get companyProfileImage => AppImages.companyProfileImage;
 
   String _aboutEn =
@@ -32,6 +55,33 @@ class CompanyStore extends ChangeNotifier {
   void setCompanyIntro({required String english, required String arabic}) {
     _aboutEn = english;
     _aboutAr = arabic;
+    notifyListeners();
+  }
+
+  void updateProfile({
+    required String name,
+    required String website,
+    required String employee,
+    required String industry,
+    required String aboutEn,
+    required String aboutAr,
+    required List<String> locations,
+    required List<String> techStack,
+    required int foundedDay,
+    required int foundedMonth,
+    required int foundedYear,
+  }) {
+    _companyName = name;
+    _website = website;
+    _employee = employee;
+    _industry = industry;
+    _aboutEn = aboutEn;
+    _aboutAr = aboutAr;
+    _locations = List.from(locations);
+    _techStack = List.from(techStack);
+    _foundedDay = foundedDay;
+    _foundedMonth = foundedMonth;
+    _foundedYear = foundedYear;
     notifyListeners();
   }
 

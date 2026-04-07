@@ -73,7 +73,7 @@ class _CompanySignUpScreenState extends State<CompanySignUpScreen> {
     await Future<void>.delayed(const Duration(milliseconds: 700));
     if (!mounted) return;
     setState(() => _loading = false);
-    Navigator.of(context).pushReplacementNamed(AppRoutes.companyDashboard);
+    Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.companyDashboard, (route) => false);
   }
 
   @override

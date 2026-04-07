@@ -164,8 +164,6 @@ class _CompanyProfileSettingsSocialLinksScreenState
           ),
           const SizedBox(height: 18),
           AppButton(label: t.saveChange, loading: _loading, onPressed: _save),
-          const SizedBox(height: 6),
-          TextButton(onPressed: () {}, child: Text(t.helpCenterBtn)),
         ],
       ),
     );

@@ -51,6 +51,7 @@ class _ThreadTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     final path = _avatars[avatarIndex % _avatars.length];
     return ListTile(
       leading: CircleAvatar(
@@ -65,7 +66,7 @@ class _ThreadTile extends StatelessWidget {
         overflow: TextOverflow.ellipsis,
       ),
       trailing: Text(
-        thread.lastTimeLabel,
+        t.isAr ? thread.lastTimeLabelAr : thread.lastTimeLabelEn,
         style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
             ),
