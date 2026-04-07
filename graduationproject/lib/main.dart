@@ -1,8 +1,22 @@
-
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:graduationproject/screens/user/auth/cubit/auth_cubit.dart';
+import 'package:graduationproject/screens/user/auth/sign_in_screen.dart';
+import 'package:graduationproject/screens/user/home/services_Screen.dart';
+import 'package:graduationproject/screens/user/home/technical_screen.dart';
+import 'screens/user/onboarding/onboarding_screen.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => AuthCubit(),
+        ),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -11,45 +25,21 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+
       debugShowCheckedModeBanner: false,
-      home: const HomePage(),
+      title: 'Job Finder App',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        useMaterial3: true,
+      ),
+      initialRoute: '/onboarding',
+      routes: {
+        '/onboarding': (context) => const OnboardingScreen(),
+        '/home': (context) => const TechnicalScreen(),
+        '/signin': (context) => const SignInScreen(),
+      },
     );
   }
 }
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
 
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  int counter = 0;
-
-  void increment() {
-    setState(() {
-      counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Test App"),
-        centerTitle: true,
-      ),
-      body: Center(
-        child: Text(
-          "Counter: $counter",
-          style: const TextStyle(fontSize: 24),
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: increment,
-        child: const Icon(Icons.add),
-      ),
-    );
-  }
-}

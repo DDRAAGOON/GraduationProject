@@ -2,7 +2,13 @@ class AppImages {
   const AppImages._();
 
   // Company
-  static const String companyLogo = 'assets/company/logo/logo.png';
+
+  static const String companyLogo= 'graduationproject/assets/company/icon/Company Logo.png';
+  static const String companyLogo1 = 'graduationproject/assets/company/icon/Company Logo (1).png';
+  static const String companyLogo2 = 'graduationproject/assets/company/icon/Company Logo (2).png';
+
+
+  static const String jobito = 'assets/company/logo/logo.png';
   static const String companyIconVector = 'assets/company/icon/Vector.png';
 
   static const String companyOnboarding1 =
