@@ -37,6 +37,8 @@ import '../../screens/company/settings/appearance_settings_light_screen.dart';
 import '../../screens/company/settings/notification_setting_screen.dart';
 import '../../screens/company/settings/notifications_screen.dart';
 import '../../screens/company/settings/settings_screen.dart';
+import '../../screens/logo/logo_page.dart';
+import '../../screens/user/onboarding/onboarding.dart';
 import '../../shared/models/applicant.dart';
 import '../../shared/models/job.dart';
 import '../../shared/models/message_thread.dart';
@@ -44,6 +46,12 @@ import '../../shared/models/message_thread.dart';
 /// The [AppRoutes] class serves as a centralized registry for all named route string constants
 /// used to navigate through the application. Using this class avoids hard-coded strings.
 final class AppRoutes {
+  /// Role picker (User vs Company) shown on cold start.
+  static const roleSelection = '/';
+
+  /// Job seeker onboarding ([OnBoardingScreen]) before auth.
+  static const userOnboarding = '/user/onboarding';
+
   // --- Company Onboarding Routes ---
   static const companyOnboardingSmartSearch = '/company/onboarding/smart_search';
   static const companyOnboardingNextJobCloser =
@@ -105,6 +113,10 @@ final class AppRouter {
 
     Widget page;
     switch (name) {
+      case AppRoutes.roleSelection:
+        page = const LogoPage();
+      case AppRoutes.userOnboarding:
+        page = const OnBoardingScreen();
       case AppRoutes.companyOnboardingSmartSearch:
         page = const CompanyOnboardingSmartSearchScreen();
       case AppRoutes.companyOnboardingNextJobCloser:

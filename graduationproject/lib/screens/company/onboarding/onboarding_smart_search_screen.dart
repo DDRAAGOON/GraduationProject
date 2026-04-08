@@ -15,7 +15,7 @@ class CompanyOnboardingSmartSearchScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     return AppScaffold(
-      showBack: false,
+      showBack: true,
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
