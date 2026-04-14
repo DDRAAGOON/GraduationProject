@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/app_colors.dart';
 import '../edit_profile_screen.dart';
-import 'login_details.dart';
+import '../profile_login_details_screen.dart'; // تصحيح الاستيراد للملف الصحيح
 
 class Notifications extends StatefulWidget {
   const Notifications({super.key});
@@ -23,19 +23,9 @@ class _NotificationsState extends State<Notifications> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_none, color: Colors.white),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: const Icon(Icons.settings_outlined, color: Colors.white),
-            onPressed: () {},
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -50,26 +40,23 @@ class _NotificationsState extends State<Notifications> {
                   Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const EditProfileScreen()));
                 }),
                 _buildTabItem("Login Details", false, () {
-                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginDetails()));
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const ProfileLoginDetailsScreen()));
                 }),
                 _buildTabItem("Notifications", true, () {}),
               ],
             ),
             const SizedBox(height: 30),
 
-            // Basic Information
             const Text("Basic Information", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             const Text("This is notifications preferences that you can update anytime.", style: TextStyle(color: Colors.white54, fontSize: 13)),
             const Divider(color: Colors.white24, height: 40),
 
-            // Notifications Section
             const Text("Notifications", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             const Text("Customize your preferred notification settings", style: TextStyle(color: Colors.white54, fontSize: 13)),
             const SizedBox(height: 30),
 
-            // Notification Options
             _buildNotificationOption(
               "Applications",
               "These are notifications for jobs that you have applied to",

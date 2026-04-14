@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:icons_plus/icons_plus.dart';
 import '../core/app_colors.dart';
 import '../notifications/notifications_screen.dart';
 import '../settings/setting_screen.dart';
@@ -12,11 +13,32 @@ class TechnicalScreen extends StatefulWidget {
 
 class _TechnicalScreenState extends State<TechnicalScreen> {
   bool _isEmploymentExpanded = false;
-  bool _isSpecializationExpanded = false;
-  bool _isLevelExpanded = false;
   bool _isSalaryExpanded = false;
 
   String _selectedCategory = "technical";
+  String _selectedLocation = "Cairo";
+  final TextEditingController _searchController = TextEditingController();
+
+  final List<String> _egyptGovernorates = [
+    "Cairo", "Giza", "Alexandria", "Dakahlia", "Red Sea", "Beheira", "Fayoum", 
+    "Gharbia", "Ismailia", "Monufia", "Minya", "Qalyubia", "New Valley", 
+    "Sharqia", "Suez", "Aswan", "Assiut", "Beni Suef", "Port Said", 
+    "Damietta", "South Sinai", "Kafr El Sheikh", "Matrouh", "Luxor", "Qena", "Sohag", "North Sinai"
+  ];
+
+  final List<Map<String, dynamic>> _allJobs = [
+    {"title": "Social Media Assistant", "company": "Nomad", "location": "Paris, France", "applied": 4, "capacity": 18, "category": "technical", "isSpecial": true},
+    {"title": "Interactive Developer", "company": "Terraform", "location": "Hamburg, Germany", "applied": 8, "capacity": 12, "category": "technical", "isSpecial": true},
+    {"title": "Brand Designer", "company": "Dropbox", "location": "San Fransisco, USA", "applied": 2, "capacity": 10, "category": "technical", "isSpecial": true},
+    {"title": "Email Marketing", "company": "Revolut", "location": "Madrid, Spain", "applied": 0, "capacity": 10, "category": "technical", "isSpecial": false},
+    {"title": "Lead Engineer", "company": "Canva", "location": "Ankara, Turkey", "applied": 4, "capacity": 10, "category": "technical", "isSpecial": false},
+    {"title": "HR Manager", "company": "LinkedIn", "location": "London, UK", "applied": 5, "capacity": 10, "category": "nontechnical", "isSpecial": true},
+    {"title": "Sales Executive", "company": "Amazon", "location": "Berlin, Germany", "applied": 12, "capacity": 20, "category": "nontechnical", "isSpecial": true},
+    {"title": "Marketing Coordinator", "company": "Facebook", "location": "Menlo Park, USA", "applied": 8, "capacity": 15, "category": "nontechnical", "isSpecial": false},
+    {"title": "Hotel Receptionist", "company": "Marriott", "location": "Paris, France", "applied": 4, "capacity": 10, "category": "services", "isSpecial": true},
+    {"title": "Delivery Driver", "company": "Uber", "location": "Madrid, Spain", "applied": 50, "capacity": 100, "category": "services", "isSpecial": true},
+    {"title": "Barista", "company": "Starbucks", "location": "Rome, Italy", "applied": 10, "capacity": 15, "category": "services", "isSpecial": false},
+  ];
 
   final Map<String, bool> _selectedFilters = {
     "Full-time (3)": true, "Part-Time (5)": false, "Remote (2)": false,
@@ -27,6 +49,12 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
     "\$700 - \$1000 (4)": false, "\$1000 - \$1500 (8)": false,
     "\$1500 - \$2000 (10)": false, "\$3000 or above (4)": false,
   };
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,10 +71,10 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
               const SizedBox(height: 20),
               _buildSearchSection(),
               const SizedBox(height: 15),
-              const Text("Popular : UI Designer, UX Researcher, Android, Admin", style: TextStyle(color: Colors.white38, fontSize: 11)),
+              const Text("Popular : UI Designer, UX Researcher, Android, Admin", 
+                style: TextStyle(color: Colors.white38, fontSize: 11)),
               const SizedBox(height: 25),
 
-              // Filter Grid (Two side-by-side)
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -56,29 +84,6 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
                       isExpanded: _isEmploymentExpanded,
                       onToggle: () => setState(() => _isEmploymentExpanded = !_isEmploymentExpanded),
                       items: ["Full-time (3)", "Part-Time (5)", "Remote (2)", "Internship (24)", "Contract (3)"],
-                    ),
-                  ),
-                  const SizedBox(width: 15),
-                  Expanded(
-                    child: _buildFilterSection(
-                      title: "Specialization",
-                      isExpanded: _isSpecializationExpanded,
-                      onToggle: () => setState(() => _isSpecializationExpanded = !_isSpecializationExpanded),
-                      items: ["Design (24)", "Sales (3)", "Marketing (3)", "Business (3)", "Human Resource (6)"],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 15),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: _buildFilterSection(
-                      title: "Experience Level",
-                      isExpanded: _isLevelExpanded,
-                      onToggle: () => setState(() => _isLevelExpanded = !_isLevelExpanded),
-                      items: ["Entry Level (57)", "Mid Level (3)", "Senior Level (5)", "Director (12)", "VP or Above (8)"],
                     ),
                   ),
                   const SizedBox(width: 15),
@@ -96,8 +101,16 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
               const SizedBox(height: 30),
               const Divider(color: Colors.white24, height: 1),
               const SizedBox(height: 25),
-              const Text("Explore By Category", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 15),
+              RichText(
+                text: const TextSpan(
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  children: [
+                    TextSpan(text: "Explore By ", style: TextStyle(color: Colors.white)),
+                    TextSpan(text: "Category", style: TextStyle(color: Color(0xFF578BC7))),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
               _buildCategoryTabs(),
               const SizedBox(height: 25),
               _buildDynamicJobSection(),
@@ -113,9 +126,11 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        _buildTopIconButton(Icons.notifications_none, hasBadge: true, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const NotificationsScreen()))),
+        _buildTopIconButton(Icons.notifications_none, hasBadge: true, 
+          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const NotificationsScreen()))),
         const SizedBox(width: 12),
-        _buildTopIconButton(Icons.settings_outlined, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingScreen()))),
+        _buildTopIconButton(Icons.settings_outlined, 
+          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingScreen()))),
       ],
     );
   }
@@ -123,15 +138,14 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
   Widget _buildTopIconButton(IconData icon, {bool hasBadge = false, VoidCallback? onTap}) {
     return GestureDetector(
       onTap: onTap,
-      child: Stack(
-        children: [
-          Container(
-            width: 44, height: 44,
-            decoration: BoxDecoration(color: const Color(0xFF0D2D4D), shape: BoxShape.circle, border: Border.all(color: Colors.white12)),
-            child: Icon(icon, color: Colors.white, size: 22),
-          ),
-          if (hasBadge) Positioned(right: 12, top: 10, child: Container(width: 8, height: 8, decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle))),
-        ],
+      child: Container(
+        width: 44, height: 44,
+        decoration: BoxDecoration(
+          color: const Color(0xFF0D2D4D), 
+          shape: BoxShape.circle, 
+          border: Border.all(color: Colors.white12)
+        ),
+        child: Icon(icon, color: Colors.white, size: 22),
       ),
     );
   }
@@ -139,67 +153,144 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
   Widget _buildSearchSection() {
     return Container(
       padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(color: Colors.white.withOpacity(0.05), borderRadius: BorderRadius.circular(30), border: Border.all(color: Colors.white12)),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.05), 
+        borderRadius: BorderRadius.circular(30), 
+        border: Border.all(color: Colors.white12)
+      ),
       child: Row(
         children: [
           const SizedBox(width: 12),
           const Icon(Icons.search, color: Colors.white54, size: 18),
-          const Expanded(child: TextField(style: TextStyle(color: Colors.white, fontSize: 13), decoration: InputDecoration(hintText: "Search jobs", hintStyle: TextStyle(color: Colors.white38), border: InputBorder.none))),
+          Expanded(
+            child: TextField(
+              controller: _searchController,
+              onChanged: (value) => setState(() {}),
+              style: const TextStyle(color: Colors.white, fontSize: 13), 
+              decoration: const InputDecoration(
+                hintText: "Search jobs", 
+                hintStyle: TextStyle(color: Colors.white38), 
+                border: InputBorder.none
+              )
+            )
+          ),
           Container(height: 20, width: 1, color: Colors.white24),
           const SizedBox(width: 12),
-          const Icon(Icons.location_on_outlined, color: Colors.white54, size: 18),
-          const Text("Florence", style: TextStyle(color: Colors.white70, fontSize: 12)),
-          const Icon(Icons.keyboard_arrow_down, color: Colors.white54, size: 18),
+          GestureDetector(
+            onTap: _showLocationPicker,
+            behavior: HitTestBehavior.opaque,
+            child: Row(
+              children: [
+                const Icon(Icons.location_on_outlined, color: Colors.white54, size: 18),
+                const SizedBox(width: 4),
+                Text(_selectedLocation, style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                const Icon(Icons.keyboard_arrow_down, color: Colors.white54, size: 18),
+              ],
+            ),
+          ),
           const SizedBox(width: 8),
-          Container(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8), decoration: BoxDecoration(color: const Color(0xFF49769F), borderRadius: BorderRadius.circular(20)), child: const Text("Search", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13))),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8), 
+            decoration: BoxDecoration(color: const Color(0xFF49769F), borderRadius: BorderRadius.circular(20)), 
+            child: const Text("Search", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13))
+          ),
         ],
       ),
+    );
+  }
+
+  void _showLocationPicker() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF0D2D4D),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Column(
+          children: [
+            const SizedBox(height: 10),
+            Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2))),
+            const Padding(
+              padding: EdgeInsets.all(20.0),
+              child: Text("Select Governorate", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+            ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: _egyptGovernorates.length,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    title: Text(_egyptGovernorates[index], style: const TextStyle(color: Colors.white70)),
+                    onTap: () {
+                      setState(() => _selectedLocation = _egyptGovernorates[index]);
+                      Navigator.pop(context);
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
   Widget _buildCategoryTabs() {
-    const tabBarHorizontalPadding = 5.0;
-    const tabBarVerticalPadding = 6.0;
-    const betweenTabs = 10.0;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: tabBarHorizontalPadding,
-        vertical: tabBarVerticalPadding,
-      ),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(30),
-      ),
-      child: Row(
-        children: [
-          Expanded(child: _buildTabItem("Technical")),
-          const SizedBox(width: betweenTabs),
-          Expanded(child: _buildTabItem("NonTechnical")),
-          const SizedBox(width: betweenTabs),
-          Expanded(child: _buildTabItem("Serves")),
-        ],
-      ),
+    return Row(
+      children: [
+        Expanded(child: _buildTabItem("Technical", "technical", Bootstrap.laptop, const Color(0xFF6C63FF))),
+        const SizedBox(width: 10),
+        Expanded(child: _buildTabItem("Non-Technical", "nontechnical", FontAwesome.user_tie_solid, const Color(0xFF4CAF50))),
+        const SizedBox(width: 10),
+        Expanded(child: _buildTabItem("Services", "services", Bootstrap.bell, const Color(0xFFFF9800))),
+      ],
     );
   }
 
-  Widget _buildTabItem(String label) {
-    bool isSelected = _selectedCategory == label;
+  Widget _buildTabItem(String label, String value, IconData icon, Color activeColor) {
+    bool isSelected = _selectedCategory == value;
     return GestureDetector(
-      onTap: () => setState(() => _selectedCategory = label),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-        decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF001E3A) : const Color(0xFFBDD8E9),
-          borderRadius: BorderRadius.circular(25),
-        ),
-        child: Text(
-          label,
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: isSelected ? Colors.white : const Color(0xFF094174),
-            fontWeight: FontWeight.bold,
-            fontSize: 11,
+      onTap: () => setState(() => _selectedCategory = value),
+      child: AnimatedScale(
+        scale: isSelected ? 1.05 : 1.0,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeOutBack,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOutQuart,
+          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 8),
+          decoration: BoxDecoration(
+            color: isSelected ? activeColor : const Color(0xFF0D2D4D),
+            borderRadius: BorderRadius.circular(15),
+            border: Border.all(color: isSelected ? Colors.white54 : Colors.white10),
+            boxShadow: isSelected ? [
+              BoxShadow(
+                color: activeColor.withOpacity(0.4),
+                blurRadius: 12,
+                spreadRadius: 2,
+                offset: const Offset(0, 4),
+              )
+            ] : [],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icon,
+                color: isSelected ? Colors.white : Colors.white54,
+                size: 28,
+              ),
+              const SizedBox(height: 15),
+              Text(
+                label,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: isSelected ? Colors.white : Colors.white70,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                  fontSize: 10,
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -254,171 +345,52 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
   }
 
   Widget _buildDynamicJobSection() {
-    if (_selectedCategory == "technical") {
-      return Column(
-        children: [
-          _buildSectionHeader("Special jobs"),
-          const SizedBox(height: 15),
-          _buildJobCard(
-            title: "Social Media Assistant",
-            company: "Nomad",
-            location: "Paris, France",
-            applied: 4,
-            capacity: 18,
-          ),
-          _buildJobCard(
-            title: "Interactive Developer",
-            company: "Terraform",
-            location: "Hamburg, Germany",
-            applied: 8,
-            capacity: 12,
-          ),
-          _buildJobCard(
-            title: "Brand Designer",
-            company: "Dropbox",
-            location: "San Fransisco, USA",
-            applied: 2,
-            capacity: 10,
-          ),
-          const SizedBox(height: 30),
-          _buildSectionHeader("Today jobs"),
-          const SizedBox(height: 15),
-          _buildJobCard(
-            title: "Email Marketing",
-            company: "Revolut",
-            location: "Madrid, Spain",
-            applied: 0,
-            capacity: 10,
-          ),
-          _buildJobCard(
-            title: "Lead Engineer",
-            company: "Canva",
-            location: "Ankara, Turkey",
-            applied: 4,
-            capacity: 10,
-          ),
-          _buildJobCard(
-            title: "Product Designer",
-            company: "ClassPass",
-            location: "Berlin, Germany",
-            applied: 4,
-            capacity: 10,
-          ),
-          _buildJobCard(
-            title: "Customer Manager",
-            company: "Pitch",
-            location: "Berlin, Germany",
-            applied: 4,
-            capacity: 10,
-          ),
-        ],
-      );
-    } else if (_selectedCategory == "NonTechnical") {
-      return Column(
-        children: [
-          _buildSectionHeader("Special jobs"),
-          const SizedBox(height: 15),
-          _buildJobCard(
-            title: "HR Manager",
-            company: "LinkedIn",
-            location: "London, UK",
-            applied: 5,
-            capacity: 10,
-          ),
-          _buildJobCard(
-            title: "Sales Executive",
-            company: "Amazon",
-            location: "Berlin, Germany",
-            applied: 12,
-            capacity: 20,
-          ),
-          _buildJobCard(
-            title: "Office Administrator",
-            company: "Google",
-            location: "Dublin, Ireland",
-            applied: 3,
-            capacity: 5,
-          ),
-          const SizedBox(height: 30),
-          _buildSectionHeader("Today jobs"),
-          const SizedBox(height: 15),
-          _buildJobCard(
-            title: "Marketing Coordinator",
-            company: "Facebook",
-            location: "Menlo Park, USA",
-            applied: 8,
-            capacity: 15,
-          ),
-          _buildJobCard(
-            title: "Content Writer",
-            company: "Medium",
-            location: "Remote",
-            applied: 20,
-            capacity: 50,
-          ),
-          _buildJobCard(
-            title: "Customer Success",
-            company: "Zendesk",
-            location: "Copenhagen, Denmark",
-            applied: 6,
-            capacity: 10,
-          ),
-        ],
-      );
-    } else {
-      // Serves category
-      return Column(
-        children: [
-          _buildSectionHeader("Special jobs"),
-          const SizedBox(height: 15),
-          _buildJobCard(
-            title: "Hotel Receptionist",
-            company: "Marriott",
-            location: "Paris, France",
-            applied: 4,
-            capacity: 10,
-          ),
-          _buildJobCard(
-            title: "Delivery Driver",
-            company: "Uber",
-            location: "Madrid, Spain",
-            applied: 50,
-            capacity: 100,
-          ),
-          _buildJobCard(
-            title: "Security Guard",
-            company: "Brinks",
-            location: "Ankara, Turkey",
-            applied: 2,
-            capacity: 10,
-          ),
-          const SizedBox(height: 30),
-          _buildSectionHeader("Today jobs"),
-          const SizedBox(height: 15),
-          _buildJobCard(
-            title: "Cleaning Staff",
-            company: "CleanHome",
-            location: "Berlin, Germany",
-            applied: 5,
-            capacity: 20,
-          ),
-          _buildJobCard(
-            title: "Barista",
-            company: "Starbucks",
-            location: "Rome, Italy",
-            applied: 10,
-            capacity: 15,
-          ),
-          _buildJobCard(
-            title: "Waiter/Waitress",
-            company: "Local Restaurant",
-            location: "Florence, Italy",
-            applied: 4,
-            capacity: 10,
-          ),
-        ],
+    final String query = _searchController.text.toLowerCase();
+    
+    final List<Map<String, dynamic>> categoryJobs = _allJobs
+        .where((job) => job["category"] == _selectedCategory && 
+                job["title"].toString().toLowerCase().contains(query))
+        .toList();
+
+    final List<Map<String, dynamic>> specialJobs = categoryJobs.where((job) => job["isSpecial"] == true).toList();
+    final List<Map<String, dynamic>> todayJobs = categoryJobs.where((job) => job["isSpecial"] == false).toList();
+
+    if (categoryJobs.isEmpty) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 40),
+          child: Text("No jobs found matching your search", style: TextStyle(color: Colors.white54, fontSize: 14)),
+        ),
       );
     }
+
+    return Column(
+      children: [
+        if (specialJobs.isNotEmpty) ...[
+          _buildSectionHeader("Special jobs"),
+          const SizedBox(height: 15),
+          ...specialJobs.map((job) => _buildJobCard(
+            title: job["title"],
+            company: job["company"],
+            location: job["location"],
+            applied: job["applied"],
+            capacity: job["capacity"],
+          )),
+        ],
+        if (todayJobs.isNotEmpty) ...[
+          const SizedBox(height: 10),
+          _buildSectionHeader("Today jobs"),
+          const SizedBox(height: 15),
+          ...todayJobs.map((job) => _buildJobCard(
+            title: job["title"],
+            company: job["company"],
+            location: job["location"],
+            applied: job["applied"],
+            capacity: job["capacity"],
+          )),
+        ],
+      ],
+    );
   }
 
   Widget _buildSectionHeader(String title) {
@@ -436,35 +408,25 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
           ),
         ),
         Row(
-          children: [
-            const Text("Show all jobs", style: TextStyle(color: Colors.white54, fontSize: 12)),
-            const SizedBox(width: 4),
-            const Icon(Icons.arrow_forward, color: Colors.white54, size: 16),
+          children: const [
+            Text("Show all jobs", style: TextStyle(color: Colors.white54, fontSize: 12)),
+            SizedBox(width: 4),
+            Icon(Icons.arrow_forward, color: Colors.white54, size: 16),
           ],
         ),
       ],
     );
   }
 
-  Widget _buildJobCard({
-    required String title,
-    required String company,
-    required String location,
-    required int applied,
-    required int capacity,
-  }) {
+  Widget _buildJobCard({required String title, required String company, required String location, required int applied, required int capacity}) {
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: Colors.white12,
-              borderRadius: BorderRadius.circular(10),
-            ),
+            width: 44, height: 44,
+            decoration: BoxDecoration(color: Colors.white12, borderRadius: BorderRadius.circular(10)),
             child: const Icon(Icons.business, color: Colors.white, size: 24),
           ),
           const SizedBox(width: 12),
@@ -479,7 +441,6 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
                   children: [
                     _buildTag("Full-Time"),
                     _buildTag("Marketing", isHighlighted: true),
-                    _buildTag("Design"),
                   ],
                 ),
               ],
@@ -490,10 +451,7 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
             children: [
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF49769F),
-                  borderRadius: BorderRadius.circular(20),
-                ),
+                decoration: BoxDecoration(color: const Color(0xFF49769F), borderRadius: BorderRadius.circular(20)),
                 child: const Text("Apply", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
               ),
               const SizedBox(height: 10),
@@ -534,10 +492,7 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
       ),
       child: Text(
         text,
-        style: TextStyle(
-          color: isHighlighted ? Colors.orange : Colors.white70,
-          fontSize: 10,
-        ),
+        style: TextStyle(color: isHighlighted ? Colors.orange : Colors.white70, fontSize: 10),
       ),
     );
   }

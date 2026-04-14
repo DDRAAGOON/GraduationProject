@@ -2,12 +2,9 @@ import 'package:flutter/material.dart';
 import '../core/app_colors.dart';
 import '../../../constants/app_images.dart';
 import 'edit_profile_screen.dart';
-
-// Global-like storage for prototype purposes
-class UserProfileData {
-  static String aboutMe = "I'm a product designer + filmmaker currently working remotely at Twitter from beautiful Manchester, United Kingdom. I'm passionate about designing digital products that have a positive impact on the world.\n\nFor 10 years, I've specialised in interface, experience & interaction design as well as working in user research and product strategy for product agencies, big tech companies & start-ups.";
-  static String fullName = "Jake Gyll";
-}
+import '../notifications/notifications_screen.dart';
+import '../settings/setting_screen.dart';
+import 'user_data.dart';
 
 class ProfileOverviewScreen extends StatefulWidget {
   const ProfileOverviewScreen({super.key});
@@ -32,9 +29,21 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    _buildTopIconButton(Icons.notifications_none, hasBadge: true),
+                    _buildTopIconButton(
+                      Icons.notifications_none,
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const NotificationsScreen()),
+                      ),
+                    ),
                     const SizedBox(width: 12),
-                    _buildTopIconButton(Icons.settings_outlined),
+                    _buildTopIconButton(
+                      Icons.settings_outlined,
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const SettingScreen()),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -91,46 +100,55 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
               // User Info Header
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Text(
-                          UserProfileData.fullName,
-                          style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+                        Expanded(
+                          child: Text(
+                            UserProfileData.fullName,
+                            style: const TextStyle(
+                              color: Colors.white, 
+                              fontSize: 20, // تم تقليل حجم الخط لتجنب التداخل
+                              fontWeight: FontWeight.bold
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
-                        const SizedBox(height: 4),
-                        const Text(
-                          "Product Designer at Twitter",
-                          style: TextStyle(color: Colors.white70, fontSize: 14),
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          children: const [
-                            Icon(Icons.location_on_outlined, color: Colors.white54, size: 16),
-                            SizedBox(width: 4),
-                            Text("Manchester, UK", style: TextStyle(color: Colors.white54, fontSize: 14)),
-                          ],
+                        const SizedBox(width: 10), // مسافة أمان بين الاسم والزر
+                        OutlinedButton(
+                          onPressed: () async {
+                            await Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const EditProfileScreen()),
+                            );
+                            setState(() {});
+                          },
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: Colors.white54),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                          ),
+                          child: const Text("Edit Profile", style: TextStyle(color: Colors.white, fontSize: 11)),
                         ),
                       ],
                     ),
-                    OutlinedButton(
-                      onPressed: () async {
-                        // Wait for the Edit screen to pop and then refresh
-                        await Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => const EditProfileScreen()),
-                        );
-                        setState(() {}); // Refresh the UI with new data
-                      },
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Colors.white54),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                      ),
-                      child: const Text("Edit Profile", style: TextStyle(color: Colors.white, fontSize: 12)),
+                    const SizedBox(height: 8),
+                    Text(
+                      UserProfileData.jobTitle,
+                      style: const TextStyle(color: Colors.white70, fontSize: 14),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        const Icon(Icons.location_on_outlined, color: Colors.white54, size: 16),
+                        const SizedBox(width: 4),
+                        Text(UserProfileData.location, style: const TextStyle(color: Colors.white54, fontSize: 14)),
+                      ],
                     ),
                   ],
                 ),
@@ -177,14 +195,9 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Wrap(
-                  spacing: 40,
-                  runSpacing: 15,
-                  children: [
-                    _buildSkillItem("Facebook Ads"),
-                    _buildSkillItem("Analytics"),
-                    _buildSkillItem("Community Manager"),
-                    _buildSkillItem("Content Planning"),
-                  ],
+                  spacing: 10,
+                  runSpacing: 10,
+                  children: UserProfileData.skills.map((skill) => _buildSkillTag(skill)).toList(),
                 ),
               ),
 
@@ -192,11 +205,11 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
 
               // Portfolio
               _buildSectionTitle("Portfolio URL"),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Text(
-                  "https://www.Protfolio.com",
-                  style: TextStyle(color: Colors.blueAccent, fontSize: 16),
+                  UserProfileData.portfolioUrl.isEmpty ? "No portfolio added" : UserProfileData.portfolioUrl,
+                  style: const TextStyle(color: Colors.blueAccent, fontSize: 16),
                 ),
               ),
 
@@ -205,33 +218,24 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
               // Details Sections
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Row(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text("Additional Details", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                          const SizedBox(height: 20),
-                          _buildDetailItem(Icons.email_outlined, "Email", "jakegyll@email.com"),
-                          _buildDetailItem(Icons.phone_android_outlined, "Phone", "+44 1245 572 135"),
-                          _buildDetailItem(Icons.translate_outlined, "Languages", "English, French"),
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text("Social Links", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                          const SizedBox(height: 20),
-                          _buildDetailItem(Icons.camera_alt_outlined, "Instagram", "instagram.com/jakegyll"),
-                          _buildDetailItem(Icons.chat_bubble_outline, "Twitter", "twitter.com/jakogyll"),
-                          _buildDetailItem(Icons.language_outlined, "Website", "www.jakegyll.com"),
-                        ],
-                      ),
-                    ),
+                    const Text("Additional Details", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 20),
+                    _buildDetailItem(Icons.email_outlined, "Email", UserProfileData.email),
+                    _buildDetailItem(Icons.phone_android_outlined, "Phone", UserProfileData.phone),
+                    _buildDetailItem(Icons.calendar_today_outlined, "Birthday", UserProfileData.dob),
+                    
+                    const SizedBox(height: 30),
+                    const Text("Social Links", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 20),
+                    if (UserProfileData.socialLinks.isEmpty)
+                      const Text("No social links added", style: TextStyle(color: Colors.white38, fontSize: 12))
+                    else
+                      ...UserProfileData.socialLinks.map((link) => 
+                        _buildDetailItem(Icons.link, link["platform"]!, link["url"]!)
+                      ).toList(),
                   ],
                 ),
               ),
@@ -244,33 +248,19 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
     );
   }
 
-  Widget _buildTopIconButton(IconData icon, {bool hasBadge = false}) {
-    return Stack(
-      children: [
-        Container(
-          width: 44,
-          height: 44,
-          decoration: BoxDecoration(
-            color: const Color(0xFF0D2D4D),
-            shape: BoxShape.circle,
-            border: Border.all(color: Colors.white12),
-          ),
-          child: Icon(icon, color: Colors.white, size: 22),
+  Widget _buildTopIconButton(IconData icon, {VoidCallback? onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 44,
+        height: 44,
+        decoration: BoxDecoration(
+          color: const Color(0xFF0D2D4D),
+          shape: BoxShape.circle,
+          border: Border.all(color: Colors.white12),
         ),
-        if (hasBadge)
-          Positioned(
-            right: 12,
-            top: 10,
-            child: Container(
-              width: 8,
-              height: 8,
-              decoration: const BoxDecoration(
-                color: Colors.red,
-                shape: BoxShape.circle,
-              ),
-            ),
-          ),
-      ],
+        child: Icon(icon, color: Colors.white, size: 22),
+      ),
     );
   }
 
@@ -284,10 +274,18 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
     );
   }
 
-  Widget _buildSkillItem(String label) {
-    return Text(
-      label,
-      style: const TextStyle(color: Colors.white60, fontSize: 14),
+  Widget _buildSkillTag(String label) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: const Color(0xFF49769F).withOpacity(0.1),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFF49769F).withOpacity(0.3)),
+      ),
+      child: Text(
+        label,
+        style: const TextStyle(color: Colors.white70, fontSize: 13),
+      ),
     );
   }
 
@@ -303,9 +301,9 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: const TextStyle(color: Colors.white, fontSize: 14)),
+                Text(title, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 2),
-                Text(value, style: const TextStyle(color: Colors.white54, fontSize: 12)),
+                Text(value, style: const TextStyle(color: Colors.white54, fontSize: 13), maxLines: 1, overflow: TextOverflow.ellipsis),
               ],
             ),
           ),

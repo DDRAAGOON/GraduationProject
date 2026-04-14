@@ -1,4 +1,15 @@
 class UserProfileData {
-  static String aboutMe = "I'm a product designer + filmmaker currently working remotely at Twitter from beautiful Manchester, United Kingdom. I'm passionate about designing digital products that have a positive impact on the world.\n\nFor 10 years, I've specialised in interface, experience & interaction design as well as working in user research and product strategy for product agencies, big tech companies & start-ups.";
   static String fullName = "Jake Gyll";
+  static String aboutMe = "I'm a product designer + filmmaker currently working remotely at Twitter from beautiful Manchester, United Kingdom.";
+  static String phone = "+44 1245 572 135";
+  static String email = "jakegyll@email.com";
+  static String dob = "1998-12-12";
+  static String gender = "Male";
+  static String portfolioUrl = "";
+  static String location = "Manchester, UK";
+  static String jobTitle = "Product Designer at Twitter";
+  
+  // أضفت هذه القوائم لحفظ البيانات الجديدة
+  static List<String> skills = ["Facebook Ads", "Analytics", "Community Manager", "Content Planning"];
+  static List<Map<String, String>> socialLinks = [];
 }
