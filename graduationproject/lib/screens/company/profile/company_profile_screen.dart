@@ -73,16 +73,7 @@ class _CompanyCompanyProfileScreenState
                 )).toList(),
               ),
               const SizedBox(height: 16),
-              SectionTitle(t.tr(en: 'Tech Stack', ar: 'التقنيات المستخدمة')),
               const SizedBox(height: 10),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: _store.techStack.map((item) => Chip(
-                  label: Text(item, style: const TextStyle(fontSize: 12)),
-                  visualDensity: VisualDensity.compact,
-                )).toList(),
-              ),
               const SizedBox(height: 16),
               SectionTitle(t.contactSectionLabel),
               const SizedBox(height: 10),

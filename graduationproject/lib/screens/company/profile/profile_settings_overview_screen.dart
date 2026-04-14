@@ -287,7 +287,6 @@ class _CompanyProfileSettingsOverviewScreenState
           ),
           
           const SizedBox(height: 16),
-          _buildChipField(t.tr(en: 'Tech Stack', ar: 'التقنيات المستخدمة'), _techStack, () => _addTagDialog(t.tr(en: 'Tech Stack', ar: 'التقنيات المستخدمة'), _techStack)),
 
           const SizedBox(height: 16),
           AppTextField(label: t.aboutCompany, controller: _about, maxLines: 4),

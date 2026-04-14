@@ -130,13 +130,6 @@ class _StatsGrid extends StatelessWidget {
         onTap: onTapNewCandidates,
       ),
       _MetricCard(
-        title: t.scheduleToday,
-        value: t.tr(en: '3', ar: '٣'),
-        color: Colors.teal.withValues(alpha: 0.25),
-        onTap: () => Navigator.of(context)
-            .pushNamed(AppRoutes.companyApplicantInterviewSchedule),
-      ),
-      _MetricCard(
         title: t.messagesReceived,
         value: t.tr(en: '24', ar: '٢٤'),
         color: Colors.orange.withValues(alpha: 0.25),

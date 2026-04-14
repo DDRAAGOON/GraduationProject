@@ -114,10 +114,6 @@ class MessagesListScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: const [
             Text(
-              "Company",
-              style: TextStyle(color: Colors.white54, fontSize: 12),
-            ),
-            Text(
               "Nomad",
               style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
             ),

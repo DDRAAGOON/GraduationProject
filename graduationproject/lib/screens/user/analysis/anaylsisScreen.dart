@@ -37,7 +37,7 @@ class AnalysisScreen extends StatelessWidget {
 
               // Interviewed Card
               _buildStatCard(
-                title: "Interviewed",
+                title: "Viewed",
                 value: "18",
                 icon: Icons.question_answer_outlined,
               ),

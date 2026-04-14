@@ -72,11 +72,6 @@ class _ProfileLoginDetailsScreenState extends State<ProfileLoginDetailsScreen> {
             const Text("This is login information that you can update anytime.", style: TextStyle(color: Colors.white54, fontSize: 13)),
             const Divider(color: Colors.white24, height: 40),
 
-            // Update Email Section
-            const Text("Update Email", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            const Text("Update your email address to make sure it is safe", style: TextStyle(color: Colors.white54, fontSize: 13)),
-            const SizedBox(height: 24),
             Row(
               children: [
                 const Text("jakegyll@email.com", style: TextStyle(color: Colors.white, fontSize: 15)),
@@ -118,12 +113,6 @@ class _ProfileLoginDetailsScreenState extends State<ProfileLoginDetailsScreen> {
               ],
             ),
             const Divider(color: Colors.white24, height: 60),
-
-            // New Password Section
-            const Text("New Password", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            const Text("Manage your password to make sure it is safe", style: TextStyle(color: Colors.white54, fontSize: 13)),
-            const SizedBox(height: 30),
             
             _buildPasswordField("Old Password", "Enter your old password", _oldPasswordController),
             const SizedBox(height: 24),
