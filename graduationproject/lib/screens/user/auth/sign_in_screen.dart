@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../shared/l10n/app_localizations.dart';
 import '../core/app_colors.dart';
 import '../home/main_screen.dart';
-import '../home/services_Screen.dart';
-import '../home/technical_screen.dart';
 import 'package:graduationproject/screens/user/auth/cubit/auth_cubit.dart';
 import '../../../constants/app_images.dart';
 import 'forgot_password_screen.dart';
@@ -42,6 +41,7 @@ class _SignInScreenState extends State<SignInScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return BlocConsumer<AuthCubit, AuthState>(
       listener: (context, state) {
         if (state is AuthSuccess) {
@@ -52,9 +52,9 @@ class _SignInScreenState extends State<SignInScreen> {
         }
 
         if (state is AuthError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message)),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.message)));
         }
       },
       builder: (context, state) {
@@ -69,9 +69,13 @@ class _SignInScreenState extends State<SignInScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 60),
-                  const Text(
-                    "Sign in to your\naccount",
-                    style: TextStyle(
+                  Text(
+                    t.userTr(
+                      'auth.signInTitle',
+                      fallbackEn: 'Sign in to your\naccount',
+                      fallbackAr: 'تسجيل الدخول إلى\nحسابك',
+                    ),
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
@@ -81,14 +85,24 @@ class _SignInScreenState extends State<SignInScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        "Email Address",
-                        style: TextStyle(color: Colors.white70, fontSize: 14),
+                      Text(
+                        t.userTr(
+                          'auth.emailLabel',
+                          fallbackEn: 'Email Address',
+                          fallbackAr: 'البريد الإلكتروني',
+                        ),
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 14,
+                        ),
                       ),
                       if (_emailError != null)
                         Text(
                           _emailError!,
-                          style: const TextStyle(color: Colors.red, fontSize: 12),
+                          style: const TextStyle(
+                            color: Colors.red,
+                            fontSize: 12,
+                          ),
                         ),
                     ],
                   ),
@@ -97,20 +111,28 @@ class _SignInScreenState extends State<SignInScreen> {
                     controller: _emailController,
                     style: const TextStyle(color: Colors.white),
                     decoration: InputDecoration(
-                      hintText: "Enter your email",
+                      hintText: t.userTr(
+                        'auth.emailHint',
+                        fallbackEn: 'Enter your email',
+                        fallbackAr: 'أدخل بريدك الإلكتروني',
+                      ),
                       hintStyle: const TextStyle(color: Colors.white38),
                       filled: true,
                       fillColor: Colors.white.withOpacity(0.05),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                         borderSide: BorderSide(
-                          color: _emailError != null ? Colors.red : Colors.white24,
+                          color: _emailError != null
+                              ? Colors.red
+                              : Colors.white24,
                         ),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                         borderSide: BorderSide(
-                          color: _emailError != null ? Colors.red : Colors.white24,
+                          color: _emailError != null
+                              ? Colors.red
+                              : Colors.white24,
                         ),
                       ),
                     ),
@@ -119,14 +141,24 @@ class _SignInScreenState extends State<SignInScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        "Password",
-                        style: TextStyle(color: Colors.white70, fontSize: 14),
+                      Text(
+                        t.userTr(
+                          'auth.passwordLabel',
+                          fallbackEn: 'Password',
+                          fallbackAr: 'كلمة المرور',
+                        ),
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 14,
+                        ),
                       ),
                       if (_passwordError != null)
                         Text(
                           _passwordError!,
-                          style: const TextStyle(color: Colors.red, fontSize: 12),
+                          style: const TextStyle(
+                            color: Colors.red,
+                            fontSize: 12,
+                          ),
                         ),
                     ],
                   ),
@@ -156,13 +188,17 @@ class _SignInScreenState extends State<SignInScreen> {
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                         borderSide: BorderSide(
-                          color: _passwordError != null ? Colors.red : Colors.white24,
+                          color: _passwordError != null
+                              ? Colors.red
+                              : Colors.white24,
                         ),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                         borderSide: BorderSide(
-                          color: _passwordError != null ? Colors.red : Colors.white24,
+                          color: _passwordError != null
+                              ? Colors.red
+                              : Colors.white24,
                         ),
                       ),
                     ),
@@ -179,9 +215,13 @@ class _SignInScreenState extends State<SignInScreen> {
                           ),
                         );
                       },
-                      child: const Text(
-                        "Forgot password?",
-                        style: TextStyle(color: Colors.white70),
+                      child: Text(
+                        t.userTr(
+                          'auth.forgotPassword',
+                          fallbackEn: 'Forgot password?',
+                          fallbackAr: 'نسيت كلمة المرور؟',
+                        ),
+                        style: const TextStyle(color: Colors.white70),
                       ),
                     ),
                   ),
@@ -221,18 +261,36 @@ class _SignInScreenState extends State<SignInScreen> {
                               bool hasError = false;
 
                               if (email.isEmpty) {
-                                _emailError = "Email is required";
+                                _emailError = t.userTr(
+                                  'auth.errorEmailRequired',
+                                  fallbackEn: 'Email is required',
+                                  fallbackAr: 'البريد الإلكتروني مطلوب',
+                                );
                                 hasError = true;
                               } else if (!_isValidEmail(email)) {
-                                _emailError = "Invalid email (@gmail.com required)";
+                                _emailError = t.userTr(
+                                  'auth.errorEmailInvalid',
+                                  fallbackEn:
+                                      'Invalid email (@gmail.com required)',
+                                  fallbackAr:
+                                      'بريد غير صالح (يجب أن يكون @gmail.com)',
+                                );
                                 hasError = true;
                               }
 
                               if (password.isEmpty) {
-                                _passwordError = "Password is required";
+                                _passwordError = t.userTr(
+                                  'auth.errorPasswordRequired',
+                                  fallbackEn: 'Password is required',
+                                  fallbackAr: 'كلمة المرور مطلوبة',
+                                );
                                 hasError = true;
                               } else if (!_isValidPassword(password)) {
-                                _passwordError = "At least 8 characters required";
+                                _passwordError = t.userTr(
+                                  'auth.errorPasswordMin',
+                                  fallbackEn: 'At least 8 characters required',
+                                  fallbackAr: 'يجب أن تكون 8 أحرف على الأقل',
+                                );
                                 hasError = true;
                               }
 
@@ -263,9 +321,13 @@ class _SignInScreenState extends State<SignInScreen> {
                                 strokeWidth: 2,
                               ),
                             )
-                          : const Text(
-                              "Continue",
-                              style: TextStyle(
+                          : Text(
+                              t.userTr(
+                                'auth.continue',
+                                fallbackEn: 'Continue',
+                                fallbackAr: 'متابعة',
+                              ),
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -274,14 +336,21 @@ class _SignInScreenState extends State<SignInScreen> {
                     ),
                   ),
                   const SizedBox(height: 40),
-                  const Row(
+                  Row(
                     children: [
                       Expanded(child: Divider(color: Colors.white24)),
                       Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 18.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 18.0),
                         child: Text(
-                          "Or sign in with",
-                          style: TextStyle(color: Colors.white38, fontSize: 16),
+                          t.userTr(
+                            'auth.orSignInWith',
+                            fallbackEn: 'Or sign in with',
+                            fallbackAr: 'أو سجل دخولك بواسطة',
+                          ),
+                          style: const TextStyle(
+                            color: Colors.white38,
+                            fontSize: 16,
+                          ),
                         ),
                       ),
                       Expanded(child: Divider(color: Colors.white24)),
@@ -300,28 +369,39 @@ class _SignInScreenState extends State<SignInScreen> {
                         width: 24,
                         height: 24,
                         fit: BoxFit.contain,
-                        errorBuilder: (context, error, stackTrace) => const Icon(Icons.error, color: Colors.red),
-                      )
+                        errorBuilder: (context, error, stackTrace) =>
+                            const Icon(Icons.error, color: Colors.red),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 30),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text(
-                        "Don’t have an account, ",
-                        style: TextStyle(color: Colors.white70),
+                      Text(
+                        t.userTr(
+                          'auth.noAccount',
+                          fallbackEn: 'Don’t have an account, ',
+                          fallbackAr: 'ليس لديك حساب، ',
+                        ),
+                        style: const TextStyle(color: Colors.white70),
                       ),
                       GestureDetector(
                         onTap: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => const SignUpScreen()),
+                            MaterialPageRoute(
+                              builder: (context) => const SignUpScreen(),
+                            ),
                           );
                         },
-                        child: const Text(
-                          "Sign up",
-                          style: TextStyle(
+                        child: Text(
+                          t.userTr(
+                            'auth.signUp',
+                            fallbackEn: 'Sign up',
+                            fallbackAr: 'إنشاء حساب',
+                          ),
+                          style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
                             decoration: TextDecoration.underline,

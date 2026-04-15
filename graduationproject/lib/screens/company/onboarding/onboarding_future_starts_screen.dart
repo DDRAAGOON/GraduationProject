@@ -28,28 +28,42 @@ class CompanyOnboardingFutureStartsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 22),
             Text(
-              t.futureStartsHere,
+              t.companyTr(
+                'onboarding.title3',
+                fallbackEn: t.futureStartsHere,
+                fallbackAr: t.futureStartsHere,
+              ),
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    fontSize: 24,
-                  ),
+                fontWeight: FontWeight.w700,
+                fontSize: 24,
+              ),
             ),
             const SizedBox(height: 10),
             Text(
-              t.futureStartsSub,
+              t.companyTr(
+                'onboarding.subtitle3',
+                fallbackEn: t.futureStartsSub,
+                fallbackAr: t.futureStartsSub,
+              ),
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-                    fontSize: 16,
-                  ),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.7),
+                fontSize: 16,
+              ),
             ),
             const Spacer(),
             AppButton(
-              label: t.getStarted,
-              onPressed: () => Navigator.of(context).pushReplacementNamed(
-                AppRoutes.companySignIn,
+              label: t.companyTr(
+                'getStarted',
+                fallbackEn: t.getStarted,
+                fallbackAr: t.getStarted,
               ),
+              onPressed: () => Navigator.of(
+                context,
+              ).pushReplacementNamed(AppRoutes.companySignIn),
             ),
             const SizedBox(height: 10),
           ],

@@ -10,13 +10,21 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  cupertino_icons: ^1.0.8
-  font_awesome_flutter: ^10.7.0
-  dio: ^5.0.0
-  country_picker: ^2.0.24
-  flutter_bloc: ^8.1.6
-  bloc: ^8.1.4
-  equatable: ^2.0.5
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.20.2
+  cupertino_icons: ^1.0.9
+  font_awesome_flutter: ^11.0.0
+  dio: ^5.9.2
+  country_picker: ^2.0.27
+  flutter_bloc: ^9.1.1
+  bloc: ^9.2.0
+  equatable: ^2.0.8
+  icons_plus: ^5.0.0
+  curved_navigation_bar: ^1.0.6
+  intl_phone_field: ^3.2.0
+  flutter_svg: ^2.2.0
+  fl_chart: ^1.0.0
 
 dev_dependencies:
   flutter_test:
@@ -28,6 +36,7 @@ flutter:
   uses-material-design: true
 
   assets:
+    - assets/l10n/
     - assets/company/Onboarding/
     - assets/company/logo/
     - assets/company/icon/

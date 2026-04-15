@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../app/router/app_router.dart';
 import '../../constants/app_images.dart';
+import '../../shared/l10n/app_localizations.dart';
 
 /// First launch: choose Job seeker (User) or Recruiter (Company), then each flow’s onboarding.
 class LogoPage extends StatelessWidget {
@@ -9,6 +10,7 @@ class LogoPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
+    final t = AppLocalizations.of(context);
 
     return Scaffold(
       backgroundColor: const Color(0xFFEAEEF2),
@@ -36,27 +38,34 @@ class LogoPage extends StatelessWidget {
                 ),
               ),
               _RoleButton(
-                label: 'User',
+                label: t.userTr(
+                  'role.user',
+                  fallbackEn: 'User',
+                  fallbackAr: 'مستخدم',
+                ),
                 gradient: const LinearGradient(
                   colors: [Color(0xFF1B2D4F), Color(0xFF2E4A7A)],
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,
                 ),
-                onTap: () => Navigator.of(context).pushNamed(
-                  AppRoutes.userOnboarding,
-                ),
+                onTap: () =>
+                    Navigator.of(context).pushNamed(AppRoutes.userOnboarding),
               ),
               SizedBox(height: size.height * 0.022),
               _RoleButton(
-                label: 'Company',
+                label: t.companyTr(
+                  'role.company',
+                  fallbackEn: 'Company',
+                  fallbackAr: 'شركة',
+                ),
                 gradient: const LinearGradient(
                   colors: [Color(0xFF4A6080), Color(0xFF7A9AB8)],
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,
                 ),
-                onTap: () => Navigator.of(context).pushNamed(
-                  AppRoutes.companyOnboardingSmartSearch,
-                ),
+                onTap: () => Navigator.of(
+                  context,
+                ).pushNamed(AppRoutes.companyOnboardingSmartSearch),
               ),
               SizedBox(height: size.height * 0.07),
             ],

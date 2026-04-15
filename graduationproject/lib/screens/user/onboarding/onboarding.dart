@@ -22,7 +22,6 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
         curve: Curves.easeIn,
       );
     } else {
-      print("Navigating to SignIn");
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const SignInScreen()),

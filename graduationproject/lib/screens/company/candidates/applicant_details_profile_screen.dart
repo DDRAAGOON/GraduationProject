@@ -36,8 +36,8 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
                   Text(
                     applicant.fullName,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.w900,
-                        ),
+                      fontWeight: FontWeight.w900,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Text(
@@ -50,9 +50,9 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 14),
                   AppButton(
-                    label: t.scheduleInterview,
+                    label: t.hiringProgress,
                     onPressed: () => Navigator.of(context).pushNamed(
-                      AppRoutes.companyApplicantInterviewSchedule,
+                      AppRoutes.companyApplicantHiringHiredDeclined,
                       arguments: applicant,
                     ),
                   ),
@@ -84,7 +84,7 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
               Expanded(
                 child: OutlinedButton(
                   onPressed: () => Navigator.of(context).pushNamed(
-                    AppRoutes.companyApplicantHiringInterview,
+                    AppRoutes.companyApplicantHiringHiredDeclined,
                     arguments: applicant,
                   ),
                   child: Text(t.hiringProgress),

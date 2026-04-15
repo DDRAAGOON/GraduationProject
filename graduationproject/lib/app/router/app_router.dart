@@ -11,8 +11,6 @@ import '../../screens/company/auth/sign_up_screen.dart';
 import '../../screens/company/candidates/applicant_details_profile_screen.dart';
 import '../../screens/company/candidates/applicant_details_resume_screen.dart';
 import '../../screens/company/candidates/applicant_hiring_progress_hired_declined_screen.dart';
-import '../../screens/company/candidates/applicant_hiring_progress_interview_screen.dart';
-import '../../screens/company/candidates/applicant_interview_schedule_screen.dart';
 import '../../screens/company/help/help_center_screen.dart';
 import '../../screens/company/home/dashboard_screen.dart';
 import '../../screens/company/jobs/job_analytics_screen.dart';
@@ -53,7 +51,8 @@ final class AppRoutes {
   static const userOnboarding = '/user/onboarding';
 
   // --- Company Onboarding Routes ---
-  static const companyOnboardingSmartSearch = '/company/onboarding/smart_search';
+  static const companyOnboardingSmartSearch =
+      '/company/onboarding/smart_search';
   static const companyOnboardingNextJobCloser =
       '/company/onboarding/next_job_closer';
   static const companyOnboardingFutureStarts =
@@ -83,12 +82,8 @@ final class AppRoutes {
 
   static const companyApplicantDetailsProfile = '/company/candidates/profile';
   static const companyApplicantDetailsResume = '/company/candidates/resume';
-  static const companyApplicantHiringInterview =
-      '/company/candidates/hiring_interview';
   static const companyApplicantHiringHiredDeclined =
       '/company/candidates/hiring_hired_declined';
-  static const companyApplicantInterviewSchedule =
-      '/company/candidates/interview_schedule';
 
   static const companyProfileOverview = '/company/profile/overview';
   static const companyProfileSocialLinks = '/company/profile/social_links';
@@ -131,7 +126,9 @@ final class AppRouter {
         page = const CompanyForgotPasswordScreen();
       case AppRoutes.companyOtp:
         page = CompanyOtpEmailVerificationScreen(
-          email: (args is String && args.isNotEmpty) ? args : 'example@mail.com',
+          email: (args is String && args.isNotEmpty)
+              ? args
+              : 'example@mail.com',
         );
       case AppRoutes.companyResetPassword:
         page = const CompanyResetPasswordScreen();
@@ -175,16 +172,8 @@ final class AppRouter {
         page = CompanyApplicantDetailsResumeScreen(
           applicant: args is Applicant ? args : Applicant.mock(),
         );
-      case AppRoutes.companyApplicantHiringInterview:
-        page = CompanyApplicantHiringProgressInterviewScreen(
-          applicant: args is Applicant ? args : Applicant.mock(),
-        );
       case AppRoutes.companyApplicantHiringHiredDeclined:
         page = CompanyApplicantHiringProgressHiredDeclinedScreen(
-          applicant: args is Applicant ? args : Applicant.mock(),
-        );
-      case AppRoutes.companyApplicantInterviewSchedule:
-        page = CompanyApplicantInterviewScheduleScreen(
           applicant: args is Applicant ? args : Applicant.mock(),
         );
       case AppRoutes.companyProfileOverview:
@@ -226,8 +215,11 @@ class _UnknownRouteScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Unknown route')),
-      body: Center(child: Text('Route not found: ${ModalRoute.of(context)?.settings.name}')),
+      body: Center(
+        child: Text(
+          'Route not found: ${ModalRoute.of(context)?.settings.name}',
+        ),
+      ),
     );
   }
 }
-

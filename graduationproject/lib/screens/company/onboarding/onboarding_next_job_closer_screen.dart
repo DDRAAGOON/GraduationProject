@@ -28,31 +28,45 @@ class CompanyOnboardingNextJobCloserScreen extends StatelessWidget {
             ),
             const SizedBox(height: 22),
             Text(
-              t.smartSearchTitle,
+              t.companyTr(
+                'onboarding.title2',
+                fallbackEn: t.smartSearchTitle,
+                fallbackAr: t.smartSearchTitle,
+              ),
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    fontSize: 24,
-                  ),
+                fontWeight: FontWeight.w700,
+                fontSize: 24,
+              ),
             ),
             const SizedBox(height: 10),
             Text(
-              t.smartSearchSub,
+              t.companyTr(
+                'onboarding.subtitle2',
+                fallbackEn: t.smartSearchSub,
+                fallbackAr: t.smartSearchSub,
+              ),
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-                    fontSize: 16,
-                  ),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.7),
+                fontSize: 16,
+              ),
             ),
             const Spacer(),
             Row(
               children: [
                 Expanded(
                   child: AppButton(
-                    label: t.next,
-                    onPressed: () => Navigator.of(context).pushNamed(
-                      AppRoutes.companyOnboardingFutureStarts,
+                    label: t.companyTr(
+                      'next',
+                      fallbackEn: t.next,
+                      fallbackAr: t.next,
                     ),
+                    onPressed: () => Navigator.of(
+                      context,
+                    ).pushNamed(AppRoutes.companyOnboardingFutureStarts),
                   ),
                 ),
               ],
@@ -64,4 +78,3 @@ class CompanyOnboardingNextJobCloserScreen extends StatelessWidget {
     );
   }
 }
-

@@ -10,7 +10,10 @@ import '../../../shared/widgets/section_title.dart';
 import '../widgets/company_applicant_avatar.dart';
 
 class CompanyApplicantHiringProgressHiredDeclinedScreen extends StatefulWidget {
-  const CompanyApplicantHiringProgressHiredDeclinedScreen({super.key, required this.applicant});
+  const CompanyApplicantHiringProgressHiredDeclinedScreen({
+    super.key,
+    required this.applicant,
+  });
 
   final Applicant applicant;
 
@@ -42,7 +45,10 @@ class _CompanyApplicantHiringProgressHiredDeclinedScreenState
         children: [
           Card(
             child: ListTile(
-              leading: CompanyApplicantAvatar(seed: widget.applicant.id, radius: 24),
+              leading: CompanyApplicantAvatar(
+                seed: widget.applicant.id,
+                radius: 24,
+              ),
               title: Text(widget.applicant.fullName),
               subtitle: Text(widget.applicant.role),
             ),
@@ -52,7 +58,6 @@ class _CompanyApplicantHiringProgressHiredDeclinedScreenState
           const SizedBox(height: 10),
           SegmentedButton<String>(
             segments: [
-              ButtonSegment(value: 'Interview', label: Text(t.interview)),
               ButtonSegment(value: 'Hired', label: Text(t.hired)),
               ButtonSegment(value: 'Declined', label: Text(t.declined)),
             ],
@@ -66,9 +71,7 @@ class _CompanyApplicantHiringProgressHiredDeclinedScreenState
               child: Text(
                 _stage == 'Hired'
                     ? t.candidateHiredMsg
-                    : _stage == 'Declined'
-                        ? t.candidateDeclinedMsg
-                        : t.candidateInterviewMsg,
+                    : t.candidateDeclinedMsg,
               ),
             ),
           ),

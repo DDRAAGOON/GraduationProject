@@ -3,8 +3,6 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:path_provider/path_provider.dart';
-
 /// Writes `about_intro_en.json` and `about_intro_ar.json` next to app documents
 /// (same shape as bundled assets).
 final class IntroJsonExport {
@@ -14,7 +12,7 @@ final class IntroJsonExport {
     required String englishAbout,
     required String arabicAbout,
   }) async {
-    final dir = await getApplicationDocumentsDirectory();
+    final dir = Directory.current;
     final enPath = '${dir.path}${Platform.pathSeparator}about_intro_en.json';
     final arPath = '${dir.path}${Platform.pathSeparator}about_intro_ar.json';
     final enc = const JsonEncoder.withIndent('  ');

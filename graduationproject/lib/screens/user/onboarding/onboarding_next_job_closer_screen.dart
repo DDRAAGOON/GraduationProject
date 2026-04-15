@@ -1,22 +1,19 @@
 import 'package:flutter/material.dart';
 import '../../../constants/app_images.dart';
+import '../../../shared/l10n/app_localizations.dart';
 import '../core/app_colors.dart';
 
 //import 'core/indictor.dart';
-
 
 class Screen1 extends StatelessWidget {
   final VoidCallback onNext;
   final int currentPage;
 
-  const Screen1({
-    super.key,
-    required this.onNext,
-    required this.currentPage,
-  });
+  const Screen1({super.key, required this.onNext, required this.currentPage});
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -30,24 +27,37 @@ class Screen1 extends StatelessWidget {
                 height: MediaQuery.of(context).size.height * 0.3,
                 fit: BoxFit.contain,
                 errorBuilder: (context, error, stackTrace) {
-                  return const Icon(Icons.broken_image, size: 100, color: Colors.white);
+                  return const Icon(
+                    Icons.broken_image,
+                    size: 100,
+                    color: Colors.white,
+                  );
                 },
               ),
               const Spacer(flex: 2),
-              const Text(
-                "Your Next Job Is Closer Than\nYou Think",
+              Text(
+                t.userTr(
+                  'onboarding.title1',
+                  fallbackEn: 'Your Next Job Is Closer Than\nYou Think',
+                  fallbackAr: 'وظيفتك القادمة أقرب مما\nتتوقع',
+                ),
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 16),
-              const Text(
-                "Thousands of job opportunities are waiting\nfor you",
+              Text(
+                t.userTr(
+                  'onboarding.subtitle1',
+                  fallbackEn:
+                      'Thousands of job opportunities are waiting\nfor you',
+                  fallbackAr: 'آلاف فرص العمل في انتظارك',
+                ),
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 16,
                   height: 1.5,
@@ -58,9 +68,12 @@ class Screen1 extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Row(
-                    children: List.generate(3, (index) => buildIndicator(isActive: index == currentPage)),
+                    children: List.generate(
+                      3,
+                      (index) => buildIndicator(isActive: index == currentPage),
+                    ),
                   ),
-                  buildNextButton(onNext),
+                  buildNextButton(onNext, t),
                 ],
               ),
               const SizedBox(height: 40),
@@ -71,7 +84,7 @@ class Screen1 extends StatelessWidget {
     );
   }
 
-  Widget buildNextButton(VoidCallback onPressed) {
+  Widget buildNextButton(VoidCallback onPressed, AppLocalizations t) {
     return GestureDetector(
       onTap: onPressed,
       child: Container(
@@ -82,7 +95,6 @@ class Screen1 extends StatelessWidget {
               Color(0xFF0A2A4A), // غامق
               Color(0xFF2F5F8F), // أفتح
               Color.fromARGB(255, 118, 159, 178),
-
             ],
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,
@@ -101,10 +113,10 @@ class Screen1 extends StatelessWidget {
             ),
           ],
         ),
-        child: const Text(
-          "Next",
+        child: Text(
+          t.userTr('onboarding.next', fallbackEn: 'Next', fallbackAr: 'التالي'),
           textAlign: TextAlign.center,
-          style: TextStyle(
+          style: const TextStyle(
             color: Colors.white,
             fontSize: 18,
             fontWeight: FontWeight.bold,
@@ -113,6 +125,7 @@ class Screen1 extends StatelessWidget {
       ),
     );
   }
+
   Widget buildIndicator({required bool isActive}) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
@@ -124,6 +137,5 @@ class Screen1 extends StatelessWidget {
         borderRadius: BorderRadius.circular(5),
       ),
     );
-
   }
 }
