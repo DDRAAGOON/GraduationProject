@@ -20,19 +20,7 @@ class NotificationsScreen extends StatelessWidget {
           "Notifications",
           style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
         ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-            child: CircleAvatar(
-              backgroundColor: Colors.white,
-              radius: 20,
-              child: IconButton(
-                icon: const Icon(Icons.tune, color: Colors.black, size: 20),
-                onPressed: () {},
-              ),
-            ),
-          ),
-        ],
+        
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 24.0),
