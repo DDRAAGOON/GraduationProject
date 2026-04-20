@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'teardsman_data.dart';
-import '../../core/app_colors.dart';
 
 class TradesmanProfile extends StatelessWidget {
   const TradesmanProfile({super.key});
@@ -40,7 +39,7 @@ class TradesmanProfile extends StatelessWidget {
                   child: CircleAvatar(
                     radius: 55,
                     backgroundColor: Colors.white12,
-                    child: Icon(Icons.person, size: 70, color: Colors.white.withOpacity(0.5)),
+                    child: Icon(Icons.person, size: 70, color: Colors.white.withValues(alpha: 0.5)),
                   ),
                 ),
               ],
@@ -98,7 +97,7 @@ class TradesmanProfile extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(15),
       ),
       child: Column(
@@ -134,7 +133,7 @@ class TradesmanProfile extends StatelessWidget {
           runSpacing: 8,
           children: TradesmanProfileData.skills.map((skill) => Chip(
             label: Text(skill, style: const TextStyle(color: Colors.white, fontSize: 12)),
-            backgroundColor: const Color(0xFF49769F).withOpacity(0.2),
+            backgroundColor: const Color(0xFF49769F).withValues(alpha: 0.2),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           )).toList(),
         ),
@@ -153,7 +152,7 @@ class TradesmanProfile extends StatelessWidget {
           margin: const EdgeInsets.only(bottom: 10),
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.03),
+            color: Colors.white.withValues(alpha: 0.03),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Row(
@@ -206,3 +205,4 @@ class TradesmanProfile extends StatelessWidget {
     );
   }
 }
+

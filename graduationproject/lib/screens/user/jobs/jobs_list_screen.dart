@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../core/app_colors.dart';
 import '../../../constants/app_images.dart';
 
@@ -133,7 +133,7 @@ class _JobsListScreenState extends State<JobsListScreen> {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(30),
         border: Border.all(color: Colors.white12),
       ),
@@ -325,7 +325,7 @@ class _JobsListScreenState extends State<JobsListScreen> {
             height: 44,
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
+              color: Colors.white.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(10),
             ),
             child: image != null 
@@ -338,7 +338,7 @@ class _JobsListScreenState extends State<JobsListScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
-                Text("$company • $location", style: const TextStyle(color: Colors.white38, fontSize: 12)),
+                Text("$company â€¢ $location", style: const TextStyle(color: Colors.white38, fontSize: 12)),
                 const SizedBox(height: 12),
                 Row(
                   children: [
@@ -395,7 +395,7 @@ class _JobsListScreenState extends State<JobsListScreen> {
       decoration: BoxDecoration(
         color: isHighlighted ? const Color(0xFF0D2D4D) : Colors.transparent,
         borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: isHighlighted ? Colors.orange.withOpacity(0.5) : Colors.white12),
+        border: Border.all(color: isHighlighted ? Colors.orange.withValues(alpha: 0.5) : Colors.white12),
       ),
       child: Text(
         text,
@@ -444,3 +444,4 @@ class _JobsListScreenState extends State<JobsListScreen> {
     );
   }
 }
+

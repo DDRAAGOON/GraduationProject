@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../core/app_colors.dart';
 import '../../../constants/app_images.dart';
 import 'chat_thread_screen.dart';
@@ -104,7 +104,7 @@ class MessagesListScreen extends StatelessWidget {
           height: 45,
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.05),
+            color: Colors.white.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(12),
           ),
         ),
@@ -164,7 +164,7 @@ class MessagesListScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(30),
         border: Border.all(color: Colors.white12),
       ),
@@ -270,3 +270,4 @@ class MessagesListScreen extends StatelessWidget {
     );
   }
 }
+

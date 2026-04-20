@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../core/app_colors.dart';
 import '../../../constants/app_images.dart';
 import 'profile_login_details_screen.dart';
@@ -248,7 +248,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         hintText: hint,
         hintStyle: const TextStyle(color: Colors.white24),
         filled: true,
-        fillColor: Colors.white.withOpacity(0.05),
+        fillColor: Colors.white.withValues(alpha: 0.05),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: const BorderSide(color: Colors.white24)),
         enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: const BorderSide(color: Colors.white24)),
       ),
@@ -275,7 +275,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             hintStyle: const TextStyle(color: Colors.white24, fontSize: 12),
             suffixIcon: suffixIcon != null ? Icon(suffixIcon, color: Colors.white54, size: 18) : null,
             filled: true,
-            fillColor: Colors.white.withOpacity(0.05),
+            fillColor: Colors.white.withValues(alpha: 0.05),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(4), borderSide: const BorderSide(color: Colors.white24)),
             enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(4), borderSide: const BorderSide(color: Colors.white24)),
           ),
@@ -300,7 +300,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           width: 120,
           padding: const EdgeInsets.symmetric(horizontal: 12),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.05),
+            color: Colors.white.withValues(alpha: 0.05),
             border: Border.all(color: Colors.white24),
             borderRadius: BorderRadius.circular(4),
           ),
@@ -328,7 +328,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: Colors.white24),
       ),
@@ -369,3 +369,4 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 }
+

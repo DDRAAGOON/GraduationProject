@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../core/app_colors.dart';
 import '../../../constants/app_images.dart';
 import 'edit_profile_screen.dart';
@@ -162,7 +162,7 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.05),
+                    color: Colors.white.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
@@ -304,7 +304,7 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
               children: [
                 Text(title, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 4),
-                Text("$company • $duration", style: const TextStyle(color: Colors.white54, fontSize: 13)),
+                Text("$company â€¢ $duration", style: const TextStyle(color: Colors.white54, fontSize: 13)),
               ],
             ),
           ),
@@ -317,9 +317,9 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: const Color(0xFF49769F).withOpacity(0.1),
+        color: const Color(0xFF49769F).withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFF49769F).withOpacity(0.3)),
+        border: Border.all(color: const Color(0xFF49769F).withValues(alpha: 0.3)),
       ),
       child: Text(
         label,
@@ -351,3 +351,4 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
     );
   }
 }
+

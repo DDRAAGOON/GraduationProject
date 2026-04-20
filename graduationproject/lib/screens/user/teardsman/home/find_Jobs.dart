@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../core/app_colors.dart';
 import '../notifications/teardsman_notifications.dart';
 import '../setting/settings.dart';
 
@@ -23,8 +22,8 @@ class _FindJobsState extends State<FindJobs> {
 
   final List<Map<String, dynamic>> _allJobs = [
     {
-      "title": "نقاش محترف (Painter)",
-      "company": "مقاولات الحديثة",
+      "title": "Ù†Ù‚Ø§Ø´ Ù…Ø­ØªØ±Ù (Painter)",
+      "company": "Ù…Ù‚Ø§ÙˆÙ„Ø§Øª Ø§Ù„Ø­Ø¯ÙŠØ«Ø©",
       "location": "Cairo",
       "tags": ["Full-Time", "Painting", "Interior"],
       "applied": 5,
@@ -32,8 +31,8 @@ class _FindJobsState extends State<FindJobs> {
       "logo": Icons.brush,
     },
     {
-      "title": "سباك صحي (Plumber)",
-      "company": "الجزيرة للخدمات",
+      "title": "Ø³Ø¨Ø§Ùƒ ØµØ­ÙŠ (Plumber)",
+      "company": "Ø§Ù„Ø¬Ø²ÙŠØ±Ø© Ù„Ù„Ø®Ø¯Ù…Ø§Øª",
       "location": "Giza",
       "tags": ["Full-Time", "Plumbing", "Maintenance"],
       "applied": 3,
@@ -41,8 +40,8 @@ class _FindJobsState extends State<FindJobs> {
       "logo": Icons.plumbing,
     },
     {
-      "title": "نجار أثاث (Carpenter)",
-      "company": "ورشة الإبداع",
+      "title": "Ù†Ø¬Ø§Ø± Ø£Ø«Ø§Ø« (Carpenter)",
+      "company": "ÙˆØ±Ø´Ø© Ø§Ù„Ø¥Ø¨Ø¯Ø§Ø¹",
       "location": "Damietta",
       "tags": ["Full-Time", "Carpentry", "Furniture"],
       "applied": 12,
@@ -50,8 +49,8 @@ class _FindJobsState extends State<FindJobs> {
       "logo": Icons.carpenter,
     },
     {
-      "title": "كهربائي منازل (Electrician)",
-      "company": "النور للكهرباء",
+      "title": "ÙƒÙ‡Ø±Ø¨Ø§Ø¦ÙŠ Ù…Ù†Ø§Ø²Ù„ (Electrician)",
+      "company": "Ø§Ù„Ù†ÙˆØ± Ù„Ù„ÙƒÙ‡Ø±Ø¨Ø§Ø¡",
       "location": "Alexandria",
       "tags": ["Part-Time", "Electrical", "Repair"],
       "applied": 2,
@@ -59,8 +58,8 @@ class _FindJobsState extends State<FindJobs> {
       "logo": Icons.electrical_services,
     },
     {
-      "title": "فني تكييف (HVAC Tech)",
-      "company": "كول اير",
+      "title": "ÙÙ†ÙŠ ØªÙƒÙŠÙŠÙ (HVAC Tech)",
+      "company": "ÙƒÙˆÙ„ Ø§ÙŠØ±",
       "location": "Cairo",
       "tags": ["Contract", "AC Repair", "Maintenance"],
       "applied": 7,
@@ -68,8 +67,8 @@ class _FindJobsState extends State<FindJobs> {
       "logo": Icons.ac_unit,
     },
     {
-      "title": "مبلط سيراميك (Tiler)",
-      "company": "تشطيبات لوكس",
+      "title": "Ù…Ø¨Ù„Ø· Ø³ÙŠØ±Ø§Ù…ÙŠÙƒ (Tiler)",
+      "company": "ØªØ´Ø·ÙŠØ¨Ø§Øª Ù„ÙˆÙƒØ³",
       "location": "Monufia",
       "tags": ["Full-Time", "Flooring", "Tiling"],
       "applied": 4,
@@ -77,8 +76,8 @@ class _FindJobsState extends State<FindJobs> {
       "logo": Icons.layers,
     },
     {
-      "title": "فني ألوميتال",
-      "company": "المستقبل للألمنيوم",
+      "title": "ÙÙ†ÙŠ Ø£Ù„ÙˆÙ…ÙŠØªØ§Ù„",
+      "company": "Ø§Ù„Ù…Ø³ØªÙ‚Ø¨Ù„ Ù„Ù„Ø£Ù„Ù…Ù†ÙŠÙˆÙ…",
       "location": "Gharbia",
       "tags": ["Full-Time", "Windows", "Alumital"],
       "applied": 6,
@@ -86,8 +85,8 @@ class _FindJobsState extends State<FindJobs> {
       "logo": Icons.window,
     },
     {
-      "title": "فني صيانة غسالات",
-      "company": "خدمة صيانة",
+      "title": "ÙÙ†ÙŠ ØµÙŠØ§Ù†Ø© ØºØ³Ø§Ù„Ø§Øª",
+      "company": "Ø®Ø¯Ù…Ø© ØµÙŠØ§Ù†Ø©",
       "location": "Cairo",
       "tags": ["Full-Time", "Washing Machine", "Repair"],
       "applied": 3,
@@ -95,8 +94,8 @@ class _FindJobsState extends State<FindJobs> {
       "logo": Icons.dry_cleaning,
     },
     {
-      "title": "فني دش ورسيفر",
-      "company": "سمارت للساتلايت",
+      "title": "ÙÙ†ÙŠ Ø¯Ø´ ÙˆØ±Ø³ÙŠÙØ±",
+      "company": "Ø³Ù…Ø§Ø±Øª Ù„Ù„Ø³Ø§ØªÙ„Ø§ÙŠØª",
       "location": "Giza",
       "tags": ["Full-Time", "Satellite", "Installation"],
       "applied": 8,
@@ -104,8 +103,8 @@ class _FindJobsState extends State<FindJobs> {
       "logo": Icons.settings_input_antenna,
     },
     {
-      "title": "مركب ستائر",
-      "company": "بيت الهنا",
+      "title": "Ù…Ø±ÙƒØ¨ Ø³ØªØ§Ø¦Ø±",
+      "company": "Ø¨ÙŠØª Ø§Ù„Ù‡Ù†Ø§",
       "location": "Alexandria",
       "tags": ["Full-Time", "Curtain", "Home Decor"],
       "applied": 2,
@@ -113,8 +112,8 @@ class _FindJobsState extends State<FindJobs> {
       "logo": Icons.window_outlined,
     },
     {
-      "title": "حداد كريتال",
-      "company": "الحديد والصلب",
+      "title": "Ø­Ø¯Ø§Ø¯ ÙƒØ±ÙŠØªØ§Ù„",
+      "company": "Ø§Ù„Ø­Ø¯ÙŠØ¯ ÙˆØ§Ù„ØµÙ„Ø¨",
       "location": "Qalyubia",
       "tags": ["Full-Time", "Blacksmith", "Metal Work"],
       "applied": 5,
@@ -122,8 +121,8 @@ class _FindJobsState extends State<FindJobs> {
       "logo": Icons.hardware,
     },
     {
-      "title": "منجد أثاث",
-      "company": "لمسة فن",
+      "title": "Ù…Ù†Ø¬Ø¯ Ø£Ø«Ø§Ø«",
+      "company": "Ù„Ù…Ø³Ø© ÙÙ†",
       "location": "Damietta",
       "tags": ["Full-Time", "Upholstery", "Furniture"],
       "applied": 1,
@@ -131,8 +130,8 @@ class _FindJobsState extends State<FindJobs> {
       "logo": Icons.chair,
     },
     {
-      "title": "فني رخام وجرانيت",
-      "company": "الماسة للرخام",
+      "title": "ÙÙ†ÙŠ Ø±Ø®Ø§Ù… ÙˆØ¬Ø±Ø§Ù†ÙŠØª",
+      "company": "Ø§Ù„Ù…Ø§Ø³Ø© Ù„Ù„Ø±Ø®Ø§Ù…",
       "location": "Cairo",
       "tags": ["Full-Time", "Marble", "Stone"],
       "applied": 4,
@@ -140,8 +139,8 @@ class _FindJobsState extends State<FindJobs> {
       "logo": Icons.foundation,
     },
     {
-      "title": "فني باركيه",
-      "company": "أرضيات الخشب",
+      "title": "ÙÙ†ÙŠ Ø¨Ø§Ø±ÙƒÙŠÙ‡",
+      "company": "Ø£Ø±Ø¶ÙŠØ§Øª Ø§Ù„Ø®Ø´Ø¨",
       "location": "Giza",
       "tags": ["Contract", "Parquet", "Flooring"],
       "applied": 2,
@@ -149,8 +148,8 @@ class _FindJobsState extends State<FindJobs> {
       "logo": Icons.grid_on,
     },
     {
-      "title": "فني عزل أسطح",
-      "company": "درع الحماية",
+      "title": "ÙÙ†ÙŠ Ø¹Ø²Ù„ Ø£Ø³Ø·Ø­",
+      "company": "Ø¯Ø±Ø¹ Ø§Ù„Ø­Ù…Ø§ÙŠØ©",
       "location": "Cairo",
       "tags": ["Full-Time", "Insulation", "Waterproof"],
       "applied": 6,
@@ -256,7 +255,7 @@ class _FindJobsState extends State<FindJobs> {
               Container(
                 padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.05),
+                  color: Colors.white.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(30),
                   border: Border.all(color: Colors.white10),
                 ),
@@ -358,7 +357,7 @@ class _FindJobsState extends State<FindJobs> {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
+              color: Colors.white.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(job['logo'], color: Colors.white70, size: 24),
@@ -374,7 +373,7 @@ class _FindJobsState extends State<FindJobs> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  "${job['company']} • ${job['location']}",
+                  "${job['company']} â€¢ ${job['location']}",
                   style: const TextStyle(color: Colors.white38, fontSize: 12),
                 ),
                 const SizedBox(height: 12),
@@ -433,9 +432,9 @@ class _FindJobsState extends State<FindJobs> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: isSpecial ? Colors.orange.withOpacity(0.1) : Colors.transparent,
+        color: isSpecial ? Colors.orange.withValues(alpha: 0.1) : Colors.transparent,
         borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: isSpecial ? Colors.orange.withOpacity(0.4) : Colors.white12),
+        border: Border.all(color: isSpecial ? Colors.orange.withValues(alpha: 0.4) : Colors.white12),
       ),
       child: Text(
         text,
@@ -447,3 +446,4 @@ class _FindJobsState extends State<FindJobs> {
     );
   }
 }
+

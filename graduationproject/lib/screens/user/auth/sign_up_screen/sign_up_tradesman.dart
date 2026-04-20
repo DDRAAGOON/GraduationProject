@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../core/app_colors.dart';
-import '../../teardsman/nav_Botton_bar/navBotton.dart';
+import '../../teardsman/nav_Botton_bar/nav_bottom_bar.dart';
 import '../../teardsman/profile/teardsman_data.dart';
 //import '../teardsman/profile/teardsman_data.dart';
 import 'sign_up_seeker.dart';
@@ -47,7 +47,7 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
   final List<String> _years = List.generate(70, (i) => (DateTime.now().year - 18 - i).toString());
 
   // Services
-  final List<String> _trades = ["نجار", "فني سباكة", "نقاش", "ميكانيكي", "كهربائي", "حداد", "منظف منازل", "Other"];
+  final List<String> _trades = ["Ù†Ø¬Ø§Ø±", "ÙÙ†ÙŠ Ø³Ø¨Ø§ÙƒØ©", "Ù†Ù‚Ø§Ø´", "Ù…ÙŠÙƒØ§Ù†ÙŠÙƒÙŠ", "ÙƒÙ‡Ø±Ø¨Ø§Ø¦ÙŠ", "Ø­Ø¯Ø§Ø¯", "Ù…Ù†Ø¸Ù Ù…Ù†Ø§Ø²Ù„", "Other"];
   String? _selectedTrade;
 
   List<Map<String, String>> _educationList = [];
@@ -191,7 +191,7 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
                     CircleAvatar(
                       radius: 40,
                       backgroundColor: Colors.white12,
-                      child: Icon(Icons.person, size: 45, color: Colors.white.withOpacity(0.5)),
+                      child: Icon(Icons.person, size: 45, color: Colors.white.withValues(alpha: 0.5)),
                     ),
                     const SizedBox(width: 20),
                     Expanded(child: _buildUploadBox("Click to replace or drag and drop\nSVG, PNG, JPG or GIF (max. 800 x 800px)", () {
@@ -248,7 +248,7 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
                 _buildSectionHeader("Criminal Record Check *", "An official document that shows a person's criminal history."),
                 const SizedBox(height: 15),
                 _buildUploadBox(
-                  _criminalRecordUploaded ? "Criminal Record Uploaded ✓" : "Click to upload Criminal Record\nSVG, PNG, JPG or GIF (max. 400 x 400px)", 
+                  _criminalRecordUploaded ? "Criminal Record Uploaded âœ“" : "Click to upload Criminal Record\nSVG, PNG, JPG or GIF (max. 400 x 400px)", 
                   () {
                     setState(() {
                       _criminalRecordUploaded = true;
@@ -304,7 +304,7 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
                 ..._educationList.asMap().entries.map((entry) => Container(
                   margin: const EdgeInsets.only(top: 10),
                   padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(color: Colors.white.withOpacity(0.03), borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.white10)),
+                  decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.03), borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.white10)),
                   child: Row(
                     children: [
                       const Icon(Icons.school, color: Color(0xFF49769F), size: 20),
@@ -326,14 +326,14 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
                     hintText: "Type and press Add", hintStyle: const TextStyle(color: Colors.white24, fontSize: 12),
                     prefixIcon: const Icon(Icons.star_outline, color: Color(0xFF49769F), size: 20),
                     suffixIcon: IconButton(icon: const Icon(Icons.add_circle_outline, color: Color(0xFF49769F)), onPressed: _addSkill),
-                    filled: true, fillColor: Colors.white.withOpacity(0.05), contentPadding: const EdgeInsets.all(16),
+                    filled: true, fillColor: Colors.white.withValues(alpha: 0.05), contentPadding: const EdgeInsets.all(16),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: const BorderSide(color: Colors.white12)),
                     enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: const BorderSide(color: Colors.white12)),
                     focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: const BorderSide(color: Color(0xFF49769F))),
                   ),
                 ),
                 const SizedBox(height: 10),
-                Wrap(spacing: 8, runSpacing: 8, children: _skillsList.map((s) => Chip(label: Text(s, style: const TextStyle(color: Colors.white, fontSize: 11)), backgroundColor: const Color(0xFF49769F).withOpacity(0.2), onDeleted: () => setState(() => _skillsList.remove(s)), deleteIcon: const Icon(Icons.close, size: 14, color: Colors.white70), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))).toList()),
+                Wrap(spacing: 8, runSpacing: 8, children: _skillsList.map((s) => Chip(label: Text(s, style: const TextStyle(color: Colors.white, fontSize: 11)), backgroundColor: const Color(0xFF49769F).withValues(alpha: 0.2), onDeleted: () => setState(() => _skillsList.remove(s)), deleteIcon: const Icon(Icons.close, size: 14, color: Colors.white70), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))).toList()),
                 const SizedBox(height: 30),
 
                 // Social Links
@@ -370,7 +370,7 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
                         width: 80,
                         margin: const EdgeInsets.only(right: 10),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.05),
+                          color: Colors.white.withValues(alpha: 0.05),
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(color: Colors.white12),
                         ),
@@ -435,7 +435,7 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
         padding: const EdgeInsets.all(16),
         width: double.infinity,
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.02),
+          color: Colors.white.withValues(alpha: 0.02),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: Colors.white12, style: BorderStyle.solid),
         ),
@@ -461,7 +461,7 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF49769F) : Colors.white.withOpacity(0.05),
+          color: isSelected ? const Color(0xFF49769F) : Colors.white.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(15),
           border: Border.all(color: isSelected ? const Color(0xFF49769F) : Colors.white12, width: 1.5),
         ),
@@ -488,7 +488,7 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
         hintText: hint, hintStyle: const TextStyle(color: Colors.white24, fontSize: 12),
         prefixIcon: icon != null ? InkWell(onTap: onIconTap, child: Icon(icon, color: const Color(0xFF49769F), size: 20)) : null,
         suffixIcon: suffixIcon != null ? IconButton(icon: Icon(suffixIcon, color: Colors.white54), onPressed: onSuffixTap) : null,
-        filled: true, fillColor: Colors.white.withOpacity(0.05), contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+        filled: true, fillColor: Colors.white.withValues(alpha: 0.05), contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: const BorderSide(color: Colors.white12)),
         enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: const BorderSide(color: Colors.white12)),
         focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: const BorderSide(color: Color(0xFF49769F))),
@@ -507,7 +507,7 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
       decoration: InputDecoration(
         labelText: label, labelStyle: const TextStyle(color: Colors.white54, fontSize: 14),
         prefixIcon: Icon(icon, color: const Color(0xFF49769F), size: 20),
-        filled: true, fillColor: Colors.white.withOpacity(0.05),
+        filled: true, fillColor: Colors.white.withValues(alpha: 0.05),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: const BorderSide(color: Colors.white12)),
         enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: const BorderSide(color: Colors.white12)),
       ),
@@ -518,7 +518,7 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: Colors.white12),
       ),
@@ -535,3 +535,5 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
     );
   }
 }
+
+

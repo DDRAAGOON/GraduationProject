@@ -1,10 +1,10 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import '../../core/app_colors.dart';
-import '../Tradesman_Messages/messages_List.dart';
-import '../home/find_Jobs.dart';
-import '../post/post_Job.dart';
-import '../profile/teardsman_Profile.dart';
+import '../Tradesman_Messages/messages_list.dart';
+import '../home/find_jobs.dart';
+import '../post/post_job.dart';
+import '../profile/tradesman_profile.dart';
 
 class Navbotton extends StatefulWidget {
   const Navbotton({super.key});
@@ -51,3 +51,7 @@ class _NavbottonState extends State<Navbotton> {
     );
   }
 }
+
+
+
+

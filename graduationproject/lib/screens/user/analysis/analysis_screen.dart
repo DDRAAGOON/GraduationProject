@@ -142,7 +142,7 @@ class AnalysisScreen extends StatelessWidget {
                 child: CircularProgressIndicator(
                   value: 0.6,
                   strokeWidth: 28,
-                  backgroundColor: const Color(0xFF094174).withOpacity(0.5),
+                  backgroundColor: const Color(0xFF094174).withValues(alpha: 0.5),
                   valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF094174)),
                 ),
               ),
@@ -153,7 +153,7 @@ class AnalysisScreen extends StatelessWidget {
                   value: 0.4,
                   strokeWidth: 28,
                   backgroundColor: Colors.transparent,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.blueGrey.withOpacity(0.3)),
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.blueGrey.withValues(alpha: 0.3)),
                 ),
               ),
             ],

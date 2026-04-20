@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:graduationproject/screens/user/core/custom_button.dart';
 import '../../../../constants/app_images.dart';
@@ -146,7 +146,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       height: 56,
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.05),
+                        color: Colors.white.withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
                           color: _phoneError != null ? Colors.red : Colors.white24,
@@ -223,7 +223,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               const SizedBox(height: 8),
               _buildTextField(
                 controller: _passwordController,
-                hintText: "•••••••••",
+                hintText: "â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢",
                 obscureText: _obscurePassword,
                 hasError: _passwordError != null,
                 suffixIcon: IconButton(
@@ -429,7 +429,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         hintText: hintText,
         hintStyle: const TextStyle(color: Colors.white38),
         filled: true,
-        fillColor: Colors.white.withOpacity(0.05),
+        fillColor: Colors.white.withValues(alpha: 0.05),
         suffixIcon: suffixIcon,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
@@ -447,3 +447,4 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 }
+

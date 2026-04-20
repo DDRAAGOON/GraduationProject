@@ -1,4 +1,4 @@
-
+﻿
 import 'package:flutter/material.dart';
 import '../../core/app_colors.dart';
 
@@ -10,8 +10,8 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
-  String _selectedLanguage = "العربية";
-  String _selectedTheme = "النظام";
+  String _selectedLanguage = "Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©";
+  String _selectedTheme = "Ø§Ù„Ù†Ø¸Ø§Ù…";
   bool _isLanguageExpanded = false;
   bool _isThemeExpanded = false;
 
@@ -23,9 +23,9 @@ class _SettingsState extends State<Settings> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
-        automaticallyImplyLeading: false, // لمنع ظهور السهم التلقائي جهة اليسار
+        automaticallyImplyLeading: false, // Ù„Ù…Ù†Ø¹ Ø¸Ù‡ÙˆØ± Ø§Ù„Ø³Ù‡Ù… Ø§Ù„ØªÙ„Ù‚Ø§Ø¦ÙŠ Ø¬Ù‡Ø© Ø§Ù„ÙŠØ³Ø§Ø±
         title: const Text(
-          "الإعدادات",
+          "Ø§Ù„Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª",
           style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
         ),
         actions: [
@@ -43,14 +43,14 @@ class _SettingsState extends State<Settings> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                "التفضيلات",
+                "Ø§Ù„ØªÙØ¶ÙŠÙ„Ø§Øª",
                 style: TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 20),
 
               // Language Section
               _buildSectionCard(
-                title: "اللغة",
+                title: "Ø§Ù„Ù„ØºØ©",
                 subtitle: _selectedLanguage,
                 icon: Icons.language,
                 child: Column(
@@ -60,7 +60,7 @@ class _SettingsState extends State<Settings> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.05),
+                          color: Colors.white.withValues(alpha: 0.05),
                           borderRadius: BorderRadius.circular(15),
                           border: Border.all(color: _isLanguageExpanded ? const Color(0xFF49769F) : Colors.white12),
                         ),
@@ -73,7 +73,7 @@ class _SettingsState extends State<Settings> {
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
-                                    const Text("اللغة", style: TextStyle(color: Colors.white38, fontSize: 12)),
+                                    const Text("Ø§Ù„Ù„ØºØ©", style: TextStyle(color: Colors.white38, fontSize: 12)),
                                     Text(_selectedLanguage, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                                   ],
                                 ),
@@ -89,13 +89,13 @@ class _SettingsState extends State<Settings> {
                       const SizedBox(height: 8),
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.03),
+                          color: Colors.white.withValues(alpha: 0.03),
                           borderRadius: BorderRadius.circular(15),
                           border: Border.all(color: Colors.white10),
                         ),
                         child: Column(
                           children: [
-                            _buildOptionItem("العربية", Icons.language, _selectedLanguage == "العربية", (val) {
+                            _buildOptionItem("Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©", Icons.language, _selectedLanguage == "Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©", (val) {
                               setState(() {
                                 _selectedLanguage = val;
                                 _isLanguageExpanded = false;
@@ -120,7 +120,7 @@ class _SettingsState extends State<Settings> {
 
               // Theme Section
               _buildSectionCard(
-                title: "المظهر",
+                title: "Ø§Ù„Ù…Ø¸Ù‡Ø±",
                 subtitle: _selectedTheme,
                 icon: Icons.palette_outlined,
                 child: Column(
@@ -130,7 +130,7 @@ class _SettingsState extends State<Settings> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.05),
+                          color: Colors.white.withValues(alpha: 0.05),
                           borderRadius: BorderRadius.circular(15),
                           border: Border.all(color: _isThemeExpanded ? const Color(0xFF49769F) : Colors.white12, width: 1.5),
                         ),
@@ -143,7 +143,7 @@ class _SettingsState extends State<Settings> {
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
-                                    const Text("المظهر", style: TextStyle(color: Colors.white38, fontSize: 12)),
+                                    const Text("Ø§Ù„Ù…Ø¸Ù‡Ø±", style: TextStyle(color: Colors.white38, fontSize: 12)),
                                     Text(_selectedTheme, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                                   ],
                                 ),
@@ -159,21 +159,21 @@ class _SettingsState extends State<Settings> {
                       const SizedBox(height: 8),
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.03),
+                          color: Colors.white.withValues(alpha: 0.03),
                           borderRadius: BorderRadius.circular(15),
                           border: Border.all(color: Colors.white10),
                         ),
                         child: Column(
                           children: [
-                            _buildOptionItem("فاتح", Icons.wb_sunny_outlined, _selectedTheme == "فاتح", (val) {
+                            _buildOptionItem("ÙØ§ØªØ­", Icons.wb_sunny_outlined, _selectedTheme == "ÙØ§ØªØ­", (val) {
                               setState(() => _selectedTheme = val);
                             }),
                             const Divider(color: Colors.white10, height: 1),
-                            _buildOptionItem("داكن", Icons.nightlight_round_outlined, _selectedTheme == "داكن", (val) {
+                            _buildOptionItem("Ø¯Ø§ÙƒÙ†", Icons.nightlight_round_outlined, _selectedTheme == "Ø¯Ø§ÙƒÙ†", (val) {
                               setState(() => _selectedTheme = val);
                             }),
                             const Divider(color: Colors.white10, height: 1),
-                            _buildOptionItem("النظام", Icons.settings_brightness_outlined, _selectedTheme == "النظام", (val) {
+                            _buildOptionItem("Ø§Ù„Ù†Ø¸Ø§Ù…", Icons.settings_brightness_outlined, _selectedTheme == "Ø§Ù„Ù†Ø¸Ø§Ù…", (val) {
                               setState(() => _selectedTheme = val);
                             }),
                           ],
@@ -206,7 +206,7 @@ class _SettingsState extends State<Settings> {
             ),
             Container(
               padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(color: const Color(0xFF094174).withOpacity(0.3), borderRadius: BorderRadius.circular(12)),
+              decoration: BoxDecoration(color: const Color(0xFF094174).withValues(alpha: 0.3), borderRadius: BorderRadius.circular(12)),
               child: Icon(icon, color: const Color(0xFF49769F), size: 22),
             ),
           ],
@@ -223,7 +223,7 @@ class _SettingsState extends State<Settings> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF49769F).withOpacity(0.2) : Colors.transparent,
+          color: isSelected ? const Color(0xFF49769F).withValues(alpha: 0.2) : Colors.transparent,
           borderRadius: BorderRadius.circular(15),
         ),
         child: Row(
@@ -243,3 +243,4 @@ class _SettingsState extends State<Settings> {
     );
   }
 }
+

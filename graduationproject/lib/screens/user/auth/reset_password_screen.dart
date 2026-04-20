@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:graduationproject/screens/user/core/custom_button.dart';
 import '../../../constants/app_images.dart';
-import '../home/services_Screen.dart';
 import '../home/technical_screen.dart';
-import 'sign_in_screen.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
   const ResetPasswordScreen({super.key});
@@ -63,7 +60,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                     height: 160,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.blue.withOpacity(0.05),
+                      color: Colors.blue.withValues(alpha: 0.05),
                     ),
                   ),
                   Image.asset(
@@ -216,10 +213,10 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 obscureText: _obscureNewPassword,
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
-                  hintText: "•••••••••••",
+                  hintText: "â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢",
                   hintStyle: const TextStyle(color: Colors.white38),
                   filled: true,
-                  fillColor: Colors.white.withOpacity(0.05),
+                  fillColor: Colors.white.withValues(alpha: 0.05),
                   suffixIcon: IconButton(
                     icon: Icon(
                       _obscureNewPassword
@@ -285,10 +282,10 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 obscureText: _obscureConfirmPassword,
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
-                  hintText: "•••••••••••",
+                  hintText: "â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢",
                   hintStyle: const TextStyle(color: Colors.white38),
                   filled: true,
-                  fillColor: Colors.white.withOpacity(0.05),
+                  fillColor: Colors.white.withValues(alpha: 0.05),
                   suffixIcon: IconButton(
                     icon: Icon(
                       _obscureConfirmPassword
@@ -423,3 +420,5 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     );
   }
 }
+
+

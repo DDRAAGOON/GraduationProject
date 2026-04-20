@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:graduationproject/screens/user/auth/sign_up_screen/sign_up_seeker.dart';
 import 'package:graduationproject/screens/user/core/custom_button.dart';
-import '../core/app_colors.dart';
 
 class OtpEmailVerificationScreen extends StatefulWidget {
   final String email;
@@ -180,7 +179,7 @@ class _OtpEmailVerificationScreenState extends State<OtpEmailVerificationScreen>
     return Container(
       width: 75, height: 90,
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.white24, width: 1.5),
       ),
@@ -201,3 +200,4 @@ class _OtpEmailVerificationScreenState extends State<OtpEmailVerificationScreen>
     );
   }
 }
+

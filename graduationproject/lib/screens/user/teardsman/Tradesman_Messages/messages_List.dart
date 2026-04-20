@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../../../../constants/app_images.dart';
 import '../../core/app_colors.dart';
 import '../notifications/teardsman_notifications.dart';
@@ -91,7 +91,7 @@ class _MessagesListState extends State<MessagesList> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 10),
-              // Top Bar: Same style as find_Jobs.dart
+              // Top Bar: Same style as find_jobs.dart
               _buildTopBar(context),
               const SizedBox(height: 25),
               const Text(
@@ -172,7 +172,7 @@ class _MessagesListState extends State<MessagesList> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(30),
         border: Border.all(color: Colors.white12),
       ),
@@ -279,3 +279,5 @@ class _MessagesListState extends State<MessagesList> {
     );
   }
 }
+
+

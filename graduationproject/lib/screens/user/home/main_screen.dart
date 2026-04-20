@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
-import '../analysis/anaylsisScreen.dart';
+import '../analysis/analysis_screen.dart';
 import '../messages/messages_list_screen.dart';
 import '../profile/profile_overview_screen.dart';
 import 'technical_screen.dart';
@@ -51,3 +51,4 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 }
+

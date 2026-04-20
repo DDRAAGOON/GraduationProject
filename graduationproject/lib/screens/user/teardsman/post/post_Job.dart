@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../core/app_colors.dart';
 
 class PostJob extends StatefulWidget {
   const PostJob({super.key});
@@ -259,7 +258,7 @@ class _PostJobState extends State<PostJob> {
                     Container(
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.02),
+                        color: Colors.white.withValues(alpha: 0.02),
                         border: Border.all(color: Colors.white12),
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -345,7 +344,7 @@ class _PostJobState extends State<PostJob> {
   Widget _buildTextField({required TextEditingController controller, required String hint, int maxLines = 1}) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.02),
+        color: Colors.white.withValues(alpha: 0.02),
         border: Border.all(color: Colors.white12),
         borderRadius: BorderRadius.circular(4),
       ),
@@ -367,7 +366,7 @@ class _PostJobState extends State<PostJob> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(4),
         border: Border.all(color: Colors.white12),
       ),
@@ -410,7 +409,7 @@ class _PostJobState extends State<PostJob> {
       width: 120,
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.05),
         border: Border.all(color: Colors.white24),
         borderRadius: BorderRadius.circular(4),
       ),
@@ -455,8 +454,8 @@ class _PostJobState extends State<PostJob> {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF49769F).withOpacity(0.3) : Colors.transparent,
-          border: Border(bottom: BorderSide(color: Colors.white.withOpacity(0.05))),
+          color: isSelected ? const Color(0xFF49769F).withValues(alpha: 0.3) : Colors.transparent,
+          border: Border(bottom: BorderSide(color: Colors.white.withValues(alpha: 0.05))),
         ),
         child: Row(
           children: [
@@ -484,7 +483,7 @@ class _PostJobState extends State<PostJob> {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.02),
+        color: Colors.white.withValues(alpha: 0.02),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: const Color(0xFF49769F), style: BorderStyle.solid),
       ),
@@ -508,3 +507,4 @@ class _PostJobState extends State<PostJob> {
     );
   }
 }
+

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../core/app_colors.dart';
 
 class ChatThreadScreen extends StatefulWidget {
@@ -141,7 +141,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
       child: Container(
         height: 60,
         decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.05),
+            color: Colors.white.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(30)),
         child: Row(
           children: [
@@ -188,3 +188,4 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
     );
   }
 }
+

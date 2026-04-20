@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
 import '../core/app_colors.dart';
 import '../notifications/notifications_screen.dart';
@@ -153,7 +153,7 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05), 
+        color: Colors.white.withValues(alpha: 0.05), 
         borderRadius: BorderRadius.circular(30), 
         border: Border.all(color: Colors.white12)
       ),
@@ -264,7 +264,7 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
             border: Border.all(color: isSelected ? Colors.white54 : Colors.white10),
             boxShadow: isSelected ? [
               BoxShadow(
-                color: activeColor.withOpacity(0.4),
+                color: activeColor.withValues(alpha: 0.4),
                 blurRadius: 12,
                 spreadRadius: 2,
                 offset: const Offset(0, 4),
@@ -417,7 +417,7 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
-                Text("$company • $location", style: const TextStyle(color: Colors.white38, fontSize: 12)),
+                Text("$company â€¢ $location", style: const TextStyle(color: Colors.white38, fontSize: 12)),
                 const SizedBox(height: 12),
                 Row(
                   children: [
@@ -470,7 +470,7 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
       decoration: BoxDecoration(
         color: isHighlighted ? const Color(0xFF0D2D4D) : Colors.transparent,
         borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: isHighlighted ? Colors.orange.withOpacity(0.5) : Colors.white12),
+        border: Border.all(color: isHighlighted ? Colors.orange.withValues(alpha: 0.5) : Colors.white12),
       ),
       child: Text(
         text,
@@ -479,3 +479,4 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
     );
   }
 }
+

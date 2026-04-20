@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../core/app_colors.dart';
 import '../help/help_center_screen.dart';
 import 'edit_profile_screen.dart';
@@ -98,7 +98,7 @@ class _ProfileLoginDetailsScreenState extends State<ProfileLoginDetailsScreen> {
                       hintText: "Enter your new email",
                       hintStyle: const TextStyle(color: Colors.white24, fontSize: 13),
                       filled: true,
-                      fillColor: Colors.white.withOpacity(0.05),
+                      fillColor: Colors.white.withValues(alpha: 0.05),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: const BorderSide(color: Colors.white24)),
                       enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: const BorderSide(color: Colors.white24)),
@@ -197,7 +197,7 @@ class _ProfileLoginDetailsScreenState extends State<ProfileLoginDetailsScreen> {
             hintText: hint,
             hintStyle: const TextStyle(color: Colors.white24, fontSize: 13),
             filled: true,
-            fillColor: Colors.white.withOpacity(0.05),
+            fillColor: Colors.white.withValues(alpha: 0.05),
             contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: const BorderSide(color: Colors.white24)),
             enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: const BorderSide(color: Colors.white24)),
@@ -209,3 +209,4 @@ class _ProfileLoginDetailsScreenState extends State<ProfileLoginDetailsScreen> {
     );
   }
 }
+

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../../../constants/app_images.dart';
 import '../../../shared/l10n/app_localizations.dart';
 import '../core/app_colors.dart';
@@ -37,7 +37,7 @@ class Screen3 extends StatelessWidget {
                 t.userTr(
                   'onboarding.title3',
                   fallbackEn: 'Your Future Starts Here',
-                  fallbackAr: 'مستقبلك يبدأ من هنا',
+                  fallbackAr: 'Ù…Ø³ØªÙ‚Ø¨Ù„Ùƒ ÙŠØ¨Ø¯Ø£ Ù…Ù† Ù‡Ù†Ø§',
                 ),
                 textAlign: TextAlign.center,
                 style: const TextStyle(
@@ -52,7 +52,7 @@ class Screen3 extends StatelessWidget {
                   'onboarding.subtitle3',
                   fallbackEn:
                       'Thousands of job opportunities are waiting\nfor you',
-                  fallbackAr: 'آلاف فرص العمل في انتظارك',
+                  fallbackAr: 'Ø¢Ù„Ø§Ù ÙØ±Øµ Ø§Ù„Ø¹Ù…Ù„ ÙÙŠ Ø§Ù†ØªØ¸Ø§Ø±Ùƒ',
                 ),
                 textAlign: TextAlign.center,
                 style: const TextStyle(
@@ -91,8 +91,8 @@ class Screen3 extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: const LinearGradient(
             colors: [
-              Color(0xFF0A2A4A), // غامق
-              Color(0xFF2F5F8F), // أفتح
+              Color(0xFF0A2A4A), // ØºØ§Ù…Ù‚
+              Color(0xFF2F5F8F), // Ø£ÙØªØ­
               Color.fromARGB(255, 118, 159, 178),
             ],
             begin: Alignment.centerLeft,
@@ -106,14 +106,14 @@ class Screen3 extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.3),
+              color: Colors.black.withValues(alpha: 0.3),
               blurRadius: 10,
               offset: const Offset(0, 5),
             ),
           ],
         ),
         child: Text(
-          t.userTr('onboarding.next', fallbackEn: 'Next', fallbackAr: 'التالي'),
+          t.userTr('onboarding.next', fallbackEn: 'Next', fallbackAr: 'Ø§Ù„ØªØ§Ù„ÙŠ'),
           textAlign: TextAlign.center,
           style: const TextStyle(
             color: Colors.white,
@@ -138,3 +138,4 @@ class Screen3 extends StatelessWidget {
     );
   }
 }
+

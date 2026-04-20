@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../../../constants/app_images.dart';
 import '../auth/sign_in_screen.dart';
 import '../core/app_colors.dart';
@@ -133,8 +133,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         decoration: BoxDecoration(
           gradient: const LinearGradient(
             colors: [
-              Color(0xFF0A2A4A), // غامق
-              Color(0xFF2F5F8F), // أفتح
+              Color(0xFF0A2A4A), // ØºØ§Ù…Ù‚
+              Color(0xFF2F5F8F), // Ø£ÙØªØ­
               Color.fromARGB(255, 118, 159, 178),
             ],
             begin: Alignment.centerLeft,
@@ -148,7 +148,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.3),
+              color: Colors.black.withValues(alpha: 0.3),
               blurRadius: 10,
               offset: const Offset(0, 5),
             ),
@@ -180,3 +180,4 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 }
+

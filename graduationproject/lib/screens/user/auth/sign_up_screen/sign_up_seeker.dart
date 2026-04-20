@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:graduationproject/screens/user/auth/sign_up_screen/sign_up_tradesman.dart';
-import 'package:icons_plus/icons_plus.dart';
 import '../../core/app_colors.dart';
 import '../../home/main_screen.dart';
 import '../../profile/user_data.dart';
@@ -45,10 +44,10 @@ class _SignUpSeeker extends State<SignUpSeeker> {
   final TextEditingController _expJobTitleController = TextEditingController();
   final TextEditingController _expDurationController = TextEditingController();
 
-  List<String> _skillsList = [];
-  List<Map<String, String>> _socialLinksList = [];
-  List<Map<String, String>> _experiencesList = [];
-  List<Map<String, String>> _educationList = [];
+  final List<String> _skillsList = [];
+  final List<Map<String, String>> _socialLinksList = [];
+  final List<Map<String, String>> _experiencesList = [];
+  final List<Map<String, String>> _educationList = [];
 
   final List<String> _genderOptions = ["Male", "Female"];
   String? _selectedGender;
@@ -208,7 +207,7 @@ class _SignUpSeeker extends State<SignUpSeeker> {
                     CircleAvatar(
                       radius: 40,
                       backgroundColor: Colors.white12,
-                      child: Icon(Icons.person, size: 45, color: Colors.white.withOpacity(0.5)),
+                      child: Icon(Icons.person, size: 45, color: Colors.white.withValues(alpha: 0.5)),
                     ),
                     const SizedBox(width: 20),
                     Expanded(child: _buildUploadBox("Click to replace or drag and drop\nSVG, PNG, JPG or GIF (max. 800 x 800px)", () {})),
@@ -270,7 +269,7 @@ class _SignUpSeeker extends State<SignUpSeeker> {
                 ..._educationList.asMap().entries.map((entry) => Container(
                   margin: const EdgeInsets.only(top: 10),
                   padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(color: Colors.white.withOpacity(0.03), borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.white10)),
+                  decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.03), borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.white10)),
                   child: Row(
                     children: [
                       const Icon(Icons.book, color: Color(0xFF49769F), size: 20),
@@ -287,7 +286,7 @@ class _SignUpSeeker extends State<SignUpSeeker> {
                 _buildTextField(_aboutMeController, "About Me", Icons.info_outline, maxLines: 3),
 
                 const SizedBox(height: 25),
-                const Text("Experience (خبرات العمل)", style: TextStyle(color: Colors.white54, fontSize: 14)),
+                const Text("Experience (Ø®Ø¨Ø±Ø§Øª Ø§Ù„Ø¹Ù…Ù„)", style: TextStyle(color: Colors.white54, fontSize: 14)),
                 const SizedBox(height: 10),
                 _buildTextField(_expJobTitleController, "Job Title", Icons.title),
                 const SizedBox(height: 10),
@@ -301,7 +300,7 @@ class _SignUpSeeker extends State<SignUpSeeker> {
                 ..._experiencesList.asMap().entries.map((entry) => Container(
                   margin: const EdgeInsets.only(top: 10),
                   padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(color: Colors.white.withOpacity(0.03), borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.white10)),
+                  decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.03), borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.white10)),
                   child: Row(
                     children: [
                       const Icon(Icons.work_history, color: Color(0xFF49769F), size: 20),
@@ -322,14 +321,14 @@ class _SignUpSeeker extends State<SignUpSeeker> {
                     hintText: "Type and press Add", hintStyle: const TextStyle(color: Colors.white24, fontSize: 12),
                     prefixIcon: const Icon(Icons.star_outline, color: Color(0xFF49769F), size: 20),
                     suffixIcon: IconButton(icon: const Icon(Icons.add_circle_outline, color: Color(0xFF49769F)), onPressed: _addSkill),
-                    filled: true, fillColor: Colors.white.withOpacity(0.05), contentPadding: const EdgeInsets.all(16),
+                    filled: true, fillColor: Colors.white.withValues(alpha: 0.05), contentPadding: const EdgeInsets.all(16),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: const BorderSide(color: Colors.white12)),
                     enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: const BorderSide(color: Colors.white12)),
                     focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: const BorderSide(color: Color(0xFF49769F))),
                   ),
                 ),
                 const SizedBox(height: 10),
-                Wrap(spacing: 8, runSpacing: 8, children: _skillsList.map((s) => Chip(label: Text(s, style: const TextStyle(color: Colors.white, fontSize: 11)), backgroundColor: const Color(0xFF49769F).withOpacity(0.2), onDeleted: () => setState(() => _skillsList.remove(s)), deleteIcon: const Icon(Icons.close, size: 14, color: Colors.white70), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))).toList()),
+                Wrap(spacing: 8, runSpacing: 8, children: _skillsList.map((s) => Chip(label: Text(s, style: const TextStyle(color: Colors.white, fontSize: 11)), backgroundColor: const Color(0xFF49769F).withValues(alpha: 0.2), onDeleted: () => setState(() => _skillsList.remove(s)), deleteIcon: const Icon(Icons.close, size: 14, color: Colors.white70), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))).toList()),
 
                 const SizedBox(height: 25),
                 _buildTextField(_portfolioController, "Portfolio Link (URL)", Icons.link_outlined),
@@ -338,13 +337,13 @@ class _SignUpSeeker extends State<SignUpSeeker> {
                 const Text("Social Media Links", style: TextStyle(color: Colors.white54, fontSize: 14)),
                 const SizedBox(height: 8),
                 Row(children: [
-                  Expanded(flex: 3, child: Container(padding: const EdgeInsets.symmetric(horizontal: 12), decoration: BoxDecoration(color: Colors.white.withOpacity(0.05), borderRadius: BorderRadius.circular(15), border: Border.all(color: Colors.white12)), child: DropdownButtonHideUnderline(child: DropdownButton<String>(value: _selectedPlatform, dropdownColor: const Color(0xFF0D2D4D), isExpanded: true, style: const TextStyle(color: Colors.white, fontSize: 12), items: _platforms.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(), onChanged: (v) => setState(() => _selectedPlatform = v!))))),
+                  Expanded(flex: 3, child: Container(padding: const EdgeInsets.symmetric(horizontal: 12), decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(15), border: Border.all(color: Colors.white12)), child: DropdownButtonHideUnderline(child: DropdownButton<String>(value: _selectedPlatform, dropdownColor: const Color(0xFF0D2D4D), isExpanded: true, style: const TextStyle(color: Colors.white, fontSize: 12), items: _platforms.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(), onChanged: (v) => setState(() => _selectedPlatform = v!))))),
                   const SizedBox(width: 10),
-                  Expanded(flex: 5, child: TextFormField(controller: _socialController, style: const TextStyle(color: Colors.white, fontSize: 13), decoration: InputDecoration(hintText: "Link", hintStyle: const TextStyle(color: Colors.white24, fontSize: 12), filled: true, fillColor: Colors.white.withOpacity(0.05), contentPadding: const EdgeInsets.all(16), border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: const BorderSide(color: Colors.white12))))),
+                  Expanded(flex: 5, child: TextFormField(controller: _socialController, style: const TextStyle(color: Colors.white, fontSize: 13), decoration: InputDecoration(hintText: "Link", hintStyle: const TextStyle(color: Colors.white24, fontSize: 12), filled: true, fillColor: Colors.white.withValues(alpha: 0.05), contentPadding: const EdgeInsets.all(16), border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: const BorderSide(color: Colors.white12))))),
                   IconButton(onPressed: _addSocialLink, icon: const Icon(Icons.add_circle, color: Color(0xFF49769F), size: 30)),
                 ]),
                 const SizedBox(height: 10),
-                ..._socialLinksList.asMap().entries.map((entry) => Container(margin: const EdgeInsets.only(bottom: 8), padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10), decoration: BoxDecoration(color: Colors.white.withOpacity(0.03), borderRadius: BorderRadius.circular(10)), child: Row(children: [const Icon(Icons.link, color: Color(0xFF49769F), size: 18), const SizedBox(width: 12), Expanded(child: Text("${entry.value['platform']}: ${entry.value['url']}", style: const TextStyle(color: Colors.white70, fontSize: 11), maxLines: 1, overflow: TextOverflow.ellipsis)), IconButton(icon: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 20), onPressed: () => setState(() => _socialLinksList.removeAt(entry.key)))]))),
+                ..._socialLinksList.asMap().entries.map((entry) => Container(margin: const EdgeInsets.only(bottom: 8), padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10), decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.03), borderRadius: BorderRadius.circular(10)), child: Row(children: [const Icon(Icons.link, color: Color(0xFF49769F), size: 18), const SizedBox(width: 12), Expanded(child: Text("${entry.value['platform']}: ${entry.value['url']}", style: const TextStyle(color: Colors.white70, fontSize: 11), maxLines: 1, overflow: TextOverflow.ellipsis)), IconButton(icon: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 20), onPressed: () => setState(() => _socialLinksList.removeAt(entry.key)))]))),
 
                 const SizedBox(height: 30),
                 Row(
@@ -362,7 +361,7 @@ class _SignUpSeeker extends State<SignUpSeeker> {
                   height: 120,
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.05),
+                    color: Colors.white.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(15),
                     border: Border.all(color: Colors.white12),
                   ),
@@ -403,10 +402,10 @@ class _SignUpSeeker extends State<SignUpSeeker> {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF49769F) : Colors.white.withOpacity(0.05),
+          color: isSelected ? const Color(0xFF49769F) : Colors.white.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(15),
           border: Border.all(color: isSelected ? const Color(0xFF49769F) : Colors.white12, width: 1.5),
-          boxShadow: isSelected ? [BoxShadow(color: const Color(0xFF49769F).withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 4))] : [],
+          boxShadow: isSelected ? [BoxShadow(color: const Color(0xFF49769F).withValues(alpha: 0.3), blurRadius: 8, offset: const Offset(0, 4))] : [],
         ),
         alignment: Alignment.center,
         child: Text(
@@ -431,7 +430,7 @@ class _SignUpSeeker extends State<SignUpSeeker> {
         hintText: hint, hintStyle: const TextStyle(color: Colors.white24, fontSize: 12),
         prefixIcon: InkWell(onTap: onIconTap, child: Icon(icon, color: const Color(0xFF49769F), size: 20)),
         suffixIcon: suffixIcon != null ? IconButton(icon: Icon(suffixIcon, color: Colors.white54), onPressed: onSuffixTap) : null,
-        filled: true, fillColor: Colors.white.withOpacity(0.05), contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+        filled: true, fillColor: Colors.white.withValues(alpha: 0.05), contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: const BorderSide(color: Colors.white12)),
         enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: const BorderSide(color: Colors.white12)),
         focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: const BorderSide(color: Color(0xFF49769F))),
@@ -459,7 +458,7 @@ class _SignUpSeeker extends State<SignUpSeeker> {
         padding: const EdgeInsets.all(16),
         width: double.infinity,
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.02),
+          color: Colors.white.withValues(alpha: 0.02),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: Colors.white12, style: BorderStyle.solid),
         ),
@@ -480,7 +479,7 @@ class _SignUpSeeker extends State<SignUpSeeker> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: Colors.white12),
       ),
@@ -508,10 +507,11 @@ class _SignUpSeeker extends State<SignUpSeeker> {
       decoration: InputDecoration(
         labelText: label, labelStyle: const TextStyle(color: Colors.white54, fontSize: 14),
         prefixIcon: Icon(icon, color: const Color(0xFF49769F), size: 20),
-        filled: true, fillColor: Colors.white.withOpacity(0.05),
+        filled: true, fillColor: Colors.white.withValues(alpha: 0.05),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: const BorderSide(color: Colors.white12)),
         enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: const BorderSide(color: Colors.white12)),
       ),
     );
   }
 }
+
