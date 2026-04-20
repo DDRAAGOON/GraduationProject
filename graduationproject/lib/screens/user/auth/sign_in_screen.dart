@@ -7,7 +7,7 @@ import '../home/technical_screen.dart';
 import 'package:graduationproject/screens/user/auth/cubit/auth_cubit.dart';
 import '../../../constants/app_images.dart';
 import 'forgot_password_screen.dart';
-import 'sign_up_screen.dart';
+import 'sign_up_screen/sign_up_screen.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});

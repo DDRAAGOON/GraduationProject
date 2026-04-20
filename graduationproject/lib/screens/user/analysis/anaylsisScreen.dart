@@ -29,7 +29,7 @@ class AnalysisScreen extends StatelessWidget {
 
               // Total Jobs Applied Card
               _buildStatCard(
-                title: "Total Jobs Applied",
+                title: "Accepted",
                 value: "45",
                 icon: Icons.description_outlined,
               ),
@@ -37,7 +37,7 @@ class AnalysisScreen extends StatelessWidget {
 
               // Interviewed Card
               _buildStatCard(
-                title: "Interviewed",
+                title: "Rejected",
                 value: "18",
                 icon: Icons.question_answer_outlined,
               ),
@@ -66,19 +66,7 @@ class AnalysisScreen extends StatelessWidget {
           ),
           child: Icon(icon, color: Colors.white, size: 22),
         ),
-        if (hasBadge)
-          Positioned(
-            right: 12,
-            top: 10,
-            child: Container(
-              width: 8,
-              height: 8,
-              decoration: const BoxDecoration(
-                color: Colors.red,
-                shape: BoxShape.circle,
-              ),
-            ),
-          ),
+
       ],
     );
   }

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:graduationproject/screens/user/core/custom_button.dart';
-import '../../../constants/app_images.dart';
-import 'otp_email_verification_screen.dart';
-import 'sign_in_screen.dart';
+import '../../../../constants/app_images.dart';
+import '../otp_email_verification_screen.dart';
+import '../sign_in_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});

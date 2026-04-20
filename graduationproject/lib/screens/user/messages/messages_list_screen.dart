@@ -107,7 +107,6 @@ class MessagesListScreen extends StatelessWidget {
             color: Colors.white.withOpacity(0.05),
             borderRadius: BorderRadius.circular(12),
           ),
-          child: Image.asset(AppImages.companyLogo),
         ),
         const SizedBox(width: 12),
         Column(

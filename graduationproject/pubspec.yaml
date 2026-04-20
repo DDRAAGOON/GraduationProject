@@ -19,6 +19,7 @@ dependencies:
   equatable: ^2.0.8
   icons_plus: ^5.0.0
   curved_navigation_bar: ^1.0.6
+  shared_preferences: ^2.2.2
 
 dev_dependencies:
   flutter_test:
