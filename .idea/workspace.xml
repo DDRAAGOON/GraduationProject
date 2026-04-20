@@ -4,40 +4,7 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="89a40d2e-dee6-4edc-af06-e2e78f633ab0" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/auth/sign_up_screen/sign_up_seeker.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/auth/sign_up_screen/sign_up_tradesman.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/Tradesman_Messages/chat_tradesman.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/Tradesman_Messages/messages_List.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/home/find_Jobs.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/nav_Botton_bar/navBotton.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/notifications/teardsman_notifications.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/post/post_Job.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/profile/teardsman_Profile.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/profile/teardsman_data.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/setting/settings.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Dart_SDK.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Dart_SDK.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/analysis/anaylsisScreen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/analysis/anaylsisScreen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/auth/otp_email_verification_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/auth/otp_email_verification_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/auth/sign_in_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/auth/sign_in_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/auth/sign_up_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/auth/sign_up_screen/sign_up_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/home/technical_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/home/technical_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/messages/messages_list_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/messages/messages_list_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/profile/edit_profile_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/profile/edit_profile_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/profile/profile_login_details_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/profile/profile_login_details_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/profile/profile_overview_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/profile/profile_overview_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/profile/setting_profile/Complete_Profile_screen.dart" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/profile/user_data.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/profile/user_data.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/linux/flutter/generated_plugins.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/linux/flutter/generated_plugins.cmake" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/macos/Flutter/GeneratedPluginRegistrant.swift" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/macos/Flutter/GeneratedPluginRegistrant.swift" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/pubspec.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/pubspec.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/windows/flutter/generated_plugins.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/windows/flutter/generated_plugins.cmake" afterDir="false" />
-    </list>
+    <list default="true" id="89a40d2e-dee6-4edc-af06-e2e78f633ab0" name="Changes" comment="Merge remote-tracking branch 'origin/user1' into user1&#10;&#10;# Conflicts:&#10;#&#9;.idea/libraries/Dart_Packages.xml&#10;#&#9;.idea/workspace.xml" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -114,5 +81,9 @@
       <updated>1773930386095</updated>
     </task>
     <servers />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Worker" />
+    <option name="LAST_COMMIT_MESSAGE" value="Worker" />
   </component>
 </project>
