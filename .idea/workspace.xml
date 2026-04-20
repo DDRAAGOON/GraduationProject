@@ -4,7 +4,13 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="89a40d2e-dee6-4edc-af06-e2e78f633ab0" name="Changes" comment="Merge remote-tracking branch 'origin/user1' into user1&#10;&#10;# Conflicts:&#10;#&#9;.idea/libraries/Dart_Packages.xml&#10;#&#9;.idea/workspace.xml" />
+    <list default="true" id="89a40d2e-dee6-4edc-af06-e2e78f633ab0" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Dart_SDK.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Dart_SDK.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/linux/flutter/generated_plugins.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/linux/flutter/generated_plugins.cmake" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/windows/flutter/generated_plugins.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/windows/flutter/generated_plugins.cmake" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -68,7 +74,6 @@
 }</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="D:\GraduationProject\graduationproject\lib\screens\user\auth\sign_up_screen" />
       <recent name="D:\GraduationProject\graduationproject\assets\company\icon" />
     </key>
   </component>
@@ -81,9 +86,5 @@
       <updated>1773930386095</updated>
     </task>
     <servers />
-  </component>
-  <component name="VcsManagerConfiguration">
-    <MESSAGE value="Worker" />
-    <option name="LAST_COMMIT_MESSAGE" value="Worker" />
   </component>
 </project>
