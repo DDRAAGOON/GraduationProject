@@ -1,0 +1,517 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:graduationproject/screens/user/auth/sign_up_screen/sign_up_tradesman.dart';
+import 'package:icons_plus/icons_plus.dart';
+import '../../core/app_colors.dart';
+import '../../home/main_screen.dart';
+import '../../profile/user_data.dart';
+
+class SignUpSeeker extends StatefulWidget {
+  const SignUpSeeker({super.key});
+
+  @override
+  State<SignUpSeeker> createState() => _SignUpSeeker();
+}
+
+class _SignUpSeeker extends State<SignUpSeeker> {
+  final _formKey = GlobalKey<FormState>();
+  
+  final String _selectedRole = "Job Seeker";
+
+  // Controllers
+  final TextEditingController _fullNameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _aboutMeController = TextEditingController();
+  final TextEditingController _skillsController = TextEditingController();
+  final TextEditingController _portfolioController = TextEditingController();
+  final TextEditingController _socialController = TextEditingController();
+
+  // DOB Dropdowns
+  String? _selectedDay;
+  String? _selectedMonth;
+  String? _selectedYear;
+  final List<String> _days = List.generate(31, (i) => (i + 1).toString().padLeft(2, '0'));
+  final List<String> _months = List.generate(12, (i) => (i + 1).toString().padLeft(2, '0'));
+  final List<String> _years = List.generate(70, (i) => (DateTime.now().year - 10 - i).toString());
+
+  // Education Controllers
+  final TextEditingController _eduInstitutionController = TextEditingController();
+  final TextEditingController _eduDegreeController = TextEditingController();
+  final TextEditingController _eduDurationController = TextEditingController();
+
+  // Experience Controllers
+  final TextEditingController _expJobTitleController = TextEditingController();
+  final TextEditingController _expDurationController = TextEditingController();
+
+  List<String> _skillsList = [];
+  List<Map<String, String>> _socialLinksList = [];
+  List<Map<String, String>> _experiencesList = [];
+  List<Map<String, String>> _educationList = [];
+
+  final List<String> _genderOptions = ["Male", "Female"];
+  String? _selectedGender;
+  final List<String> _platforms = ["LinkedIn", "GitHub", "Twitter", "Instagram", "Facebook", "Other"];
+  String _selectedPlatform = "LinkedIn";
+
+  @override
+  void dispose() {
+    _fullNameController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
+    _addressController.dispose();
+    _aboutMeController.dispose();
+    _skillsController.dispose();
+    _portfolioController.dispose();
+    _socialController.dispose();
+    _eduInstitutionController.dispose();
+    _eduDegreeController.dispose();
+    _eduDurationController.dispose();
+    _expJobTitleController.dispose();
+    _expDurationController.dispose();
+    super.dispose();
+  }
+
+  void _addEducation() {
+    if (_eduInstitutionController.text.isNotEmpty && _eduDegreeController.text.isNotEmpty) {
+      setState(() {
+        _educationList.add({
+          "institution": _eduInstitutionController.text.trim(),
+          "degree": _eduDegreeController.text.trim(),
+          "duration": _eduDurationController.text.trim(),
+        });
+        _eduInstitutionController.clear();
+        _eduDegreeController.clear();
+        _eduDurationController.clear();
+      });
+    }
+  }
+
+  void _addExperience() {
+    if (_expJobTitleController.text.isNotEmpty) {
+      setState(() {
+        _experiencesList.add({
+          "title": _expJobTitleController.text.trim(),
+          "duration": _expDurationController.text.trim(),
+        });
+        _expJobTitleController.clear();
+        _expDurationController.clear();
+      });
+    }
+  }
+
+  void _addSkill() {
+    String skill = _skillsController.text.trim();
+    if (skill.isNotEmpty && !_skillsList.contains(skill)) {
+      setState(() {
+        _skillsList.add(skill);
+        _skillsController.clear();
+      });
+    }
+  }
+
+  void _addSocialLink() {
+    if (_socialController.text.isNotEmpty) {
+      setState(() {
+        _socialLinksList.add({"platform": _selectedPlatform, "url": _socialController.text.trim()});
+        _socialController.clear();
+      });
+    }
+  }
+
+  void _saveProfile() {
+    if (_formKey.currentState!.validate()) {
+      if (_selectedDay == null || _selectedMonth == null || _selectedYear == null) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Please select your full Date of Birth")));
+        return;
+      }
+      if (_selectedGender == null) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Please select gender")));
+        return;
+      }
+
+      UserProfileData.fullName = _fullNameController.text;
+      UserProfileData.email = _emailController.text;
+      UserProfileData.phone = "+20 ${_phoneController.text}";
+      UserProfileData.aboutMe = _aboutMeController.text;
+      UserProfileData.dob = "$_selectedYear-$_selectedMonth-$_selectedDay";
+      UserProfileData.location = _addressController.text;
+      UserProfileData.gender = _selectedGender!;
+      UserProfileData.portfolioUrl = _portfolioController.text;
+      UserProfileData.skills = List.from(_skillsList);
+      UserProfileData.socialLinks = List.from(_socialLinksList);
+      UserProfileData.experiences = List.from(_experiencesList);
+
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Profile saved successfully!")));
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const MainScreen()));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0, title: const Text("Registration", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)), centerTitle: true),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header
+                RichText(
+                  text: const TextSpan(
+                    style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+                    children: [
+                      TextSpan(text: "You Can "),
+                      TextSpan(text: "SignUp ", style: TextStyle(color: Color(0xFF49769F))),
+                      TextSpan(text: "Tradesman or a job seeker with "),
+                      TextSpan(text: "Jobito", style: TextStyle(color: Colors.orange)),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 5),
+                Container(width: 80, height: 3, color: Colors.orange, margin: const EdgeInsets.only(left: 230)),
+                const SizedBox(height: 25),
+                
+                // Role selection with lines
+                Row(
+                  children: [
+                    Expanded(child: _buildRoleOption("Job Seeker")),
+                    Container(
+                      width: 30,
+                      height: 1,
+                      color: Colors.white24,
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 8),
+                      child: Text("or", style: TextStyle(color: Colors.white54, fontSize: 16, fontWeight: FontWeight.bold)),
+                    ),
+                    Container(
+                      width: 30,
+                      height: 1,
+                      color: Colors.white24,
+                    ),
+                    Expanded(child: _buildRoleOption("Tradesman")),
+                  ],
+                ),
+                const SizedBox(height: 35),
+
+                // Profile Photo Section (Matching Tradesman)
+                _buildSectionHeader("Profile Photo", "This image will be shown publicly as your profile picture."),
+                const SizedBox(height: 15),
+                Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 40,
+                      backgroundColor: Colors.white12,
+                      child: Icon(Icons.person, size: 45, color: Colors.white.withOpacity(0.5)),
+                    ),
+                    const SizedBox(width: 20),
+                    Expanded(child: _buildUploadBox("Click to replace or drag and drop\nSVG, PNG, JPG or GIF (max. 800 x 800px)", () {})),
+                  ],
+                ),
+                const SizedBox(height: 30),
+
+                const Text("Personal Information", style: TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.w600)),
+                const SizedBox(height: 20),
+                _buildTextField(_fullNameController, "Full Name", Icons.person_outline, isRequired: true),
+                const SizedBox(height: 20),
+                _buildTextField(_emailController, "Email", Icons.email_outlined, isRequired: true, validator: (v) => (v == null || !v.endsWith("@gmail.com")) ? "Valid @gmail.com required" : null),
+                const SizedBox(height: 20),
+                _buildTextField(_phoneController, "Phone Number", Icons.phone_android_outlined, keyboardType: TextInputType.phone, isRequired: true, prefixText: "+20 ", inputFormatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(10)]),
+                const SizedBox(height: 20),
+                
+                // Gender Dropdown
+                _buildDropdownField(
+                  label: "Gender",
+                  icon: Icons.person_search_outlined,
+                  value: _selectedGender,
+                  items: _genderOptions,
+                  onChanged: (v) => setState(() => _selectedGender = v),
+                  isRequired: true,
+                ),
+                const SizedBox(height: 20),
+
+                // Date of Birth Dropdowns (Matching Tradesman)
+                const Text("Date of Birth", style: TextStyle(color: Colors.white54, fontSize: 14)),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    Expanded(child: _buildSimpleDropdown("Day", _days, _selectedDay, (v) => setState(() => _selectedDay = v))),
+                    const SizedBox(width: 10),
+                    Expanded(child: _buildSimpleDropdown("Month", _months, _selectedMonth, (v) => setState(() => _selectedMonth = v))),
+                    const SizedBox(width: 10),
+                    Expanded(child: _buildSimpleDropdown("Year", _years, _selectedYear, (v) => setState(() => _selectedYear = v))),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                
+                _buildTextField(_addressController, "Address", Icons.location_on_outlined, isRequired: true),
+
+                const SizedBox(height: 35),
+                const Text("Education", style: TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.w600)),
+                const Text("Add your academic qualifications", style: TextStyle(color: Colors.white38, fontSize: 12)),
+                const SizedBox(height: 20),
+                _buildTextField(_eduInstitutionController, "Education Institution", Icons.school_outlined),
+                const SizedBox(height: 15),
+                _buildTextField(_eduDegreeController, "Academic Degree", Icons.workspace_premium_outlined),
+                const SizedBox(height: 15),
+                Row(
+                  children: [
+                    Expanded(child: _buildTextField(_eduDurationController, "Duration", Icons.timer_outlined)),
+                    const SizedBox(width: 10),
+                    IconButton(onPressed: _addEducation, icon: const Icon(Icons.add_circle, color: Color(0xFF49769F), size: 35)),
+                  ],
+                ),
+                ..._educationList.asMap().entries.map((entry) => Container(
+                  margin: const EdgeInsets.only(top: 10),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(color: Colors.white.withOpacity(0.03), borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.white10)),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.book, color: Color(0xFF49769F), size: 20),
+                      const SizedBox(width: 12),
+                      Expanded(child: Text("${entry.value['institution']} - ${entry.value['degree']} (${entry.value['duration']})", style: const TextStyle(color: Colors.white70, fontSize: 12))),
+                      IconButton(icon: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 20), onPressed: () => setState(() => _educationList.removeAt(entry.key))),
+                    ],
+                  ),
+                )),
+
+                const SizedBox(height: 35),
+                const Text("Professional Details", style: TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.w600)),
+                const SizedBox(height: 20),
+                _buildTextField(_aboutMeController, "About Me", Icons.info_outline, maxLines: 3),
+
+                const SizedBox(height: 25),
+                const Text("Experience (خبرات العمل)", style: TextStyle(color: Colors.white54, fontSize: 14)),
+                const SizedBox(height: 10),
+                _buildTextField(_expJobTitleController, "Job Title", Icons.title),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    Expanded(child: _buildTextField(_expDurationController, "Duration", Icons.timer)),
+                    const SizedBox(width: 10),
+                    IconButton(onPressed: _addExperience, icon: const Icon(Icons.add_circle, color: Color(0xFF49769F), size: 35)),
+                  ],
+                ),
+                ..._experiencesList.asMap().entries.map((entry) => Container(
+                  margin: const EdgeInsets.only(top: 10),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(color: Colors.white.withOpacity(0.03), borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.white10)),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.work_history, color: Color(0xFF49769F), size: 20),
+                      const SizedBox(width: 12),
+                      Expanded(child: Text("${entry.value['title']} (${entry.value['duration']})", style: const TextStyle(color: Colors.white70, fontSize: 12))),
+                      IconButton(icon: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 20), onPressed: () => setState(() => _experiencesList.removeAt(entry.key))),
+                    ],
+                  ),
+                )),
+
+                const SizedBox(height: 25),
+                const Text("Skills", style: TextStyle(color: Colors.white54, fontSize: 14)),
+                const SizedBox(height: 8),
+                TextFormField(
+                  controller: _skillsController,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    hintText: "Type and press Add", hintStyle: const TextStyle(color: Colors.white24, fontSize: 12),
+                    prefixIcon: const Icon(Icons.star_outline, color: Color(0xFF49769F), size: 20),
+                    suffixIcon: IconButton(icon: const Icon(Icons.add_circle_outline, color: Color(0xFF49769F)), onPressed: _addSkill),
+                    filled: true, fillColor: Colors.white.withOpacity(0.05), contentPadding: const EdgeInsets.all(16),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: const BorderSide(color: Colors.white12)),
+                    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: const BorderSide(color: Colors.white12)),
+                    focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: const BorderSide(color: Color(0xFF49769F))),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Wrap(spacing: 8, runSpacing: 8, children: _skillsList.map((s) => Chip(label: Text(s, style: const TextStyle(color: Colors.white, fontSize: 11)), backgroundColor: const Color(0xFF49769F).withOpacity(0.2), onDeleted: () => setState(() => _skillsList.remove(s)), deleteIcon: const Icon(Icons.close, size: 14, color: Colors.white70), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))).toList()),
+
+                const SizedBox(height: 25),
+                _buildTextField(_portfolioController, "Portfolio Link (URL)", Icons.link_outlined),
+
+                const SizedBox(height: 25),
+                const Text("Social Media Links", style: TextStyle(color: Colors.white54, fontSize: 14)),
+                const SizedBox(height: 8),
+                Row(children: [
+                  Expanded(flex: 3, child: Container(padding: const EdgeInsets.symmetric(horizontal: 12), decoration: BoxDecoration(color: Colors.white.withOpacity(0.05), borderRadius: BorderRadius.circular(15), border: Border.all(color: Colors.white12)), child: DropdownButtonHideUnderline(child: DropdownButton<String>(value: _selectedPlatform, dropdownColor: const Color(0xFF0D2D4D), isExpanded: true, style: const TextStyle(color: Colors.white, fontSize: 12), items: _platforms.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(), onChanged: (v) => setState(() => _selectedPlatform = v!))))),
+                  const SizedBox(width: 10),
+                  Expanded(flex: 5, child: TextFormField(controller: _socialController, style: const TextStyle(color: Colors.white, fontSize: 13), decoration: InputDecoration(hintText: "Link", hintStyle: const TextStyle(color: Colors.white24, fontSize: 12), filled: true, fillColor: Colors.white.withOpacity(0.05), contentPadding: const EdgeInsets.all(16), border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: const BorderSide(color: Colors.white12))))),
+                  IconButton(onPressed: _addSocialLink, icon: const Icon(Icons.add_circle, color: Color(0xFF49769F), size: 30)),
+                ]),
+                const SizedBox(height: 10),
+                ..._socialLinksList.asMap().entries.map((entry) => Container(margin: const EdgeInsets.only(bottom: 8), padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10), decoration: BoxDecoration(color: Colors.white.withOpacity(0.03), borderRadius: BorderRadius.circular(10)), child: Row(children: [const Icon(Icons.link, color: Color(0xFF49769F), size: 18), const SizedBox(width: 12), Expanded(child: Text("${entry.value['platform']}: ${entry.value['url']}", style: const TextStyle(color: Colors.white70, fontSize: 11), maxLines: 1, overflow: TextOverflow.ellipsis)), IconButton(icon: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 20), onPressed: () => setState(() => _socialLinksList.removeAt(entry.key)))]))),
+
+                const SizedBox(height: 30),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text("Work Images", style: TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.w600)),
+                    IconButton(
+                      icon: const Icon(Icons.add_a_photo, color: Color(0xFF49769F)),
+                      onPressed: () {},
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Container(
+                  height: 120,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.05),
+                    borderRadius: BorderRadius.circular(15),
+                    border: Border.all(color: Colors.white12),
+                  ),
+                  child: const Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.photo_library_outlined, color: Colors.white24, size: 40),
+                        SizedBox(height: 8),
+                        Text("Add your work showcase", style: TextStyle(color: Colors.white24, fontSize: 12)),
+                      ],
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 40),
+                SizedBox(width: double.infinity, height: 56, child: ElevatedButton(onPressed: _saveProfile, style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF49769F), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))), child: const Text("Save Profile", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)))),
+                const SizedBox(height: 40),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRoleOption(String role) {
+    bool isSelected = _selectedRole == role;
+    return GestureDetector(
+      onTap: () {
+        if (role == "Tradesman") {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const SignUpTradesman()),
+          );
+        }
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFF49769F) : Colors.white.withOpacity(0.05),
+          borderRadius: BorderRadius.circular(15),
+          border: Border.all(color: isSelected ? const Color(0xFF49769F) : Colors.white12, width: 1.5),
+          boxShadow: isSelected ? [BoxShadow(color: const Color(0xFF49769F).withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 4))] : [],
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          role,
+          style: TextStyle(
+            color: isSelected ? Colors.white : Colors.white70,
+            fontSize: 15,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTextField(TextEditingController controller, String label, IconData icon, {String? hint, String? prefixText, int maxLines = 1, TextInputType keyboardType = TextInputType.text, bool isRequired = false, VoidCallback? onIconTap, IconData? suffixIcon, VoidCallback? onSuffixTap, List<TextInputFormatter>? inputFormatters, String? Function(String?)? validator}) {
+    return TextFormField(
+      controller: controller, maxLines: maxLines, keyboardType: keyboardType, inputFormatters: inputFormatters, style: const TextStyle(color: Colors.white),
+      validator: isRequired ? (validator ?? (value) => (value == null || value.isEmpty) ? "$label is required" : null) : null,
+      decoration: InputDecoration(
+        prefixText: prefixText, prefixStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        labelText: label, labelStyle: const TextStyle(color: Colors.white54, fontSize: 14),
+        hintText: hint, hintStyle: const TextStyle(color: Colors.white24, fontSize: 12),
+        prefixIcon: InkWell(onTap: onIconTap, child: Icon(icon, color: const Color(0xFF49769F), size: 20)),
+        suffixIcon: suffixIcon != null ? IconButton(icon: Icon(suffixIcon, color: Colors.white54), onPressed: onSuffixTap) : null,
+        filled: true, fillColor: Colors.white.withOpacity(0.05), contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: const BorderSide(color: Colors.white12)),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: const BorderSide(color: Colors.white12)),
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: const BorderSide(color: Color(0xFF49769F))),
+      ),
+    );
+  }
+
+  Widget _buildSectionHeader(String title, String subtitle) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+        if (subtitle.isNotEmpty) ...[
+          const SizedBox(height: 4),
+          Text(subtitle, style: const TextStyle(color: Colors.white38, fontSize: 12)),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildUploadBox(String text, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.02),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.white12, style: BorderStyle.solid),
+        ),
+        child: Center(
+          child: Column(
+            children: [
+              const Icon(Icons.cloud_upload_outlined, color: Color(0xFF49769F), size: 30),
+              const SizedBox(height: 8),
+              Text(text, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white38, fontSize: 11)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSimpleDropdown(String hint, List<String> items, String? value, ValueChanged<String?> onChanged) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.white12),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          hint: Text(hint, style: const TextStyle(color: Colors.white24, fontSize: 12)),
+          value: value,
+          isExpanded: true,
+          dropdownColor: const Color(0xFF0D2D4D),
+          items: items.map((e) => DropdownMenuItem(value: e, child: Text(e, style: const TextStyle(color: Colors.white, fontSize: 13)))).toList(),
+          onChanged: onChanged,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDropdownField({required String label, required IconData icon, required String? value, required List<String> items, required ValueChanged<String?> onChanged, bool isRequired = false}) {
+    return DropdownButtonFormField<String>(
+      value: value,
+      items: items.map((item) => DropdownMenuItem(value: item, child: Text(item, style: const TextStyle(color: Colors.white)))).toList(),
+      onChanged: onChanged,
+      dropdownColor: const Color(0xFF0D2D4D),
+      style: const TextStyle(color: Colors.white),
+      validator: isRequired ? (v) => v == null ? "$label is required" : null : null,
+      decoration: InputDecoration(
+        labelText: label, labelStyle: const TextStyle(color: Colors.white54, fontSize: 14),
+        prefixIcon: Icon(icon, color: const Color(0xFF49769F), size: 20),
+        filled: true, fillColor: Colors.white.withOpacity(0.05),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: const BorderSide(color: Colors.white12)),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: const BorderSide(color: Colors.white12)),
+      ),
+    );
+  }
+}

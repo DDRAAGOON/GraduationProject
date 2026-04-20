@@ -27,17 +27,17 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
   ];
 
   final List<Map<String, dynamic>> _allJobs = [
-    {"title": "Social Media Assistant", "company": "Nomad", "location": "Paris, France", "applied": 4, "capacity": 18, "category": "technical", "isSpecial": true},
-    {"title": "Interactive Developer", "company": "Terraform", "location": "Hamburg, Germany", "applied": 8, "capacity": 12, "category": "technical", "isSpecial": true},
-    {"title": "Brand Designer", "company": "Dropbox", "location": "San Fransisco, USA", "applied": 2, "capacity": 10, "category": "technical", "isSpecial": true},
-    {"title": "Email Marketing", "company": "Revolut", "location": "Madrid, Spain", "applied": 0, "capacity": 10, "category": "technical", "isSpecial": false},
-    {"title": "Lead Engineer", "company": "Canva", "location": "Ankara, Turkey", "applied": 4, "capacity": 10, "category": "technical", "isSpecial": false},
-    {"title": "HR Manager", "company": "LinkedIn", "location": "London, UK", "applied": 5, "capacity": 10, "category": "nontechnical", "isSpecial": true},
-    {"title": "Sales Executive", "company": "Amazon", "location": "Berlin, Germany", "applied": 12, "capacity": 20, "category": "nontechnical", "isSpecial": true},
-    {"title": "Marketing Coordinator", "company": "Facebook", "location": "Menlo Park, USA", "applied": 8, "capacity": 15, "category": "nontechnical", "isSpecial": false},
-    {"title": "Hotel Receptionist", "company": "Marriott", "location": "Paris, France", "applied": 4, "capacity": 10, "category": "services", "isSpecial": true},
-    {"title": "Delivery Driver", "company": "Uber", "location": "Madrid, Spain", "applied": 50, "capacity": 100, "category": "services", "isSpecial": true},
-    {"title": "Barista", "company": "Starbucks", "location": "Rome, Italy", "applied": 10, "capacity": 15, "category": "services", "isSpecial": false},
+    {"title": "Social Media Assistant", "company": "Nomad", "location": "Paris, France", "applied": 4, "capacity": 18, "category": "technical"},
+    {"title": "Interactive Developer", "company": "Terraform", "location": "Hamburg, Germany", "applied": 8, "capacity": 12, "category": "technical"},
+    {"title": "Brand Designer", "company": "Dropbox", "location": "San Fransisco, USA", "applied": 2, "capacity": 10, "category": "technical"},
+    {"title": "Email Marketing", "company": "Revolut", "location": "Madrid, Spain", "applied": 0, "capacity": 10, "category": "technical"},
+    {"title": "Lead Engineer", "company": "Canva", "location": "Ankara, Turkey", "applied": 4, "capacity": 10, "category": "technical"},
+    {"title": "HR Manager", "company": "LinkedIn", "location": "London, UK", "applied": 5, "capacity": 10, "category": "nontechnical"},
+    {"title": "Sales Executive", "company": "Amazon", "location": "Berlin, Germany", "applied": 12, "capacity": 20, "category": "nontechnical"},
+    {"title": "Marketing Coordinator", "company": "Facebook", "location": "Menlo Park, USA", "applied": 8, "capacity": 15, "category": "nontechnical"},
+    {"title": "Hotel Receptionist", "company": "Marriott", "location": "Paris, France", "applied": 4, "capacity": 10, "category": "services"},
+    {"title": "Delivery Driver", "company": "Uber", "location": "Madrid, Spain", "applied": 50, "capacity": 100, "category": "services"},
+    {"title": "Barista", "company": "Starbucks", "location": "Rome, Italy", "applied": 10, "capacity": 15, "category": "services"},
   ];
 
   final Map<String, bool> _selectedFilters = {
@@ -62,13 +62,12 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
       backgroundColor: AppColors.background,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 10),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 10),
               _buildTopBar(),
-              const SizedBox(height: 20),
+              const SizedBox(height: 25),
               _buildSearchSection(),
               const SizedBox(height: 15),
               const Text("Popular : UI Designer, UX Researcher, Android, Admin", 
@@ -126,7 +125,7 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        _buildTopIconButton(Icons.notifications_none, hasBadge: true, 
+        _buildTopIconButton(Icons.notifications_none, 
           onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const NotificationsScreen()))),
         const SizedBox(width: 12),
         _buildTopIconButton(Icons.settings_outlined, 
@@ -135,7 +134,7 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
     );
   }
 
-  Widget _buildTopIconButton(IconData icon, {bool hasBadge = false, VoidCallback? onTap}) {
+  Widget _buildTopIconButton(IconData icon, {VoidCallback? onTap}) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -352,9 +351,6 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
                 job["title"].toString().toLowerCase().contains(query))
         .toList();
 
-    final List<Map<String, dynamic>> specialJobs = categoryJobs.where((job) => job["isSpecial"] == true).toList();
-    final List<Map<String, dynamic>> todayJobs = categoryJobs.where((job) => job["isSpecial"] == false).toList();
-
     if (categoryJobs.isEmpty) {
       return const Center(
         child: Padding(
@@ -366,29 +362,15 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
 
     return Column(
       children: [
-        if (specialJobs.isNotEmpty) ...[
-          _buildSectionHeader("Special jobs"),
-          const SizedBox(height: 15),
-          ...specialJobs.map((job) => _buildJobCard(
-            title: job["title"],
-            company: job["company"],
-            location: job["location"],
-            applied: job["applied"],
-            capacity: job["capacity"],
-          )),
-        ],
-        if (todayJobs.isNotEmpty) ...[
-          const SizedBox(height: 10),
-          _buildSectionHeader("Today jobs"),
-          const SizedBox(height: 15),
-          ...todayJobs.map((job) => _buildJobCard(
-            title: job["title"],
-            company: job["company"],
-            location: job["location"],
-            applied: job["applied"],
-            capacity: job["capacity"],
-          )),
-        ],
+        _buildSectionHeader("All jobs"),
+        const SizedBox(height: 15),
+        ...categoryJobs.map((job) => _buildJobCard(
+          title: job["title"],
+          company: job["company"],
+          location: job["location"],
+          applied: job["applied"],
+          capacity: job["capacity"],
+        )),
       ],
     );
   }

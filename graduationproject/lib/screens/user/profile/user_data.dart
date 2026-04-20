@@ -9,7 +9,9 @@ class UserProfileData {
   static String location = "Manchester, UK";
   static String jobTitle = "Product Designer at Twitter";
   
-  // أضفت هذه القوائم لحفظ البيانات الجديدة
   static List<String> skills = ["Facebook Ads", "Analytics", "Community Manager", "Content Planning"];
   static List<Map<String, String>> socialLinks = [];
+
+  // أضفت هذا السطر لحل المشكلة
+  static List<Map<String, String>> experiences = [];
 }
