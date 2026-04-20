@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:graduationproject/screens/user/auth/sign_up_screen/sign_up_seeker.dart';
 import 'package:graduationproject/screens/user/core/custom_button.dart';
 import '../core/app_colors.dart';
-import '../profile/setting_profile/Complete_Profile_screen.dart'; // Import complete profile screen
 
 class OtpEmailVerificationScreen extends StatefulWidget {
   final String email;
@@ -100,7 +100,7 @@ class _OtpEmailVerificationScreenState extends State<OtpEmailVerificationScreen>
                     // Navigate to Complete Profile Screen
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (context) => const CompleteProfileScreen()),
+                      MaterialPageRoute(builder: (context) => const SignUpSeeker()),
                     );
                   },
                   style: ElevatedButton.styleFrom(

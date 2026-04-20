@@ -108,6 +108,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             const Text("This is your personal information that you can update anytime.", style: TextStyle(color: Colors.white54, fontSize: 13)),
             const Divider(color: Colors.white24, height: 40),
 
+            // Profile Photo
+            const Text("Profile Photo", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            const Text("This image will be shown publicly as your profile picture, it will help recruiters recognize you!", style: TextStyle(color: Colors.white54, fontSize: 12)),
+            const SizedBox(height: 20),
             Row(
               children: [
                 const CircleAvatar(
@@ -177,6 +182,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 _buildSkillTag("Community Manager"),
               ],
             ),
+            const Divider(color: Colors.white24, height: 40),
+
+            // Portfolio URL
+            const Text("Portfolio URL", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 12),
+            _buildTextField(_portfolioController, "Link to your portfolio URL"),
             const Divider(color: Colors.white24, height: 40),
 
             // Account Type

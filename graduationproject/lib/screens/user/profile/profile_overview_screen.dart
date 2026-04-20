@@ -112,14 +112,14 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
                             UserProfileData.fullName,
                             style: const TextStyle(
                               color: Colors.white, 
-                              fontSize: 20, // تم تقليل حجم الخط لتجنب التداخل
+                              fontSize: 20,
                               fontWeight: FontWeight.bold
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        const SizedBox(width: 10), // مسافة أمان بين الاسم والزر
+                        const SizedBox(width: 10),
                         OutlinedButton(
                           onPressed: () async {
                             await Navigator.push(
@@ -190,6 +190,22 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
 
               const SizedBox(height: 30),
 
+              // Work Experience Section
+              _buildSectionTitle("Work Experience"),
+              if (UserProfileData.experiences.isEmpty)
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child: Text("No experience added yet", style: TextStyle(color: Colors.white38, fontSize: 12)),
+                )
+              else
+                ...UserProfileData.experiences.map((exp) => _buildExperienceItem(
+                  exp['title']!, 
+                  exp['company']!, 
+                  exp['duration']!
+                )).toList(),
+
+              const SizedBox(height: 30),
+
               // Skills
               _buildSectionTitle("Skills"),
               Padding(
@@ -240,7 +256,7 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
                 ),
               ),
 
-              const SizedBox(height: 120), // Bottom padding for nav bar
+              const SizedBox(height: 120),
             ],
           ),
         ),
@@ -270,6 +286,29 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
       child: Text(
         title,
         style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+      ),
+    );
+  }
+
+  Widget _buildExperienceItem(String title, String company, String duration) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(Icons.work_outline, color: Color(0xFF49769F), size: 24),
+          const SizedBox(width: 15),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 4),
+                Text("$company • $duration", style: const TextStyle(color: Colors.white54, fontSize: 13)),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
