@@ -1,9 +1,9 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../core/app_colors.dart';
 import '../../teardsman/nav_Botton_bar/nav_bottom_bar.dart';
 import '../../teardsman/profile/teardsman_data.dart';
-//import '../teardsman/profile/teardsman_data.dart';
+import '../../../../../shared/l10n/app_localizations.dart';
 import 'sign_up_seeker.dart';
 
 class SignUpTradesman extends StatefulWidget {
@@ -47,7 +47,7 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
   final List<String> _years = List.generate(70, (i) => (DateTime.now().year - 18 - i).toString());
 
   // Services
-  final List<String> _trades = ["Ù†Ø¬Ø§Ø±", "ÙÙ†ÙŠ Ø³Ø¨Ø§ÙƒØ©", "Ù†Ù‚Ø§Ø´", "Ù…ÙŠÙƒØ§Ù†ÙŠÙƒÙŠ", "ÙƒÙ‡Ø±Ø¨Ø§Ø¦ÙŠ", "Ø­Ø¯Ø§Ø¯", "Ù…Ù†Ø¸Ù Ù…Ù†Ø§Ø²Ù„", "Other"];
+  final List<String> _trades = ["نجار", "فني سباكة", "نقاش", "ميكانيكي", "كهربائي", "حداد", "منظف منازل", "Other"];
   String? _selectedTrade;
 
   List<Map<String, String>> _educationList = [];
@@ -141,9 +141,10 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0, title: const Text("Registration", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)), centerTitle: true),
+      appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0, title: Text(t.registration, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)), centerTitle: true),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
@@ -184,7 +185,7 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
                 const SizedBox(height: 35),
 
                 // Profile Photo Section
-                _buildSectionHeader("Profile Photo", "This image will be shown publicly as your profile picture."),
+                _buildSectionHeader(t.profilePhoto, t.uploadHint),
                 const SizedBox(height: 15),
                 Row(
                   children: [
@@ -194,7 +195,7 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
                       child: Icon(Icons.person, size: 45, color: Colors.white.withValues(alpha: 0.5)),
                     ),
                     const SizedBox(width: 20),
-                    Expanded(child: _buildUploadBox("Click to replace or drag and drop\nSVG, PNG, JPG or GIF (max. 800 x 800px)", () {
+                    Expanded(child: _buildUploadBox(t.uploadHint, () {
                       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Profile Photo Selected")));
                     })),
                   ],
@@ -202,13 +203,13 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
                 const SizedBox(height: 30),
 
                 // Personal Details
-                const Text("Personal Information", style: TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.w600)),
+                Text(t.personalInfo, style: const TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.w600)),
                 const SizedBox(height: 20),
-                _buildTextField(_fullNameController, "Full Name", Icons.person_outline, isRequired: true),
+                _buildTextField(_fullNameController, t.fullName, Icons.person_outline, isRequired: true),
                 const SizedBox(height: 20),
-                _buildTextField(_emailController, "Email", Icons.email_outlined, isRequired: true),
+                _buildTextField(_emailController, t.emailAddress, Icons.email_outlined, isRequired: true),
                 const SizedBox(height: 20),
-                _buildTextField(_phoneController, "Phone Number", Icons.phone_android_outlined, 
+                _buildTextField(_phoneController, t.phoneNumber, Icons.phone_android_outlined, 
                   keyboardType: TextInputType.phone, 
                   isRequired: true, 
                   prefixText: "+20 ",
@@ -217,10 +218,10 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
                 
                 // Gender Dropdown
                 _buildDropdownField(
-                  label: "Gender",
+                  label: t.gender,
                   icon: Icons.person_search_outlined,
                   value: _selectedGender,
-                  items: _genderOptions,
+                  items: [t.tr(en: 'Male', ar: 'ذكر'), t.tr(en: 'Female', ar: 'أنثى')],
                   onChanged: (v) => setState(() => _selectedGender = v),
                   isRequired: true,
                 ),
@@ -228,7 +229,7 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
                 const SizedBox(height: 20),
                 
                 // Date of Birth Dropdowns
-                const Text("Date of Birth", style: TextStyle(color: Colors.white54, fontSize: 14)),
+                Text(t.dob, style: const TextStyle(color: Colors.white54, fontSize: 14)),
                 const SizedBox(height: 10),
                 Row(
                   children: [
@@ -241,14 +242,14 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
                 ),
                 
                 const SizedBox(height: 20),
-                _buildTextField(_addressController, "Address", Icons.location_on_outlined, isRequired: true),
+                _buildTextField(_addressController, t.address, Icons.location_on_outlined, isRequired: true),
                 const SizedBox(height: 30),
 
                 // Criminal Record Check (Required)
-                _buildSectionHeader("Criminal Record Check *", "An official document that shows a person's criminal history."),
+                _buildSectionHeader("${t.criminalRecord} *", t.criminalRecordHint),
                 const SizedBox(height: 15),
                 _buildUploadBox(
-                  _criminalRecordUploaded ? "Criminal Record Uploaded âœ“" : "Click to upload Criminal Record\nSVG, PNG, JPG or GIF (max. 400 x 400px)", 
+                  _criminalRecordUploaded ? "${t.criminalRecord} ${t.saved} ✓" : t.uploadHint, 
                   () {
                     setState(() {
                       _criminalRecordUploaded = true;
@@ -259,9 +260,9 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
                 const SizedBox(height: 30),
 
                 // About Me
-                const Text("About Me", style: TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.w600)),
+                Text(t.aboutMe, style: const TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.w600)),
                 const SizedBox(height: 15),
-                _buildTextField(_aboutMeController, "About Me", Icons.info_outline, maxLines: 4),
+                _buildTextField(_aboutMeController, t.aboutMe, Icons.info_outline, maxLines: 4),
                 const SizedBox(height: 30),
 
                 // Service (Required choice or text)
@@ -269,7 +270,7 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
                 const Text("Select or enter the profession you provide", style: TextStyle(color: Colors.white38, fontSize: 12)),
                 const SizedBox(height: 15),
                 _buildDropdownField(
-                  label: "Select Service",
+                  label: t.selectService,
                   icon: Icons.work_outline,
                   value: _selectedTrade,
                   items: _trades,
@@ -287,7 +288,7 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
                 const SizedBox(height: 30),
 
                 // Education
-                const Text("Education", style: TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.w600)),
+                Text(t.education, style: const TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.w600)),
                 const Text("Add your academic qualifications", style: TextStyle(color: Colors.white38, fontSize: 12)),
                 const SizedBox(height: 20),
                 _buildTextField(_eduInstitutionController, "Education Institution", Icons.school_outlined),
@@ -337,7 +338,7 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
                 const SizedBox(height: 30),
 
                 // Social Links
-                const Text("Social Links", style: TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.w600)),
+                Text(t.socialMedia, style: const TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.w600)),
                 const SizedBox(height: 15),
                 Row(
                   children: [
@@ -349,10 +350,10 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
                 const SizedBox(height: 30),
 
                 // Your Work
-                _buildSectionHeader("Your Work", "Upload images of your previous work"),
+                _buildSectionHeader(t.yourWork, t.workImagesHint),
                 const SizedBox(height: 15),
                 _buildUploadBox(
-                  "Click to add work images\nSVG, PNG, JPG or GIF (max. 800 x 800px)", 
+                  t.uploadHint, 
                   () {
                     setState(() {
                       _workImages.add("Work Image ${_workImages.length + 1}");
@@ -403,7 +404,7 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
                       backgroundColor: const Color(0xFF49769F),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                     ),
-                    child: const Text("Save Profile", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                    child: Text(t.saveProfile, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
                   ),
                 ),
                 const SizedBox(height: 40),

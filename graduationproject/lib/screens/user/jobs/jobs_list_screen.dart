@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import '../core/app_colors.dart';
 import '../../../constants/app_images.dart';
 
@@ -314,7 +314,6 @@ class _JobsListScreenState extends State<JobsListScreen> {
     required int applied,
     required int capacity,
   }) {
-    double progress = applied / capacity;
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
       child: Row(
@@ -338,7 +337,7 @@ class _JobsListScreenState extends State<JobsListScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
-                Text("$company â€¢ $location", style: const TextStyle(color: Colors.white38, fontSize: 12)),
+                Text("$company • $location", style: const TextStyle(color: Colors.white38, fontSize: 12)),
                 const SizedBox(height: 12),
                 Row(
                   children: [
@@ -362,25 +361,8 @@ class _JobsListScreenState extends State<JobsListScreen> {
                 child: const Text("Apply", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
               ),
               const SizedBox(height: 10),
-              SizedBox(
-                width: 100,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(4),
-                      child: LinearProgressIndicator(
-                        value: progress,
-                        backgroundColor: Colors.white12,
-                        valueColor: const AlwaysStoppedAnimation<Color>(Colors.tealAccent),
-                        minHeight: 4,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text("$applied applied of $capacity capacity", style: const TextStyle(color: Colors.white38, fontSize: 9)),
-                  ],
-                ),
-              ),
+              const SizedBox(height: 10),
+              Text("$applied متقدم", style: const TextStyle(color: Colors.white38, fontSize: 11)),
             ],
           ),
         ],

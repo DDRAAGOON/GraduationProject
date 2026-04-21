@@ -56,6 +56,8 @@ class AppLocalizations {
   String get job => isAr ? 'الوظائف' : 'Job';
   String get profile => isAr ? 'الملف الشخصي' : 'Profile';
   String get stats => isAr ? 'الإحصائيات' : 'Stats';
+  String get preferences => isAr ? 'التفضيلات' : 'Preferences';
+  String get systemMode => isAr ? 'النظام' : 'System';
 
   // ── Language / Settings ────────────────────────────────────────────────────
   String get language => isAr ? 'اللغة' : 'Language';
@@ -144,6 +146,16 @@ class AppLocalizations {
   String get agreeTerms => isAr
       ? 'أوافق على شروط الخدمة وسياسة الخصوصية'
       : 'I Agree with Terms of Service and Privacy Policy';
+  String get registration => isAr ? 'إنشاء حساب جديد' : 'Registration';
+  String get personalInfo => isAr ? 'المعلومات الشخصية' : 'Personal Information';
+  String get profilePhoto => isAr ? 'صورة الملف الشخصي' : 'Profile Photo';
+  String get uploadHint => isAr ? 'انقر للاستبدال أو اسحب وأفلت' : 'Click to replace or drag and drop';
+  String get criminalRecord => isAr ? 'السجل الجنائي' : 'Criminal Record';
+  String get criminalRecordHint => isAr ? 'وثيقة رسمية توضح التاريخ الجنائي للشخص.' : 'An official document that shows a person\'s criminal history.';
+  String get selectService => isAr ? 'اختر الخدمة' : 'Select Service';
+  String get aboutMe => isAr ? 'عني' : 'About Me';
+  String get yourWork => isAr ? 'أعمالك' : 'Your Work';
+  String get workImagesHint => isAr ? 'ارفع صوراً لأعمالك السابقة' : 'Upload images of your previous work';
 
   // ── OTP ────────────────────────────────────────────────────────────────────
   String get otpTitle =>
@@ -233,6 +245,19 @@ class AppLocalizations {
   String get basicInfoHint => isAr
       ? 'معلومات أساسية عن الدور والشركة'
       : 'Basic info about role and company';
+  String get fullName => isAr ? 'الاسم الكامل' : 'Full Name';
+  String get phoneNumber => isAr ? 'رقم الهاتف' : 'Phone Number';
+  String get gender => isAr ? 'الجنس' : 'Gender';
+  String get dob => isAr ? 'تاريخ الميلاد' : 'Date of Birth';
+  String get day => isAr ? 'اليوم' : 'Day';
+  String get month => isAr ? 'الشهر' : 'Month';
+  String get year => isAr ? 'السنة' : 'Year';
+  String get education => isAr ? 'التعليم' : 'Education';
+  String get expWork => isAr ? 'خبرات العمل' : 'Work Experience';
+  String get portfolioLink => isAr ? 'رابط ملف الأعمال' : 'Portfolio Link';
+  String get socialMedia => isAr ? 'روابط التواصل الاجتماعي' : 'Social Media Links';
+  String get workImages => isAr ? 'صور العمل' : 'Work Images';
+  String get saveProfile => isAr ? 'حفظ الملف الشخصي' : 'Save Profile';
   String get perksAndBenefits =>
       isAr ? 'المزايا والفوائد' : 'Perks and Benefits';
   String get openV2Step1 =>

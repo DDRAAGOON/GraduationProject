@@ -4,6 +4,7 @@ import 'package:graduationproject/screens/user/auth/sign_up_screen/sign_up_trade
 import '../../core/app_colors.dart';
 import '../../home/main_screen.dart';
 import '../../profile/user_data.dart';
+import '../../../../../shared/l10n/app_localizations.dart';
 
 class SignUpSeeker extends StatefulWidget {
   const SignUpSeeker({super.key});
@@ -149,9 +150,10 @@ class _SignUpSeeker extends State<SignUpSeeker> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0, title: const Text("Registration", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)), centerTitle: true),
+      appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0, title: Text(t.registration, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)), centerTitle: true),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
@@ -200,7 +202,7 @@ class _SignUpSeeker extends State<SignUpSeeker> {
                 const SizedBox(height: 35),
 
                 // Profile Photo Section (Matching Tradesman)
-                _buildSectionHeader("Profile Photo", "This image will be shown publicly as your profile picture."),
+                _buildSectionHeader(t.profilePhoto, t.uploadHint),
                 const SizedBox(height: 15),
                 Row(
                   children: [
@@ -210,49 +212,49 @@ class _SignUpSeeker extends State<SignUpSeeker> {
                       child: Icon(Icons.person, size: 45, color: Colors.white.withValues(alpha: 0.5)),
                     ),
                     const SizedBox(width: 20),
-                    Expanded(child: _buildUploadBox("Click to replace or drag and drop\nSVG, PNG, JPG or GIF (max. 800 x 800px)", () {})),
+                    Expanded(child: _buildUploadBox(t.uploadHint, () {})),
                   ],
                 ),
                 const SizedBox(height: 30),
 
-                const Text("Personal Information", style: TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.w600)),
+                Text(t.personalInfo, style: const TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.w600)),
                 const SizedBox(height: 20),
-                _buildTextField(_fullNameController, "Full Name", Icons.person_outline, isRequired: true),
+                _buildTextField(_fullNameController, t.fullName, Icons.person_outline, isRequired: true),
                 const SizedBox(height: 20),
-                _buildTextField(_emailController, "Email", Icons.email_outlined, isRequired: true, validator: (v) => (v == null || !v.endsWith("@gmail.com")) ? "Valid @gmail.com required" : null),
+                _buildTextField(_emailController, t.emailAddress, Icons.email_outlined, isRequired: true, validator: (v) => (v == null || !v.endsWith("@gmail.com")) ? t.enterValidEmail : null),
                 const SizedBox(height: 20),
-                _buildTextField(_phoneController, "Phone Number", Icons.phone_android_outlined, keyboardType: TextInputType.phone, isRequired: true, prefixText: "+20 ", inputFormatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(10)]),
+                _buildTextField(_phoneController, t.phoneNumber, Icons.phone_android_outlined, keyboardType: TextInputType.phone, isRequired: true, prefixText: "+20 ", inputFormatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(10)]),
                 const SizedBox(height: 20),
                 
                 // Gender Dropdown
                 _buildDropdownField(
-                  label: "Gender",
+                  label: t.gender,
                   icon: Icons.person_search_outlined,
                   value: _selectedGender,
-                  items: _genderOptions,
+                  items: [t.tr(en: 'Male', ar: 'ذكر'), t.tr(en: 'Female', ar: 'أنثى')],
                   onChanged: (v) => setState(() => _selectedGender = v),
                   isRequired: true,
                 ),
                 const SizedBox(height: 20),
 
                 // Date of Birth Dropdowns (Matching Tradesman)
-                const Text("Date of Birth", style: TextStyle(color: Colors.white54, fontSize: 14)),
+                Text(t.dob, style: const TextStyle(color: Colors.white54, fontSize: 14)),
                 const SizedBox(height: 10),
                 Row(
                   children: [
-                    Expanded(child: _buildSimpleDropdown("Day", _days, _selectedDay, (v) => setState(() => _selectedDay = v))),
+                    Expanded(child: _buildSimpleDropdown(t.day, _days, _selectedDay, (v) => setState(() => _selectedDay = v))),
                     const SizedBox(width: 10),
-                    Expanded(child: _buildSimpleDropdown("Month", _months, _selectedMonth, (v) => setState(() => _selectedMonth = v))),
+                    Expanded(child: _buildSimpleDropdown(t.month, _months, _selectedMonth, (v) => setState(() => _selectedMonth = v))),
                     const SizedBox(width: 10),
-                    Expanded(child: _buildSimpleDropdown("Year", _years, _selectedYear, (v) => setState(() => _selectedYear = v))),
+                    Expanded(child: _buildSimpleDropdown(t.year, _years, _selectedYear, (v) => setState(() => _selectedYear = v))),
                   ],
                 ),
                 const SizedBox(height: 20),
                 
-                _buildTextField(_addressController, "Address", Icons.location_on_outlined, isRequired: true),
+                _buildTextField(_addressController, t.address, Icons.location_on_outlined, isRequired: true),
 
                 const SizedBox(height: 35),
-                const Text("Education", style: TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.w600)),
+                Text(t.education, style: const TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.w600)),
                 const Text("Add your academic qualifications", style: TextStyle(color: Colors.white38, fontSize: 12)),
                 const SizedBox(height: 20),
                 _buildTextField(_eduInstitutionController, "Education Institution", Icons.school_outlined),
@@ -286,7 +288,7 @@ class _SignUpSeeker extends State<SignUpSeeker> {
                 _buildTextField(_aboutMeController, "About Me", Icons.info_outline, maxLines: 3),
 
                 const SizedBox(height: 25),
-                const Text("Experience (Ø®Ø¨Ø±Ø§Øª Ø§Ù„Ø¹Ù…Ù„)", style: TextStyle(color: Colors.white54, fontSize: 14)),
+                Text(t.expWork, style: const TextStyle(color: Colors.white54, fontSize: 14)),
                 const SizedBox(height: 10),
                 _buildTextField(_expJobTitleController, "Job Title", Icons.title),
                 const SizedBox(height: 10),
@@ -378,7 +380,7 @@ class _SignUpSeeker extends State<SignUpSeeker> {
                 ),
 
                 const SizedBox(height: 40),
-                SizedBox(width: double.infinity, height: 56, child: ElevatedButton(onPressed: _saveProfile, style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF49769F), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))), child: const Text("Save Profile", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)))),
+                SizedBox(width: double.infinity, height: 56, child: ElevatedButton(onPressed: _saveProfile, style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF49769F), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))), child: Text(t.saveProfile, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)))),
                 const SizedBox(height: 40),
               ],
             ),

@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import '../core/app_colors.dart';
 import '../../../constants/app_images.dart';
 import 'edit_profile_screen.dart';
@@ -198,11 +198,11 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
                   child: Text("No experience added yet", style: TextStyle(color: Colors.white38, fontSize: 12)),
                 )
               else
-                ...UserProfileData.experiences.map((exp) => _buildExperienceItem(
+                  ...UserProfileData.experiences.map((exp) => _buildExperienceItem(
                   exp['title']!, 
                   exp['company']!, 
                   exp['duration']!
-                )).toList(),
+                )),
 
               const SizedBox(height: 30),
 
@@ -251,7 +251,7 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
                     else
                       ...UserProfileData.socialLinks.map((link) => 
                         _buildDetailItem(Icons.link, link["platform"]!, link["url"]!)
-                      ).toList(),
+                      ),
                   ],
                 ),
               ),

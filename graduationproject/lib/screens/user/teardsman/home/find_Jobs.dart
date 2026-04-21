@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../../shared/l10n/app_localizations.dart';
 import '../notifications/teardsman_notifications.dart';
 import '../setting/settings.dart';
 
@@ -22,8 +23,8 @@ class _FindJobsState extends State<FindJobs> {
 
   final List<Map<String, dynamic>> _allJobs = [
     {
-      "title": "Ù†Ù‚Ø§Ø´ Ù…Ø­ØªØ±Ù (Painter)",
-      "company": "Ù…Ù‚Ø§ÙˆÙ„Ø§Øª Ø§Ù„Ø­Ø¯ÙŠØ«Ø©",
+      "title": "نقاش محترف (Painter)",
+      "company": "مقاولات الحديثة",
       "location": "Cairo",
       "tags": ["Full-Time", "Painting", "Interior"],
       "applied": 5,
@@ -31,8 +32,8 @@ class _FindJobsState extends State<FindJobs> {
       "logo": Icons.brush,
     },
     {
-      "title": "Ø³Ø¨Ø§Ùƒ ØµØ­ÙŠ (Plumber)",
-      "company": "Ø§Ù„Ø¬Ø²ÙŠØ±Ø© Ù„Ù„Ø®Ø¯Ù…Ø§Øª",
+      "title": "سباك صحي (Plumber)",
+      "company": "الجزيرة للخدمات",
       "location": "Giza",
       "tags": ["Full-Time", "Plumbing", "Maintenance"],
       "applied": 3,
@@ -40,8 +41,8 @@ class _FindJobsState extends State<FindJobs> {
       "logo": Icons.plumbing,
     },
     {
-      "title": "Ù†Ø¬Ø§Ø± Ø£Ø«Ø§Ø« (Carpenter)",
-      "company": "ÙˆØ±Ø´Ø© Ø§Ù„Ø¥Ø¨Ø¯Ø§Ø¹",
+      "title": "نجار أثاث (Carpenter)",
+      "company": "ورشة الإبداع",
       "location": "Damietta",
       "tags": ["Full-Time", "Carpentry", "Furniture"],
       "applied": 12,
@@ -49,8 +50,8 @@ class _FindJobsState extends State<FindJobs> {
       "logo": Icons.carpenter,
     },
     {
-      "title": "ÙƒÙ‡Ø±Ø¨Ø§Ø¦ÙŠ Ù…Ù†Ø§Ø²Ù„ (Electrician)",
-      "company": "Ø§Ù„Ù†ÙˆØ± Ù„Ù„ÙƒÙ‡Ø±Ø¨Ø§Ø¡",
+      "title": "كهربائي منازل (Electrician)",
+      "company": "النور للكهرباء",
       "location": "Alexandria",
       "tags": ["Part-Time", "Electrical", "Repair"],
       "applied": 2,
@@ -58,8 +59,8 @@ class _FindJobsState extends State<FindJobs> {
       "logo": Icons.electrical_services,
     },
     {
-      "title": "ÙÙ†ÙŠ ØªÙƒÙŠÙŠÙ (HVAC Tech)",
-      "company": "ÙƒÙˆÙ„ Ø§ÙŠØ±",
+      "title": "فني تكييف (HVAC Tech)",
+      "company": "كول اير",
       "location": "Cairo",
       "tags": ["Contract", "AC Repair", "Maintenance"],
       "applied": 7,
@@ -67,8 +68,8 @@ class _FindJobsState extends State<FindJobs> {
       "logo": Icons.ac_unit,
     },
     {
-      "title": "Ù…Ø¨Ù„Ø· Ø³ÙŠØ±Ø§Ù…ÙŠÙƒ (Tiler)",
-      "company": "ØªØ´Ø·ÙŠØ¨Ø§Øª Ù„ÙˆÙƒØ³",
+      "title": "مبلط سيراميك (Tiler)",
+      "company": "تشطيبات لوكس",
       "location": "Monufia",
       "tags": ["Full-Time", "Flooring", "Tiling"],
       "applied": 4,
@@ -76,8 +77,8 @@ class _FindJobsState extends State<FindJobs> {
       "logo": Icons.layers,
     },
     {
-      "title": "ÙÙ†ÙŠ Ø£Ù„ÙˆÙ…ÙŠØªØ§Ù„",
-      "company": "Ø§Ù„Ù…Ø³ØªÙ‚Ø¨Ù„ Ù„Ù„Ø£Ù„Ù…Ù†ÙŠÙˆÙ…",
+      "title": "فني ألوميتال",
+      "company": "المستقبل للألمنيوم",
       "location": "Gharbia",
       "tags": ["Full-Time", "Windows", "Alumital"],
       "applied": 6,
@@ -85,8 +86,8 @@ class _FindJobsState extends State<FindJobs> {
       "logo": Icons.window,
     },
     {
-      "title": "ÙÙ†ÙŠ ØµÙŠØ§Ù†Ø© ØºØ³Ø§Ù„Ø§Øª",
-      "company": "Ø®Ø¯Ù…Ø© ØµÙŠØ§Ù†Ø©",
+      "title": "فني صيانة غسالات",
+      "company": "خدمة صيانة",
       "location": "Cairo",
       "tags": ["Full-Time", "Washing Machine", "Repair"],
       "applied": 3,
@@ -94,8 +95,8 @@ class _FindJobsState extends State<FindJobs> {
       "logo": Icons.dry_cleaning,
     },
     {
-      "title": "ÙÙ†ÙŠ Ø¯Ø´ ÙˆØ±Ø³ÙŠÙØ±",
-      "company": "Ø³Ù…Ø§Ø±Øª Ù„Ù„Ø³Ø§ØªÙ„Ø§ÙŠØª",
+      "title": "فني دش ورسيفر",
+      "company": "سمارت للستالايت",
       "location": "Giza",
       "tags": ["Full-Time", "Satellite", "Installation"],
       "applied": 8,
@@ -103,8 +104,8 @@ class _FindJobsState extends State<FindJobs> {
       "logo": Icons.settings_input_antenna,
     },
     {
-      "title": "Ù…Ø±ÙƒØ¨ Ø³ØªØ§Ø¦Ø±",
-      "company": "Ø¨ÙŠØª Ø§Ù„Ù‡Ù†Ø§",
+      "title": "مركب ستائر",
+      "company": "بيت الهنا",
       "location": "Alexandria",
       "tags": ["Full-Time", "Curtain", "Home Decor"],
       "applied": 2,
@@ -112,8 +113,8 @@ class _FindJobsState extends State<FindJobs> {
       "logo": Icons.window_outlined,
     },
     {
-      "title": "Ø­Ø¯Ø§Ø¯ ÙƒØ±ÙŠØªØ§Ù„",
-      "company": "Ø§Ù„Ø­Ø¯ÙŠØ¯ ÙˆØ§Ù„ØµÙ„Ø¨",
+      "title": "حداد كريتال",
+      "company": "الحديد والصلب",
       "location": "Qalyubia",
       "tags": ["Full-Time", "Blacksmith", "Metal Work"],
       "applied": 5,
@@ -121,8 +122,8 @@ class _FindJobsState extends State<FindJobs> {
       "logo": Icons.hardware,
     },
     {
-      "title": "Ù…Ù†Ø¬Ø¯ Ø£Ø«Ø§Ø«",
-      "company": "Ù„Ù…Ø³Ø© ÙÙ†",
+      "title": "منجد أثاث",
+      "company": "لمسة فن",
       "location": "Damietta",
       "tags": ["Full-Time", "Upholstery", "Furniture"],
       "applied": 1,
@@ -130,8 +131,8 @@ class _FindJobsState extends State<FindJobs> {
       "logo": Icons.chair,
     },
     {
-      "title": "ÙÙ†ÙŠ Ø±Ø®Ø§Ù… ÙˆØ¬Ø±Ø§Ù†ÙŠØª",
-      "company": "Ø§Ù„Ù…Ø§Ø³Ø© Ù„Ù„Ø±Ø®Ø§Ù…",
+      "title": "فني رخام وجرانيت",
+      "company": "الماسة للرخام",
       "location": "Cairo",
       "tags": ["Full-Time", "Marble", "Stone"],
       "applied": 4,
@@ -139,8 +140,8 @@ class _FindJobsState extends State<FindJobs> {
       "logo": Icons.foundation,
     },
     {
-      "title": "ÙÙ†ÙŠ Ø¨Ø§Ø±ÙƒÙŠÙ‡",
-      "company": "Ø£Ø±Ø¶ÙŠØ§Øª Ø§Ù„Ø®Ø´Ø¨",
+      "title": "فني باركيه",
+      "company": "أرضيات الخشب",
       "location": "Giza",
       "tags": ["Contract", "Parquet", "Flooring"],
       "applied": 2,
@@ -186,7 +187,7 @@ class _FindJobsState extends State<FindJobs> {
     });
   }
 
-  void _showLocationPicker() {
+  void _showLocationPicker(AppLocalizations t) {
     showModalBottomSheet(
       context: context,
       backgroundColor: const Color(0xFF0D2D4D),
@@ -198,9 +199,9 @@ class _FindJobsState extends State<FindJobs> {
           children: [
             const SizedBox(height: 10),
             Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2))),
-            const Padding(
-              padding: EdgeInsets.all(20.0),
-              child: Text("Select Governorate", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Text(t.tr(en: "Select Governorate", ar: "اختر المحافظة"), style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
             ),
             Expanded(
               child: ListView.builder(
@@ -228,6 +229,7 @@ class _FindJobsState extends State<FindJobs> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: const Color(0xFF011931),
       body: SafeArea(
@@ -265,17 +267,17 @@ class _FindJobsState extends State<FindJobs> {
                       child: TextField(
                         controller: _searchController,
                         style: const TextStyle(color: Colors.white, fontSize: 13),
-                        decoration: const InputDecoration(
-                          hintText: "Job title or keyword",
-                          hintStyle: TextStyle(color: Colors.white38),
-                          border: InputBorder.none,
-                        ),
+                          decoration: InputDecoration(
+                            hintText: t.userTr('find_jobs.searchHint', fallbackEn: 'Job title or keyword', fallbackAr: 'عنوان الوظيفة أو كلمة مفتاحية'),
+                            hintStyle: const TextStyle(color: Colors.white38),
+                            border: InputBorder.none,
+                          ),
                       ),
                     ),
                     Container(height: 20, width: 1, color: Colors.white10),
                     const SizedBox(width: 12),
                     GestureDetector(
-                      onTap: _showLocationPicker,
+                      onTap: () => _showLocationPicker(t),
                       child: Row(
                         children: [
                           const Icon(Icons.location_on_outlined, color: Colors.white38, size: 18),
@@ -289,19 +291,19 @@ class _FindJobsState extends State<FindJobs> {
                 ),
               ),
               const SizedBox(height: 15),
-              const Text(
-                "Popular : Plumber, Painter, Carpenter, Electrician",
-                style: TextStyle(color: Colors.white38, fontSize: 11),
+              Text(
+                "${t.userTr('find_jobs.popular', fallbackEn: 'Popular', fallbackAr: 'شائع')} : Plumber, Painter, Carpenter, Electrician",
+                style: const TextStyle(color: Colors.white38, fontSize: 11),
               ),
               const SizedBox(height: 35),
 
               // All Jobs Header
               RichText(
-                text: const TextSpan(
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                text: TextSpan(
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   children: [
-                    TextSpan(text: "All ", style: TextStyle(color: Colors.white)),
-                    TextSpan(text: "jobs", style: TextStyle(color: Color(0xFF49769F))),
+                    TextSpan(text: t.tr(en: "All ", ar: "جميع "), style: const TextStyle(color: Colors.white)),
+                    TextSpan(text: t.tr(en: "jobs", ar: "الوظائف"), style: const TextStyle(color: Color(0xFF49769F))),
                   ],
                 ),
               ),
@@ -309,10 +311,10 @@ class _FindJobsState extends State<FindJobs> {
 
               // Jobs List
               _filteredJobs.isEmpty 
-              ? const Center(
+              ? Center(
                   child: Padding(
-                    padding: EdgeInsets.only(top: 50.0),
-                    child: Text("No jobs found", style: TextStyle(color: Colors.white54)),
+                    padding: const EdgeInsets.only(top: 50.0),
+                  child: Text(t.tr(en: 'No jobs found', ar: 'لا توجد وظائف'), style: const TextStyle(color: Colors.white54)),
                   ),
                 )
               : ListView.builder(
@@ -320,7 +322,7 @@ class _FindJobsState extends State<FindJobs> {
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: _filteredJobs.length,
                 itemBuilder: (context, index) {
-                  return _buildJobCard(_filteredJobs[index]);
+                  return _buildJobCard(_filteredJobs[index], t);
                 },
               ),
               const SizedBox(height: 20),
@@ -347,7 +349,7 @@ class _FindJobsState extends State<FindJobs> {
     );
   }
 
-  Widget _buildJobCard(Map<String, dynamic> job) {
+  Widget _buildJobCard(Map<String, dynamic> job, AppLocalizations t) {
     return Container(
       margin: const EdgeInsets.only(bottom: 25),
       child: Row(
@@ -373,7 +375,7 @@ class _FindJobsState extends State<FindJobs> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  "${job['company']} â€¢ ${job['location']}",
+                  "${job['company']} • ${job['location']}",
                   style: const TextStyle(color: Colors.white38, fontSize: 12),
                 ),
                 const SizedBox(height: 12),
@@ -395,30 +397,13 @@ class _FindJobsState extends State<FindJobs> {
                   color: const Color(0xFF49769F),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: const Text("Apply", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+                child: Text(t.tr(en: 'Apply', ar: 'تقديم'), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
               ),
               const SizedBox(height: 12),
-              SizedBox(
-                width: 90,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(2),
-                      child: LinearProgressIndicator(
-                        value: job['applied'] / job['capacity'],
-                        backgroundColor: Colors.white10,
-                        valueColor: const AlwaysStoppedAnimation<Color>(Colors.tealAccent),
-                        minHeight: 4,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      "${job['applied']} applied of ${job['capacity']}",
-                      style: const TextStyle(color: Colors.white38, fontSize: 9),
-                    ),
-                  ],
-                ),
+              const SizedBox(height: 12),
+              Text(
+                "${job['applied']} ${t.tr(en: 'applied', ar: 'متقدم')}",
+                style: const TextStyle(color: Colors.white38, fontSize: 11),
               ),
             ],
           ),

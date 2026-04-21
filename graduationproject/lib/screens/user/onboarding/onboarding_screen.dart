@@ -1,4 +1,5 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+import '../../../shared/l10n/app_localizations.dart';
 import '../../../constants/app_images.dart';
 import '../auth/sign_in_screen.dart';
 import '../core/app_colors.dart';
@@ -14,26 +15,40 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
-  final List<Map<String, String>> _onboardingData = [
-    {
-      'image': AppImages.companyOnboarding1,
-      'title': "Your Next Job Is Closer Than\nYou Think",
-      'description': "Thousands of job opportunities are waiting\nfor you",
-    },
-    {
-      'image': AppImages.companyOnboarding2,
-      'title': "Smart Search & Better\nOpportunities",
-      'description': "Save time and focus on what \nmatters",
-    },
-    {
-      'image': AppImages.companyOnboarding3,
-      'title': "Your Future Starts Here",
-      'description': "Thousands of job opportunities are waiting\nfor you",
-    },
-  ];
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
+    final onboardingData = [
+      {
+        'image': AppImages.companyOnboarding1,
+        'title': t.userTr('onboarding.title1',
+            fallbackEn: "Your Next Job Is Closer Than\nYou Think",
+            fallbackAr: "وظيفتك القادمة أقرب مما\nتتوقع"),
+        'description': t.userTr('onboarding.subtitle1',
+            fallbackEn: "Thousands of job opportunities are waiting\nfor you",
+            fallbackAr: "آلاف فرص العمل في انتظارك"),
+      },
+      {
+        'image': AppImages.companyOnboarding2,
+        'title': t.userTr('onboarding.title2',
+            fallbackEn: "Smart Search & Better\nOpportunities",
+            fallbackAr: "بحث ذكي وفرص\nأفضل"),
+        'description': t.userTr('onboarding.subtitle2',
+            fallbackEn: "Save time and focus on what \nmatters",
+            fallbackAr: "وفر وقتك وركز على ما يهم"),
+      },
+      {
+        'image': AppImages.companyOnboarding3,
+        'title': t.userTr('onboarding.title3',
+            fallbackEn: "Your Future Starts Here",
+            fallbackAr: "مستقبلك يبدأ من هنا"),
+        'description': t.userTr('onboarding.subtitle3',
+            fallbackEn: "Thousands of job opportunities are waiting\nfor you",
+            fallbackAr: "آلاف فرص العمل في انتظارك"),
+      },
+    ];
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -47,7 +62,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     _currentPage = page;
                   });
                 },
-                itemCount: _onboardingData.length,
+                itemCount: onboardingData.length,
                 itemBuilder: (context, index) {
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -55,7 +70,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       children: [
                         const Spacer(flex: 2),
                         Image.asset(
-                          _onboardingData[index]['image']!,
+                          onboardingData[index]['image']!,
                           height: MediaQuery.of(context).size.height * 0.3,
                           fit: BoxFit.contain,
                           errorBuilder: (context, error, stackTrace) {
@@ -65,7 +80,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         ),
                         const Spacer(flex: 2),
                         Text(
-                          _onboardingData[index]['title']!,
+                          onboardingData[index]['title']!,
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             color: Colors.white,
@@ -75,7 +90,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         ),
                         const SizedBox(height: 30),
                         Text(
-                          _onboardingData[index]['description']!,
+                          onboardingData[index]['description']!,
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             color: Colors.white,
@@ -97,11 +112,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 children: [
                   Row(
                     children: List.generate(
-                      _onboardingData.length,
+                      onboardingData.length,
                       (index) => _buildIndicator(isActive: index == _currentPage),
                     ),
                   ),
-                  _buildNextButton(),
+                  _buildNextButton(t),
                 ],
               ),
             ),
@@ -111,8 +126,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  void _nextPage() {
-    if (_currentPage < _onboardingData.length - 1) {
+  void _nextPage(int count) {
+    if (_currentPage < count - 1) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeIn,
@@ -125,16 +140,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     }
   }
 
-  Widget _buildNextButton() {
+  Widget _buildNextButton(AppLocalizations t) {
     return GestureDetector(
-      onTap: _nextPage,
+      onTap: () => _nextPage(3),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 40),
         decoration: BoxDecoration(
           gradient: const LinearGradient(
             colors: [
-              Color(0xFF0A2A4A), // ØºØ§Ù…Ù‚
-              Color(0xFF2F5F8F), // Ø£ÙØªØ­
+              Color(0xFF0A2A4A), // Dark
+              Color(0xFF2F5F8F), // Light
               Color.fromARGB(255, 118, 159, 178),
             ],
             begin: Alignment.centerLeft,
@@ -154,8 +169,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ),
           ],
         ),
-        child: const Text(
-          "Next",
+        child: Text(
+          t.next,
           textAlign: TextAlign.center,
           style: TextStyle(
             color: Colors.white,

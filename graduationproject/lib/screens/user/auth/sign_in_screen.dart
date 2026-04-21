@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../shared/l10n/app_localizations.dart';
 import '../core/app_colors.dart';
@@ -70,11 +70,7 @@ class _SignInScreenState extends State<SignInScreen> {
                 children: [
                   const SizedBox(height: 60),
                   Text(
-                    t.userTr(
-                      'auth.signInTitle',
-                      fallbackEn: 'Sign in to your\naccount',
-                      fallbackAr: 'ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„ Ø¥Ù„Ù‰\nØ­Ø³Ø§Ø¨Ùƒ',
-                    ),
+                    t.signInToAccount,
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 32,
@@ -86,11 +82,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        t.userTr(
-                          'auth.emailLabel',
-                          fallbackEn: 'Email Address',
-                          fallbackAr: 'Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ',
-                        ),
+                        t.emailAddress,
                         style: const TextStyle(
                           color: Colors.white70,
                           fontSize: 14,
@@ -111,11 +103,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     controller: _emailController,
                     style: const TextStyle(color: Colors.white),
                     decoration: InputDecoration(
-                      hintText: t.userTr(
-                        'auth.emailHint',
-                        fallbackEn: 'Enter your email',
-                        fallbackAr: 'Ø£Ø¯Ø®Ù„ Ø¨Ø±ÙŠØ¯Ùƒ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ',
-                      ),
+                      hintText: t.enterYourEmail,
                       hintStyle: const TextStyle(color: Colors.white38),
                       filled: true,
                       fillColor: Colors.white.withValues(alpha: 0.05),
@@ -142,11 +130,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        t.userTr(
-                          'auth.passwordLabel',
-                          fallbackEn: 'Password',
-                          fallbackAr: 'ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±',
-                        ),
+                        t.password,
                         style: const TextStyle(
                           color: Colors.white70,
                           fontSize: 14,
@@ -168,7 +152,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     obscureText: _obscurePassword,
                     style: const TextStyle(color: Colors.white),
                     decoration: InputDecoration(
-                      hintText: "â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢",
+                      hintText: "•••••••••••",
                       hintStyle: const TextStyle(color: Colors.white38),
                       filled: true,
                       fillColor: Colors.white.withValues(alpha: 0.05),
@@ -216,11 +200,7 @@ class _SignInScreenState extends State<SignInScreen> {
                         );
                       },
                       child: Text(
-                        t.userTr(
-                          'auth.forgotPassword',
-                          fallbackEn: 'Forgot password?',
-                          fallbackAr: 'Ù†Ø³ÙŠØª ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±ØŸ',
-                        ),
+                        t.forgotPassword,
                         style: const TextStyle(color: Colors.white70),
                       ),
                     ),
@@ -261,36 +241,18 @@ class _SignInScreenState extends State<SignInScreen> {
                               bool hasError = false;
 
                               if (email.isEmpty) {
-                                _emailError = t.userTr(
-                                  'auth.errorEmailRequired',
-                                  fallbackEn: 'Email is required',
-                                  fallbackAr: 'Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ Ù…Ø·Ù„ÙˆØ¨',
-                                );
+                                _emailError = t.required;
                                 hasError = true;
                               } else if (!_isValidEmail(email)) {
-                                _emailError = t.userTr(
-                                  'auth.errorEmailInvalid',
-                                  fallbackEn:
-                                      'Invalid email (@gmail.com required)',
-                                  fallbackAr:
-                                      'Ø¨Ø±ÙŠØ¯ ØºÙŠØ± ØµØ§Ù„Ø­ (ÙŠØ¬Ø¨ Ø£Ù† ÙŠÙƒÙˆÙ† @gmail.com)',
-                                );
+                                _emailError = t.enterValidEmail;
                                 hasError = true;
                               }
 
                               if (password.isEmpty) {
-                                _passwordError = t.userTr(
-                                  'auth.errorPasswordRequired',
-                                  fallbackEn: 'Password is required',
-                                  fallbackAr: 'ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ± Ù…Ø·Ù„ÙˆØ¨Ø©',
-                                );
+                                _passwordError = t.required;
                                 hasError = true;
                               } else if (!_isValidPassword(password)) {
-                                _passwordError = t.userTr(
-                                  'auth.errorPasswordMin',
-                                  fallbackEn: 'At least 8 characters required',
-                                  fallbackAr: 'ÙŠØ¬Ø¨ Ø£Ù† ØªÙƒÙˆÙ† 8 Ø£Ø­Ø±Ù Ø¹Ù„Ù‰ Ø§Ù„Ø£Ù‚Ù„',
-                                );
+                                _passwordError = t.min8Chars;
                                 hasError = true;
                               }
 
@@ -322,11 +284,7 @@ class _SignInScreenState extends State<SignInScreen> {
                               ),
                             )
                           : Text(
-                              t.userTr(
-                                'auth.continue',
-                                fallbackEn: 'Continue',
-                                fallbackAr: 'Ù…ØªØ§Ø¨Ø¹Ø©',
-                              ),
+                              t.continueBtn,
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 18,
@@ -342,11 +300,7 @@ class _SignInScreenState extends State<SignInScreen> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 18.0),
                         child: Text(
-                          t.userTr(
-                            'auth.orSignInWith',
-                            fallbackEn: 'Or sign in with',
-                            fallbackAr: 'Ø£Ùˆ Ø³Ø¬Ù„ Ø¯Ø®ÙˆÙ„Ùƒ Ø¨ÙˆØ§Ø³Ø·Ø©',
-                          ),
+                          t.orSignInWith,
                           style: const TextStyle(
                             color: Colors.white38,
                             fontSize: 16,
@@ -379,11 +333,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        t.userTr(
-                          'auth.noAccount',
-                          fallbackEn: 'Donâ€™t have an account, ',
-                          fallbackAr: 'Ù„ÙŠØ³ Ù„Ø¯ÙŠÙƒ Ø­Ø³Ø§Ø¨ØŒ ',
-                        ),
+                        t.dontHaveAccount,
                         style: const TextStyle(color: Colors.white70),
                       ),
                       GestureDetector(
@@ -396,11 +346,7 @@ class _SignInScreenState extends State<SignInScreen> {
                           );
                         },
                         child: Text(
-                          t.userTr(
-                            'auth.signUp',
-                            fallbackEn: 'Sign up',
-                            fallbackAr: 'Ø¥Ù†Ø´Ø§Ø¡ Ø­Ø³Ø§Ø¨',
-                          ),
+                          t.signUpBtn,
                           style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,

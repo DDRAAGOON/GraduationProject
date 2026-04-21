@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
 import '../core/app_colors.dart';
 import '../notifications/notifications_screen.dart';
@@ -417,7 +417,7 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
-                Text("$company â€¢ $location", style: const TextStyle(color: Colors.white38, fontSize: 12)),
+                Text("$company • $location", style: const TextStyle(color: Colors.white38, fontSize: 12)),
                 const SizedBox(height: 12),
                 Row(
                   children: [
@@ -437,25 +437,8 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
                 child: const Text("Apply", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
               ),
               const SizedBox(height: 10),
-              SizedBox(
-                width: 100,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(4),
-                      child: LinearProgressIndicator(
-                        value: applied / capacity,
-                        backgroundColor: Colors.white12,
-                        valueColor: const AlwaysStoppedAnimation<Color>(Colors.tealAccent),
-                        minHeight: 4,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text("$applied applied of $capacity capacity", style: const TextStyle(color: Colors.white38, fontSize: 9)),
-                  ],
-                ),
-              ),
+              const SizedBox(height: 10),
+              Text("$applied متقدم", style: const TextStyle(color: Colors.white38, fontSize: 11)),
             ],
           ),
         ],

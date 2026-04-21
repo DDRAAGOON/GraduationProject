@@ -266,7 +266,7 @@ class _PostJobState extends State<PostJob> {
                         children: [
                           _buildDayItem("All Days", isSpecial: true),
                           const Divider(color: Colors.white12, height: 1),
-                          ..._days.map((day) => _buildDayItem(day)).toList(),
+                          ..._days.map((day) => _buildDayItem(day)),
                         ],
                       ),
                     ),

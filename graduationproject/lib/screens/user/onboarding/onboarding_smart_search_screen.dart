@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import '../../../constants/app_images.dart';
 import '../../../shared/l10n/app_localizations.dart';
 import '../core/app_colors.dart';
@@ -37,7 +37,7 @@ class Screen2 extends StatelessWidget {
                 t.userTr(
                   'onboarding.title2',
                   fallbackEn: 'Smart Search & Better\nOpportunities',
-                  fallbackAr: 'Ø¨Ø­Ø« Ø°ÙƒÙŠ ÙˆÙØ±Øµ\nØ£ÙØ¶Ù„',
+                  fallbackAr: 'بحث ذكي وفرص أفضل',
                 ),
                 textAlign: TextAlign.center,
                 style: const TextStyle(
@@ -51,7 +51,7 @@ class Screen2 extends StatelessWidget {
                 t.userTr(
                   'onboarding.subtitle2',
                   fallbackEn: 'Save time and focus on what \nmatters',
-                  fallbackAr: 'ÙˆÙØ± ÙˆÙ‚ØªÙƒ ÙˆØ±ÙƒØ² Ø¹Ù„Ù‰ Ù…Ø§ ÙŠÙ‡Ù…',
+                  fallbackAr: 'وفر وقتك وركز على ما يهم',
                 ),
                 textAlign: TextAlign.center,
                 style: const TextStyle(
@@ -90,8 +90,8 @@ class Screen2 extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: const LinearGradient(
             colors: [
-              Color(0xFF0A2A4A), // ØºØ§Ù…Ù‚
-              Color(0xFF2F5F8F), // Ø£ÙØªØ­
+              Color(0xFF0A2A4A), // Dark
+              Color(0xFF2F5F8F), // Light
               Color.fromARGB(255, 118, 159, 178),
             ],
             begin: Alignment.centerLeft,
@@ -112,7 +112,7 @@ class Screen2 extends StatelessWidget {
           ],
         ),
         child: Text(
-          t.userTr('onboarding.next', fallbackEn: 'Next', fallbackAr: 'Ø§Ù„ØªØ§Ù„ÙŠ'),
+          t.userTr('onboarding.next', fallbackEn: 'Next', fallbackAr: 'التالي'),
           textAlign: TextAlign.center,
           style: const TextStyle(
             color: Colors.white,
