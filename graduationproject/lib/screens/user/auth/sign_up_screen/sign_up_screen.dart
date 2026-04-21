@@ -223,7 +223,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               const SizedBox(height: 8),
               _buildTextField(
                 controller: _passwordController,
-                hintText: "â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢",
+                hintText: "•••••••••••",
                 obscureText: _obscurePassword,
                 hasError: _passwordError != null,
                 suffixIcon: IconButton(

@@ -3,17 +3,19 @@
 import 'package:flutter/material.dart';
 
 final class AppTheme {
-  static const _darkBg = Color(0xFF001E3A);
-  static const _darkSurface = Color(0xFF0A2A45);
-  static const _darkPrimary = Color(0xFF4E86C6);
-  static const _darkText = Color(0xFFEAF2F8);
-  static const _darkMuted = Color(0xFF9AB4C8);
+  static const _darkBg = Color(0xFF0B1020);
+  static const _darkSurface = Color(0xFF161D33);
+  static const _darkPrimary = Color(0xFF4A6ED1);
+  static const _darkAccent = Color(0xFFFF7A2A);
+  static const _darkText = Color(0xFFEAF0FF);
+  static const _darkMuted = Color(0xFF9FAED2);
 
-  static const _lightBg = Color(0xFFF9FBFE);
+  static const _lightBg = Color(0xFFF7F9FC);
   static const _lightSurface = Color(0xFFFFFFFF);
-  static const _lightPrimary = Color(0xFF094174);
-  static const _lightText = Color(0xFF111827);
-  static const _lightMuted = Color(0xFF6B7280);
+  static const _lightPrimary = Color(0xFF4A6ED1);
+  static const _lightAccent = Color(0xFFFF7A2A);
+  static const _lightText = Color(0xFF0B1020);
+  static const _lightMuted = Color(0xFFB59A90);
 
   static ThemeData light() {
     final base = ThemeData(
@@ -23,7 +25,7 @@ final class AppTheme {
         seedColor: _lightPrimary,
         brightness: Brightness.light,
         surface: _lightSurface,
-      ),
+      ).copyWith(primary: _lightPrimary, secondary: _lightAccent),
     );
 
     return base.copyWith(
@@ -32,7 +34,7 @@ final class AppTheme {
         backgroundColor: _lightBg.withValues(alpha: 0.98),
         elevation: 0,
         foregroundColor: _lightText,
-        centerTitle: true,
+        centerTitle: false,
       ),
       textTheme: base.textTheme.apply(
         bodyColor: _lightText,
@@ -46,6 +48,10 @@ final class AppTheme {
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide(color: const Color(0xFFE5E7EB)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: const BorderSide(color: _lightPrimary, width: 1.3),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
@@ -61,15 +67,23 @@ final class AppTheme {
           backgroundColor: _lightPrimary,
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(14),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
         ),
       ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          side: const BorderSide(color: Color(0xFFD7DDED)),
+          foregroundColor: _lightText,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        ),
+      ),
       cardTheme: CardThemeData(
         color: _lightSurface,
-        elevation: 0.5,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        elevation: 0.2,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: _lightBg.withValues(alpha: 0.96),
@@ -92,7 +106,7 @@ final class AppTheme {
         seedColor: _darkPrimary,
         brightness: Brightness.dark,
         surface: _darkSurface,
-      ),
+      ).copyWith(primary: _darkPrimary, secondary: _darkAccent),
     );
 
     return base.copyWith(
@@ -101,7 +115,7 @@ final class AppTheme {
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: _darkText,
-        centerTitle: true,
+        centerTitle: false,
       ),
       textTheme: base.textTheme.apply(
         bodyColor: _darkText,
@@ -116,6 +130,10 @@ final class AppTheme {
           borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide.none,
         ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: const BorderSide(color: _darkPrimary, width: 1.3),
+        ),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 14,
           vertical: 14,
@@ -126,7 +144,7 @@ final class AppTheme {
           backgroundColor: _darkPrimary,
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(14),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
         ),
@@ -134,7 +152,7 @@ final class AppTheme {
       cardTheme: CardThemeData(
         color: _darkSurface,
         elevation: 0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: _darkSurface,

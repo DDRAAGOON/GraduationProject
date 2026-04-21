@@ -6,8 +6,6 @@ import '../../shared/models/job.dart';
 import '../../shared/models/message_thread.dart';
 import 'company_repository.dart';
 
-// API implementation placeholder.
-// It will be wired once you provide endpoints/JSON and confirm HTTP/serialization details.
 final class ApiCompanyRepository implements CompanyRepository {
   const ApiCompanyRepository({
     required this.client,
@@ -16,28 +14,59 @@ final class ApiCompanyRepository implements CompanyRepository {
   final CompanyApiClient client;
 
   @override
-  Future<List<Job>> fetchJobs() {
-    return Future.error(
-      UnimplementedError('ApiCompanyRepository.fetchJobs is not implemented yet.'),
-    );
+  Future<List<Job>> fetchJobs() async {
+    final raw = await client.fetchJobs();
+    return raw
+        .map(
+          (item) => Job(
+            id: item['id']?.toString() ?? '',
+            title: item['title']?.toString() ?? 'Untitled',
+            companyName: item['companyName']?.toString() ?? 'Company',
+            location: item['location']?.toString() ?? 'Remote',
+            employmentType: item['type']?.toString() ?? 'Full-time',
+            category: item['tags'] is List && (item['tags'] as List).isNotEmpty
+                ? (item['tags'] as List).first.toString()
+                : 'General',
+            salaryRange: item['salaryRange']?.toString() ?? 'Negotiable',
+          ),
+        )
+        .toList();
   }
 
   @override
-  Future<List<Applicant>> fetchApplicantsByJobId(String jobId) {
-    return Future.error(
-      UnimplementedError(
-        'ApiCompanyRepository.fetchApplicantsByJobId is not implemented yet.',
-      ),
-    );
+  Future<List<Applicant>> fetchApplicantsByJobId(String jobId) async {
+    final raw = await client.fetchApplications();
+    return raw
+        .where((item) => item['jobId']?.toString() == jobId)
+        .map(
+          (item) => Applicant(
+            id: item['id']?.toString() ?? '',
+            fullName: item['userName']?.toString() ?? 'Candidate',
+            role: 'Candidate',
+            rating: 0,
+            stage: item['status']?.toString() ?? 'Applied',
+            email: 'unknown@mail.com',
+            phone: '-',
+            location: 'N/A',
+            appliedDateLabel: item['updatedAt']?.toString() ?? '',
+          ),
+        )
+        .toList();
   }
 
   @override
-  Future<List<MessageThread>> fetchMessageThreads() {
-    return Future.error(
-      UnimplementedError(
-        'ApiCompanyRepository.fetchMessageThreads is not implemented yet.',
-      ),
-    );
+  Future<List<MessageThread>> fetchMessageThreads() async {
+    final raw = await client.fetchMessages();
+    return raw
+        .map(
+          (item) => MessageThread(
+            id: item['id']?.toString() ?? '',
+            title: item['fromCompany'] == true ? 'Company Update' : 'Candidate',
+            subtitle: item['text']?.toString() ?? '',
+            lastTimeLabelEn: 'now',
+            lastTimeLabelAr: 'الان',
+          ),
+        )
+        .toList();
   }
 }
-

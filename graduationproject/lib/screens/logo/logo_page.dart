@@ -11,15 +11,32 @@ class LogoPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
     final t = AppLocalizations.of(context);
+    final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFEAEEF2),
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: size.width * 0.08),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: size.height * 0.18),
+              SizedBox(height: size.height * 0.08),
+              Text(
+                'JOBITO',
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.w900,
+                  color: cs.primary,
+                  letterSpacing: 0.5,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Find your next role or hire top talent faster.',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: cs.onSurface.withValues(alpha: 0.7),
+                ),
+              ),
+              SizedBox(height: size.height * 0.06),
               Center(
                 child: ConstrainedBox(
                   constraints: BoxConstraints(
@@ -37,19 +54,16 @@ class LogoPage extends StatelessWidget {
                   ),
                 ),
               ),
+              SizedBox(height: size.height * 0.06),
               _RoleButton(
                 label: t.userTr(
                   'role.user',
                   fallbackEn: 'User',
                   fallbackAr: 'مستخدم',
                 ),
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF1B2D4F), Color(0xFF2E4A7A)],
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                ),
+                color: cs.primary,
                 onTap: () =>
-                    Navigator.of(context).pushNamed(AppRoutes.userOnboarding),
+                    Navigator.of(context).pushNamed(AppRoutes.userOnboardingNew),
               ),
               SizedBox(height: size.height * 0.022),
               _RoleButton(
@@ -58,14 +72,17 @@ class LogoPage extends StatelessWidget {
                   fallbackEn: 'Company',
                   fallbackAr: 'شركة',
                 ),
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF4A6080), Color(0xFF7A9AB8)],
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                ),
+                color: cs.secondary,
                 onTap: () => Navigator.of(
                   context,
-                ).pushNamed(AppRoutes.companyOnboardingSmartSearch),
+                ).pushNamed(AppRoutes.companyOnboardingNew),
+              ),
+              SizedBox(height: size.height * 0.012),
+              TextButton.icon(
+                onPressed: () =>
+                    Navigator.of(context).pushNamed(AppRoutes.adminPanel),
+                icon: const Icon(Icons.admin_panel_settings_outlined),
+                label: const Text('Admin'),
               ),
               SizedBox(height: size.height * 0.07),
             ],
@@ -79,12 +96,12 @@ class LogoPage extends StatelessWidget {
 class _RoleButton extends StatelessWidget {
   const _RoleButton({
     required this.label,
-    required this.gradient,
+    required this.color,
     required this.onTap,
   });
 
   final String label;
-  final Gradient gradient;
+  final Color color;
   final VoidCallback onTap;
 
   @override
@@ -93,10 +110,10 @@ class _RoleButton extends StatelessWidget {
       onTap: onTap,
       child: Container(
         width: double.infinity,
-        height: 52,
+        height: 54,
         decoration: BoxDecoration(
-          gradient: gradient,
-          borderRadius: BorderRadius.circular(30),
+          color: color,
+          borderRadius: BorderRadius.circular(14),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.15),
@@ -111,7 +128,7 @@ class _RoleButton extends StatelessWidget {
           style: const TextStyle(
             color: Colors.white,
             fontSize: 16,
-            fontWeight: FontWeight.w500,
+            fontWeight: FontWeight.w700,
             letterSpacing: 0.3,
           ),
         ),

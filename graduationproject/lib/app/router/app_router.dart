@@ -2,17 +2,21 @@
 
 import 'package:flutter/material.dart';
 
+import '../../screens/admin/admin_panel_screen.dart';
 import '../../screens/company/auth/forgot_password_screen.dart';
 import '../../screens/company/auth/otp_email_verification_screen.dart';
 import '../../screens/company/auth/password_changed_dialog_screen.dart';
+import '../../screens/company/auth/recruitment_company_sign_in_screen.dart';
 import '../../screens/company/auth/reset_password_screen.dart';
 import '../../screens/company/auth/sign_in_screen.dart';
 import '../../screens/company/auth/sign_up_screen.dart';
 import '../../screens/company/candidates/applicant_details_profile_screen.dart';
 import '../../screens/company/candidates/applicant_details_resume_screen.dart';
 import '../../screens/company/candidates/applicant_hiring_progress_hired_declined_screen.dart';
+import '../../screens/company/candidates/recruitment_candidate_details_screen.dart';
 import '../../screens/company/help/help_center_screen.dart';
 import '../../screens/company/home/dashboard_screen.dart';
+import '../../screens/company/home/recruitment_company_shell_screen.dart';
 import '../../screens/company/jobs/job_analytics_screen.dart';
 import '../../screens/company/jobs/job_applicants_pipeline_view_screen.dart';
 import '../../screens/company/jobs/job_applicants_table_view_screen.dart';
@@ -20,23 +24,35 @@ import '../../screens/company/jobs/job_details_screen.dart';
 import '../../screens/company/jobs/jobs_hub_screen.dart';
 import '../../screens/company/jobs/post_job/post_job_step1_information_screen.dart';
 import '../../screens/company/jobs/post_job/post_job_step2_description_screen.dart';
+import '../../screens/company/jobs/recruitment_post_job_screen.dart';
 import '../../screens/company/messages/chat_thread_candidate_v2_screen.dart';
 import '../../screens/company/messages/chat_thread_screen.dart';
 import '../../screens/company/messages/messages_list_screen.dart';
 import '../../screens/company/onboarding/onboarding_future_starts_screen.dart';
 import '../../screens/company/onboarding/onboarding_next_job_closer_screen.dart';
 import '../../screens/company/onboarding/onboarding_smart_search_screen.dart';
+import '../../screens/company/onboarding/recruitment_company_onboarding_screen.dart';
 import '../../screens/company/profile/company_edit_intro_screen.dart';
 import '../../screens/company/profile/company_profile_screen.dart';
 import '../../screens/company/profile/profile_settings_overview_screen.dart';
 import '../../screens/company/profile/profile_settings_social_links_screen.dart';
+import '../../screens/company/profile/recruitment_company_profile_screen.dart';
 import '../../screens/company/settings/appearance_settings_dark_screen.dart';
 import '../../screens/company/settings/appearance_settings_light_screen.dart';
 import '../../screens/company/settings/notification_setting_screen.dart';
 import '../../screens/company/settings/notifications_screen.dart';
 import '../../screens/company/settings/settings_screen.dart';
 import '../../screens/logo/logo_page.dart';
+import '../../screens/user/jobs/recruitment_application_timeline_screen.dart';
+import '../../screens/user/jobs/recruitment_job_application_screen.dart';
+import '../../screens/user/jobs/recruitment_job_filters_screen.dart';
+import '../../screens/user/jobs/recruitment_job_details_screen.dart';
+import '../../screens/user/auth/recruitment_user_sign_in_screen.dart';
 import '../../screens/user/onboarding/onboarding.dart';
+import '../../screens/user/onboarding/recruitment_user_onboarding_screen.dart';
+import '../../screens/user/settings/recruitment_user_settings_screen.dart';
+import '../../screens/user/home/recruitment_user_shell_screen.dart';
+import '../../shared/state/recruitment_sync_store.dart';
 import '../../shared/models/applicant.dart';
 import '../../shared/models/job.dart';
 import '../../shared/models/message_thread.dart';
@@ -49,6 +65,15 @@ final class AppRoutes {
 
   /// Job seeker onboarding ([OnBoardingScreen]) before auth.
   static const userOnboarding = '/user/onboarding';
+  static const userWorkspace = '/user/workspace';
+  static const userJobDetails = '/user/jobs/details';
+  static const userJobApplication = '/user/jobs/apply';
+  static const userAdvancedFilters = '/user/jobs/filters';
+  static const userApplicationTimeline = '/user/jobs/application_timeline';
+  static const userOnboardingNew = '/user/onboarding/new';
+  static const userSettingsNew = '/user/settings/new';
+  static const userSignInNew = '/user/auth/sign_in_new';
+  static const adminPanel = '/admin/panel';
 
   // --- Company Onboarding Routes ---
   static const companyOnboardingSmartSearch =
@@ -68,6 +93,12 @@ final class AppRoutes {
 
   // Company shell areas
   static const companyDashboard = '/company/home/dashboard';
+  static const companyWorkspace = '/company/workspace';
+  static const companyOnboardingNew = '/company/onboarding/new';
+  static const companySignInNew = '/company/auth/sign_in_new';
+  static const companyPostJobComposer = '/company/jobs/post_composer';
+  static const companyProfileEditor = '/company/profile/editor';
+  static const companyCandidateDetails = '/company/candidates/details_new';
   static const companyMessagesList = '/company/messages/list';
   static const companyChatThread = '/company/messages/thread';
   static const companyChatThreadCandidateV2 = '/company/messages/thread_v2';
@@ -105,6 +136,18 @@ final class AppRouter {
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     final name = settings.name;
     final args = settings.arguments;
+    final fallbackJob = RecruitmentSyncStore.instance.jobs.isNotEmpty
+        ? RecruitmentSyncStore.instance.jobs.first
+        : RecruitmentJob(
+            id: 'fallback',
+            title: 'No Job',
+            companyName: 'Company',
+            location: 'N/A',
+            salaryRange: 'N/A',
+            type: 'N/A',
+            tags: const <String>[],
+            publishedAt: DateTime.now(),
+          );
 
     Widget page;
     switch (name) {
@@ -112,6 +155,41 @@ final class AppRouter {
         page = const LogoPage();
       case AppRoutes.userOnboarding:
         page = const OnBoardingScreen();
+      case AppRoutes.userWorkspace:
+        page = const RecruitmentUserShellScreen();
+      case AppRoutes.userOnboardingNew:
+        page = const RecruitmentUserOnboardingScreen();
+      case AppRoutes.userJobDetails:
+        page = RecruitmentJobDetailsScreen(
+          job: args is RecruitmentJob ? args : fallbackJob,
+        );
+      case AppRoutes.userJobApplication:
+        page = RecruitmentJobApplicationScreen(
+          job: args is RecruitmentJob ? args : fallbackJob,
+        );
+      case AppRoutes.userAdvancedFilters:
+        page = const RecruitmentJobFiltersScreen();
+      case AppRoutes.userApplicationTimeline:
+        final fallbackApplication = RecruitmentSyncStore.instance.applications.isNotEmpty
+            ? RecruitmentSyncStore.instance.applications.first
+            : RecruitmentApplication(
+                id: 'fallback',
+                jobId: 'fallback',
+                jobTitle: 'Unknown',
+                companyName: 'Unknown',
+                userName: 'Unknown',
+                status: 'Applied',
+                updatedAt: DateTime.now(),
+              );
+        page = RecruitmentApplicationTimelineScreen(
+          application: args is RecruitmentApplication ? args : fallbackApplication,
+        );
+      case AppRoutes.userSettingsNew:
+        page = const RecruitmentUserSettingsScreen();
+      case AppRoutes.userSignInNew:
+        page = const RecruitmentUserSignInScreen();
+      case AppRoutes.adminPanel:
+        page = const AdminPanelScreen();
       case AppRoutes.companyOnboardingSmartSearch:
         page = const CompanyOnboardingSmartSearchScreen();
       case AppRoutes.companyOnboardingNextJobCloser:
@@ -136,6 +214,31 @@ final class AppRouter {
         page = const CompanyPasswordChangedDialogScreen();
       case AppRoutes.companyDashboard:
         page = const CompanyDashboardScreen();
+      case AppRoutes.companyWorkspace:
+        page = const RecruitmentCompanyShellScreen();
+      case AppRoutes.companyOnboardingNew:
+        page = const RecruitmentCompanyOnboardingScreen();
+      case AppRoutes.companySignInNew:
+        page = const RecruitmentCompanySignInScreen();
+      case AppRoutes.companyPostJobComposer:
+        page = const RecruitmentPostJobScreen();
+      case AppRoutes.companyProfileEditor:
+        page = const RecruitmentCompanyProfileScreen();
+      case AppRoutes.companyCandidateDetails:
+        final fallbackApplication = RecruitmentSyncStore.instance.applications.isNotEmpty
+            ? RecruitmentSyncStore.instance.applications.first
+            : RecruitmentApplication(
+                id: 'fallback',
+                jobId: 'fallback',
+                jobTitle: 'Unknown',
+                companyName: 'Unknown',
+                userName: 'Unknown',
+                status: 'Applied',
+                updatedAt: DateTime.now(),
+              );
+        page = RecruitmentCandidateDetailsScreen(
+          application: args is RecruitmentApplication ? args : fallbackApplication,
+        );
       case AppRoutes.companyMessagesList:
         page = const CompanyMessagesListScreen();
       case AppRoutes.companyChatThread:

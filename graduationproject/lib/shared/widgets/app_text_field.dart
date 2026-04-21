@@ -14,6 +14,7 @@ class AppTextField extends StatelessWidget {
     this.validatorText,
     this.onChanged,
     this.maxLines = 1,
+    this.prefixIcon,
   });
 
   final String label;
@@ -25,6 +26,7 @@ class AppTextField extends StatelessWidget {
   final String? validatorText;
   final ValueChanged<String>? onChanged;
   final int maxLines;
+  final IconData? prefixIcon;
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +44,7 @@ class AppTextField extends StatelessWidget {
           decoration: InputDecoration(
             hintText: hint,
             errorText: validatorText,
+            prefixIcon: prefixIcon != null ? Icon(prefixIcon, size: 20) : null,
             suffixIcon: suffix,
           ),
         ),

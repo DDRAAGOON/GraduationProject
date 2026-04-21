@@ -3,15 +3,20 @@
 final class ApiEndpoints {
   const ApiEndpoints._();
 
-  // TODO: Replace with your real backend base URL.
-  static const String baseUrl = 'https://api.example.com';
+  // Render deployment URL (can be overridden at build time).
+  static const String baseUrl = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: 'http://localhost:4000',
+  );
 
-  // Company / Jobs
-  static const String jobs = '/company/jobs';
-  static const String applicants = '/company/applicants';
-  static const String applicantsByJob = '/company/jobs/{jobId}/applicants';
+  // Auth
+  static const String login = '/api/auth/login';
 
-  // Messages
-  static const String threads = '/company/threads';
+  // Recruitment entities
+  static const String jobs = '/api/jobs';
+  static const String applications = '/api/applications';
+  static const String applicationStatus = '/api/applications/{id}/status';
+  static const String messages = '/api/messages';
+  static const String notifications = '/api/notifications';
 }
 
