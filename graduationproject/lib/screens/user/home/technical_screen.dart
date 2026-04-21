@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
-import '../core/app_colors.dart';
 import '../notifications/notifications_screen.dart';
 import '../settings/setting_screen.dart';
+import '../../../shared/l10n/app_localizations.dart';
 
 class TechnicalScreen extends StatefulWidget {
   const TechnicalScreen({super.key});
@@ -58,8 +58,9 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 10),
@@ -70,8 +71,8 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
               const SizedBox(height: 25),
               _buildSearchSection(),
               const SizedBox(height: 15),
-              const Text("Popular : UI Designer, UX Researcher, Android, Admin", 
-                style: TextStyle(color: Colors.white38, fontSize: 11)),
+              Text("${t.tr(en: "Popular", ar: "شائع")} : UI Designer, UX Researcher, Android, Admin", 
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 11)),
               const SizedBox(height: 25),
 
               Row(
@@ -98,21 +99,21 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
               ),
 
               const SizedBox(height: 30),
-              const Divider(color: Colors.white24, height: 1),
+              Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 1),
               const SizedBox(height: 25),
               RichText(
-                text: const TextSpan(
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                text: TextSpan(
+                  style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                   children: [
-                    TextSpan(text: "Explore By ", style: TextStyle(color: Colors.white)),
-                    TextSpan(text: "Category", style: TextStyle(color: Color(0xFF578BC7))),
+                    TextSpan(text: t.tr(en: "Explore By ", ar: "استكشف حسب "), style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+                    TextSpan(text: t.categoryLabel, style: const TextStyle(color: Color(0xFF578BC7))),
                   ],
                 ),
               ),
               const SizedBox(height: 20),
               _buildCategoryTabs(),
               const SizedBox(height: 25),
-              _buildDynamicJobSection(),
+              _buildDynamicJobSection(t),
               const SizedBox(height: 100),
             ],
           ),
@@ -140,11 +141,13 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
       child: Container(
         width: 44, height: 44,
         decoration: BoxDecoration(
-          color: const Color(0xFF0D2D4D), 
+          color: Theme.of(context).brightness == Brightness.dark 
+              ? const Color(0xFF0D2D4D) 
+              : Theme.of(context).colorScheme.primary.withValues(alpha: 0.1), 
           shape: BoxShape.circle, 
-          border: Border.all(color: Colors.white12)
+          border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.12))
         ),
-        child: Icon(icon, color: Colors.white, size: 22),
+        child: Icon(icon, color: Theme.of(context).colorScheme.onSurface, size: 22),
       ),
     );
   }
@@ -153,9 +156,11 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.05), 
+        color: Theme.of(context).brightness == Brightness.dark 
+            ? Colors.white.withValues(alpha: 0.05) 
+            : Colors.black.withValues(alpha: 0.05), 
         borderRadius: BorderRadius.circular(30), 
-        border: Border.all(color: Colors.white12)
+        border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.12))
       ),
       child: Row(
         children: [
@@ -165,10 +170,10 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
             child: TextField(
               controller: _searchController,
               onChanged: (value) => setState(() {}),
-              style: const TextStyle(color: Colors.white, fontSize: 13), 
-              decoration: const InputDecoration(
-                hintText: "Search jobs", 
-                hintStyle: TextStyle(color: Colors.white38), 
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 13), 
+              decoration: InputDecoration(
+                hintText: AppLocalizations.of(context).tr(en: "Search jobs", ar: "البحث عن وظائف"), 
+                hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)), 
                 border: InputBorder.none
               )
             )
@@ -190,8 +195,8 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
           const SizedBox(width: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8), 
-            decoration: BoxDecoration(color: const Color(0xFF49769F), borderRadius: BorderRadius.circular(20)), 
-            child: const Text("Search", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13))
+            decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary, borderRadius: BorderRadius.circular(20)), 
+            child: Text(AppLocalizations.of(context).tr(en: "Search", ar: "بحث"), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13))
           ),
         ],
       ),
@@ -235,13 +240,14 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
   }
 
   Widget _buildCategoryTabs() {
+    final t = AppLocalizations.of(context);
     return Row(
       children: [
-        Expanded(child: _buildTabItem("Technical", "technical", Bootstrap.laptop, const Color(0xFF6C63FF))),
+        Expanded(child: _buildTabItem(t.tr(en: "Technical", ar: "تقني"), "technical", Bootstrap.laptop, const Color(0xFF6C63FF))),
         const SizedBox(width: 10),
-        Expanded(child: _buildTabItem("Non-Technical", "nontechnical", FontAwesome.user_tie_solid, const Color(0xFF4CAF50))),
+        Expanded(child: _buildTabItem(t.tr(en: "Non-Technical", ar: "إداري"), "nontechnical", FontAwesome.user_tie_solid, const Color(0xFF4CAF50))),
         const SizedBox(width: 10),
-        Expanded(child: _buildTabItem("Services", "services", Bootstrap.bell, const Color(0xFFFF9800))),
+        Expanded(child: _buildTabItem(t.tr(en: "Services", ar: "خدمات"), "services", Bootstrap.bell, const Color(0xFFFF9800))),
       ],
     );
   }
@@ -259,9 +265,9 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
           curve: Curves.easeInOutQuart,
           padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 8),
           decoration: BoxDecoration(
-            color: isSelected ? activeColor : const Color(0xFF0D2D4D),
+            color: isSelected ? activeColor : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0D2D4D) : Colors.black.withValues(alpha: 0.05)),
             borderRadius: BorderRadius.circular(15),
-            border: Border.all(color: isSelected ? Colors.white54 : Colors.white10),
+            border: Border.all(color: isSelected ? Colors.white.withValues(alpha: 0.6) : Theme.of(context).dividerColor.withValues(alpha: 0.1)),
             boxShadow: isSelected ? [
               BoxShadow(
                 color: activeColor.withValues(alpha: 0.4),
@@ -276,7 +282,7 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
             children: [
               Icon(
                 icon,
-                color: isSelected ? Colors.white : Colors.white54,
+                color: isSelected ? Colors.white : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                 size: 28,
               ),
               const SizedBox(height: 15),
@@ -284,7 +290,7 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
                 label,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: isSelected ? Colors.white : Colors.white70,
+                  color: isSelected ? Colors.white : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                   fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                   fontSize: 10,
                 ),
@@ -306,8 +312,8 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(child: Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13), overflow: TextOverflow.ellipsis)),
-              Icon(isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down, color: Colors.white, size: 18),
+              Expanded(child: Text(title, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold, fontSize: 13), overflow: TextOverflow.ellipsis)),
+              Icon(isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down, color: Theme.of(context).colorScheme.onSurface, size: 18),
             ],
           ),
         ),
@@ -332,18 +338,18 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
           children: [
             Container(
               width: 16, height: 16,
-              decoration: BoxDecoration(color: isSelected ? const Color(0xFF49769F) : Colors.transparent, borderRadius: BorderRadius.circular(4), border: Border.all(color: Colors.white38)),
+              decoration: BoxDecoration(color: isSelected ? Theme.of(context).colorScheme.primary : Colors.transparent, borderRadius: BorderRadius.circular(4), border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38))),
               child: isSelected ? const Icon(Icons.check, color: Colors.white, size: 12) : null,
             ),
             const SizedBox(width: 8),
-            Expanded(child: Text(label, style: const TextStyle(color: Colors.white70, fontSize: 11), overflow: TextOverflow.ellipsis)),
+            Expanded(child: Text(label, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 11), overflow: TextOverflow.ellipsis)),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildDynamicJobSection() {
+  Widget _buildDynamicJobSection(AppLocalizations t) {
     final String query = _searchController.text.toLowerCase();
     
     final List<Map<String, dynamic>> categoryJobs = _allJobs
@@ -352,10 +358,10 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
         .toList();
 
     if (categoryJobs.isEmpty) {
-      return const Center(
+      return Center(
         child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 40),
-          child: Text("No jobs found matching your search", style: TextStyle(color: Colors.white54, fontSize: 14)),
+          padding: const EdgeInsets.symmetric(vertical: 40),
+          child: Text(t.tr(en: "No jobs found matching your search", ar: "لم يتم العثور على وظائف تطابق بحثك"), style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 14)),
         ),
       );
     }
@@ -376,24 +382,25 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
   }
 
   Widget _buildSectionHeader(String title) {
+    final t = AppLocalizations.of(context);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         RichText(
           text: TextSpan(
-            style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 18, fontWeight: FontWeight.bold),
             children: [
               TextSpan(text: title.split(' ')[0]),
               const TextSpan(text: " "),
-              TextSpan(text: title.split(' ')[1], style: const TextStyle(color: Color(0xFF49769F))),
+              TextSpan(text: title.split(' ')[1], style: TextStyle(color: Theme.of(context).colorScheme.primary)),
             ],
           ),
         ),
         Row(
-          children: const [
-            Text("Show all jobs", style: TextStyle(color: Colors.white54, fontSize: 12)),
-            SizedBox(width: 4),
-            Icon(Icons.arrow_forward, color: Colors.white54, size: 16),
+          children: [
+            Text(t.tr(en: "Show all jobs", ar: "عرض الكل"), style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 12)),
+            const SizedBox(width: 4),
+            Icon(Icons.arrow_forward, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), size: 16),
           ],
         ),
       ],
@@ -401,6 +408,7 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
   }
 
   Widget _buildJobCard({required String title, required String company, required String location, required int applied, required int capacity}) {
+    final t = AppLocalizations.of(context);
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
       child: Row(
@@ -408,16 +416,19 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
         children: [
           Container(
             width: 44, height: 44,
-            decoration: BoxDecoration(color: Colors.white12, borderRadius: BorderRadius.circular(10)),
-            child: const Icon(Icons.business, color: Colors.white, size: 24),
+            decoration: BoxDecoration(
+              color: Theme.of(context).brightness == Brightness.dark ? Colors.white12 : Colors.black.withValues(alpha: 0.05), 
+              borderRadius: BorderRadius.circular(10)
+            ),
+            child: Icon(Icons.business, color: Theme.of(context).colorScheme.onSurface, size: 24),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
-                Text("$company • $location", style: const TextStyle(color: Colors.white38, fontSize: 12)),
+                Text(title, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold, fontSize: 15)),
+                Text("$company • $location", style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 12)),
                 const SizedBox(height: 12),
                 Row(
                   children: [
@@ -433,12 +444,11 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
             children: [
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-                decoration: BoxDecoration(color: const Color(0xFF49769F), borderRadius: BorderRadius.circular(20)),
-                child: const Text("Apply", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+                decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary, borderRadius: BorderRadius.circular(20)),
+                child: Text(t.tr(en: "Apply", ar: "تقديم"), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
               ),
               const SizedBox(height: 10),
-              const SizedBox(height: 10),
-              Text("$applied متقدم", style: const TextStyle(color: Colors.white38, fontSize: 11)),
+              Text("$applied ${t.tr(en: 'applied', ar: 'متقدم')}", style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 11)),
             ],
           ),
         ],
@@ -453,11 +463,11 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
       decoration: BoxDecoration(
         color: isHighlighted ? const Color(0xFF0D2D4D) : Colors.transparent,
         borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: isHighlighted ? Colors.orange.withValues(alpha: 0.5) : Colors.white12),
+        border: Border.all(color: isHighlighted ? Colors.orange.withValues(alpha: 0.5) : Theme.of(context).dividerColor.withValues(alpha: 0.2)),
       ),
       child: Text(
         text,
-        style: TextStyle(color: isHighlighted ? Colors.orange : Colors.white70, fontSize: 10),
+        style: TextStyle(color: isHighlighted ? Colors.orange : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 10),
       ),
     );
   }

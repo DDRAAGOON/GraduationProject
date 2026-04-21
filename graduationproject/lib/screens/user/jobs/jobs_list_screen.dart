@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../core/app_colors.dart';
 import '../../../constants/app_images.dart';
+import '../../../shared/l10n/app_localizations.dart';
 
 class JobsListScreen extends StatefulWidget {
   const JobsListScreen({super.key});
@@ -12,8 +12,9 @@ class JobsListScreen extends StatefulWidget {
 class _JobsListScreenState extends State<JobsListScreen> {
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -35,24 +36,24 @@ class _JobsListScreenState extends State<JobsListScreen> {
               const SizedBox(height: 20),
 
               // Search Section
-              _buildSearchSection(),
+              _buildSearchSection(t),
               const SizedBox(height: 15),
 
               // Popular Tags
-              const Text(
-                "Popular : UI Designer, UX Researcher, Android, Admin",
-                style: TextStyle(color: Colors.white38, fontSize: 11),
+              Text(
+                "${t.tr(en: "Popular", ar: "شائع")} : UI Designer, UX Researcher, Android, Admin",
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 11),
               ),
               const SizedBox(height: 25),
 
               // Filters Section
               _buildFiltersGrid(),
               const SizedBox(height: 30),
-              const Divider(color: Colors.white24, height: 1),
+              Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 1),
               const SizedBox(height: 25),
 
               // All Jobs Header
-              _buildJobListHeader(),
+              _buildJobListHeader(t),
               const SizedBox(height: 20),
 
               // Job List
@@ -106,11 +107,13 @@ class _JobsListScreenState extends State<JobsListScreen> {
           width: 44,
           height: 44,
           decoration: BoxDecoration(
-            color: const Color(0xFF0D2D4D),
+            color: Theme.of(context).brightness == Brightness.dark 
+                ? const Color(0xFF0D2D4D) 
+                : Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
             shape: BoxShape.circle,
-            border: Border.all(color: Colors.white12),
+            border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.12)),
           ),
-          child: Icon(icon, color: Colors.white, size: 22),
+          child: Icon(icon, color: Theme.of(context).colorScheme.onSurface, size: 22),
         ),
         if (hasBadge)
           Positioned(
@@ -129,43 +132,45 @@ class _JobsListScreenState extends State<JobsListScreen> {
     );
   }
 
-  Widget _buildSearchSection() {
+  Widget _buildSearchSection(AppLocalizations t) {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.05),
+        color: Theme.of(context).brightness == Brightness.dark 
+            ? Colors.white.withValues(alpha: 0.05) 
+            : Colors.black.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(30),
-        border: Border.all(color: Colors.white12),
+        border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.12)),
       ),
       child: Row(
         children: [
           const SizedBox(width: 12),
           const Icon(Icons.search, color: Colors.white54, size: 18),
           const SizedBox(width: 8),
-          const Expanded(
+          Expanded(
             child: TextField(
-              style: TextStyle(color: Colors.white, fontSize: 13),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 13),
               decoration: InputDecoration(
-                hintText: "Job title or keyword",
-                hintStyle: TextStyle(color: Colors.white38),
+                hintText: t.tr(en: "Job title or keyword", ar: "عنوان الوظيفة أو كلمة مفتاحية"),
+                hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)),
                 border: InputBorder.none,
               ),
             ),
           ),
           Container(height: 20, width: 1, color: Colors.white24),
           const SizedBox(width: 12),
-          const Icon(Icons.location_on_outlined, color: Colors.white54, size: 18),
+          Icon(Icons.location_on_outlined, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), size: 18),
           const SizedBox(width: 4),
-          const Text("Florence, Italy", style: TextStyle(color: Colors.white70, fontSize: 12)),
-          const Icon(Icons.keyboard_arrow_down, color: Colors.white54, size: 18),
+          Text("Florence, Italy", style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 12)),
+          Icon(Icons.keyboard_arrow_down, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), size: 18),
           const SizedBox(width: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
-              color: const Color(0xFF49769F),
+              color: Theme.of(context).colorScheme.primary,
               borderRadius: BorderRadius.circular(20),
             ),
-            child: const Text("Search", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+            child: Text(t.tr(en: "Search", ar: "بحث"), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
           ),
         ],
       ),
@@ -232,8 +237,8 @@ class _JobsListScreenState extends State<JobsListScreen> {
       children: [
         Row(
           children: [
-            Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
-            const Icon(Icons.keyboard_arrow_up, color: Colors.white, size: 18),
+            Text(title, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold, fontSize: 13)),
+            Icon(Icons.keyboard_arrow_up, color: Theme.of(context).colorScheme.onSurface, size: 18),
           ],
         ),
         const SizedBox(height: 10),
@@ -251,9 +256,9 @@ class _JobsListScreenState extends State<JobsListScreen> {
             width: 18,
             height: 18,
             decoration: BoxDecoration(
-              color: value ? const Color(0xFF49769F) : Colors.transparent,
+              color: value ? Theme.of(context).colorScheme.primary : Colors.transparent,
               borderRadius: BorderRadius.circular(4),
-              border: Border.all(color: Colors.white38),
+              border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)),
             ),
             child: value ? const Icon(Icons.check, color: Colors.white, size: 14) : null,
           ),
@@ -261,7 +266,7 @@ class _JobsListScreenState extends State<JobsListScreen> {
           Expanded(
             child: Text(
               label,
-              style: const TextStyle(color: Colors.white70, fontSize: 11),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 11),
               overflow: TextOverflow.ellipsis,
             ),
           ),
@@ -270,15 +275,15 @@ class _JobsListScreenState extends State<JobsListScreen> {
     );
   }
 
-  Widget _buildJobListHeader() {
+  Widget _buildJobListHeader(AppLocalizations t) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
-            Text("All Jobs", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-            Text("Showing 73 results", style: TextStyle(color: Colors.white38, fontSize: 11)),
+          children: [
+            Text(t.tr(en: "All Jobs", ar: "جميع الوظائف"), style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold, fontSize: 16)),
+            Text("${t.tr(en: "Showing", ar: "عرض")} 73 ${t.tr(en: "results", ar: "نتيجة")}", style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 11)),
           ],
         ),
         Row(
@@ -286,20 +291,20 @@ class _JobsListScreenState extends State<JobsListScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.white12),
+                border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.12)),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Row(
-                children: const [
-                  Text("Sort by: ", style: TextStyle(color: Colors.white38, fontSize: 12)),
-                  Icon(Icons.keyboard_arrow_down, color: Colors.white70, size: 16),
+                children: [
+                  Text("${t.tr(en: "Sort by", ar: "ترتيب حسب")}: ", style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 12)),
+                  Icon(Icons.keyboard_arrow_down, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), size: 16),
                 ],
               ),
             ),
             const SizedBox(width: 10),
-            const Icon(Icons.grid_view, color: Colors.white38, size: 20),
+            Icon(Icons.grid_view, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), size: 20),
             const SizedBox(width: 5),
-            const Icon(Icons.menu, color: Colors.white38, size: 20),
+            Icon(Icons.menu, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), size: 20),
           ],
         ),
       ],
@@ -314,6 +319,7 @@ class _JobsListScreenState extends State<JobsListScreen> {
     required int applied,
     required int capacity,
   }) {
+    final t = AppLocalizations.of(context);
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
       child: Row(
@@ -324,20 +330,22 @@ class _JobsListScreenState extends State<JobsListScreen> {
             height: 44,
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.05),
+              color: Theme.of(context).brightness == Brightness.dark 
+                  ? Colors.white.withValues(alpha: 0.05)
+                  : Colors.black.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(10),
             ),
             child: image != null 
-                ? Image.asset(image, errorBuilder: (_, __, ___) => const Icon(Icons.business, color: Colors.white))
-                : const Icon(Icons.business, color: Colors.white),
+                ? Image.asset(image, errorBuilder: (ctx, e, s) => Icon(Icons.business, color: Theme.of(ctx).colorScheme.onSurface))
+                : Icon(Icons.business, color: Theme.of(context).colorScheme.onSurface),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
-                Text("$company • $location", style: const TextStyle(color: Colors.white38, fontSize: 12)),
+                Text(title, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold, fontSize: 15)),
+                Text("$company • $location", style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 12)),
                 const SizedBox(height: 12),
                 Row(
                   children: [
@@ -355,14 +363,14 @@ class _JobsListScreenState extends State<JobsListScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF49769F),
+                  color: Theme.of(context).colorScheme.primary,
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: const Text("Apply", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+                child: Text(t.tr(en: "Apply", ar: "تقديم"), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
               ),
               const SizedBox(height: 10),
               const SizedBox(height: 10),
-              Text("$applied متقدم", style: const TextStyle(color: Colors.white38, fontSize: 11)),
+              Text("$applied ${t.tr(en: 'applied', ar: 'متقدم')}", style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 11)),
             ],
           ),
         ],
@@ -382,7 +390,7 @@ class _JobsListScreenState extends State<JobsListScreen> {
       child: Text(
         text,
         style: TextStyle(
-          color: isHighlighted ? Colors.orange : Colors.white70,
+          color: isHighlighted ? Colors.orange : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
           fontSize: 10,
         ),
       ),
@@ -393,17 +401,17 @@ class _JobsListScreenState extends State<JobsListScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Icon(Icons.arrow_back_ios, color: Colors.white38, size: 14),
+        const Icon(Icons.arrow_back_ios, color: Colors.white54, size: 14),
         const SizedBox(width: 10),
         _buildPageNumber("1", true),
         _buildPageNumber("2", false),
         _buildPageNumber("3", false),
         _buildPageNumber("4", false),
         _buildPageNumber("5", false),
-        const Text(" .. ", style: TextStyle(color: Colors.white38)),
+        Text(" .. ", style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38))),
         _buildPageNumber("33", false),
         const SizedBox(width: 10),
-        const Icon(Icons.arrow_forward_ios, color: Colors.white38, size: 14),
+        const Icon(Icons.arrow_forward_ios, color: Colors.white54, size: 14),
       ],
     );
   }
@@ -414,13 +422,13 @@ class _JobsListScreenState extends State<JobsListScreen> {
       width: 30,
       height: 30,
       decoration: BoxDecoration(
-        color: isActive ? const Color(0xFF49769F) : Colors.transparent,
+        color: isActive ? Theme.of(context).colorScheme.primary : Colors.transparent,
         shape: BoxShape.circle,
       ),
       child: Center(
         child: Text(
           num,
-          style: TextStyle(color: isActive ? Colors.white : Colors.white38, fontSize: 12),
+          style: TextStyle(color: isActive ? Colors.white : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 12),
         ),
       ),
     );

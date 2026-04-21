@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../core/app_colors.dart';
 import '../../teardsman/nav_Botton_bar/nav_bottom_bar.dart';
 import '../../teardsman/profile/teardsman_data.dart';
 import '../../../../../shared/l10n/app_localizations.dart';
-import 'sign_up_seeker.dart';
 
 class SignUpTradesman extends StatefulWidget {
   const SignUpTradesman({super.key});
@@ -35,7 +33,7 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
   final TextEditingController _instagramController = TextEditingController();
   final TextEditingController _facebookController = TextEditingController();
 
-  final List<String> _genderOptions = ["Male", "Female"];
+
   String? _selectedGender;
   
   // DOB Dropdowns
@@ -50,12 +48,12 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
   final List<String> _trades = ["نجار", "فني سباكة", "نقاش", "ميكانيكي", "كهربائي", "حداد", "منظف منازل", "Other"];
   String? _selectedTrade;
 
-  List<Map<String, String>> _educationList = [];
-  List<String> _skillsList = [];
+  final List<Map<String, String>> _educationList = [];
+  final List<String> _skillsList = [];
   
   // Criminal Record and Work Images state
   bool _criminalRecordUploaded = false;
-  List<String> _workImages = [];
+  final List<String> _workImages = [];
 
   @override
   void dispose() {
@@ -143,8 +141,19 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0, title: Text(t.registration, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)), centerTitle: true),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: Text(
+          t.registration,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
@@ -155,13 +164,27 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
               children: [
                 // Header
                 RichText(
-                  text: const TextSpan(
-                    style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+                  text: TextSpan(
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
                     children: [
-                      TextSpan(text: "You Can "),
-                      TextSpan(text: "SignUp ", style: TextStyle(color: Color(0xFF49769F))),
-                      TextSpan(text: "Tradesman or a job seeker with "),
-                      TextSpan(text: "Jobito", style: TextStyle(color: Colors.orange)),
+                      TextSpan(text: t.isAr ? "يمكنك " : "You Can "),
+                      TextSpan(
+                        text: t.isAr ? "التسجيل " : "SignUp ",
+                        style: const TextStyle(color: Color(0xFF49769F)),
+                      ),
+                      TextSpan(
+                        text: t.isAr
+                            ? "كحرفي أو باحث عن عمل مع "
+                            : "Tradesman or a job seeker with ",
+                      ),
+                      const TextSpan(
+                        text: "Jobito",
+                        style: TextStyle(color: Colors.orange),
+                      ),
                     ],
                   ),
                 ),
@@ -191,8 +214,8 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
                   children: [
                     CircleAvatar(
                       radius: 40,
-                      backgroundColor: Colors.white12,
-                      child: Icon(Icons.person, size: 45, color: Colors.white.withValues(alpha: 0.5)),
+                      backgroundColor: Theme.of(context).dividerColor.withValues(alpha: 0.1),
+                      child: Icon(Icons.person, size: 45, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
                     ),
                     const SizedBox(width: 20),
                     Expanded(child: _buildUploadBox(t.uploadHint, () {
@@ -203,7 +226,7 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
                 const SizedBox(height: 30),
 
                 // Personal Details
-                Text(t.personalInfo, style: const TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.w600)),
+                Text(t.personalInfo, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 16, fontWeight: FontWeight.w600)),
                 const SizedBox(height: 20),
                 _buildTextField(_fullNameController, t.fullName, Icons.person_outline, isRequired: true),
                 const SizedBox(height: 20),
@@ -229,7 +252,7 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
                 const SizedBox(height: 20),
                 
                 // Date of Birth Dropdowns
-                Text(t.dob, style: const TextStyle(color: Colors.white54, fontSize: 14)),
+                Text(t.dob, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 14)),
                 const SizedBox(height: 10),
                 Row(
                   children: [
@@ -260,14 +283,14 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
                 const SizedBox(height: 30),
 
                 // About Me
-                Text(t.aboutMe, style: const TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.w600)),
+                Text(t.aboutMe, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 16, fontWeight: FontWeight.w600)),
                 const SizedBox(height: 15),
                 _buildTextField(_aboutMeController, t.aboutMe, Icons.info_outline, maxLines: 4),
                 const SizedBox(height: 30),
 
                 // Service (Required choice or text)
-                const Text("Service *", style: TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.w600)),
-                const Text("Select or enter the profession you provide", style: TextStyle(color: Colors.white38, fontSize: 12)),
+                Text("${t.selectService} *", style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 16, fontWeight: FontWeight.w600)),
+                Text(t.tr(en: "Select or enter the profession you provide", ar: "اختر أو أدخل المهنة التي تمارسها"), style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 12)),
                 const SizedBox(height: 15),
                 _buildDropdownField(
                   label: t.selectService,
@@ -276,20 +299,20 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
                   items: _trades,
                   onChanged: (v) => setState(() {
                     _selectedTrade = v;
-                    if (v != "Other") _serviceController.text = v!;
-                    else _serviceController.clear();
+                    if (v != "Other") { _serviceController.text = v!; }
+                    else { _serviceController.clear(); }
                   }),
                   isRequired: true,
                 ),
                 if (_selectedTrade == "Other") ...[
                   const SizedBox(height: 15),
-                  _buildTextField(_serviceController, "Enter Profession", Icons.edit_note_outlined, isRequired: true),
+                  _buildTextField(_serviceController, t.tr(en: "Enter Profession", ar: "أدخل المهنة"), Icons.edit_note_outlined, isRequired: true),
                 ],
                 const SizedBox(height: 30),
 
                 // Education
-                Text(t.education, style: const TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.w600)),
-                const Text("Add your academic qualifications", style: TextStyle(color: Colors.white38, fontSize: 12)),
+                Text(t.education, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 16, fontWeight: FontWeight.w600)),
+                Text(t.tr(en: "Add your academic qualifications", ar: "أضف مؤهلاتك الأكاديمية"), style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 12)),
                 const SizedBox(height: 20),
                 _buildTextField(_eduInstitutionController, "Education Institution", Icons.school_outlined),
                 const SizedBox(height: 15),
@@ -318,27 +341,32 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
                 const SizedBox(height: 30),
 
                 // Skills
-                const Text("Skills", style: TextStyle(color: Colors.white54, fontSize: 14)),
+                Text(t.tr(en: "Skills", ar: "المهارات"), style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 14)),
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _skillsController,
-                  style: const TextStyle(color: Colors.white),
+                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                   decoration: InputDecoration(
-                    hintText: "Type and press Add", hintStyle: const TextStyle(color: Colors.white24, fontSize: 12),
+                    hintText: t.tr(en: "Type and press Add", ar: "اكتب واضغط إضافة"), 
+                    hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.24), fontSize: 12),
                     prefixIcon: const Icon(Icons.star_outline, color: Color(0xFF49769F), size: 20),
                     suffixIcon: IconButton(icon: const Icon(Icons.add_circle_outline, color: Color(0xFF49769F)), onPressed: _addSkill),
-                    filled: true, fillColor: Colors.white.withValues(alpha: 0.05), contentPadding: const EdgeInsets.all(16),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: const BorderSide(color: Colors.white12)),
-                    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: const BorderSide(color: Colors.white12)),
+                    filled: true,
+                    fillColor: Theme.of(context).brightness == Brightness.dark 
+                        ? Colors.white.withValues(alpha: 0.05) 
+                        : Colors.black.withValues(alpha: 0.05),
+                    contentPadding: const EdgeInsets.all(16),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.12))),
+                    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.12))),
                     focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: const BorderSide(color: Color(0xFF49769F))),
                   ),
                 ),
                 const SizedBox(height: 10),
-                Wrap(spacing: 8, runSpacing: 8, children: _skillsList.map((s) => Chip(label: Text(s, style: const TextStyle(color: Colors.white, fontSize: 11)), backgroundColor: const Color(0xFF49769F).withValues(alpha: 0.2), onDeleted: () => setState(() => _skillsList.remove(s)), deleteIcon: const Icon(Icons.close, size: 14, color: Colors.white70), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))).toList()),
+                Wrap(spacing: 8, runSpacing: 8, children: _skillsList.map((s) => Chip(label: Text(s, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 11)), backgroundColor: const Color(0xFF49769F).withValues(alpha: 0.2), onDeleted: () => setState(() => _skillsList.remove(s)), deleteIcon: Icon(Icons.close, size: 14, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))).toList()),
                 const SizedBox(height: 30),
 
                 // Social Links
-                Text(t.socialMedia, style: const TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.w600)),
+                Text(t.socialMedia, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 16, fontWeight: FontWeight.w600)),
                 const SizedBox(height: 15),
                 Row(
                   children: [
@@ -481,12 +509,13 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
 
   Widget _buildTextField(TextEditingController controller, String label, IconData? icon, {String? hint, String? prefixText, int maxLines = 1, TextInputType keyboardType = TextInputType.text, bool isRequired = false, VoidCallback? onIconTap, IconData? suffixIcon, VoidCallback? onSuffixTap, List<TextInputFormatter>? inputFormatters, String? Function(String?)? validator}) {
     return TextFormField(
-      controller: controller, maxLines: maxLines, keyboardType: keyboardType, inputFormatters: inputFormatters, style: const TextStyle(color: Colors.white, fontSize: 14),
+      controller: controller, maxLines: maxLines, keyboardType: keyboardType, inputFormatters: inputFormatters, 
+      style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14),
       validator: isRequired ? (validator ?? (value) => (value == null || value.isEmpty) ? "$label is required" : null) : null,
       decoration: InputDecoration(
-        prefixText: prefixText, prefixStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        labelText: label, labelStyle: const TextStyle(color: Colors.white54, fontSize: 14),
-        hintText: hint, hintStyle: const TextStyle(color: Colors.white24, fontSize: 12),
+        prefixText: prefixText, prefixStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold),
+        labelText: label, labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 14),
+        hintText: hint, hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.24), fontSize: 12),
         prefixIcon: icon != null ? InkWell(onTap: onIconTap, child: Icon(icon, color: const Color(0xFF49769F), size: 20)) : null,
         suffixIcon: suffixIcon != null ? IconButton(icon: Icon(suffixIcon, color: Colors.white54), onPressed: onSuffixTap) : null,
         filled: true, fillColor: Colors.white.withValues(alpha: 0.05), contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
@@ -499,7 +528,7 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
 
   Widget _buildDropdownField({required String label, required IconData icon, required String? value, required List<String> items, required ValueChanged<String?> onChanged, bool isRequired = false}) {
     return DropdownButtonFormField<String>(
-      value: value,
+      initialValue: value,
       items: items.map((item) => DropdownMenuItem(value: item, child: Text(item, style: const TextStyle(color: Colors.white)))).toList(),
       onChanged: onChanged,
       dropdownColor: const Color(0xFF0D2D4D),

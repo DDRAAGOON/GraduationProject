@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../../shared/l10n/app_localizations.dart';
 import '../../../constants/app_images.dart';
 import '../auth/sign_in_screen.dart';
-import '../core/app_colors.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -50,7 +49,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     ];
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           children: [
@@ -82,8 +81,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         Text(
                           onboardingData[index]['title']!,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
@@ -92,8 +91,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         Text(
                           onboardingData[index]['description']!,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                             fontSize: 16,
                             height: 1.5,
                           ),
@@ -189,7 +188,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       width: isActive ? 32 : 12,
       height: 10,
       decoration: BoxDecoration(
-        color: isActive ? Colors.white : const Color(0xFF0A335E),
+        color: isActive ? Theme.of(context).colorScheme.primary : Theme.of(context).dividerColor.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(5),
       ),
     );

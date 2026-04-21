@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../../../../shared/l10n/app_localizations.dart';
 import '../../../../../shared/state/locale_controller.dart';
 import '../../../../../shared/state/theme_controller.dart';
-import '../../core/app_colors.dart';
 
 class Settings extends StatefulWidget {
   const Settings({super.key});
@@ -22,7 +21,7 @@ class _SettingsState extends State<Settings> {
     final themeController = ThemeController.instance;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -30,8 +29,8 @@ class _SettingsState extends State<Settings> {
         automaticallyImplyLeading: false,
         title: Text(
           t.settings,
-          style: const TextStyle(
-            color: Colors.white,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 22,
             fontWeight: FontWeight.bold,
           ),
@@ -40,7 +39,7 @@ class _SettingsState extends State<Settings> {
           IconButton(
             icon: Icon(
               t.isAr ? Icons.arrow_back_ios : Icons.arrow_forward_ios,
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.onSurface,
               size: 20,
             ),
             onPressed: () => Navigator.pop(context),
@@ -55,8 +54,8 @@ class _SettingsState extends State<Settings> {
           children: [
             Text(
               t.preferences,
-              style: const TextStyle(
-                color: Colors.white70,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
@@ -81,12 +80,14 @@ class _SettingsState extends State<Settings> {
                         vertical: 12,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.05),
+                        color: Theme.of(context).brightness == Brightness.dark 
+                            ? Colors.white.withValues(alpha: 0.05) 
+                            : Colors.black.withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(15),
                         border: Border.all(
                           color: _isLanguageExpanded
-                              ? const Color(0xFF49769F)
-                              : Colors.white12,
+                              ? Theme.of(context).colorScheme.primary
+                              : Theme.of(context).dividerColor.withValues(alpha: 0.12),
                         ),
                       ),
                       child: Row(
@@ -107,15 +108,15 @@ class _SettingsState extends State<Settings> {
                                 children: [
                                   Text(
                                     t.language,
-                                    style: const TextStyle(
-                                      color: Colors.white38,
+                                    style: TextStyle(
+                                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38),
                                       fontSize: 12,
                                     ),
                                   ),
                                   Text(
                                     t.isAr ? t.arabic : t.english,
-                                    style: const TextStyle(
-                                      color: Colors.white,
+                                    style: TextStyle(
+                                      color: Theme.of(context).colorScheme.onSurface,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -133,9 +134,11 @@ class _SettingsState extends State<Settings> {
                     const SizedBox(height: 8),
                     Container(
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.03),
+                        color: Theme.of(context).brightness == Brightness.dark 
+                            ? Colors.white.withValues(alpha: 0.03) 
+                            : Colors.black.withValues(alpha: 0.03),
                         borderRadius: BorderRadius.circular(15),
-                        border: Border.all(color: Colors.white10),
+                        border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
                       ),
                       child: Column(
                         children: [
@@ -192,12 +195,14 @@ class _SettingsState extends State<Settings> {
                         vertical: 12,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.05),
+                        color: Theme.of(context).brightness == Brightness.dark 
+                            ? Colors.white.withValues(alpha: 0.05) 
+                            : Colors.black.withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(15),
                         border: Border.all(
                           color: _isThemeExpanded
-                              ? const Color(0xFF49769F)
-                              : Colors.white12,
+                              ? Theme.of(context).colorScheme.primary
+                              : Theme.of(context).dividerColor.withValues(alpha: 0.12),
                           width: 1.5,
                         ),
                       ),
@@ -219,8 +224,8 @@ class _SettingsState extends State<Settings> {
                                 children: [
                                   Text(
                                     t.appearance,
-                                    style: const TextStyle(
-                                      color: Colors.white38,
+                                    style: TextStyle(
+                                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38),
                                       fontSize: 12,
                                     ),
                                   ),
@@ -229,8 +234,8 @@ class _SettingsState extends State<Settings> {
                                       themeController.themeMode.value,
                                       t,
                                     ),
-                                    style: const TextStyle(
-                                      color: Colors.white,
+                                    style: TextStyle(
+                                      color: Theme.of(context).colorScheme.onSurface,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -360,14 +365,14 @@ class _SettingsState extends State<Settings> {
                   children: [
                     Text(
                       title,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     Text(
                       subtitle,
-                      style: const TextStyle(color: Colors.white38, fontSize: 12),
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 12),
                     ),
                   ],
                 ),
@@ -415,14 +420,14 @@ class _SettingsState extends State<Settings> {
                 children: [
                   Icon(
                     icon,
-                    color: isSelected ? const Color(0xFF49769F) : Colors.white38,
+                    color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38),
                     size: 20,
                   ),
                   const SizedBox(width: 12),
                   Text(
                     label,
                     style: TextStyle(
-                      color: isSelected ? const Color(0xFF49769F) : Colors.white70,
+                      color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                       fontWeight:
                           isSelected ? FontWeight.bold : FontWeight.normal,
                     ),
@@ -430,16 +435,16 @@ class _SettingsState extends State<Settings> {
                 ],
               ),
               if (isSelected)
-                const Icon(Icons.check, color: Color(0xFF49769F), size: 20),
+                Icon(Icons.check, color: Theme.of(context).colorScheme.primary, size: 20),
             ] else ...[
               if (isSelected)
-                const Icon(Icons.check, color: Color(0xFF49769F), size: 20),
+                Icon(Icons.check, color: Theme.of(context).colorScheme.primary, size: 20),
               Row(
                 children: [
                   Text(
                     label,
                     style: TextStyle(
-                      color: isSelected ? const Color(0xFF49769F) : Colors.white70,
+                      color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                       fontWeight:
                           isSelected ? FontWeight.bold : FontWeight.normal,
                     ),
@@ -447,7 +452,7 @@ class _SettingsState extends State<Settings> {
                   const SizedBox(width: 12),
                   Icon(
                     icon,
-                    color: isSelected ? const Color(0xFF49769F) : Colors.white38,
+                    color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38),
                     size: 20,
                   ),
                 ],

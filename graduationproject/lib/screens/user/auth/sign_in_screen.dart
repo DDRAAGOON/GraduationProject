@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../shared/l10n/app_localizations.dart';
-import '../core/app_colors.dart';
 import '../home/main_screen.dart';
 import 'package:graduationproject/screens/user/auth/cubit/auth_cubit.dart';
 import '../../../constants/app_images.dart';
@@ -61,7 +60,7 @@ class _SignInScreenState extends State<SignInScreen> {
         bool isLoading = state is AuthLoading;
 
         return Scaffold(
-          backgroundColor: AppColors.background,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           body: SafeArea(
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -71,8 +70,8 @@ class _SignInScreenState extends State<SignInScreen> {
                   const SizedBox(height: 60),
                   Text(
                     t.signInToAccount,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
                     ),
@@ -83,8 +82,8 @@ class _SignInScreenState extends State<SignInScreen> {
                     children: [
                       Text(
                         t.emailAddress,
-                        style: const TextStyle(
-                          color: Colors.white70,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                           fontSize: 14,
                         ),
                       ),
@@ -101,26 +100,28 @@ class _SignInScreenState extends State<SignInScreen> {
                   const SizedBox(height: 8),
                   TextField(
                     controller: _emailController,
-                    style: const TextStyle(color: Colors.white),
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                     decoration: InputDecoration(
                       hintText: t.enterYourEmail,
-                      hintStyle: const TextStyle(color: Colors.white38),
+                      hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)),
                       filled: true,
-                      fillColor: Colors.white.withValues(alpha: 0.05),
+                      fillColor: Theme.of(context).brightness == Brightness.dark 
+                        ? Colors.white.withValues(alpha: 0.05) 
+                        : Colors.black.withValues(alpha: 0.05),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                         borderSide: BorderSide(
                           color: _emailError != null
-                              ? Colors.red
-                              : Colors.white24,
+                               ? Colors.red
+                               : Theme.of(context).dividerColor.withValues(alpha: 0.2),
                         ),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                         borderSide: BorderSide(
                           color: _emailError != null
-                              ? Colors.red
-                              : Colors.white24,
+                               ? Colors.red
+                               : Theme.of(context).dividerColor.withValues(alpha: 0.2),
                         ),
                       ),
                     ),
@@ -131,8 +132,8 @@ class _SignInScreenState extends State<SignInScreen> {
                     children: [
                       Text(
                         t.password,
-                        style: const TextStyle(
-                          color: Colors.white70,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                           fontSize: 14,
                         ),
                       ),
@@ -150,18 +151,20 @@ class _SignInScreenState extends State<SignInScreen> {
                   TextField(
                     controller: _passwordController,
                     obscureText: _obscurePassword,
-                    style: const TextStyle(color: Colors.white),
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                     decoration: InputDecoration(
                       hintText: "•••••••••••",
-                      hintStyle: const TextStyle(color: Colors.white38),
+                      hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)),
                       filled: true,
-                      fillColor: Colors.white.withValues(alpha: 0.05),
+                      fillColor: Theme.of(context).brightness == Brightness.dark 
+                        ? Colors.white.withValues(alpha: 0.05) 
+                        : Colors.black.withValues(alpha: 0.05),
                       suffixIcon: IconButton(
                         icon: Icon(
                           _obscurePassword
-                              ? Icons.visibility_off_outlined
-                              : Icons.visibility_outlined,
-                          color: Colors.white70,
+                               ? Icons.visibility_off_outlined
+                               : Icons.visibility_outlined,
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                         ),
                         onPressed: () {
                           setState(() {
@@ -173,16 +176,16 @@ class _SignInScreenState extends State<SignInScreen> {
                         borderRadius: BorderRadius.circular(8),
                         borderSide: BorderSide(
                           color: _passwordError != null
-                              ? Colors.red
-                              : Colors.white24,
+                               ? Colors.red
+                               : Theme.of(context).dividerColor.withValues(alpha: 0.2),
                         ),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                         borderSide: BorderSide(
                           color: _passwordError != null
-                              ? Colors.red
-                              : Colors.white24,
+                               ? Colors.red
+                               : Theme.of(context).dividerColor.withValues(alpha: 0.2),
                         ),
                       ),
                     ),
@@ -201,7 +204,7 @@ class _SignInScreenState extends State<SignInScreen> {
                       },
                       child: Text(
                         t.forgotPassword,
-                        style: const TextStyle(color: Colors.white70),
+                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
                       ),
                     ),
                   ),
@@ -209,12 +212,12 @@ class _SignInScreenState extends State<SignInScreen> {
                   Container(
                     width: double.infinity,
                     height: 56,
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
-                          Color(0xFF0A2A4A),
-                          Color(0xFF2F5F8F),
-                          Color.fromARGB(255, 118, 159, 178),
+                          Theme.of(context).colorScheme.primary.withValues(alpha: 0.9),
+                          Theme.of(context).colorScheme.primary.withValues(alpha: 0.7),
+                          Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
                         ],
                         begin: Alignment.centerLeft,
                         end: Alignment.centerRight,
@@ -296,26 +299,26 @@ class _SignInScreenState extends State<SignInScreen> {
                   const SizedBox(height: 40),
                   Row(
                     children: [
-                      Expanded(child: Divider(color: Colors.white24)),
+                      Expanded(child: Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.2))),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 18.0),
                         child: Text(
                           t.orSignInWith,
-                          style: const TextStyle(
-                            color: Colors.white38,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38),
                             fontSize: 16,
                           ),
                         ),
                       ),
-                      Expanded(child: Divider(color: Colors.white24)),
+                      Expanded(child: Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.2))),
                     ],
                   ),
                   const SizedBox(height: 30),
                   Center(
                     child: Container(
                       padding: const EdgeInsets.all(12),
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black.withValues(alpha: 0.05),
                         shape: BoxShape.circle,
                       ),
                       child: Image.asset(
@@ -334,7 +337,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     children: [
                       Text(
                         t.dontHaveAccount,
-                        style: const TextStyle(color: Colors.white70),
+                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
                       ),
                       GestureDetector(
                         onTap: () {
@@ -347,8 +350,8 @@ class _SignInScreenState extends State<SignInScreen> {
                         },
                         child: Text(
                           t.signUpBtn,
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontWeight: FontWeight.bold,
                             decoration: TextDecoration.underline,
                           ),

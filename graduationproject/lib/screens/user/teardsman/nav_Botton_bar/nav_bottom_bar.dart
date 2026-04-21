@@ -1,6 +1,5 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
-import '../../core/app_colors.dart';
 import '../Tradesman_Messages/messages_list.dart';
 import '../home/find_jobs.dart';
 import '../post/post_job.dart';
@@ -26,7 +25,7 @@ class _NavbottonState extends State<Navbotton> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: _pages[_selectedIndex],
       bottomNavigationBar: CurvedNavigationBar(
         index: _selectedIndex,
@@ -37,9 +36,11 @@ class _NavbottonState extends State<Navbotton> {
           Icon(Icons.person, size: 30, color: Colors.white),
           Icon(Icons.add, size: 30, color: Colors.white),
         ],
-        color: const Color(0xFF49769F),
-        buttonBackgroundColor: const Color(0xFF001E3A),
-        backgroundColor: AppColors.background,
+        color: Theme.of(context).colorScheme.primary,
+        buttonBackgroundColor: Theme.of(context).brightness == Brightness.dark 
+            ? const Color(0xFF001E3A) 
+            : Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         animationCurve: Curves.easeInOut,
         animationDuration: const Duration(milliseconds: 400),
         onTap: (index) {

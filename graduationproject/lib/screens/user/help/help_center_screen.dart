@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
-import '../core/app_colors.dart';
+import '../../../shared/l10n/app_localizations.dart';
 
 class HelpScreen extends StatelessWidget {
   const HelpScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 20),
+          icon: Icon(Icons.arrow_back_ios, color: Theme.of(context).colorScheme.onSurface, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -24,32 +25,35 @@ class HelpScreen extends StatelessWidget {
             children: [
               // Sort By Row
               Row(
-                children: const [
-                  Text("Sort by: ", style: TextStyle(color: Colors.white54, fontSize: 14)),
-                  Text("Most relevant", style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
-                  Icon(Icons.keyboard_arrow_down, color: Colors.white54, size: 20),
+                children: [
+                  Text(t.tr(en: "Sort by: ", ar: "صنف حسب: "), style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 14)),
+                  Text(t.tr(en: "Most relevant", ar: "الأكثر صلة"), style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14, fontWeight: FontWeight.bold)),
+                  Icon(Icons.keyboard_arrow_down, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), size: 20),
                 ],
               ),
               const SizedBox(height: 30),
 
               // Sections
               _buildHelpSection(
-                title: "What is My Applications?",
-                content: "My Applications is a way for you to track jobs as you move through the application process. Depending on the job you applied to, you may also receive notifications indicating that an application has been actioned by an employer.",
+                context, t,
+                title: t.tr(en: "What is My Applications?", ar: "ما هي طلباتي؟"),
+                content: t.tr(en: "My Applications is a way for you to track jobs as you move through the application process.", ar: "طلباتي هي وسيلة لك لتتبع الوظائف أثناء تحركك خلال عملية التقديم."),
               ),
-              const Divider(color: Colors.white12, height: 40),
+              Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 40),
 
               _buildHelpSection(
-                title: "How to access my applications history",
-                content: "To access applications history, go to your My Applications page on your dashboard profile. You must be signed in to your Jobito account to view this page.",
+                context, t,
+                title: t.tr(en: "How to access my applications history", ar: "كيفية الوصول إلى سجل طلباتي"),
+                content: t.tr(en: "To access applications history, go to your My Applications page on your dashboard profile.", ar: "للوصول إلى سجل الطلبات، انتقل إلى صفحة طلباتي في ملفك الشخصي."),
               ),
-              const Divider(color: Colors.white12, height: 40),
+              Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 40),
 
               _buildHelpSection(
-                title: "Not seeing jobs you applied in your my application list?",
-                content: "Please note that we are unable to track materials submitted for jobs you apply to via an employer's site. As a result, these applications are not recorded in the My Applications section of your Jobito account. We suggest keeping a personal record of all positions you have applied to externally.",
+                context, t,
+                title: t.tr(en: "Not seeing jobs you applied in your my application list?", ar: "ألا ترى الوظائف التي تقدمت إليها في قائمة طلباتي؟"),
+                content: t.tr(en: "Please note that we are unable to track materials submitted for jobs you apply to via an employer's site.", ar: "يرجى ملاحظة أننا غير قادرين على تتبع المواد المقدمة للوظائف التي تتقدم إليها عبر موقع صاحب العمل."),
               ),
-              const Divider(color: Colors.white12, height: 40),
+              Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 40),
 
               const SizedBox(height: 20),
 
@@ -58,35 +62,36 @@ class HelpScreen extends StatelessWidget {
                 width: double.infinity,
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF5A87B6), // Light blue from image
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(35),
+                  border: Border.all(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3)),
                 ),
                 child: Stack(
                   children: [
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const SizedBox(
+                        SizedBox(
                           width: 200,
                           child: Text(
-                            "Didn't find what you were looking for?",
-                            style: TextStyle(color: Color(0xFF001E3A), fontSize: 18, fontWeight: FontWeight.bold),
+                            t.tr(en: "Didn't find what you were looking for?", ar: "لم تجد ما كنت تبحث عنه؟"),
+                            style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 18, fontWeight: FontWeight.bold),
                           ),
                         ),
                         const SizedBox(height: 12),
-                        const Text(
-                          "Contact our customer service",
-                          style: TextStyle(color: Color(0xFF001E3A), fontSize: 14),
+                        Text(
+                          t.tr(en: "Contact our customer service", ar: "اتصل بخدمة العملاء لدينا"),
+                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 14),
                         ),
                         const SizedBox(height: 24),
                         ElevatedButton(
                           onPressed: () {},
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF001E3A),
+                            backgroundColor: Theme.of(context).colorScheme.primary,
                             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                           ),
-                          child: const Text("Contact Us", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                          child: Text(t.tr(en: "Contact Us", ar: "اتصل بنا"), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                         ),
                       ],
                     ),
@@ -95,8 +100,8 @@ class HelpScreen extends StatelessWidget {
                       bottom: 0,
                       child: Container(
                         padding: const EdgeInsets.all(12),
-                        decoration: const BoxDecoration(
-                          color: Color(0xFF001E3A),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.primary,
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(Icons.chat_bubble, color: Colors.white, size: 24),
@@ -105,7 +110,7 @@ class HelpScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 100), // Space for bottom nav
+              const SizedBox(height: 100),
             ],
           ),
         ),
@@ -113,7 +118,7 @@ class HelpScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHelpSection({required String title, required String content}) {
+  Widget _buildHelpSection(BuildContext context, AppLocalizations t, {required String title, required String content}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -123,43 +128,43 @@ class HelpScreen extends StatelessWidget {
             Expanded(
               child: Text(
                 title,
-                style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ),
-            const Icon(Icons.more_horiz, color: Colors.white54),
+            Icon(Icons.more_horiz, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
           ],
         ),
         const SizedBox(height: 12),
         Text(
           content,
-          style: const TextStyle(color: Colors.white54, fontSize: 13, height: 1.5),
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 13, height: 1.5),
         ),
         const SizedBox(height: 20),
         Row(
           children: [
-            const Text("Was this article helpful?", style: TextStyle(color: Colors.white54, fontSize: 12)),
+            Text(t.tr(en: "Was this article helpful?", ar: "هل كان هذا المقال مفيدًا؟"), style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 12)),
             const Spacer(),
-            _buildVoteButton("Yes", Icons.thumb_up_outlined),
+            _buildVoteButton(context, t.tr(en: "Yes", ar: "نعم"), Icons.thumb_up_outlined),
             const SizedBox(width: 10),
-            _buildVoteButton("No", Icons.thumb_down_outlined),
+            _buildVoteButton(context, t.tr(en: "No", ar: "لا"), Icons.thumb_down_outlined),
           ],
         ),
       ],
     );
   }
 
-  Widget _buildVoteButton(String text, IconData icon) {
+  Widget _buildVoteButton(BuildContext context, String text, IconData icon) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.white24),
+        border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.12)),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
         children: [
-          Icon(icon, color: Colors.white, size: 14),
+          Icon(icon, color: Theme.of(context).colorScheme.onSurface, size: 14),
           const SizedBox(width: 6),
-          Text(text, style: const TextStyle(color: Colors.white, fontSize: 12)),
+          Text(text, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 12)),
         ],
       ),
     );

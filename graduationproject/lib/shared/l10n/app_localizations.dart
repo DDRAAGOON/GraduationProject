@@ -51,339 +51,265 @@ class AppLocalizations {
   }
 
   // ── Bottom Nav ─────────────────────────────────────────────────────────────
-  String get home => isAr ? 'الرئيسية' : 'Home';
-  String get chat => isAr ? 'المحادثة' : 'Chat';
-  String get job => isAr ? 'الوظائف' : 'Job';
-  String get profile => isAr ? 'الملف الشخصي' : 'Profile';
-  String get stats => isAr ? 'الإحصائيات' : 'Stats';
-  String get preferences => isAr ? 'التفضيلات' : 'Preferences';
-  String get systemMode => isAr ? 'النظام' : 'System';
+  String get home => userTr('common.home', fallbackEn: 'Home', fallbackAr: 'الرئيسية');
+  String get chat => userTr('common.chat', fallbackEn: 'Chat', fallbackAr: 'المحادثة');
+  String get job => userTr('common.job', fallbackEn: 'Job', fallbackAr: 'الوظائف');
+  String get profile => userTr('common.profile', fallbackEn: 'Profile', fallbackAr: 'الملف الشخصي');
+  String get stats => userTr('common.stats', fallbackEn: 'Stats', fallbackAr: 'الإحصائيات');
+  String get preferences => userTr('common.preferences', fallbackEn: 'Preferences', fallbackAr: 'التفضيلات');
+  String get systemMode => userTr('common.systemMode', fallbackEn: 'System', fallbackAr: 'النظام');
 
   // ── Language / Settings ────────────────────────────────────────────────────
-  String get language => isAr ? 'اللغة' : 'Language';
-  String get arabic => 'العربية';
-  String get english => 'English';
-  String get appearance => isAr ? 'المظهر' : 'Appearance';
-  String get theme => isAr ? 'المظهر العام' : 'Theme';
-  String get dark => isAr ? 'داكن' : 'Dark';
-  String get light => isAr ? 'فاتح' : 'Light';
-  String get settings => isAr ? 'الإعدادات' : 'Settings';
-  String get notifications => isAr ? 'الإشعارات' : 'Notifications';
+  String get language => userTr('common.language', fallbackEn: 'Language', fallbackAr: 'اللغة');
+  String get arabic => userTr('common.arabic', fallbackEn: 'Arabic', fallbackAr: 'العربية');
+  String get english => userTr('common.english', fallbackEn: 'English', fallbackAr: 'English');
+  String get appearance => userTr('common.appearance', fallbackEn: 'Appearance', fallbackAr: 'المظهر');
+  String get theme => userTr('common.theme', fallbackEn: 'Theme', fallbackAr: 'المظهر العام');
+  String get dark => userTr('common.dark', fallbackEn: 'Dark', fallbackAr: 'داكن');
+  String get light => userTr('common.light', fallbackEn: 'Light', fallbackAr: 'فاتح');
+  String get settings => userTr('common.settings', fallbackEn: 'Settings', fallbackAr: 'الإعدادات');
+  String get notifications => userTr('common.notifications', fallbackEn: 'Notifications', fallbackAr: 'الإشعارات');
 
   // ── Common actions ─────────────────────────────────────────────────────────
-  String get continueBtn => isAr ? 'متابعة' : 'Continue';
-  String get next => isAr ? 'التالي' : 'Next';
-  String get nextStep => isAr ? 'الخطوة التالية' : 'Next Step';
-  String get getStarted => isAr ? 'ابدأ الآن' : 'Get Started';
-  String get save => isAr ? 'حفظ' : 'Save';
-  String get saveChange => isAr ? 'حفظ التغييرات' : 'Save Change';
-  String get saved => isAr ? 'تم الحفظ' : 'Saved';
-  String get cancel => isAr ? 'إلغاء' : 'Cancel';
-  String get delete => isAr ? 'حذف' : 'Delete';
-  String get edit => isAr ? 'تعديل' : 'Edit';
-  String get addMore => isAr ? 'إضافة المزيد' : 'Add more';
-  String get reply => isAr ? 'رد' : 'Reply';
-  String get yes => isAr ? 'نعم' : 'Yes';
-  String get no => isAr ? 'لا' : 'No';
-  String get upload => isAr ? 'رفع' : 'Upload';
-  String get required => isAr ? 'مطلوب' : 'Required';
+  String get continueBtn => userTr('common.continue', fallbackEn: 'Continue', fallbackAr: 'متابعة');
+  String get next => userTr('common.next', fallbackEn: 'Next', fallbackAr: 'التالي');
+  String get nextStep => userTr('common.nextStep', fallbackEn: 'Next Step', fallbackAr: 'الخطوة التالية');
+  String get getStarted => userTr('common.getStarted', fallbackEn: 'Get Started', fallbackAr: 'ابدأ الآن');
+  String get save => userTr('common.save', fallbackEn: 'Save', fallbackAr: 'حفظ');
+  String get saveChange => userTr('common.saveChange', fallbackEn: 'Save Change', fallbackAr: 'حفظ التغييرات');
+  String get saved => userTr('common.saved', fallbackEn: 'Saved', fallbackAr: 'تم الحفظ');
+  String get cancel => userTr('common.cancel', fallbackEn: 'Cancel', fallbackAr: 'إلغاء');
+  String get delete => userTr('common.delete', fallbackEn: 'Delete', fallbackAr: 'حذف');
+  String get edit => userTr('common.edit', fallbackEn: 'Edit', fallbackAr: 'تعديل');
+  String get addMore => userTr('common.addMore', fallbackEn: 'Add more', fallbackAr: 'إضافة المزيد');
+  String get reply => userTr('common.reply', fallbackEn: 'Reply', fallbackAr: 'رد');
+  String get yes => userTr('common.yes', fallbackEn: 'Yes', fallbackAr: 'نعم');
+  String get no => userTr('common.no', fallbackEn: 'No', fallbackAr: 'لا');
+  String get upload => userTr('common.upload', fallbackEn: 'Upload', fallbackAr: 'رفع');
+  String get required => userTr('common.required', fallbackEn: 'Required', fallbackAr: 'مطلوب');
 
   // ── Validation ─────────────────────────────────────────────────────────────
-  String get enterValidEmail =>
-      isAr ? 'أدخل بريدًا إلكترونيًا صحيحًا' : 'Enter a valid email';
-  String get min8Chars => isAr ? 'الحد الأدنى 8 أحرف' : 'Minimum 8 characters';
-  String get passwordsNoMatch =>
-      isAr ? 'كلمتا المرور غير متطابقتين' : 'Passwords do not match';
-  String get enterCompanyNumber =>
-      isAr ? 'أدخل رقم الشركة' : 'Enter company number';
-  String get at3Chars => isAr ? 'على الأقل 3 أحرف' : 'At least 3 characters';
-  String get mustBe8Chars =>
-      isAr ? 'يجب أن تكون 8 أحرف على الأقل' : 'Must be at least 8 characters';
-  String get mustMatch =>
-      isAr ? 'يجب أن تتطابق كلمتا المرور' : 'Both passwords must match';
-  String get acceptTermsMsg =>
-      isAr ? 'يرجى قبول الشروط للمتابعة' : 'Please accept terms to continue';
-  String get enterCode4 =>
-      isAr ? 'أدخل الرمز المكون من 4 أرقام' : 'Enter the 4-digit code';
-  String get enterMobileNumber =>
-      isAr ? 'أدخل رقم الهاتف' : 'Enter mobile number';
+  String get enterValidEmail => userTr('validation.enterValidEmail', fallbackEn: 'Enter a valid email', fallbackAr: 'أدخل بريدًا إلكترونيًا صحيحًا');
+  String get min8Chars => userTr('validation.min8Chars', fallbackEn: 'Minimum 8 characters', fallbackAr: 'الحد الأدنى 8 أحرف');
+  String get passwordsNoMatch => userTr('validation.passwordsNoMatch', fallbackEn: 'Passwords do not match', fallbackAr: 'كلمتا المرور غير متطابقتين');
+  String get enterCompanyNumber => userTr('validation.enterCompanyNumber', fallbackEn: 'Enter company number', fallbackAr: 'أدخل رقم الشركة');
+  String get at3Chars => userTr('validation.at3Chars', fallbackEn: 'At least 3 characters', fallbackAr: 'على الأقل 3 أحرف');
+  String get mustBe8Chars => userTr('validation.mustBe8Chars', fallbackEn: 'Must be at least 8 characters', fallbackAr: 'يجب أن تكون 8 أحرف على الأقل');
+  String get mustMatch => userTr('validation.mustMatch', fallbackEn: 'Both passwords must match', fallbackAr: 'يجب أن تتطابق كلمتا المرور');
+  String get acceptTermsMsg => userTr('validation.acceptTermsMsg', fallbackEn: 'Please accept terms to continue', fallbackAr: 'يرجى قبول الشروط للمتابعة');
+  String get enterCode4 => userTr('validation.enterCode4', fallbackEn: 'Enter the 4-digit code', fallbackAr: 'أدخل الرمز المكون من 4 أرقام');
+  String get enterMobileNumber => userTr('validation.enterMobileNumber', fallbackEn: 'Enter mobile number', fallbackAr: 'أدخل رقم الهاتف');
 
   // ── Auth ───────────────────────────────────────────────────────────────────
-  String get signInToAccount =>
-      isAr ? 'تسجيل الدخول إلى\nحسابك' : 'Sign in to your\naccount';
-  String get createAccount =>
-      isAr ? 'إنشاء حسابك\nالجديد' : 'Create your new\naccount';
-  String get companyEmailAddress =>
-      isAr ? 'البريد الإلكتروني للشركة' : 'Company Email Address';
-  String get emailAddress => isAr ? 'البريد الإلكتروني' : 'Email Address';
-  String get companyEmail => isAr ? 'البريد الإلكتروني' : 'Company Email';
-  String get enterYourEmail =>
-      isAr ? 'أدخل بريدك الإلكتروني' : 'Enter your email';
-  String get password => isAr ? 'كلمة المرور' : 'Password';
-  String get enterYourPassword =>
-      isAr ? 'أدخل كلمة المرور' : 'Enter your password';
-  String get confirmPassword => isAr ? 'تأكيد كلمة المرور' : 'Confirm Password';
-  String get confirmYourPassword =>
-      isAr ? 'تأكيد كلمة المرور' : 'Confirm your password';
-  String get forgotPassword => isAr ? 'نسيت كلمة المرور؟' : 'Forgot password?';
-  String get orSignInWith => isAr ? 'أو سجل دخولك بـ' : 'Or sign in with';
-  String get dontHaveAccount =>
-      isAr ? 'ليس لديك حساب؟ ' : "Don't have an account? ";
-  String get signUpBtn => isAr ? 'إنشاء حساب' : 'Sign up';
-  String get alreadyRegistered =>
-      isAr ? 'لديك حساب بالفعل؟ ' : 'Already Registered? ';
-  String get signInBtn => isAr ? 'تسجيل الدخول' : 'Sign In';
-  String get companyName => isAr ? 'اسم الشركة' : 'Company Name';
-  String get enterCompanyName =>
-      isAr ? 'أدخل اسم الشركة' : 'Enter company name';
-  String get companyNumber => isAr ? 'رقم الشركة' : 'Company Number';
-  String get enterCompanyNumberHint =>
-      isAr ? 'أدخل رقم الشركة' : 'Enter company number';
-  String get address => isAr ? 'العنوان' : 'Address';
-  String get enterAddress => isAr ? 'أدخل العنوان' : 'Enter address';
-  String get taxNumber => isAr ? 'الرقم الضريبي' : 'Tax number';
-  String get enterTaxNumber => isAr ? 'أدخل الرقم الضريبي' : 'Enter tax number';
-  String get agreeTerms => isAr
-      ? 'أوافق على شروط الخدمة وسياسة الخصوصية'
-      : 'I Agree with Terms of Service and Privacy Policy';
-  String get registration => isAr ? 'إنشاء حساب جديد' : 'Registration';
-  String get personalInfo => isAr ? 'المعلومات الشخصية' : 'Personal Information';
-  String get profilePhoto => isAr ? 'صورة الملف الشخصي' : 'Profile Photo';
-  String get uploadHint => isAr ? 'انقر للاستبدال أو اسحب وأفلت' : 'Click to replace or drag and drop';
-  String get criminalRecord => isAr ? 'السجل الجنائي' : 'Criminal Record';
-  String get criminalRecordHint => isAr ? 'وثيقة رسمية توضح التاريخ الجنائي للشخص.' : 'An official document that shows a person\'s criminal history.';
-  String get selectService => isAr ? 'اختر الخدمة' : 'Select Service';
-  String get aboutMe => isAr ? 'عني' : 'About Me';
-  String get yourWork => isAr ? 'أعمالك' : 'Your Work';
-  String get workImagesHint => isAr ? 'ارفع صوراً لأعمالك السابقة' : 'Upload images of your previous work';
+  String get signInToAccount => userTr('auth.signInToAccount', fallbackEn: 'Sign in to your\naccount', fallbackAr: 'تسجيل الدخول إلى\nحسابك');
+  String get createAccount => userTr('auth.createAccount', fallbackEn: 'Create your new\naccount', fallbackAr: 'إنشاء حسابك\nالجديد');
+  String get companyEmailAddress => userTr('auth.companyEmailAddress', fallbackEn: 'Company Email Address', fallbackAr: 'البريد الإلكتروني للشركة');
+  String get emailAddress => userTr('auth.emailAddress', fallbackEn: 'Email Address', fallbackAr: 'البريد الإلكتروني');
+  String get companyEmail => userTr('auth.companyEmail', fallbackEn: 'Company Email', fallbackAr: 'البريد الإلكتروني');
+  String get enterYourEmail => userTr('auth.enterYourEmail', fallbackEn: 'Enter your email', fallbackAr: 'أدخل بريدك الإلكتروني');
+  String get password => userTr('auth.password', fallbackEn: 'Password', fallbackAr: 'كلمة المرور');
+  String get enterYourPassword => userTr('auth.enterYourPassword', fallbackEn: 'Enter your password', fallbackAr: 'أدخل كلمة المرور');
+  String get confirmPassword => userTr('auth.confirmPassword', fallbackEn: 'Confirm Password', fallbackAr: 'تأكيد كلمة المرور');
+  String get confirmYourPassword => userTr('auth.confirmYourPassword', fallbackEn: 'Confirm your password', fallbackAr: 'تأكيد كلمة المرور');
+  String get forgotPassword => userTr('auth.forgotPassword', fallbackEn: 'Forgot password?', fallbackAr: 'نسيت كلمة المرور؟');
+  String get orSignInWith => userTr('auth.orSignInWith', fallbackEn: 'Or sign in with', fallbackAr: 'أو سجل دخولك بـ');
+  String get dontHaveAccount => userTr('auth.dontHaveAccount', fallbackEn: "Don't have an account? ", fallbackAr: 'ليس لديك حساب؟ ');
+  String get signUpBtn => userTr('auth.signUpBtn', fallbackEn: 'Sign up', fallbackAr: 'إنشاء حساب');
+  String get alreadyRegistered => userTr('auth.alreadyRegistered', fallbackEn: 'Already Registered? ', fallbackAr: 'لديك حساب بالفعل؟ ');
+  String get signInBtn => userTr('auth.signInBtn', fallbackEn: 'Sign In', fallbackAr: 'تسجيل الدخول');
+  String get companyName => userTr('auth.companyName', fallbackEn: 'Company Name', fallbackAr: 'اسم الشركة');
+  String get enterCompanyName => userTr('auth.enterCompanyName', fallbackEn: 'Enter company name', fallbackAr: 'أدخل اسم الشركة');
+  String get companyNumber => userTr('auth.companyNumber', fallbackEn: 'Company Number', fallbackAr: 'رقم الشركة');
+  String get enterCompanyNumberHint => userTr('auth.enterCompanyNumberHint', fallbackEn: 'Enter company number', fallbackAr: 'أدخل رقم الشركة');
+  String get address => userTr('auth.address', fallbackEn: 'Address', fallbackAr: 'العنوان');
+  String get enterAddress => userTr('auth.enterAddress', fallbackEn: 'Enter address', fallbackAr: 'أدخل العنوان');
+  String get taxNumber => userTr('auth.taxNumber', fallbackEn: 'Tax number', fallbackAr: 'الرقم الضريبي');
+  String get enterTaxNumber => userTr('auth.enterTaxNumber', fallbackEn: 'Enter tax number', fallbackAr: 'أدخل الرقم الضريبي');
+  String get agreeTerms => userTr('auth.agreeTerms', fallbackEn: 'I Agree with Terms of Service and Privacy Policy', fallbackAr: 'أوافق على شروط الخدمة وسياسة الخصوصية');
+  String get registration => userTr('auth.registration', fallbackEn: 'Registration', fallbackAr: 'إنشاء حساب جديد');
+  String get personalInfo => userTr('auth.personalInfo', fallbackEn: 'Personal Information', fallbackAr: 'المعلومات الشخصية');
+  String get profilePhoto => userTr('auth.profilePhoto', fallbackEn: 'Profile Photo', fallbackAr: 'صورة الملف الشخصي');
+  String get uploadHint => userTr('auth.uploadHint', fallbackEn: 'Click to replace or drag and drop', fallbackAr: 'انقر للاستبدال أو اسحب وأفلت');
+  String get criminalRecord => userTr('auth.criminalRecord', fallbackEn: 'Criminal Record', fallbackAr: 'السجل الجنائي');
+  String get criminalRecordHint => userTr('auth.criminalRecordHint', fallbackEn: "An official document that shows a person's criminal history.", fallbackAr: 'وثيقة رسمية توضح التاريخ الجنائي للشخص.');
+  String get selectService => userTr('auth.selectService', fallbackEn: 'Select Service', fallbackAr: 'اختر الخدمة');
+  String get aboutMe => userTr('auth.aboutMe', fallbackEn: 'About Me', fallbackAr: 'عني');
+  String get yourWork => userTr('auth.yourWork', fallbackEn: 'Your Work', fallbackAr: 'أعمالك');
+  String get workImagesHint => userTr('auth.workImagesHint', fallbackEn: 'Upload images of your previous work', fallbackAr: 'ارفع صوراً لأعمالك السابقة');
 
   // ── OTP ────────────────────────────────────────────────────────────────────
-  String get otpTitle =>
-      isAr ? 'التحقق من البريد الإلكتروني' : 'Email verification';
-  String get otpSubtitle => isAr
-      ? 'أدخل رمز التحقق الذي أرسلناه إليك على:'
-      : 'Enter the verification code we send you on:';
-  String get didntReceiveCode =>
-      isAr ? 'لم تستقبل الرمز؟ ' : "Didn't receive code? ";
-  String get resend => isAr ? 'إعادة الإرسال' : 'Resend';
+  String get otpTitle => userTr('otp.otpTitle', fallbackEn: 'Email verification', fallbackAr: 'التحقق من البريد الإلكتروني');
+  String get otpSubtitle => userTr('otp.otpSubtitle', fallbackEn: 'Enter the verification code we send you on:', fallbackAr: 'أدخل رمز التحقق الذي أرسلناه إليك على:');
+  String get didntReceiveCode => userTr('otp.didntReceiveCode', fallbackEn: "Didn't receive code? ", fallbackAr: 'لم تستقبل الرمز؟ ');
+  String get resend => userTr('otp.resend', fallbackEn: 'Resend', fallbackAr: 'إعادة الإرسال');
 
   // ── Reset / Password Changed ────────────────────────────────────────────────
-  String get resetPassword =>
-      isAr ? 'إعادة تعيين كلمة المرور' : 'Reset Password';
-  String get resetPasswordSub => isAr
-      ? 'يجب أن تكون كلمة المرور الجديدة مختلفة عن\nكلمة المرور المستخدمة سابقًا'
-      : 'Your new password must be different from the\npreviously used password';
-  String get newPassword => isAr ? 'كلمة المرور الجديدة' : 'New Password';
-  String get enterNewPassword =>
-      isAr ? 'أدخل كلمة المرور الجديدة' : 'Enter new password';
-  String get confirmPasswordHint =>
-      isAr ? 'تأكيد كلمة المرور' : 'Confirm password';
-  String get verifyAccount => isAr ? 'التحقق من الحساب' : 'Verify Account';
-  String get passwordChanged =>
-      isAr ? 'تم تغيير كلمة المرور' : 'Password Changed';
-  String get passwordChangedMsg => isAr
-      ? 'تم تغيير كلمة المرور بنجاح، يمكنك تسجيل الدخول\nمجددًا بكلمة المرور الجديدة'
-      : 'Password changed successfully, you can login again\nwith a new password';
-  String get backToSignIn =>
-      isAr ? 'العودة إلى تسجيل الدخول' : 'Back to Sign in';
+  String get resetPassword => userTr('reset.resetPassword', fallbackEn: 'Reset Password', fallbackAr: 'إعادة تعيين كلمة المرور');
+  String get resetPasswordSub => userTr('reset.resetPasswordSub', fallbackEn: 'Your new password must be different from the\npreviously used password', fallbackAr: 'يجب أن تكون كلمة المرور الجديدة مختلفة عن\nكلمة المرور المستخدمة سابقًا');
+  String get newPassword => userTr('reset.newPassword', fallbackEn: 'New Password', fallbackAr: 'كلمة المرور الجديدة');
+  String get enterNewPassword => userTr('reset.enterNewPassword', fallbackEn: 'Enter new password', fallbackAr: 'أدخل كلمة المرور الجديدة');
+  String get confirmPasswordHint => userTr('reset.confirmPasswordHint', fallbackEn: 'Confirm password', fallbackAr: 'تأكيد كلمة المرور');
+  String get verifyAccount => userTr('reset.verifyAccount', fallbackEn: 'Verify Account', fallbackAr: 'التحقق من الحساب');
+  String get passwordChanged => userTr('reset.passwordChanged', fallbackEn: 'Password Changed', fallbackAr: 'تم تغيير كلمة المرور');
+  String get passwordChangedMsg => userTr('reset.passwordChangedMsg', fallbackEn: 'Password changed successfully, you can login again\nwith a new password', fallbackAr: 'تم تغيير كلمة المرور بنجاح، يمكنك تسجيل الدخول\nمجددًا بكلمة المرور الجديدة');
+  String get backToSignIn => userTr('reset.backToSignIn', fallbackEn: 'Back to Sign in', fallbackAr: 'العودة إلى تسجيل الدخول');
 
   // ── Onboarding ─────────────────────────────────────────────────────────────
-  String get smartSearchTitle =>
-      isAr ? 'بحث ذكي وفرص\nأفضل' : 'Smart Search & Better\nOpportunities';
-  String get smartSearchSub => isAr
-      ? 'وفر وقتك وركز على ما يهم'
-      : 'Save time and focus on what \nmatters';
-  String get futureStartsHere =>
-      isAr ? 'مستقبلك يبدأ من هنا' : 'Your Future Starts Here';
-  String get futureStartsSub => isAr
-      ? 'اتخذ الخطوة التالية نحو وظيفة أحلامك\nكل شيء في تطبيق واحد'
-      : 'Take the next step toward your\ndream job All in one app';
+  String get smartSearchTitle => userTr('onboarding.smartSearchTitle', fallbackEn: 'Smart Search & Better\nOpportunities', fallbackAr: 'بحث ذكي وفرص\nأفضل');
+  String get smartSearchSub => userTr('onboarding.smartSearchSub', fallbackEn: 'Save time and focus on what \nmatters', fallbackAr: 'وفر وقتك وركز على ما يهم');
+  String get futureStartsHere => userTr('onboarding.futureStartsHere', fallbackEn: 'Your Future Starts Here', fallbackAr: 'مستقبلك يبدأ من هنا');
+  String get futureStartsSub => userTr('onboarding.futureStartsSub', fallbackEn: 'Take the next step toward your\ndream job All in one app', fallbackAr: 'اتخذ الخطوة التالية نحو وظيفة أحلامك\nكل شيء في تطبيق واحد');
 
   // ── Dashboard ──────────────────────────────────────────────────────────────
-  String get newCandidates =>
-      isAr ? 'مرشحون جدد\nللمراجعة' : 'New candidates\nto review';
-  String get scheduleToday => isAr ? 'جدول\nاليوم' : 'Schedule\nfor today';
-  String get messagesReceived =>
-      isAr ? 'الرسائل\nالمستلمة' : 'Messages\nreceived';
-  String get jobUpdates => isAr ? 'تحديثات الوظائف' : 'Job Updates';
-  String get deleteJobTitle =>
-      isAr ? 'حذف الإعلان الوظيفي؟' : 'Delete job post?';
+  String get newCandidates => userTr('dashboard.newCandidates', fallbackEn: 'New candidates\nto review', fallbackAr: 'مرشحون جدد\nللمراجعة');
+  String get scheduleToday => userTr('dashboard.scheduleToday', fallbackEn: 'Schedule\nfor today', fallbackAr: 'جدول\nاليوم');
+  String get messagesReceived => userTr('dashboard.messagesReceived', fallbackEn: 'Messages\nreceived', fallbackAr: 'الرسائل\nالمستلمة');
+  String get jobUpdates => userTr('dashboard.jobUpdates', fallbackEn: 'Job Updates', fallbackAr: 'تحديثات الوظائف');
+  String get deleteJobTitle => userTr('dashboard.deleteJobTitle', fallbackEn: 'Delete job post?', fallbackAr: 'حذف الإعلان الوظيفي؟');
   String deleteJobContent(String title) => isAr
       ? 'سيتم حذف "$title" نهائيًا.'
       : 'This will permanently delete "$title".';
-  String get jobDeleted => isAr ? 'تم حذف الوظيفة' : 'Job deleted';
-  String get appliedOf => isAr ? 'تقدّم من أصل' : 'applied of';
-  String get noJobsYet => isAr ? 'لا توجد وظائف بعد' : 'No jobs yet';
+  String get jobDeleted => userTr('dashboard.jobDeleted', fallbackEn: 'Job deleted', fallbackAr: 'تم حذف الوظيفة');
+  String get appliedOf => userTr('dashboard.appliedOf', fallbackEn: 'applied of', fallbackAr: 'تقدّم من أصل');
+  String get noJobsYet => userTr('dashboard.noJobsYet', fallbackEn: 'No jobs yet', fallbackAr: 'لا توجد وظائف بعد');
 
   // ── Jobs ───────────────────────────────────────────────────────────────────
-  String get postJob => isAr ? 'نشر وظيفة' : 'Post a Job';
-  String get step1Label =>
-      isAr ? 'الخطوة 1/3 • معلومات الوظيفة' : 'Step 1/3 • Job Information';
-  String get step2Label =>
-      isAr ? 'الخطوة 2/3 • وصف الوظيفة' : 'Step 2/3 • Job Description';
-  String get step1Short => isAr ? 'الخطوة 1/3' : 'Step 1/3';
-  String get step2Short => isAr ? 'الخطوة 2/3' : 'Step 2/3';
-  String get jobTitle => isAr ? 'مسمى الوظيفة' : 'Job title';
-  String get jobTitleHint =>
-      isAr ? 'مثال: مهندس برمجيات' : 'e.g. Software Engineer';
-  String get typeOfEmployment => isAr ? 'نوع التوظيف' : 'Type of Employment';
-  String get salary => isAr ? 'الراتب' : 'Salary';
-  String get requiredSkills => isAr ? 'المهارات المطلوبة' : 'Required skills';
-  String get jobDescriptions => isAr ? 'وصف الوظيفة' : 'Job Descriptions';
-  String get addDescription =>
-      isAr ? 'أضف وصف الوظيفة...' : 'Add the description of the job...';
-  String get whatWeProvide =>
-      isAr ? 'ما نقدمه (اختياري)' : 'What we provide (optional)';
-  String get addPreferredQual => isAr
-      ? 'أضف مؤهلات المرشح المفضلة'
-      : 'Add preferred candidate qualifications';
-  String get niceToHaves => isAr ? 'مميزات إضافية' : 'Nice-To-Haves';
-  String get niceToHavesHint => isAr
-      ? 'أضف مهارات ومؤهلات إضافية'
-      : 'Add nice-to-have skills and qualifications';
-  String get basicInfo => isAr ? 'معلومات أساسية' : 'Basic Information';
-  String get basicInfoHint => isAr
-      ? 'معلومات أساسية عن الدور والشركة'
-      : 'Basic info about role and company';
-  String get fullName => isAr ? 'الاسم الكامل' : 'Full Name';
-  String get phoneNumber => isAr ? 'رقم الهاتف' : 'Phone Number';
-  String get gender => isAr ? 'الجنس' : 'Gender';
-  String get dob => isAr ? 'تاريخ الميلاد' : 'Date of Birth';
-  String get day => isAr ? 'اليوم' : 'Day';
-  String get month => isAr ? 'الشهر' : 'Month';
-  String get year => isAr ? 'السنة' : 'Year';
-  String get education => isAr ? 'التعليم' : 'Education';
-  String get expWork => isAr ? 'خبرات العمل' : 'Work Experience';
-  String get portfolioLink => isAr ? 'رابط ملف الأعمال' : 'Portfolio Link';
-  String get socialMedia => isAr ? 'روابط التواصل الاجتماعي' : 'Social Media Links';
-  String get workImages => isAr ? 'صور العمل' : 'Work Images';
-  String get saveProfile => isAr ? 'حفظ الملف الشخصي' : 'Save Profile';
-  String get perksAndBenefits =>
-      isAr ? 'المزايا والفوائد' : 'Perks and Benefits';
-  String get openV2Step1 =>
-      isAr ? 'فتح النسخة 2 من الخطوة 1' : 'Open v2 of Step 1';
-  String get openV2Step2 =>
-      isAr ? 'فتح النسخة 2 من الخطوة 2' : 'Open v2 of Step 2';
-  String get details => isAr ? 'التفاصيل' : 'Details';
-  String get listPerks => isAr
-      ? 'اذكر المزايا (مفصولة بفاصلة)'
-      : 'List perks and benefits (comma separated)';
+  String get postJob => userTr('jobs.postJob', fallbackEn: 'Post a Job', fallbackAr: 'نشر وظيفة');
+  String get step1Label => userTr('jobs.step1Label', fallbackEn: 'Step 1/3 • Job Information', fallbackAr: 'الخطوة 1/3 • معلومات الوظيفة');
+  String get step2Label => userTr('jobs.step2Label', fallbackEn: 'Step 2/3 • Job Description', fallbackAr: 'الخطوة 2/3 • وصف الوظيفة');
+  String get step1Short => userTr('jobs.step1Short', fallbackEn: 'Step 1/3', fallbackAr: 'الخطوة 1/3');
+  String get step2Short => userTr('jobs.step2Short', fallbackEn: 'Step 2/3', fallbackAr: 'الخطوة 2/3');
+  String get jobTitle => userTr('jobs.jobTitle', fallbackEn: 'Job title', fallbackAr: 'مسمى الوظيفة');
+  String get jobTitleHint => userTr('jobs.jobTitleHint', fallbackEn: 'e.g. Software Engineer', fallbackAr: 'مثال: مهندس برمجيات');
+  String get typeOfEmployment => userTr('jobs.typeOfEmployment', fallbackEn: 'Type of Employment', fallbackAr: 'نوع التوظيف');
+  String get salary => userTr('jobs.salary', fallbackEn: 'Salary', fallbackAr: 'الراتب');
+  String get requiredSkills => userTr('jobs.requiredSkills', fallbackEn: 'Required skills', fallbackAr: 'المهارات المطلوبة');
+  String get jobDescriptions => userTr('jobs.jobDescriptions', fallbackEn: 'Job Descriptions', fallbackAr: 'وصف الوظيفة');
+  String get addDescription => userTr('jobs.addDescription', fallbackEn: 'Add the description of the job...', fallbackAr: 'أضف وصف الوظيفة...');
+  String get whatWeProvide => userTr('jobs.whatWeProvide', fallbackEn: 'What we provide (optional)', fallbackAr: 'ما نقدمه (اختياري)');
+  String get addPreferredQual => userTr('jobs.addPreferredQual', fallbackEn: 'Add preferred candidate qualifications', fallbackAr: 'أضف مؤهلات المرشح المفضلة');
+  String get niceToHaves => userTr('jobs.niceToHaves', fallbackEn: 'Nice-To-Haves', fallbackAr: 'مميزات إضافية');
+  String get niceToHavesHint => userTr('jobs.niceToHavesHint', fallbackEn: 'Add nice-to-have skills and qualifications', fallbackAr: 'أضف مهارات ومؤهلات إضافية');
+  String get basicInfo => userTr('jobs.basicInfo', fallbackEn: 'Basic Information', fallbackAr: 'معلومات أساسية');
+  String get basicInfoHint => userTr('jobs.basicInfoHint', fallbackEn: 'Basic info about role and company', fallbackAr: 'معلومات أساسية عن الدور والشركة');
+  String get fullName => userTr('jobs.fullName', fallbackEn: 'Full Name', fallbackAr: 'الاسم الكامل');
+  String get phoneNumber => userTr('jobs.phoneNumber', fallbackEn: 'Phone Number', fallbackAr: 'رقم الهاتف');
+  String get gender => userTr('jobs.gender', fallbackEn: 'Gender', fallbackAr: 'الجنس');
+  String get dob => userTr('jobs.dob', fallbackEn: 'Date of Birth', fallbackAr: 'تاريخ الميلاد');
+  String get day => userTr('jobs.day', fallbackEn: 'Day', fallbackAr: 'اليوم');
+  String get month => userTr('jobs.month', fallbackEn: 'Month', fallbackAr: 'الشهر');
+  String get year => userTr('jobs.year', fallbackEn: 'Year', fallbackAr: 'السنة');
+  String get education => userTr('jobs.education', fallbackEn: 'Education', fallbackAr: 'التعليم');
+  String get expWork => userTr('jobs.expWork', fallbackEn: 'Work Experience', fallbackAr: 'خبرات العمل');
+  String get portfolioLink => userTr('jobs.portfolioLink', fallbackEn: 'Portfolio Link', fallbackAr: 'رابط ملف الأعمال');
+  String get socialMedia => userTr('jobs.socialMedia', fallbackEn: 'Social Media Links', fallbackAr: 'روابط التواصل الاجتماعي');
+  String get workImages => userTr('jobs.workImages', fallbackEn: 'Work Images', fallbackAr: 'صور العمل');
+  String get saveProfile => userTr('jobs.saveProfile', fallbackEn: 'Save Profile', fallbackAr: 'حفظ الملف الشخصي');
+  String get perksAndBenefits => userTr('jobs.perksAndBenefits', fallbackEn: 'Perks and Benefits', fallbackAr: 'المزايا والفوائد');
+  String get details => userTr('jobs.details', fallbackEn: 'Details', fallbackAr: 'التفاصيل');
+  String get listPerks => userTr('jobs.listPerks', fallbackEn: 'List perks and benefits (comma separated)', fallbackAr: 'اذكر المزايا (مفصولة بفاصلة)');
 
   // ── Job Details ────────────────────────────────────────────────────────────
-  String get descriptionSection => isAr ? 'الوصف' : 'Description';
-  String get responsibilities => isAr ? 'المسؤوليات' : 'Responsibilities';
-  String get niceToHavesSection => isAr ? 'مميزات إضافية' : 'Nice-To-Haves';
-  String get aboutThisRole => isAr ? 'عن هذه الوظيفة' : 'About this role';
-  String get salaryLabel => isAr ? 'الراتب' : 'Salary';
-  String get jobTypeLabel => isAr ? 'نوع الوظيفة' : 'Job Type';
-  String get categoryLabel => isAr ? 'الفئة' : 'Category';
-  String get noDescriptionYet =>
-      isAr ? 'لا يوجد وصف بعد.' : 'No description yet.';
-  String get noItemsYet => isAr ? 'لا توجد عناصر بعد' : 'No items yet';
-  String get tableView => isAr ? 'جدول' : 'Table';
-  String get pipelineView => isAr ? 'خط سير' : 'Pipeline';
-  String get openFullTable =>
-      isAr ? 'فتح عرض الجدول الكامل' : 'Open Full Table View';
-  String get openFullPipeline =>
-      isAr ? 'فتح عرض خط السير الكامل' : 'Open Full Pipeline View';
-  String get editJobTooltip => isAr ? 'تعديل الوظيفة' : 'Edit job';
-  String get deleteJobTooltip => isAr ? 'حذف الوظيفة' : 'Delete job';
-  String get editJobTitle => isAr ? 'تعديل الوظيفة' : 'Edit Job';
-  String get locationLabel => isAr ? 'الموقع' : 'Location';
-  String get employmentTypeLabel => isAr ? 'نوع التوظيف' : 'Employment type';
-  String get salaryRangeLabel => isAr ? 'نطاق الراتب' : 'Salary range';
-  String get titleLabel => isAr ? 'العنوان' : 'Title';
-  String get inReview => isAr ? 'قيد المراجعة' : 'In Review';
-  String get shortlisted => isAr ? 'في القائمة المختصرة' : 'Shortlisted';
+  String get descriptionSection => userTr('jobDetails.descriptionSection', fallbackEn: 'Description', fallbackAr: 'الوصف');
+  String get responsibilities => userTr('jobDetails.responsibilities', fallbackEn: 'Responsibilities', fallbackAr: 'المسؤوليات');
+  String get niceToHavesSection => userTr('jobDetails.niceToHavesSection', fallbackEn: 'Nice-To-Haves', fallbackAr: 'مميزات إضافية');
+  String get aboutThisRole => userTr('jobDetails.aboutThisRole', fallbackEn: 'About this role', fallbackAr: 'عن هذه الوظيفة');
+  String get salaryLabel => userTr('jobDetails.salaryLabel', fallbackEn: 'Salary', fallbackAr: 'الراتب');
+  String get jobTypeLabel => userTr('jobDetails.jobTypeLabel', fallbackEn: 'Job Type', fallbackAr: 'نوع الوظيفة');
+  String get categoryLabel => userTr('jobDetails.categoryLabel', fallbackEn: 'Category', fallbackAr: 'الفئة');
+  String get noDescriptionYet => userTr('jobDetails.noDescriptionYet', fallbackEn: 'No description yet.', fallbackAr: 'لا يوجد وصف بعد.');
+  String get noItemsYet => userTr('jobDetails.noItemsYet', fallbackEn: 'No items yet', fallbackAr: 'لا توجد عناصر بعد');
+  String get tableView => userTr('jobDetails.tableView', fallbackEn: 'Table', fallbackAr: 'جدول');
+  String get pipelineView => userTr('jobDetails.pipelineView', fallbackEn: 'Pipeline', fallbackAr: 'خط سير');
+  String get locationLabel => userTr('jobDetails.locationLabel', fallbackEn: 'Location', fallbackAr: 'الموقع');
+  String get employmentTypeLabel => userTr('jobDetails.employmentTypeLabel', fallbackEn: 'Employment type', fallbackAr: 'نوع التوظيف');
+  String get salaryRangeLabel => userTr('jobDetails.salaryRangeLabel', fallbackEn: 'Salary range', fallbackAr: 'نطاق الراتب');
+  String get titleLabel => userTr('jobDetails.titleLabel', fallbackEn: 'Title', fallbackAr: 'العنوان');
+  String get inReview => userTr('jobDetails.inReview', fallbackEn: 'In Review', fallbackAr: 'قيد المراجعة');
+  String get shortlisted => userTr('jobDetails.shortlisted', fallbackEn: 'Shortlisted', fallbackAr: 'في القائمة المختصرة');
 
-  // ── Candidates ─────────────────────────────────────────────────────────────
-  String get applicantDetails => isAr ? 'تفاصيل المتقدم' : 'Applicant Details';
-  String get contactSection => isAr ? 'بيانات التواصل' : 'Contact';
-  String get quickActions => isAr ? 'إجراءات سريعة' : 'Quick actions';
-  String get resumeLabel => isAr ? 'السيرة الذاتية' : 'Resume';
-  String get hiringProgress => isAr ? 'تقدم التوظيف' : 'Hiring Progress';
-  String get scheduleInterview =>
-      isAr ? 'جدولة المقابلة' : 'Schedule Interview';
-  String get email => isAr ? 'البريد الإلكتروني' : 'Email';
-  String get phone => isAr ? 'الهاتف' : 'Phone';
-  String get locationInfo => isAr ? 'الموقع' : 'Location';
-  String get currentStage => isAr ? 'المرحلة الحالية' : 'Current Stage';
-  String get moveToNextStep =>
-      isAr ? 'الانتقال إلى الخطوة التالية' : 'Move To Next Step';
-  String get notes => isAr ? 'الملاحظات' : 'Notes';
-  String get interview => isAr ? 'مقابلة' : 'Interview';
-  String get hired => isAr ? 'تم التوظيف' : 'Hired';
-  String get declined => isAr ? 'مرفوض' : 'Declined';
-  String get candidateHiredMsg =>
-      isAr ? 'تم توظيف المرشح بنجاح.' : 'Candidate has been marked as hired.';
-  String get candidateDeclinedMsg =>
-      isAr ? 'تم رفض المرشح.' : 'Candidate has been declined.';
-  String get candidateInterviewMsg => isAr
-      ? 'المرشح في مرحلة المقابلة حاليًا.'
-      : 'Candidate is currently in interview stage.';
-  String get interviewSchedule =>
-      isAr ? 'جدول المقابلات' : 'Interview Schedule';
-  String get interviewList => isAr ? 'قائمة المقابلات' : 'Interview List';
-  String get addFeedback => isAr ? 'إضافة تغذية راجعة' : 'Add Feedback';
-  String get addScheduleInterview =>
-      isAr ? 'إضافة مقابلة' : 'Add schedule interview';
-  String get lastUsed => isAr ? 'آخر استخدام' : 'Last used';
-
-  // ── Profile Settings ───────────────────────────────────────────────────────
-  String get profileSettings =>
-      isAr ? 'إعدادات الملف الشخصي' : 'Profile Settings';
-  String get overviewSection => isAr ? 'نظرة عامة' : 'Overview';
-  String get socialLinks => isAr ? 'روابط التواصل' : 'Social Links';
-  String get companyLogo => isAr ? 'شعار الشركة' : 'Company Logo';
-  String get logoHint => isAr
-      ? 'انقر للاستبدال أو اسحب وأفلت\nSVG أو PNG أو JPG أو GIF (الحد الأقصى 400x400 بكسل)'
-      : 'Click to replace or drag and drop\nSVG, PNG, JPG or GIF (max. 400 x 400px)';
-  String get website => isAr ? 'الموقع الإلكتروني' : 'Website';
-  String get employee => isAr ? 'الموظفون' : 'Employee';
-  String get industry => isAr ? 'القطاع' : 'Industry';
-  String get dateFounded => isAr ? 'تاريخ التأسيس' : 'Date Founded';
-  String get aboutCompany => isAr ? 'عن الشركة' : 'About Company';
-  String get previewProfile =>
-      isAr ? 'معاينة ملف الشركة' : 'Preview Company Profile';
-  String get socialLinksHint => isAr
-      ? 'أضف روابط خارجية إلى ملف شركتك. يمكنك إضافة اسم المستخدم فقط دون الرابط الكامل.'
-      : 'Add elsewhere links to your company profile. You can add only username without full https links.';
-  String get addContactTitle => isAr ? 'إضافة جهة تواصل' : 'Add contact';
-  String get editContactTitle => isAr ? 'تعديل جهة التواصل' : 'Edit contact';
-  String get addSocialLink =>
-      isAr ? 'إضافة رابط تواصل اجتماعي' : 'Add social/contact link';
-  String get editSocialLink =>
-      isAr ? 'تعديل رابط التواصل' : 'Edit social/contact link';
-  String get nameLabel => isAr ? 'الاسم' : 'Name';
-  String get urlOrHandle => isAr ? 'رابط أو معرف' : 'URL or handle';
-  String get urlHandle => isAr ? 'رابط / معرف' : 'URL / handle';
-  String get helpCenterBtn => isAr ? 'مركز المساعدة' : 'Help Center';
-
-  // ── Company Profile ────────────────────────────────────────────────────────
-  String get about => isAr ? 'نبذة عني' : 'About';
-  String get editIntroTooltip => isAr ? 'تعديل التعريف' : 'Edit intro';
-  String get contactSectionLabel => isAr ? 'بيانات التواصل' : 'Contact';
-  String get addMoreContact => isAr ? 'إضافة المزيد' : 'Add more';
+  // ── Profile / Overview ─────────────────────────────────────────────────────
+  String get profileSettings => userTr('profile.profileSettings', fallbackEn: 'Profile Settings', fallbackAr: 'إعدادات الملف الشخصي');
+  String get overviewSection => userTr('profile.overviewSection', fallbackEn: 'Overview', fallbackAr: 'نظرة عامة');
+  String get socialLinks => userTr('profile.socialLinks', fallbackEn: 'Social Links', fallbackAr: 'روابط التواصل');
+  String get companyLogo => userTr('profile.companyLogo', fallbackEn: 'Company Logo', fallbackAr: 'شعار الشركة');
+  String get logoHint => userTr('profile.logoHint', fallbackEn: 'Click to replace or drag and drop', fallbackAr: 'انقر للاستبدال أو اسحب وأفلت');
+  String get website => userTr('profile.website', fallbackEn: 'Website', fallbackAr: 'الموقع الإلكتروني');
+  String get employee => userTr('profile.employee', fallbackEn: 'Employee', fallbackAr: 'الموظفون');
+  String get industry => userTr('profile.industry', fallbackEn: 'Industry', fallbackAr: 'القطاع');
+  String get dateFounded => userTr('profile.dateFounded', fallbackEn: 'Date Founded', fallbackAr: 'تاريخ التأسيس');
+  String get aboutCompany => userTr('profile.aboutCompany', fallbackEn: 'About Company', fallbackAr: 'عن الشركة');
+  String get previewProfile => userTr('profile.previewProfile', fallbackEn: 'Preview Company Profile', fallbackAr: 'معاينة ملف الشركة');
 
   // ── Help Center ────────────────────────────────────────────────────────────
-  String get helpCenter => isAr ? 'مركز المساعدة' : 'Help Center';
-  String get searchHelp => isAr ? 'البحث في المساعدة' : 'Search help';
-  String get mostRelevant => isAr ? 'الأكثر صلة' : 'Most relevant';
-  String get popularArticles => isAr ? 'المقالات الشائعة' : 'Popular articles';
-  String get didntFindWhat =>
-      isAr ? 'لم تجد ما تبحث عنه؟' : "Didn't find what you were looking for?";
-  String get contactCustomerService =>
-      isAr ? 'تواصل مع خدمة العملاء لدينا' : 'Contact our customer service';
-  String get contactUs => isAr ? 'اتصل بنا' : 'Contact Us';
-  String get wasArticleHelpful =>
-      isAr ? 'هل كان هذا المقال مفيدًا؟' : 'Was this article helpful?';
+  String get helpCenter => userTr('help.helpCenter', fallbackEn: 'Help Center', fallbackAr: 'مركز المساعدة');
+  String get searchHelp => userTr('help.searchHelp', fallbackEn: 'Search help', fallbackAr: 'البحث في المساعدة');
+  String get popularArticles => userTr('help.popularArticles', fallbackEn: 'Popular articles', fallbackAr: 'المقالات الشائعة');
 
   // ── Messages / Chat ────────────────────────────────────────────────────────
-  String get messages => isAr ? 'الرسائل' : 'Messages';
-  String get replyMessage => isAr ? 'اكتب ردك' : 'Reply message';
+  String get messages => userTr('chat.messages', fallbackEn: 'Messages', fallbackAr: 'الرسائل');
+  String get replyMessage => userTr('chat.replyMessage', fallbackEn: 'Reply message', fallbackAr: 'اكتب ردك');
+
+  String get editProfile => userTr('profile.editProfile', fallbackEn: 'Edit Profile', fallbackAr: 'تعديل الملف الشخصي');
+  String get aboutMeSection => userTr('profile.aboutMe', fallbackEn: 'About Me', fallbackAr: 'عني');
+  String get workExperience => userTr('profile.workExperience', fallbackEn: 'Work Experience', fallbackAr: 'خبرة العمل');
+  String get skills => userTr('profile.skills', fallbackEn: 'Skills', fallbackAr: 'المهارات');
+  String get portfolioUrl => userTr('profile.portfolioUrl', fallbackEn: 'Portfolio URL', fallbackAr: 'رابط الأعمال');
+  String get additionalDetails => userTr('profile.additionalDetails', fallbackEn: 'Additional Details', fallbackAr: 'تفاصيل إضافية');
+  String get email => userTr('common.email', fallbackEn: 'Email', fallbackAr: 'البريد الإلكتروني');
+  String get phone => userTr('common.phone', fallbackEn: 'Phone', fallbackAr: 'الهاتف');
+
+  // ── Company Candidates ─────────────────────────────────────────────────────
+  String get hired => userTr('candidates.hired', fallbackEn: 'Hired', fallbackAr: 'تم التوظيف');
+  String get declined => userTr('candidates.declined', fallbackEn: 'Declined', fallbackAr: 'مرفوض');
+  String get candidateHiredMsg => userTr('candidates.candidateHiredMsg', fallbackEn: 'Candidate has been hired', fallbackAr: 'تم توظيف المرشح');
+  String get candidateDeclinedMsg => userTr('candidates.candidateDeclinedMsg', fallbackEn: 'Candidate has been declined', fallbackAr: 'تم رفض المرشح');
+  String get hiringProgress => userTr('candidates.hiringProgress', fallbackEn: 'Hiring Progress', fallbackAr: 'تقدم التوظيف');
+  String get currentStage => userTr('candidates.currentStage', fallbackEn: 'Current Stage', fallbackAr: 'المرحلة الحالية');
+  String get interview => userTr('candidates.interview', fallbackEn: 'Interview', fallbackAr: 'المقابلة');
+  String get moveToNextStep => userTr('candidates.moveToNextStep', fallbackEn: 'Move to Next Step', fallbackAr: 'الانتقال للخطوة التالية');
+  String get notes => userTr('candidates.notes', fallbackEn: 'Notes', fallbackAr: 'الملاحظات');
+  String get interviewSchedule => userTr('candidates.interviewSchedule', fallbackEn: 'Interview Schedule', fallbackAr: 'جدول المقابلات');
+  String get addScheduleInterview => userTr('candidates.addScheduleInterview', fallbackEn: 'Add Schedule Interview', fallbackAr: 'إضافة موعد مقابلة');
+  String get interviewList => userTr('candidates.interviewList', fallbackEn: 'Interview List', fallbackAr: 'قائمة المقابلات');
+  String get addFeedback => userTr('candidates.addFeedback', fallbackEn: 'Add Feedback', fallbackAr: 'إضافة ملاحظات');
+  String get mostRelevant => userTr('candidates.mostRelevant', fallbackEn: 'Most Relevant', fallbackAr: 'الأكثر صلة');
+
+  // ── Company Help ───────────────────────────────────────────────────────────
+  String get didntFindWhat => userTr('help.didntFindWhat', fallbackEn: "Didn't find what you were looking for?", fallbackAr: 'لم تجد ما كنت تبحث عنه؟');
+  String get contactCustomerService => userTr('help.contactCustomerService', fallbackEn: 'Contact our customer service', fallbackAr: 'اتصل بخدمة العملاء');
+  String get contactUs => userTr('help.contactUs', fallbackEn: 'Contact Us', fallbackAr: 'اتصل بنا');
+  String get wasArticleHelpful => userTr('help.wasArticleHelpful', fallbackEn: 'Was this article helpful?', fallbackAr: 'هل كان هذا المقال مفيدًا؟');
+
+  // ── Company Jobs ───────────────────────────────────────────────────────────
+  String get deleteJobTooltip => userTr('jobs.deleteJobTooltip', fallbackEn: 'Delete Job', fallbackAr: 'حذف الوظيفة');
+  String get openFullTable => userTr('jobs.openFullTable', fallbackEn: 'Open Full Table', fallbackAr: 'فتح الجدول الكامل');
+  String get openFullPipeline => userTr('jobs.openFullPipeline', fallbackEn: 'Open Full Pipeline', fallbackAr: 'فتح المسار الكامل');
+  String get editJobTitle => userTr('jobs.editJobTitle', fallbackEn: 'Edit Job Title', fallbackAr: 'تعديل مسمى الوظيفة');
+
+  // ── Company Profile ────────────────────────────────────────────────────────
+  String get about => userTr('profile.about', fallbackEn: 'About', fallbackAr: 'عن الشركة');
+  String get locationInfo => userTr('profile.locationInfo', fallbackEn: 'Location', fallbackAr: 'الموقع');
+  String get contactSectionLabel => userTr('profile.contactSection', fallbackEn: 'Contact', fallbackAr: 'التواصل');
+  String get addSocialLink => userTr('profile.addSocialLink', fallbackEn: 'Add Social Link', fallbackAr: 'إضافة رابط تواصل');
+  String get editSocialLink => userTr('profile.editSocialLink', fallbackEn: 'Edit Social Link', fallbackAr: 'تعديل رابط التواصل');
+  String get nameLabel => userTr('profile.nameLabel', fallbackEn: 'Name', fallbackAr: 'الاسم');
+  String get urlHandle => userTr('profile.urlHandle', fallbackEn: 'URL / Handle', fallbackAr: 'الرابط / المعرّف');
+  String get socialLinksHint => userTr('profile.socialLinksHint', fallbackEn: 'Add your social media links', fallbackAr: 'أضف روابط التواصل الاجتماعي');
+
+  // ── Gender ─────────────────────────────────────────────────────────────────
+  String get male => userTr('common.male', fallbackEn: 'Male', fallbackAr: 'ذكر');
+  String get female => userTr('common.female', fallbackEn: 'Female', fallbackAr: 'أنثى');
+
+  // ── Applicant Details ──────────────────────────────────────────────────────
+  String get applicantDetails => userTr('candidates.applicantDetails', fallbackEn: 'Applicant Details', fallbackAr: 'تفاصيل المتقدم');
+  String get contactSection => userTr('candidates.contactSection', fallbackEn: 'Contact', fallbackAr: 'التواصل');
+  String get quickActions => userTr('candidates.quickActions', fallbackEn: 'Quick Actions', fallbackAr: 'الإجراءات السريعة');
+  String get resumeLabel => userTr('candidates.resumeLabel', fallbackEn: 'Resume', fallbackAr: 'السيرة الذاتية');
+  String get lastUsed => userTr('candidates.lastUsed', fallbackEn: 'Last Used', fallbackAr: 'آخر استخدام');
 
   // ── Unknown route ──────────────────────────────────────────────────────────
-  String get unknownRoute => isAr ? 'مسار غير معروف' : 'Unknown route';
+  String get unknownRoute => userTr('common.unknownRoute', fallbackEn: 'Unknown route', fallbackAr: 'مسار غير معروف');
 }
 
 class _AppLocalizationsDelegate

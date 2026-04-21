@@ -1,6 +1,6 @@
-﻿import 'package:flutter/material.dart';
-import '../core/app_colors.dart';
+import 'package:flutter/material.dart';
 import '../../../constants/app_images.dart';
+import '../../../shared/l10n/app_localizations.dart';
 import 'profile_login_details_screen.dart';
 import 'setting_profile/notifications.dart';
 import 'user_data.dart';
@@ -56,22 +56,23 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+          icon: Icon(Icons.arrow_back_ios, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.notifications_none, color: Colors.white),
+            icon: Icon(Icons.notifications_none, color: Theme.of(context).colorScheme.onSurface),
             onPressed: () {},
           ),
           IconButton(
-            icon: const Icon(Icons.settings_outlined, color: Colors.white),
+            icon: Icon(Icons.settings_outlined, color: Theme.of(context).colorScheme.onSurface),
             onPressed: () {},
           ),
         ],
@@ -85,14 +86,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildTabItem("My Profile", true, () {}),
-                _buildTabItem("Login Details", false, () {
+                _buildTabItem(t.tr(en: "My Profile", ar: "ملفي الشخصي"), true, () {}),
+                _buildTabItem(t.tr(en: "Login Details", ar: "تفاصيل الدخول"), false, () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => const ProfileLoginDetailsScreen()),
                   );
                 }),
-                _buildTabItem("Notifications", false, () {
+                _buildTabItem(t.notifications, false, () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => const Notifications()),
@@ -103,15 +104,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             const SizedBox(height: 30),
 
             // Basic Information
-            const Text("Basic Information", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+            Text(t.tr(en: "Basic Information", ar: "معلومات أساسية"), style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
-            const Text("This is your personal information that you can update anytime.", style: TextStyle(color: Colors.white54, fontSize: 13)),
-            const Divider(color: Colors.white24, height: 40),
+            Text(t.tr(en: "This is your personal information that you can update anytime.", ar: "هذه هي معلوماتك الشخصية التي يمكنك تحديثها في أي وقت."), style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 13)),
+            Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 40),
 
             // Profile Photo
-            const Text("Profile Photo", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+            Text(t.tr(en: "Profile Photo", ar: "صورة الملف الشخصي"), style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
-            const Text("This image will be shown publicly as your profile picture, it will help recruiters recognize you!", style: TextStyle(color: Colors.white54, fontSize: 12)),
+            Text(t.tr(en: "This image will be shown publicly as your profile picture, it will help recruiters recognize you!", ar: "ستظهر هذه الصورة علنًا كصورة ملفك الشخصي، وسوف تساعد الموظفين على التعرف عليك!"), style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 12)),
             const SizedBox(height: 20),
             Row(
               children: [
@@ -124,53 +125,53 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   child: Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      border: Border.all(color: Colors.white24, style: BorderStyle.solid),
+                      border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), style: BorderStyle.solid),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Column(
-                      children: const [
-                        Icon(Icons.image_outlined, color: Colors.white54, size: 30),
-                        SizedBox(height: 8),
-                        Text("Click to replace or drag and drop", style: TextStyle(color: Colors.blueAccent, fontSize: 12)),
-                        Text("SVG, PNG, JPG or GIF (max. 400 x 400px)", style: TextStyle(color: Colors.white38, fontSize: 10)),
+                      children: [
+                        Icon(Icons.image_outlined, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), size: 30),
+                        const SizedBox(height: 8),
+                        Text(t.tr(en: "Click to replace or drag and drop", ar: "انقر للاستبدال أو السحب والإفلات"), style: const TextStyle(color: Colors.blueAccent, fontSize: 12)),
+                        Text(t.tr(en: "SVG, PNG, JPG or GIF (max. 400 x 400px)", ar: "SVG, PNG, JPG أو GIF (بحد أقصى 400 × 400 بكسل)"), style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 10)),
                       ],
                     ),
                   ),
                 ),
               ],
             ),
-            const Divider(color: Colors.white24, height: 40),
+            Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 40),
 
             // About Me
-            const Text("About Me", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+            Text(t.aboutMe, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16, fontWeight: FontWeight.bold)),
             const SizedBox(height: 12),
-            _buildTextField(_aboutMeController, "Enter About Me", maxLines: 3),
-            const Divider(color: Colors.white24, height: 40),
+            _buildTextField(_aboutMeController, t.tr(en: "Enter About Me", ar: "أدخل معلومات عنك"), maxLines: 3),
+            Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 40),
 
             // Personal Details
-            const Text("Personal Details", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+            Text(t.tr(en: "Personal Details", ar: "تفاصيل شخصية"), style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16, fontWeight: FontWeight.bold)),
             const SizedBox(height: 20),
             Row(
               children: [
-                Expanded(child: _buildTextFieldWithLabel(_fullNameController, "Full Name", "Enter Full Name")),
+                Expanded(child: _buildTextFieldWithLabel(_fullNameController, t.tr(en: "Full Name", ar: "الاسم بالكامل"), t.tr(en: "Enter Full Name", ar: "أدخل الاسم بالكامل"))),
                 const SizedBox(width: 15),
-                Expanded(child: _buildTextFieldWithLabel(_phoneController, "Phone Number", "Enter Phone Number")),
+                Expanded(child: _buildTextFieldWithLabel(_phoneController, t.tr(en: "Phone Number", ar: "رقم الهاتف"), t.tr(en: "Enter Phone Number", ar: "أدخل رقم الهاتف"))),
               ],
             ),
             const SizedBox(height: 20),
             Row(
               children: [
-                Expanded(child: _buildTextFieldWithLabel(_emailController, "Email", "Enter Email")),
+                Expanded(child: _buildTextFieldWithLabel(_emailController, t.tr(en: "Email", ar: "البريد الإلكتروني"), t.tr(en: "Enter Email", ar: "أدخل البريد الإلكتروني"))),
                 const SizedBox(width: 15),
-                Expanded(child: _buildTextFieldWithLabel(_dobController, "Date of Birth", "Enter Date of Birth", suffixIcon: Icons.calendar_today_outlined)),
+                Expanded(child: _buildTextFieldWithLabel(_dobController, t.dob, t.tr(en: "Enter Date of Birth", ar: "أدخل تاريخ الميلاد"), suffixIcon: Icons.calendar_today_outlined)),
               ],
             ),
             const SizedBox(height: 20),
-            _buildDropdownField("Gender", ["Male", "Female"]),
-            const Divider(color: Colors.white24, height: 40),
+            _buildDropdownField(t.gender, [t.male, t.female]),
+            Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 40),
 
             // Skills
-            const Text("Skills", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+            Text(t.tr(en: "Skills", ar: "المهارات"), style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 15),
             Wrap(
               spacing: 10,
@@ -182,21 +183,21 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 _buildSkillTag("Community Manager"),
               ],
             ),
-            const Divider(color: Colors.white24, height: 40),
+            Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 40),
 
             // Portfolio URL
-            const Text("Portfolio URL", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+            Text(t.tr(en: "Portfolio URL", ar: "رابط الأعمال"), style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16, fontWeight: FontWeight.bold)),
             const SizedBox(height: 12),
-            _buildTextField(_portfolioController, "Link to your portfolio URL"),
-            const Divider(color: Colors.white24, height: 40),
+            _buildTextField(_portfolioController, t.tr(en: "Link to your portfolio URL", ar: "رابط لمحفظتك")),
+            Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 40),
 
             // Account Type
-            const Text("Account Type", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+            Text(t.tr(en: "Account Type", ar: "نوع الحساب"), style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
-            const Text("You can update your account type", style: TextStyle(color: Colors.white54, fontSize: 13)),
+            Text(t.tr(en: "You can update your account type", ar: "يمكنك تحديث نوع حسابك"), style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 13)),
             const SizedBox(height: 20),
-            _buildRadioOption("Job Seeker", "Looking for a job"),
-            _buildRadioOption("Workers", "Hiring, sourcing candidates, or posting a jobs"),
+            _buildRadioOption(t.tr(en: "Job Seeker", ar: "باحث عن عمل"), t.tr(en: "Looking for a job", ar: "تبحث عن وظيفة")),
+            _buildRadioOption(t.tr(en: "Workers", ar: "عمال"), t.tr(en: "Hiring, sourcing candidates, or posting a jobs", ar: "التوظيف ، البحث عن مرشحين ، أو نشر الوظائف")),
             
             const SizedBox(height: 40),
             Align(
@@ -204,11 +205,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               child: ElevatedButton(
                 onPressed: _saveData,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF49769F),
+                  backgroundColor: Theme.of(context).colorScheme.primary,
                   padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                 ),
-                child: const Text("Save Profile", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                child: Text(t.tr(en: "Save Profile", ar: "حفظ الملف الشخصي"), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
               ),
             ),
             const SizedBox(height: 100),
@@ -225,14 +226,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         children: [
           Text(
             title,
-            style: TextStyle(color: isActive ? Colors.white : Colors.white38, fontWeight: isActive ? FontWeight.bold : FontWeight.normal, fontSize: 14),
+            style: TextStyle(
+              color: isActive ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), 
+              fontWeight: isActive ? FontWeight.bold : FontWeight.normal, 
+              fontSize: 14,
+            ),
           ),
           if (isActive)
             Container(
               margin: const EdgeInsets.only(top: 8),
               height: 2,
               width: 60,
-              color: Colors.blueAccent,
+              color: Theme.of(context).colorScheme.primary,
             ),
         ],
       ),
@@ -243,14 +248,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     return TextField(
       controller: controller,
       maxLines: maxLines,
-      style: const TextStyle(color: Colors.white),
+      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: const TextStyle(color: Colors.white24),
+        hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)),
         filled: true,
-        fillColor: Colors.white.withValues(alpha: 0.05),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: const BorderSide(color: Colors.white24)),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: const BorderSide(color: Colors.white24)),
+        fillColor: Theme.of(context).brightness == Brightness.dark 
+            ? Colors.white.withValues(alpha: 0.05) 
+            : Colors.black.withValues(alpha: 0.05),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.12))),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.12))),
       ),
     );
   }
@@ -262,22 +269,24 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         RichText(
           text: TextSpan(
             text: label,
-            style: const TextStyle(color: Colors.white, fontSize: 14),
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14),
             children: const [TextSpan(text: " *", style: TextStyle(color: Colors.red))],
           ),
         ),
         const SizedBox(height: 8),
         TextField(
           controller: controller,
-          style: const TextStyle(color: Colors.white),
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: const TextStyle(color: Colors.white24, fontSize: 12),
-            suffixIcon: suffixIcon != null ? Icon(suffixIcon, color: Colors.white54, size: 18) : null,
+            hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 12),
+            suffixIcon: suffixIcon != null ? Icon(suffixIcon, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), size: 18) : null,
             filled: true,
-            fillColor: Colors.white.withValues(alpha: 0.05),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(4), borderSide: const BorderSide(color: Colors.white24)),
-            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(4), borderSide: const BorderSide(color: Colors.white24)),
+            fillColor: Theme.of(context).brightness == Brightness.dark 
+                ? Colors.white.withValues(alpha: 0.05) 
+                : Colors.black.withValues(alpha: 0.05),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(4), borderSide: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.12))),
+            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(4), borderSide: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.12))),
           ),
         ),
       ],
@@ -291,7 +300,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         RichText(
           text: TextSpan(
             text: label,
-            style: const TextStyle(color: Colors.white, fontSize: 14),
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14),
             children: const [TextSpan(text: " *", style: TextStyle(color: Colors.red))],
           ),
         ),
@@ -300,17 +309,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           width: 120,
           padding: const EdgeInsets.symmetric(horizontal: 12),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.05),
-            border: Border.all(color: Colors.white24),
+            color: Theme.of(context).brightness == Brightness.dark 
+                ? Colors.white.withValues(alpha: 0.05) 
+                : Colors.black.withValues(alpha: 0.05),
+            border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.12)),
             borderRadius: BorderRadius.circular(4),
           ),
           child: DropdownButton<String>(
             value: _selectedGender,
-            dropdownColor: AppColors.background,
+            dropdownColor: Theme.of(context).scaffoldBackgroundColor,
             underline: Container(),
             isExpanded: true,
-            icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white54),
-            items: items.map((String value) => DropdownMenuItem<String>(value: value, child: Text(value, style: const TextStyle(color: Colors.white)))).toList(),
+            icon: Icon(Icons.keyboard_arrow_down, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)),
+            items: items.map((String value) => DropdownMenuItem<String>(value: value, child: Text(value, style: TextStyle(color: Theme.of(context).colorScheme.onSurface)))).toList(),
             onChanged: (String? newValue) {
               if (newValue != null) {
                 setState(() {
@@ -328,16 +339,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.05),
+        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white24),
+        border: Border.all(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(skill, style: const TextStyle(color: Colors.white70, fontSize: 13)),
+          Text(skill, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 13)),
           const SizedBox(width: 8),
-          const Icon(Icons.close, color: Colors.white54, size: 14),
+          Icon(Icons.close, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), size: 14),
         ],
       ),
     );
@@ -352,16 +363,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           Radio<String>(
             value: title,
             groupValue: _accountType,
-            activeColor: const Color(0xFF49769F),
+            activeColor: Theme.of(context).colorScheme.primary,
             onChanged: (value) => setState(() => _accountType = value!),
           ),
           const SizedBox(width: 8),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
+              Text(title, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold, fontSize: 15)),
               const SizedBox(height: 4),
-              Text(subtitle, style: const TextStyle(color: Colors.white54, fontSize: 12)),
+              Text(subtitle, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 12)),
             ],
           ),
         ],

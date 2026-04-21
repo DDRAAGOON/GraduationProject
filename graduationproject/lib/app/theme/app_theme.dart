@@ -9,9 +9,9 @@ final class AppTheme {
   static const _darkText = Color(0xFFEAF2F8);
   static const _darkMuted = Color(0xFF9AB4C8);
 
-  static const _lightBg = Color(0xFFFFFFFF);
+  static const _lightBg = Color(0xFFF9FBFE);
   static const _lightSurface = Color(0xFFFFFFFF);
-  static const _lightPrimary = Color(0xFF2F6FDB);
+  static const _lightPrimary = Color(0xFF094174);
   static const _lightText = Color(0xFF111827);
   static const _lightMuted = Color(0xFF6B7280);
 

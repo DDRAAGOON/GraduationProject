@@ -1,6 +1,6 @@
-﻿import 'package:flutter/material.dart';
-import '../core/app_colors.dart';
+import 'package:flutter/material.dart';
 import '../../../constants/app_images.dart';
+import '../../../shared/l10n/app_localizations.dart';
 import 'chat_thread_screen.dart';
 
 class MessagesListScreen extends StatelessWidget {
@@ -8,8 +8,9 @@ class MessagesListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -17,27 +18,23 @@ class MessagesListScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 10),
-              // Top Bar: Logo, Company Name, Plus, Notification
-              _buildTopBar(),
+              _buildTopBar(context),
               const SizedBox(height: 25),
-              const Text(
-                "Messages",
+              Text(
+                t.messages,
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 15),
-              // Search Bar
-              _buildSearchBar(),
+              _buildSearchBar(context, t),
               const SizedBox(height: 20),
-              // Messages List
               Expanded(
                 child: ListView(
                   physics: const BouncingScrollPhysics(),
                   children: [
-
                     _buildMessageItem(
                       context,
                       name: "Joe Bartmann",
@@ -45,7 +42,7 @@ class MessagesListScreen extends StatelessWidget {
                       time: "3:40 PM",
                       image: AppImages.companyProfile2,
                     ),
-                    const Divider(color: Colors.white12, height: 1),
+                    Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 1),
                     _buildMessageItem(
                       context,
                       name: "Ally Wales",
@@ -53,7 +50,7 @@ class MessagesListScreen extends StatelessWidget {
                       time: "3:40 PM",
                       image: AppImages.companyProfile3,
                     ),
-                    const Divider(color: Colors.white12, height: 1),
+                    Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 1),
                     _buildMessageItem(
                       context,
                       name: "James Gardner",
@@ -61,7 +58,7 @@ class MessagesListScreen extends StatelessWidget {
                       time: "3:40 PM",
                       image: AppImages.companyProfile4,
                     ),
-                    const Divider(color: Colors.white12, height: 1),
+                    Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 1),
                     _buildMessageItem(
                       context,
                       name: "Allison Geidt",
@@ -69,7 +66,7 @@ class MessagesListScreen extends StatelessWidget {
                       time: "3:40 PM",
                       image: AppImages.companyProfile5,
                     ),
-                    const Divider(color: Colors.white12, height: 1),
+                    Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 1),
                     _buildMessageItem(
                       context,
                       name: "Ruben Culhane",
@@ -77,7 +74,7 @@ class MessagesListScreen extends StatelessWidget {
                       time: "3:40 PM",
                       image: AppImages.companyProfile6,
                     ),
-                    const Divider(color: Colors.white12, height: 1),
+                    Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 1),
                     _buildMessageItem(
                       context,
                       name: "Lydia Diaz",
@@ -85,7 +82,7 @@ class MessagesListScreen extends StatelessWidget {
                       time: "3:40 PM",
                       image: AppImages.companyProfile7,
                     ),
-                    const SizedBox(height: 100), // Space for bottom nav
+                    const SizedBox(height: 100),
                   ],
                 ),
               ),
@@ -96,7 +93,7 @@ class MessagesListScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTopBar() {
+  Widget _buildTopBar(BuildContext context) {
     return Row(
       children: [
         Container(
@@ -104,28 +101,32 @@ class MessagesListScreen extends StatelessWidget {
           height: 45,
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.05),
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.white.withValues(alpha: 0.05)
+                : Colors.black.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(12),
           ),
         ),
         const SizedBox(width: 12),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
+          children: [
             Text(
               "Nomad",
-              style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16, fontWeight: FontWeight.bold),
             ),
           ],
         ),
         const Spacer(),
         Container(
           decoration: BoxDecoration(
-            color: const Color(0xFF0D2D4D),
+            color: Theme.of(context).brightness == Brightness.dark
+                ? const Color(0xFF0D2D4D)
+                : Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
           child: IconButton(
-            icon: const Icon(Icons.add, color: Colors.white),
+            icon: Icon(Icons.add, color: Theme.of(context).colorScheme.onSurface),
             onPressed: () {},
           ),
         ),
@@ -134,11 +135,11 @@ class MessagesListScreen extends StatelessWidget {
           children: [
             Container(
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.white24),
+                border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.12)),
                 shape: BoxShape.circle,
               ),
               child: IconButton(
-                icon: const Icon(Icons.notifications_none, color: Colors.white),
+                icon: Icon(Icons.notifications_none, color: Theme.of(context).colorScheme.onSurface),
                 onPressed: () {},
               ),
             ),
@@ -160,20 +161,22 @@ class MessagesListScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSearchBar() {
+  Widget _buildSearchBar(BuildContext context, AppLocalizations t) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.05),
+        color: Theme.of(context).brightness == Brightness.dark
+            ? Colors.white.withValues(alpha: 0.05)
+            : Colors.black.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(30),
-        border: Border.all(color: Colors.white12),
+        border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.12)),
       ),
-      child: const TextField(
-        style: TextStyle(color: Colors.white),
+      child: TextField(
+        style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
         decoration: InputDecoration(
-          icon: Icon(Icons.search, color: Colors.white54),
-          hintText: "Search messages",
-          hintStyle: TextStyle(color: Colors.white38),
+          icon: Icon(Icons.search, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
+          hintText: t.tr(en: "Search messages", ar: "البحث في الرسائل"),
+          hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)),
           border: InputBorder.none,
         ),
       ),
@@ -205,8 +208,10 @@ class MessagesListScreen extends StatelessWidget {
         margin: const EdgeInsets.symmetric(vertical: 4),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: isHighlighted ? Colors.white : Colors.transparent,
-          borderRadius: isHighlighted 
+          color: isHighlighted
+            ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.1)
+            : Colors.transparent,
+          borderRadius: isHighlighted
             ? const BorderRadius.only(
                 topLeft: Radius.circular(50),
                 bottomLeft: Radius.circular(50),
@@ -232,7 +237,7 @@ class MessagesListScreen extends StatelessWidget {
                       Text(
                         name,
                         style: TextStyle(
-                          color: isHighlighted ? Colors.black : Colors.white,
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
@@ -245,7 +250,7 @@ class MessagesListScreen extends StatelessWidget {
                       Text(
                         time,
                         style: TextStyle(
-                          color: isHighlighted ? Colors.black45 : Colors.white38,
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38),
                           fontSize: 12,
                         ),
                       ),
@@ -257,7 +262,7 @@ class MessagesListScreen extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      color: isHighlighted ? Colors.black54 : Colors.white60,
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
                       fontSize: 14,
                     ),
                   ),
@@ -270,4 +275,3 @@ class MessagesListScreen extends StatelessWidget {
     );
   }
 }
-
