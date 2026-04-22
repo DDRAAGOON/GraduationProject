@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../auth/sign_in_screen.dart';
+import '../../../app/router/app_router.dart';
 import 'onboarding_future_starts_screen.dart';
 import 'onboarding_next_job_closer_screen.dart';
 import 'onboarding_smart_search_screen.dart';
@@ -22,10 +22,10 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
         curve: Curves.easeIn,
       );
     } else {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const SignInScreen()),
-      );
+      // Use named route for consistency
+      Navigator.pushReplacementNamed(context, AppRoutes.companySignIn); 
+      // Note: Assuming you want to go to sign in. 
+      // If there's a specific user sign in route, use it.
     }
   }
 

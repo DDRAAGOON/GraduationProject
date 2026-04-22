@@ -41,9 +41,22 @@ class _RecruitmentUserShellScreenState extends State<RecruitmentUserShellScreen>
       const _ProfileTab(),
     ];
     return Scaffold(
-      appBar: AppBar(title: Text(_isAr ? 'مساحة المستخدم' : 'User Workspace')),
+      backgroundColor: const Color(0xFFF9F5F1),
+      appBar: AppBar(
+        title: _isAr 
+            ? Text('مساحة المستخدم') 
+            : Image.asset(
+                'assets/company/logo/logo.png',
+                height: 150,
+                fit: BoxFit.contain,
+              ),
+        backgroundColor: const Color(0xFFF9F5F1),
+        surfaceTintColor: Colors.transparent,
+        centerTitle: false,
+      ),
       body: pages[_tab],
       bottomNavigationBar: NavigationBar(
+        backgroundColor: Colors.white,
         selectedIndex: _tab,
         onDestinationSelected: (int value) => setState(() => _tab = value),
         destinations: <NavigationDestination>[
@@ -76,6 +89,19 @@ class _RecruitmentUserShellScreenState extends State<RecruitmentUserShellScreen>
 class _DiscoverTab extends StatelessWidget {
   const _DiscoverTab();
 
+  Color _getJobTypeColor(String type) {
+    switch (type.toLowerCase()) {
+      case 'full-time':
+        return Colors.green;
+      case 'part-time':
+        return Colors.blue;
+      case 'contract':
+        return Colors.orange;
+      default:
+        return Colors.grey;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final RecruitmentSyncStore store = RecruitmentSyncStore.instance;
@@ -88,31 +114,113 @@ class _DiscoverTab extends StatelessWidget {
         itemBuilder: (BuildContext context, int index) {
           if (index == 0) {
             return Padding(
-              padding: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.only(bottom: 16),
               child: Row(
                 children: [
                   Expanded(
-                    child: TextField(
-                      decoration: InputDecoration(
-                        hintText:
-                            isAr ? 'ابحث عن وظيفة أو شركة' : 'Search jobs or companies',
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
-                      onChanged: (value) =>
-                          store.updateFilters(searchQuery: value.trim()),
+                      child: Row(
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.only(left: 12),
+                            child: Icon(Icons.search, color: Colors.grey, size: 20),
+                          ),
+                          Expanded(
+                            flex: 3,
+                            child: TextField(
+                              decoration: InputDecoration(
+                                hintText: isAr ? 'بحث...' : 'Search...',
+                                border: InputBorder.none,
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+                                hintStyle: const TextStyle(fontSize: 14),
+                              ),
+                              onChanged: (value) =>
+                                  store.updateFilters(searchQuery: value.trim()),
+                            ),
+                          ),
+                          Container(
+                            height: 24,
+                            width: 1,
+                            color: Colors.grey.withOpacity(0.3),
+                          ),
+                          const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 8),
+                            child: Icon(Icons.location_on, color: Colors.grey, size: 18),
+                          ),
+                          Expanded(
+                            flex: 2,
+                            child: DropdownButtonHideUnderline(
+                              child: DropdownButton<String>(
+                                value: store.filterLocation,
+                                isExpanded: true,
+                                icon: const Icon(Icons.keyboard_arrow_down, size: 18),
+                                style: TextStyle(
+                                  color: Colors.black.withOpacity(0.8),
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                items: RecruitmentSyncStore.egyptGovernorates.map((gov) {
+                                  return DropdownMenuItem(
+                                    value: gov,
+                                    child: Text(gov, overflow: TextOverflow.ellipsis),
+                                  );
+                                }).toList(),
+                                onChanged: (value) {
+                                  if (value != null) {
+                                    store.updateFilters(location: value);
+                                  }
+                                },
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                        ],
+                      ),
                     ),
                   ),
                   const SizedBox(width: 10),
-                  IconButton(
-                    onPressed: () => Navigator.of(context)
-                        .pushNamed(AppRoutes.userAdvancedFilters),
-                    icon: const Icon(Icons.tune),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: IconButton(
+                      onPressed: () => Navigator.of(context)
+                          .pushNamed(AppRoutes.userAdvancedFilters),
+                      icon: const Icon(Icons.tune, color: Colors.black54),
+                    ),
                   ),
                 ],
               ),
             );
           }
           final RecruitmentJob job = store.filteredJobs[index - 1];
+          final typeColor = _getJobTypeColor(job.type);
           return Card(
+            color: Colors.white,
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+              side: BorderSide(color: Colors.grey.withOpacity(0.1)),
+            ),
             margin: const EdgeInsets.only(bottom: 12),
             child: Padding(
               padding: const EdgeInsets.all(14),
@@ -126,21 +234,57 @@ class _DiscoverTab extends StatelessWidget {
                         ),
                   ),
                   const SizedBox(height: 4),
-                  Text('${job.companyName} • ${job.location}'),
+                  Row(
+                    children: [
+                      const Icon(Icons.business, size: 16, color: Colors.grey),
+                      const SizedBox(width: 4),
+                      Text(job.companyName),
+                      const SizedBox(width: 8),
+                      const Icon(Icons.location_on, size: 16, color: Colors.grey),
+                      const SizedBox(width: 4),
+                      Text(job.location),
+                    ],
+                  ),
                   const SizedBox(height: 8),
                   Wrap(
                     spacing: 8,
+                    runSpacing: 8,
                     children: job.tags
-                        .map((String tag) => Chip(label: Text(tag)))
+                        .map((String tag) => Chip(
+                              label: Text(tag),
+                              backgroundColor: const Color(0xFFF9F5F1),
+                              side: BorderSide.none,
+                              padding: const EdgeInsets.symmetric(horizontal: 4),
+                            ))
                         .toList(),
                   ),
-                  const SizedBox(height: 8),
-                  Text(job.salaryRange),
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: typeColor.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(color: typeColor.withOpacity(0.5)),
+                    ),
+                    child: Text(
+                      job.type,
+                      style: TextStyle(
+                        color: typeColor,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
                   const SizedBox(height: 12),
                   Row(
                     children: <Widget>[
                       Expanded(
                         child: OutlinedButton(
+                          style: OutlinedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
                           onPressed: () => Navigator.of(context).pushNamed(
                             AppRoutes.userJobDetails,
                             arguments: job,
@@ -159,10 +303,7 @@ class _DiscoverTab extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
-                  if (store.userRole == 'Job Seeker')
-                    _WorkerRequestQuickCard(isAr: isAr),
-                  if (store.userRole == 'Job Seeker') const SizedBox(height: 8),
+                  const SizedBox(height: 12),
                   AppButton(
                     label: isAr ? 'قدّم الآن' : 'Apply Now',
                     onPressed: () => Navigator.of(context).pushNamed(
@@ -198,6 +339,12 @@ class _ApplicationsTab extends StatelessWidget {
           itemBuilder: (BuildContext context, int index) {
             final RecruitmentApplication app = store.applications[index];
             return Card(
+              color: Colors.white,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: BorderSide(color: Colors.grey.withOpacity(0.1)),
+              ),
               margin: const EdgeInsets.only(bottom: 12),
               child: ListTile(
                 title: Text(app.jobTitle),
@@ -273,6 +420,12 @@ class _SavedJobsTab extends StatelessWidget {
           itemBuilder: (context, index) {
             final job = store.savedJobs[index];
             return Card(
+              color: Colors.white,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: BorderSide(color: Colors.grey.withOpacity(0.1)),
+              ),
               child: ListTile(
                 title: Text(job.title),
                 subtitle: Text('${job.companyName} • ${job.location}'),
@@ -302,37 +455,36 @@ class _ProfileTab extends StatefulWidget {
 
 class _ProfileTabState extends State<_ProfileTab> {
   final _nameController = TextEditingController();
-  final _titleController = TextEditingController();
-  final _locationController = TextEditingController(text: 'Cairo, Egypt');
-  final _bioController = TextEditingController(
-    text:
-        'Flutter developer focused on scalable architecture and pixel-perfect UI.',
-  );
-  final _skillsController = TextEditingController(
-    text: 'Flutter, Dart, REST API, Firebase',
-  );
-  final _portfolioController = TextEditingController(
-    text: 'https://portfolio.example.com',
-  );
-  String _selectedRole = 'Job Seeker';
+  final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _locationController = TextEditingController();
+  final _aboutController = TextEditingController();
+  final _skillsController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
+    _loadData();
+  }
+
+  void _loadData() {
     final store = RecruitmentSyncStore.instance;
     _nameController.text = store.currentUserName;
-    _titleController.text = store.currentUserTitle;
-    _selectedRole = store.userRole;
+    _emailController.text = store.currentUserEmail;
+    _phoneController.text = store.currentUserPhone;
+    _locationController.text = store.currentUserLocation;
+    _aboutController.text = store.currentUserAbout;
+    _skillsController.text = store.currentUserSkills.join(', ');
   }
 
   @override
   void dispose() {
     _nameController.dispose();
-    _titleController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
     _locationController.dispose();
-    _bioController.dispose();
+    _aboutController.dispose();
     _skillsController.dispose();
-    _portfolioController.dispose();
     super.dispose();
   }
 
@@ -342,217 +494,114 @@ class _ProfileTabState extends State<_ProfileTab> {
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
     return AnimatedBuilder(
       animation: store,
-      builder: (context, _) => Padding(
-        padding: const EdgeInsets.all(16),
-        child: ListView(
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    'Profile',
-                    style: Theme.of(context).textTheme.headlineSmall,
+      builder: (context, _) {
+        // Sync controllers if data changes in store
+        _loadData();
+        return Padding(
+          padding: const EdgeInsets.all(16),
+          child: ListView(
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      isAr ? 'الملف الشخصي' : 'Profile',
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
+                  ),
+                  OutlinedButton.icon(
+                    onPressed: () =>
+                        Navigator.of(context).pushNamed(AppRoutes.userSettingsNew),
+                    icon: const Icon(Icons.settings_outlined),
+                    label: Text(isAr ? 'الإعدادات' : 'Settings'),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Card(
+                color: Colors.white,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  side: BorderSide(color: Colors.grey.withOpacity(0.1)),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(14),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildProfileItem(isAr ? 'الاسم بالكامل' : 'Full Name', _nameController),
+                      _buildProfileItem(isAr ? 'البريد الإلكتروني' : 'Email', _emailController),
+                      _buildProfileItem(isAr ? 'رقم الهاتف' : 'Phone', _phoneController),
+                      _buildProfileItem(isAr ? 'الموقع' : 'Location', _locationController),
+                      _buildProfileItem(isAr ? 'نبذة عني' : 'About Me', _aboutController, maxLines: 3),
+                      _buildProfileItem(isAr ? 'المهارات' : 'Skills', _skillsController),
+                      
+                      if (store.socialLinks.isNotEmpty) ...[
+                        const SizedBox(height: 20),
+                        Text(
+                          isAr ? 'الروابط الاجتماعية' : 'Social Links',
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                        ),
+                        const SizedBox(height: 8),
+                        ...store.socialLinks.map((link) => Padding(
+                          padding: const EdgeInsets.only(bottom: 4),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.link, size: 18, color: Colors.blue),
+                              const SizedBox(width: 8),
+                              Text('${link['platform']}: '),
+                              Expanded(
+                                child: Text(
+                                  link['url'] ?? '',
+                                  style: const TextStyle(color: Colors.blue, decoration: TextDecoration.underline),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        )),
+                      ],
+
+                      const SizedBox(height: 20),
+                      AppButton(
+                        label: isAr ? 'حفظ التغييرات' : 'Save Profile',
+                        onPressed: () {
+                          store.updateUserProfile(
+                            fullName: _nameController.text,
+                            title: store.currentUserTitle,
+                            email: _emailController.text,
+                            phone: _phoneController.text,
+                            location: _locationController.text,
+                            about: _aboutController.text,
+                            skills: _skillsController.text.split(',').map((e) => e.trim()).toList(),
+                          );
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(isAr ? 'تم تحديث الملف الشخصي' : 'Profile updated')),
+                          );
+                        },
+                      ),
+                    ],
                   ),
                 ),
-                OutlinedButton.icon(
-                  onPressed: () =>
-                      Navigator.of(context).pushNamed(AppRoutes.userSettingsNew),
-                  icon: const Icon(Icons.settings_outlined),
-                  label: Text(isAr ? 'الإعدادات' : 'Settings'),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(14),
-                child: Column(
-                  children: [
-                    TextField(
-                      controller: _nameController,
-                      decoration: const InputDecoration(labelText: 'Full name'),
-                    ),
-                    const SizedBox(height: 10),
-                    TextField(
-                      controller: _titleController,
-                      decoration: InputDecoration(
-                        labelText: isAr ? 'المسمى الوظيفي' : 'Professional title',
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    DropdownButtonFormField<String>(
-                      initialValue: _selectedRole,
-                      decoration: InputDecoration(
-                        labelText: isAr ? 'نوع الحساب' : 'Account type',
-                      ),
-                      items: const [
-                        DropdownMenuItem(
-                          value: 'Worker',
-                          child: Text('Worker'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'Job Seeker',
-                          child: Text('Job Seeker'),
-                        ),
-                      ],
-                      onChanged: (value) {
-                        if (value == null) return;
-                        setState(() => _selectedRole = value);
-                      },
-                    ),
-                    const SizedBox(height: 10),
-                    TextField(
-                      controller: _locationController,
-                      decoration:
-                          InputDecoration(labelText: isAr ? 'الموقع' : 'Location'),
-                    ),
-                    const SizedBox(height: 10),
-                    TextField(
-                      controller: _bioController,
-                      maxLines: 4,
-                      decoration: const InputDecoration(
-                        labelText: 'About',
-                        alignLabelWithHint: true,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    TextField(
-                      controller: _skillsController,
-                      decoration:
-                          const InputDecoration(labelText: 'Skills (comma separated)'),
-                    ),
-                    const SizedBox(height: 10),
-                    TextField(
-                      controller: _portfolioController,
-                      decoration: const InputDecoration(labelText: 'Portfolio URL'),
-                    ),
-                    const SizedBox(height: 14),
-                    AppButton(
-                      label: 'Save Profile',
-                      onPressed: () {
-                        store.updateUserProfile(
-                          fullName: _nameController.text,
-                          title: _titleController.text,
-                          role: _selectedRole,
-                        );
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              isAr ? 'تم تحديث البروفايل' : 'Profile updated',
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
-                ),
               ),
-            ),
-            const SizedBox(height: 12),
-            Card(
-              child: ListTile(
-                leading: const Icon(Icons.verified_user_outlined),
-                title: const Text('Profile Completion'),
-                subtitle: const Text('78% completed - add CV and certifications'),
-                trailing: const Icon(Icons.chevron_right),
-              ),
-            ),
-          ],
-        ),
-      ),
+            ],
+          ),
+        );
+      },
     );
   }
-}
 
-class _WorkerRequestQuickCard extends StatefulWidget {
-  const _WorkerRequestQuickCard({required this.isAr});
-
-  final bool isAr;
-
-  @override
-  State<_WorkerRequestQuickCard> createState() => _WorkerRequestQuickCardState();
-}
-
-class _WorkerRequestQuickCardState extends State<_WorkerRequestQuickCard> {
-  final _title = TextEditingController();
-  final _desc = TextEditingController();
-  final _budget = TextEditingController();
-
-  @override
-  void dispose() {
-    _title.dispose();
-    _desc.dispose();
-    _budget.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final store = RecruitmentSyncStore.instance;
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              widget.isAr ? 'محتاج Worker؟' : 'Need a Worker?',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: _title,
-              decoration: InputDecoration(
-                labelText: widget.isAr ? 'عنوان الطلب' : 'Request title',
-              ),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: _desc,
-              maxLines: 2,
-              decoration: InputDecoration(
-                labelText: widget.isAr ? 'تفاصيل' : 'Description',
-              ),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: _budget,
-              decoration: InputDecoration(
-                labelText: widget.isAr ? 'الميزانية' : 'Budget',
-              ),
-            ),
-            const SizedBox(height: 10),
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton(
-                onPressed: () {
-                  if (_title.text.trim().isEmpty || _desc.text.trim().isEmpty) {
-                    return;
-                  }
-                  store.postServiceRequest(
-                    title: _title.text.trim(),
-                    description: _desc.text.trim(),
-                    budget: _budget.text.trim().isEmpty
-                        ? 'Negotiable'
-                        : _budget.text.trim(),
-                  );
-                  _title.clear();
-                  _desc.clear();
-                  _budget.clear();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(widget.isAr
-                          ? 'تم نشر طلب الـWorker'
-                          : 'Worker request posted'),
-                    ),
-                  );
-                },
-                child: Text(widget.isAr ? 'نشر الطلب' : 'Post Request'),
-              ),
-            ),
-          ],
+  Widget _buildProfileItem(String label, TextEditingController controller, {int maxLines = 1}) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: TextField(
+        controller: controller,
+        maxLines: maxLines,
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: const TextStyle(fontSize: 14),
+          border: const UnderlineInputBorder(),
         ),
       ),
     );

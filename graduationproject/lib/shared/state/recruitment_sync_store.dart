@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 
 class RecruitmentJob {
   const RecruitmentJob({
@@ -8,8 +9,10 @@ class RecruitmentJob {
     required this.location,
     required this.salaryRange,
     required this.type,
+    required this.category,
     required this.tags,
     required this.publishedAt,
+    this.logoIcon,
   });
 
   final String id;
@@ -18,8 +21,10 @@ class RecruitmentJob {
   final String location;
   final String salaryRange;
   final String type;
+  final String category;
   final List<String> tags;
   final DateTime publishedAt;
+  final IconData? logoIcon;
 }
 
 class RecruitmentApplication {
@@ -94,14 +99,56 @@ class RecruitmentSyncStore extends ChangeNotifier {
 
   static final RecruitmentSyncStore instance = RecruitmentSyncStore._();
 
+  static const List<String> egyptGovernorates = [
+    'All',
+    'Cairo',
+    'Giza',
+    'Alexandria',
+    'Dakahlia',
+    'Red Sea',
+    'Beheira',
+    'Fayoum',
+    'Gharbia',
+    'Ismailia',
+    'Monufia',
+    'Minya',
+    'Qalyubia',
+    'New Valley',
+    'Sharqia',
+    'Suez',
+    'Aswan',
+    'Assiut',
+    'Beni Suef',
+    'Port Said',
+    'Damietta',
+    'South Sinai',
+    'Kafr El Sheikh',
+    'Matrouh',
+    'Luxor',
+    'Qena',
+    'Sohag',
+    'North Sinai',
+    'Remote',
+  ];
+
+  static const List<String> categories = [
+    'All',
+    'Technical',
+    'Non-technical',
+    'Service',
+    'Tradesman',
+  ];
+
   final List<RecruitmentJob> _jobs = <RecruitmentJob>[
+    // Technical
     RecruitmentJob(
       id: 'job_1',
       title: 'Flutter Mobile Developer',
       companyName: 'Jobito Labs',
-      location: 'Cairo, Egypt',
+      location: 'Cairo',
       salaryRange: '20k - 30k EGP',
       type: 'Full-time',
+      category: 'Technical',
       tags: const ['Flutter', 'Dart', 'REST'],
       publishedAt: DateTime.now().subtract(const Duration(hours: 3)),
     ),
@@ -112,58 +159,93 @@ class RecruitmentSyncStore extends ChangeNotifier {
       location: 'Remote',
       salaryRange: '30k - 45k EGP',
       type: 'Full-time',
+      category: 'Technical',
       tags: const ['Node.js', 'Express', 'PostgreSQL'],
       publishedAt: DateTime.now().subtract(const Duration(hours: 7)),
     ),
+    // Tradesman
     RecruitmentJob(
-      id: 'job_3',
-      title: 'UI/UX Product Designer',
-      companyName: 'BlueOrbit',
-      location: 'Cairo, Egypt',
-      salaryRange: '18k - 28k EGP',
-      type: 'Part-time',
-      tags: const ['Figma', 'Design Systems', 'UX Research'],
+      id: 'tr_1',
+      title: 'نقاش محترف (Painter)',
+      companyName: 'مقاولات الحديثة',
+      location: 'Cairo',
+      salaryRange: 'Negotiable',
+      type: 'Full-time',
+      category: 'Tradesman',
+      tags: const ['Painting', 'Interior'],
+      logoIcon: Icons.brush,
       publishedAt: DateTime.now().subtract(const Duration(days: 1)),
     ),
     RecruitmentJob(
-      id: 'job_4',
-      title: 'QA Automation Engineer',
-      companyName: 'HireFlow Tech',
-      location: 'Alex, Egypt',
-      salaryRange: '20k - 35k EGP',
-      type: 'Contract',
-      tags: const ['Selenium', 'Cypress', 'CI/CD'],
+      id: 'tr_2',
+      title: 'سباك صحي (Plumber)',
+      companyName: 'الجزيرة للخدمات',
+      location: 'Giza',
+      salaryRange: 'Negotiable',
+      type: 'Full-time',
+      category: 'Tradesman',
+      tags: const ['Plumbing', 'Maintenance'],
+      logoIcon: Icons.plumbing,
       publishedAt: DateTime.now().subtract(const Duration(days: 2)),
     ),
-  ];
-
-  final List<RecruitmentApplication> _applications = <RecruitmentApplication>[
-    RecruitmentApplication(
-      id: 'app_1',
-      jobId: 'job_1',
-      jobTitle: 'Flutter Mobile Developer',
-      companyName: 'Jobito Labs',
-      userName: 'Ahmed User',
-      status: 'In Review',
-      updatedAt: DateTime.now().subtract(const Duration(hours: 1)),
+    RecruitmentJob(
+      id: 'tr_3',
+      title: 'نجار أثاث (Carpenter)',
+      companyName: 'ورشة الإبداع',
+      location: 'Damietta',
+      salaryRange: 'Negotiable',
+      type: 'Full-time',
+      category: 'Tradesman',
+      tags: const ['Carpentry', 'Furniture'],
+      logoIcon: Icons.carpenter,
+      publishedAt: DateTime.now().subtract(const Duration(days: 3)),
+    ),
+    RecruitmentJob(
+      id: 'tr_4',
+      title: 'كهربائي منازل (Electrician)',
+      companyName: 'النور للكهرباء',
+      location: 'Alexandria',
+      salaryRange: 'Negotiable',
+      type: 'Part-time',
+      category: 'Tradesman',
+      tags: const ['Electrical', 'Repair'],
+      logoIcon: Icons.electrical_services,
+      publishedAt: DateTime.now().subtract(const Duration(days: 4)),
+    ),
+    RecruitmentJob(
+      id: 'tr_5',
+      title: 'فني تكييف (HVAC Tech)',
+      companyName: 'كول اير',
+      location: 'Cairo',
+      salaryRange: 'Negotiable',
+      type: 'Contract',
+      category: 'Tradesman',
+      tags: const ['AC Repair', 'Maintenance'],
+      logoIcon: Icons.ac_unit,
+      publishedAt: DateTime.now().subtract(const Duration(days: 5)),
     ),
   ];
 
-  final List<RecruitmentMessage> _messages = <RecruitmentMessage>[
-    RecruitmentMessage(
-      id: 'msg_1',
-      fromCompany: true,
-      text: 'Thanks for applying. We will review your profile today.',
-      createdAt: DateTime.now().subtract(const Duration(minutes: 30)),
-    ),
-  ];
-  final Set<String> _savedJobIds = <String>{'job_1'};
+  final List<RecruitmentApplication> _applications = <RecruitmentApplication>[];
+  final List<RecruitmentMessage> _messages = <RecruitmentMessage>[];
+  final Set<String> _savedJobIds = <String>{};
+  
   String _currentUserName = 'Ahmed User';
+  String _currentUserEmail = 'user@jobito.com';
+  String _currentUserPhone = '';
+  String _currentUserLocation = 'Cairo, Egypt';
+  String _currentUserAbout = '';
   String _currentUserTitle = 'Mobile Developer';
+  String _currentUserPortfolio = '';
   String _userRole = 'Job Seeker';
   String _searchQuery = '';
   String _filterType = 'All';
   String _filterLocation = 'All';
+  String _filterCategory = 'All';
+  List<Map<String, String>> _socialLinks = [];
+  List<String> _currentUserSkills = [];
+  List<Map<String, String>> _currentUserEducation = [];
+  List<Map<String, String>> _currentUserExperience = [];
   final List<ServiceRequestPost> _serviceRequests = <ServiceRequestPost>[
     ServiceRequestPost(
       id: 'sr_1',
@@ -176,32 +258,45 @@ class RecruitmentSyncStore extends ChangeNotifier {
   ];
 
   List<RecruitmentJob> get jobs => List<RecruitmentJob>.unmodifiable(_jobs);
-
-  List<RecruitmentApplication> get applications =>
-      List<RecruitmentApplication>.unmodifiable(_applications);
-
-  List<RecruitmentMessage> get messages =>
-      List<RecruitmentMessage>.unmodifiable(_messages);
+  List<RecruitmentApplication> get applications => List<RecruitmentApplication>.unmodifiable(_applications);
+  List<RecruitmentMessage> get messages => List<RecruitmentMessage>.unmodifiable(_messages);
   Set<String> get savedJobIds => Set<String>.unmodifiable(_savedJobIds);
+  
   String get currentUserName => _currentUserName;
+  String get currentUserEmail => _currentUserEmail;
+  String get currentUserPhone => _currentUserPhone;
+  String get currentUserLocation => _currentUserLocation;
+  String get currentUserAbout => _currentUserAbout;
   String get currentUserTitle => _currentUserTitle;
+  String get currentUserPortfolio => _currentUserPortfolio;
   String get userRole => _userRole;
   String get searchQuery => _searchQuery;
   String get filterType => _filterType;
   String get filterLocation => _filterLocation;
-  List<ServiceRequestPost> get serviceRequests =>
-      List<ServiceRequestPost>.unmodifiable(_serviceRequests);
+  String get filterCategory => _filterCategory;
+  List<Map<String, String>> get socialLinks => _socialLinks;
+  List<String> get currentUserSkills => _currentUserSkills;
+  List<Map<String, String>> get currentUserEducation => _currentUserEducation;
+  List<Map<String, String>> get currentUserExperience => _currentUserExperience;
+  List<ServiceRequestPost> get serviceRequests => List<ServiceRequestPost>.unmodifiable(_serviceRequests);
+
   List<RecruitmentJob> get savedJobs =>
       _jobs.where((item) => _savedJobIds.contains(item.id)).toList();
+
   List<RecruitmentJob> get filteredJobs {
     return _jobs.where((job) {
+      final query = _searchQuery.toLowerCase();
       final matchesQuery = _searchQuery.isEmpty ||
-          job.title.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-          job.companyName.toLowerCase().contains(_searchQuery.toLowerCase());
+          job.title.toLowerCase().contains(query) ||
+          job.companyName.toLowerCase().contains(query) ||
+          job.location.toLowerCase().contains(query);
+
       final matchesType = _filterType == 'All' || job.type == _filterType;
-      final matchesLocation =
-          _filterLocation == 'All' || job.location == _filterLocation;
-      return matchesQuery && matchesType && matchesLocation;
+      final matchesLocation = _filterLocation == 'All' ||
+          job.location.toLowerCase() == _filterLocation.toLowerCase();
+      final matchesCategory = _filterCategory == 'All' || job.category == _filterCategory;
+
+      return matchesQuery && matchesType && matchesLocation && matchesCategory;
     }).toList();
   }
 
@@ -222,12 +317,33 @@ class RecruitmentSyncStore extends ChangeNotifier {
   void updateUserProfile({
     required String fullName,
     required String title,
+    String? email,
+    String? phone,
+    String? location,
+    String? about,
+    String? portfolio,
+    List<String>? skills,
+    List<Map<String, String>>? education,
+    List<Map<String, String>>? experience,
     String? role,
+    List<Map<String, String>>? socialLinks,
   }) {
     _currentUserName = fullName.trim().isEmpty ? _currentUserName : fullName;
     _currentUserTitle = title.trim().isEmpty ? _currentUserTitle : title;
+    if (email != null) _currentUserEmail = email;
+    if (phone != null) _currentUserPhone = phone;
+    if (location != null) _currentUserLocation = location;
+    if (about != null) _currentUserAbout = about;
+    if (portfolio != null) _currentUserPortfolio = portfolio;
+    if (skills != null) _currentUserSkills = List.from(skills);
+    if (education != null) _currentUserEducation = List.from(education);
+    if (experience != null) _currentUserExperience = List.from(experience);
+
     if (role != null && role.isNotEmpty) {
       _userRole = role;
+    }
+    if (socialLinks != null) {
+      _socialLinks = List.from(socialLinks);
     }
     notifyListeners();
   }
@@ -248,15 +364,6 @@ class RecruitmentSyncStore extends ChangeNotifier {
         createdAt: DateTime.now(),
       ),
     );
-    _messages.insert(
-      0,
-      RecruitmentMessage(
-        id: 'msg_${DateTime.now().millisecondsSinceEpoch}',
-        fromCompany: false,
-        text: 'New worker request posted: $title',
-        createdAt: DateTime.now(),
-      ),
-    );
     notifyListeners();
   }
 
@@ -264,6 +371,7 @@ class RecruitmentSyncStore extends ChangeNotifier {
     String? searchQuery,
     String? type,
     String? location,
+    String? category,
   }) {
     if (searchQuery != null) {
       _searchQuery = searchQuery;
@@ -274,6 +382,9 @@ class RecruitmentSyncStore extends ChangeNotifier {
     if (location != null) {
       _filterLocation = location;
     }
+    if (category != null) {
+      _filterCategory = category;
+    }
     notifyListeners();
   }
 
@@ -282,9 +393,7 @@ class RecruitmentSyncStore extends ChangeNotifier {
     required String userName,
   }) {
     final int index = _jobs.indexWhere((RecruitmentJob item) => item.id == jobId);
-    if (index < 0) {
-      return;
-    }
+    if (index < 0) return;
     final RecruitmentJob job = _jobs[index];
     _applications.insert(
       0,
@@ -305,25 +414,11 @@ class RecruitmentSyncStore extends ChangeNotifier {
     required String applicationId,
     required String nextStatus,
   }) {
-    final int index = _applications.indexWhere(
-      (RecruitmentApplication app) => app.id == applicationId,
-    );
-    if (index < 0) {
-      return;
-    }
+    final int index = _applications.indexWhere((app) => app.id == applicationId);
+    if (index < 0) return;
     _applications[index] = _applications[index].copyWith(
       status: nextStatus,
       updatedAt: DateTime.now(),
-    );
-    _messages.insert(
-      0,
-      RecruitmentMessage(
-        id: 'msg_${DateTime.now().millisecondsSinceEpoch}',
-        fromCompany: true,
-        text:
-            'Application for ${_applications[index].jobTitle} moved to $nextStatus.',
-        createdAt: DateTime.now(),
-      ),
     );
     notifyListeners();
   }
@@ -346,63 +441,18 @@ class RecruitmentSyncStore extends ChangeNotifier {
     required List<Map<String, dynamic>> applications,
     required List<Map<String, dynamic>> messages,
   }) {
-    _jobs
-      ..clear()
-      ..addAll(
-        jobs.map(
-          (Map<String, dynamic> item) => RecruitmentJob(
-            id: item['id']?.toString() ?? '',
-            title: item['title']?.toString() ?? 'Untitled',
-            companyName: item['companyName']?.toString() ?? 'Company',
-            location: item['location']?.toString() ?? 'Remote',
-            salaryRange: item['salaryRange']?.toString() ?? 'Negotiable',
-            type: item['type']?.toString() ?? 'Full-time',
-            tags: item['tags'] is List
-                ? (item['tags'] as List).map((dynamic e) => e.toString()).toList()
-                : const <String>[],
-            publishedAt: DateTime.tryParse(item['createdAt']?.toString() ?? '') ??
-                DateTime.now(),
-          ),
-        ),
-      );
-    _applications
-      ..clear()
-      ..addAll(
-        applications.map(
-          (Map<String, dynamic> item) => RecruitmentApplication(
-            id: item['id']?.toString() ?? '',
-            jobId: item['jobId']?.toString() ?? '',
-            jobTitle: _jobTitleById(item['jobId']?.toString() ?? ''),
-            companyName: 'Jobito Labs',
-            userName: item['userName']?.toString() ?? 'Candidate',
-            status: item['status']?.toString() ?? 'Applied',
-            updatedAt: DateTime.tryParse(item['updatedAt']?.toString() ?? '') ??
-                DateTime.now(),
-          ),
-        ),
-      );
-    _messages
-      ..clear()
-      ..addAll(
-        messages.map(
-          (Map<String, dynamic> item) => RecruitmentMessage(
-            id: item['id']?.toString() ?? '',
-            fromCompany: item['fromCompany'] == true,
-            text: item['text']?.toString() ?? '',
-            createdAt: DateTime.tryParse(item['createdAt']?.toString() ?? '') ??
-                DateTime.now(),
-          ),
-        ),
-      );
-    _savedJobIds.removeWhere((id) => _jobs.every((j) => j.id != id));
+    _jobs.clear();
+    _jobs.addAll(jobs.map((item) => RecruitmentJob(
+      id: item['id']?.toString() ?? '',
+      title: item['title']?.toString() ?? 'Untitled',
+      companyName: item['companyName']?.toString() ?? 'Company',
+      location: item['location']?.toString() ?? 'Remote',
+      salaryRange: item['salaryRange']?.toString() ?? 'Negotiable',
+      type: item['type']?.toString() ?? 'Full-time',
+      category: item['category']?.toString() ?? 'Technical',
+      tags: item['tags'] is List ? (item['tags'] as List).map((e) => e.toString()).toList() : const [],
+      publishedAt: DateTime.tryParse(item['createdAt']?.toString() ?? '') ?? DateTime.now(),
+    )));
     notifyListeners();
-  }
-
-  String _jobTitleById(String jobId) {
-    final index = _jobs.indexWhere((item) => item.id == jobId);
-    if (index < 0) {
-      return 'Job';
-    }
-    return _jobs[index].title;
   }
 }

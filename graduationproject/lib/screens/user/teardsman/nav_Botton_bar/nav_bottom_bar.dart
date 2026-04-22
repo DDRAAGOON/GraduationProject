@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:curved_navigation_bar/curved_navigation_bar.dart';
-import '../Tradesman_Messages/messages_list.dart';
+import '../Tradesman_Messages/messages_List.dart';
 import '../home/find_jobs.dart';
-import '../post/post_job.dart';
+import '../home/tradesman_saved_jobs.dart';
+import '../post/post_Job.dart';
 import '../profile/tradesman_profile.dart';
 
 class Navbotton extends StatefulWidget {
@@ -15,44 +15,53 @@ class Navbotton extends StatefulWidget {
 class _NavbottonState extends State<Navbotton> {
   int _selectedIndex = 0;
 
+  bool get _isAr => Localizations.localeOf(context).languageCode == 'ar';
+
   final List<Widget> _pages = [
-    const FindJobs(),
-    const MessagesList(),
-    const TradesmanProfile(),
-    const PostJob(),
+    const FindJobs(), 
+    const PostJob(), 
+    const MessagesList(), 
+    const TradesmanSavedJobs(),
+    const TradesmanProfile(), 
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: const Color(0xFFF9F5F1),
       body: _pages[_selectedIndex],
-      bottomNavigationBar: CurvedNavigationBar(
-        index: _selectedIndex,
-        height: 65.0,
-        items: const <Widget>[
-          Icon(Icons.home, size: 30, color: Colors.white),
-          Icon(Icons.chat_rounded, size: 30, color: Colors.white),
-          Icon(Icons.person, size: 30, color: Colors.white),
-          Icon(Icons.add, size: 30, color: Colors.white),
-        ],
-        color: Theme.of(context).colorScheme.primary,
-        buttonBackgroundColor: Theme.of(context).brightness == Brightness.dark 
-            ? const Color(0xFF001E3A) 
-            : Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        animationCurve: Curves.easeInOut,
-        animationDuration: const Duration(milliseconds: 400),
-        onTap: (index) {
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _selectedIndex,
+        onDestinationSelected: (int index) {
           setState(() {
             _selectedIndex = index;
           });
         },
+        backgroundColor: Colors.white,
+        labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+        destinations: <NavigationDestination>[
+          NavigationDestination(
+            icon: const Icon(Icons.search),
+            label: _isAr ? 'اكتشف' : 'Discover',
+          ),
+          NavigationDestination(
+            icon: const Icon(Icons.fact_check),
+            label: _isAr ? 'تقديماتي' : 'Postings',
+          ),
+          NavigationDestination(
+            icon: const Icon(Icons.chat_bubble),
+            label: _isAr ? 'الرسائل' : 'Inbox',
+          ),
+          NavigationDestination(
+            icon: const Icon(Icons.bookmark),
+            label: _isAr ? 'المحفوظة' : 'Saved',
+          ),
+          NavigationDestination(
+            icon: const Icon(Icons.person),
+            label: _isAr ? 'البروفايل' : 'Profile',
+          ),
+        ],
       ),
     );
   }
 }
-
-
-
-

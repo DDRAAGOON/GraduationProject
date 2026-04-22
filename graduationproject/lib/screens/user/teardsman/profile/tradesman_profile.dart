@@ -7,11 +7,16 @@ class TradesmanProfile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF011931),
+      backgroundColor: const Color(0xFFF9F5F1),
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: const Color(0xFFF9F5F1),
         elevation: 0,
-        title: const Text("Profile", style: TextStyle(color: Colors.white)),
+        surfaceTintColor: Colors.transparent,
+        title: Image.asset(
+          'assets/company/logo/logo.png',
+          height: 35,
+          fit: BoxFit.contain,
+        ),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -25,9 +30,9 @@ class TradesmanProfile extends StatelessWidget {
                   height: 180,
                   width: double.infinity,
                   margin: const EdgeInsets.only(bottom: 60),
-                  decoration: const BoxDecoration(
-                    color: Colors.white12,
-                    image: DecorationImage(
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withOpacity(0.1),
+                    image: const DecorationImage(
                       image: AssetImage("assets/company/profile/1.png"), // Placeholder
                       fit: BoxFit.cover,
                     ),
@@ -35,11 +40,11 @@ class TradesmanProfile extends StatelessWidget {
                 ),
                 CircleAvatar(
                   radius: 60,
-                  backgroundColor: const Color(0xFF011931),
+                  backgroundColor: const Color(0xFFF9F5F1),
                   child: CircleAvatar(
                     radius: 55,
-                    backgroundColor: Colors.white12,
-                    child: Icon(Icons.person, size: 70, color: Colors.white.withValues(alpha: 0.5)),
+                    backgroundColor: Colors.white,
+                    child: Icon(Icons.person, size: 70, color: Colors.grey.withOpacity(0.5)),
                   ),
                 ),
               ],
@@ -47,11 +52,11 @@ class TradesmanProfile extends StatelessWidget {
             const SizedBox(height: 10),
             Text(
               TradesmanProfileData.fullName,
-              style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+              style: const TextStyle(color: Colors.black87, fontSize: 24, fontWeight: FontWeight.bold),
             ),
             Text(
               TradesmanProfileData.service,
-              style: const TextStyle(color: Color(0xFF49769F), fontSize: 16),
+              style: const TextStyle(color: Color(0xFF49769F), fontSize: 16, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 20),
             
@@ -83,11 +88,11 @@ class TradesmanProfile extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+        Text(title, style: const TextStyle(color: Colors.black87, fontSize: 18, fontWeight: FontWeight.bold)),
         const SizedBox(height: 8),
         Text(
           content.isEmpty ? "No information provided." : content,
-          style: const TextStyle(color: Colors.white70, fontSize: 14, height: 1.5),
+          style: const TextStyle(color: Colors.black54, fontSize: 14, height: 1.5),
         ),
       ],
     );
@@ -97,15 +102,16 @@ class TradesmanProfile extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.05),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(15),
+        border: Border.all(color: Colors.grey.withOpacity(0.1)),
       ),
       child: Column(
         children: [
           _buildInfoRow(Icons.phone, TradesmanProfileData.phone),
-          const Divider(color: Colors.white12, height: 20),
+          const Divider(color: Colors.black12, height: 20),
           _buildInfoRow(Icons.email, TradesmanProfileData.email),
-          const Divider(color: Colors.white12, height: 20),
+          const Divider(color: Colors.black12, height: 20),
           _buildInfoRow(Icons.location_on, TradesmanProfileData.address),
         ],
       ),
@@ -117,7 +123,7 @@ class TradesmanProfile extends StatelessWidget {
       children: [
         Icon(icon, color: const Color(0xFF49769F), size: 20),
         const SizedBox(width: 15),
-        Text(text, style: const TextStyle(color: Colors.white70, fontSize: 14)),
+        Text(text, style: const TextStyle(color: Colors.black54, fontSize: 14)),
       ],
     );
   }
@@ -126,14 +132,15 @@ class TradesmanProfile extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text("Skills", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+        const Text("Skills", style: TextStyle(color: Colors.black87, fontSize: 18, fontWeight: FontWeight.bold)),
         const SizedBox(height: 10),
         Wrap(
           spacing: 8,
           runSpacing: 8,
           children: TradesmanProfileData.skills.map((skill) => Chip(
-            label: Text(skill, style: const TextStyle(color: Colors.white, fontSize: 12)),
-            backgroundColor: const Color(0xFF49769F).withValues(alpha: 0.2),
+            label: Text(skill, style: const TextStyle(color: Colors.black87, fontSize: 12)),
+            backgroundColor: const Color(0xFF49769F).withOpacity(0.1),
+            side: BorderSide.none,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           )).toList(),
         ),
@@ -146,14 +153,15 @@ class TradesmanProfile extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text("Education", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+        const Text("Education", style: TextStyle(color: Colors.black87, fontSize: 18, fontWeight: FontWeight.bold)),
         const SizedBox(height: 10),
         ...TradesmanProfileData.education.map((edu) => Container(
           margin: const EdgeInsets.only(bottom: 10),
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.03),
+            color: Colors.white,
             borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: Colors.grey.withOpacity(0.1)),
           ),
           child: Row(
             children: [
@@ -163,8 +171,8 @@ class TradesmanProfile extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(edu['institution'] ?? "", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                    Text("${edu['degree']} (${edu['duration']})", style: const TextStyle(color: Colors.white54, fontSize: 12)),
+                    Text(edu['institution'] ?? "", style: const TextStyle(color: Colors.black87, fontWeight: FontWeight.bold)),
+                    Text("${edu['degree']} (${edu['duration']})", style: const TextStyle(color: Colors.black54, fontSize: 12)),
                   ],
                 ),
               ),
@@ -180,7 +188,7 @@ class TradesmanProfile extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text("Work Showcase", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+        const Text("Work Showcase", style: TextStyle(color: Colors.black87, fontSize: 18, fontWeight: FontWeight.bold)),
         const SizedBox(height: 10),
         SizedBox(
           height: 120,
@@ -191,8 +199,9 @@ class TradesmanProfile extends StatelessWidget {
               width: 120,
               margin: const EdgeInsets.only(right: 12),
               decoration: BoxDecoration(
-                color: Colors.white12,
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(15),
+                border: Border.all(color: Colors.grey.withOpacity(0.1)),
                 image: const DecorationImage(
                   image: AssetImage("assets/company/profile/6.png"), // Placeholder
                   fit: BoxFit.cover,
@@ -205,4 +214,3 @@ class TradesmanProfile extends StatelessWidget {
     );
   }
 }
-

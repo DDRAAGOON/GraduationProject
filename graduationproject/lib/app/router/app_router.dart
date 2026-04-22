@@ -146,7 +146,7 @@ final class AppRouter {
             salaryRange: 'N/A',
             type: 'N/A',
             tags: const <String>[],
-            publishedAt: DateTime.now(),
+            publishedAt: DateTime.now(), category: '',
           );
 
     Widget page;

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../app/router/app_router.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_text_field.dart';
+import 'sign_up_screen/sign_up_seeker.dart';
 
 class RecruitmentUserSignInScreen extends StatefulWidget {
   const RecruitmentUserSignInScreen({super.key});
@@ -47,7 +48,12 @@ class _RecruitmentUserSignInScreenState extends State<RecruitmentUserSignInScree
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(_isAr ? 'تسجيل دخول المستخدم' : 'User Sign In')),
+      backgroundColor: const Color(0xFFF9F5F1),
+      appBar: AppBar(
+        title: Text(_isAr ? 'تسجيل دخول المستخدم' : 'User Sign In'),
+        backgroundColor: const Color(0xFFF9F5F1),
+        surfaceTintColor: Colors.transparent,
+      ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -83,6 +89,36 @@ class _RecruitmentUserSignInScreenState extends State<RecruitmentUserSignInScree
           AppButton(
             label: _isAr ? 'دخول' : 'Sign In',
             onPressed: _submit,
+          ),
+          const SizedBox(height: 24),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                _isAr ? 'انشاء حساب الان' : "Don't have an account?",
+                style: TextStyle(
+                  color: Colors.grey[600],
+                  fontSize: 14,
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const SignUpSeeker(),
+                    ),
+                  );
+                },
+                child: Text(
+                  _isAr ? 'تسجيل جديد' : 'Sign Up',
+                  style: TextStyle(
+                    color: Theme.of(context).primaryColor,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),

@@ -24,8 +24,6 @@ class _RecruitmentJobApplicationScreenState
   final _portfolio = TextEditingController();
   final _cvLink = TextEditingController();
   final _cover = TextEditingController();
-  final _expectedSalary = TextEditingController();
-  final _noticePeriod = TextEditingController();
   final _linkedIn = TextEditingController();
   bool _relocate = false;
   bool _authorizedToWork = true;
@@ -49,8 +47,6 @@ class _RecruitmentJobApplicationScreenState
     _portfolio.dispose();
     _cvLink.dispose();
     _cover.dispose();
-    _expectedSalary.dispose();
-    _noticePeriod.dispose();
     _linkedIn.dispose();
     super.dispose();
   }
@@ -132,16 +128,6 @@ class _RecruitmentJobApplicationScreenState
           TextField(
             controller: _experience,
             decoration: const InputDecoration(labelText: 'Years of experience'),
-          ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _expectedSalary,
-            decoration: const InputDecoration(labelText: 'Expected salary'),
-          ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _noticePeriod,
-            decoration: const InputDecoration(labelText: 'Notice period'),
           ),
           const SizedBox(height: 12),
           TextField(

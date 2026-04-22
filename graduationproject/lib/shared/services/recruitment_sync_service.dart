@@ -84,7 +84,7 @@ class RecruitmentSyncService {
           salaryRange: salaryRange,
           type: type,
           tags: tags,
-          publishedAt: DateTime.now(),
+          publishedAt: DateTime.now(), category: '',
         ),
       );
     }

@@ -83,7 +83,7 @@ class _PostJobState extends State<PostJob> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: const Color(0xFF0D2D4D),
+      backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -99,19 +99,19 @@ class _PostJobState extends State<PostJob> {
               padding: const EdgeInsets.symmetric(vertical: 20),
               child: Column(
                 children: [
-                  Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2))),
+                  Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey.withOpacity(0.2), borderRadius: BorderRadius.circular(2))),
                   Padding(
                     padding: const EdgeInsets.all(20.0),
                     child: Row(
                       children: [
                         if (currentGov != null) 
                           IconButton(
-                            icon: const Icon(Icons.arrow_back, color: Colors.white),
+                            icon: const Icon(Icons.arrow_back, color: Colors.black87),
                             onPressed: () => setModalState(() => currentGov = null),
                           ),
                         Text(
                           currentGov ?? "Select Governorate", 
-                          style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)
+                          style: const TextStyle(color: Colors.black87, fontSize: 18, fontWeight: FontWeight.bold)
                         ),
                       ],
                     ),
@@ -121,7 +121,7 @@ class _PostJobState extends State<PostJob> {
                       itemCount: items.length,
                       itemBuilder: (context, index) {
                         return ListTile(
-                          title: Text(items[index], style: const TextStyle(color: Colors.white70)),
+                          title: Text(items[index], style: const TextStyle(color: Colors.black87)),
                           onTap: () {
                             if (currentGov == null) {
                               setModalState(() => currentGov = items[index]);
@@ -148,12 +148,17 @@ class _PostJobState extends State<PostJob> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF011931),
+      backgroundColor: const Color(0xFFF9F5F1),
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: const Color(0xFFF9F5F1),
         elevation: 0,
-        automaticallyImplyLeading: false, // This removes the back arrow
-        title: const Text("Post a Job", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        surfaceTintColor: Colors.transparent,
+        automaticallyImplyLeading: false, 
+        title: Image.asset(
+          'assets/company/logo/logo.png',
+          height: 35,
+          fit: BoxFit.contain,
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
@@ -162,7 +167,7 @@ class _PostJobState extends State<PostJob> {
           children: [
             // Basic Information Header
             _buildSectionHeader("Basic Information", "This information will be displayed publicly"),
-            const Divider(color: Colors.white24, height: 40),
+            const Divider(color: Colors.black12, height: 40),
 
             // Job Title
             _buildSideTitleSection(
@@ -173,11 +178,11 @@ class _PostJobState extends State<PostJob> {
                 children: [
                   _buildTextField(controller: _titleController, hint: "e.g. Software Engineer"),
                   const SizedBox(height: 8),
-                  const Text("At least 80 characters", style: TextStyle(color: Colors.white38, fontSize: 11)),
+                  const Text("At least 80 characters", style: TextStyle(color: Colors.black38, fontSize: 11)),
                 ],
               ),
             ),
-            const Divider(color: Colors.white24, height: 40),
+            const Divider(color: Colors.black12, height: 40),
 
             // Job Descriptions
             _buildSideTitleSection(
@@ -199,7 +204,7 @@ class _PostJobState extends State<PostJob> {
                 ],
               ),
             ),
-            const Divider(color: Colors.white24, height: 40),
+            const Divider(color: Colors.black12, height: 40),
 
             // Required Skills
             _buildSideTitleSection(
@@ -229,7 +234,7 @@ class _PostJobState extends State<PostJob> {
                 ],
               ),
             ),
-            const Divider(color: Colors.white24, height: 40),
+            const Divider(color: Colors.black12, height: 40),
 
             // Location
             _buildSideTitleSection(
@@ -240,7 +245,7 @@ class _PostJobState extends State<PostJob> {
                 child: _buildDropdownField(_selectedLocation),
               ),
             ),
-            const Divider(color: Colors.white24, height: 40),
+            const Divider(color: Colors.black12, height: 40),
 
             // Work Time
             _buildSideTitleSection(
@@ -258,14 +263,14 @@ class _PostJobState extends State<PostJob> {
                     Container(
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.02),
-                        border: Border.all(color: Colors.white12),
+                        color: Colors.white,
+                        border: Border.all(color: Colors.grey.withOpacity(0.2)),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Column(
                         children: [
                           _buildDayItem("All Days", isSpecial: true),
-                          const Divider(color: Colors.white12, height: 1),
+                          const Divider(color: Colors.black12, height: 1),
                           ..._days.map((day) => _buildDayItem(day)),
                         ],
                       ),
@@ -274,7 +279,7 @@ class _PostJobState extends State<PostJob> {
                 ],
               ),
             ),
-            const Divider(color: Colors.white24, height: 40),
+            const Divider(color: Colors.black12, height: 40),
 
             // Work Image
             _buildSideTitleSection(
@@ -308,9 +313,9 @@ class _PostJobState extends State<PostJob> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+        Text(title, style: const TextStyle(color: Colors.black87, fontSize: 18, fontWeight: FontWeight.bold)),
         const SizedBox(height: 4),
-        Text(subtitle, style: const TextStyle(color: Colors.white38, fontSize: 12)),
+        Text(subtitle, style: const TextStyle(color: Colors.black38, fontSize: 12)),
       ],
     );
   }
@@ -324,10 +329,10 @@ class _PostJobState extends State<PostJob> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
+              Text(title, style: const TextStyle(color: Colors.black87, fontSize: 15, fontWeight: FontWeight.bold)),
               if (subtitle.isNotEmpty) ...[
                 const SizedBox(height: 4),
-                Text(subtitle, style: const TextStyle(color: Colors.white38, fontSize: 11)),
+                Text(subtitle, style: const TextStyle(color: Colors.black38, fontSize: 11)),
               ],
             ],
           ),
@@ -344,17 +349,17 @@ class _PostJobState extends State<PostJob> {
   Widget _buildTextField({required TextEditingController controller, required String hint, int maxLines = 1}) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.02),
-        border: Border.all(color: Colors.white12),
+        color: Colors.white,
+        border: Border.all(color: Colors.grey.withOpacity(0.2)),
         borderRadius: BorderRadius.circular(4),
       ),
       child: TextField(
         controller: controller,
         maxLines: maxLines,
-        style: const TextStyle(color: Colors.white, fontSize: 14),
+        style: const TextStyle(color: Colors.black87, fontSize: 14),
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: const TextStyle(color: Colors.white24, fontSize: 13),
+          hintStyle: const TextStyle(color: Colors.black26, fontSize: 13),
           contentPadding: const EdgeInsets.all(12),
           border: InputBorder.none,
         ),
@@ -366,9 +371,9 @@ class _PostJobState extends State<PostJob> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.05),
+        color: const Color(0xFF49769F).withOpacity(0.1),
         borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: Colors.white12),
+        border: Border.all(color: const Color(0xFF49769F).withOpacity(0.2)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -381,7 +386,7 @@ class _PostJobState extends State<PostJob> {
                 _selectedSkills.remove(label);
               });
             },
-            child: const Icon(Icons.close, size: 14, color: Colors.white38),
+            child: const Icon(Icons.close, size: 14, color: Colors.black38),
           ),
         ],
       ),
@@ -392,13 +397,13 @@ class _PostJobState extends State<PostJob> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.white24)),
+        border: Border(bottom: BorderSide(color: Colors.black12)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Expanded(child: Text(value, style: const TextStyle(color: Colors.white70, fontSize: 14), overflow: TextOverflow.ellipsis)),
-          const Icon(Icons.keyboard_arrow_down, color: Colors.white38),
+          Expanded(child: Text(value, style: const TextStyle(color: Colors.black54, fontSize: 14), overflow: TextOverflow.ellipsis)),
+          const Icon(Icons.keyboard_arrow_down, color: Colors.black38),
         ],
       ),
     );
@@ -409,17 +414,17 @@ class _PostJobState extends State<PostJob> {
       width: 120,
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.05),
-        border: Border.all(color: Colors.white24),
+        color: Colors.white,
+        border: Border.all(color: Colors.grey.withOpacity(0.2)),
         borderRadius: BorderRadius.circular(4),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(hint, style: const TextStyle(color: Colors.white70, fontSize: 12)),
+          Text(hint, style: const TextStyle(color: Colors.black54, fontSize: 12)),
           Icon(
             _isWorkTimeExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down, 
-            color: Colors.white38, 
+            color: Colors.black38, 
             size: 16
           ),
         ],
@@ -454,21 +459,21 @@ class _PostJobState extends State<PostJob> {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF49769F).withValues(alpha: 0.3) : Colors.transparent,
-          border: Border(bottom: BorderSide(color: Colors.white.withValues(alpha: 0.05))),
+          color: isSelected ? const Color(0xFF49769F).withOpacity(0.1) : Colors.transparent,
+          border: Border(bottom: BorderSide(color: Colors.black.withOpacity(0.05))),
         ),
         child: Row(
           children: [
             Icon(
               isSelected ? Icons.check_box : Icons.check_box_outline_blank,
-              color: isSelected ? const Color(0xFF49769F) : Colors.white24,
+              color: isSelected ? const Color(0xFF49769F) : Colors.black26,
               size: 20,
             ),
             const SizedBox(width: 12),
             Text(
               day,
               style: TextStyle(
-                color: isSelected ? Colors.white : Colors.white70,
+                color: isSelected ? Colors.black87 : Colors.black54,
                 fontSize: 13,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               ),
@@ -483,21 +488,21 @@ class _PostJobState extends State<PostJob> {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.02),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: const Color(0xFF49769F), style: BorderStyle.solid),
       ),
       child: Center(
         child: Column(
           children: [
-            const Icon(Icons.image_outlined, color: Colors.white38, size: 32),
+            const Icon(Icons.image_outlined, color: Colors.black26, size: 32),
             const SizedBox(height: 12),
             RichText(
               textAlign: TextAlign.center,
               text: TextSpan(
                 children: [
                   const TextSpan(text: "Click to replace ", style: TextStyle(color: Color(0xFF49769F), fontSize: 12)),
-                  TextSpan(text: "or drag and drop\n$text".replaceAll("Click to replace or drag and drop\n", ""), style: const TextStyle(color: Colors.white38, fontSize: 12)),
+                  TextSpan(text: "or drag and drop\n$text".replaceAll("Click to replace or drag and drop\n", ""), style: const TextStyle(color: Colors.black38, fontSize: 12)),
                 ],
               ),
             ),
@@ -507,4 +512,3 @@ class _PostJobState extends State<PostJob> {
     );
   }
 }
-

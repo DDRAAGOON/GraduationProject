@@ -14,42 +14,71 @@ class RecruitmentJobFiltersScreen extends StatefulWidget {
 class _RecruitmentJobFiltersScreenState
     extends State<RecruitmentJobFiltersScreen> {
   late String _selectedType;
-  late String _selectedLocation;
+  late String _selectedCategory;
 
   @override
   void initState() {
     super.initState();
     final store = RecruitmentSyncStore.instance;
     _selectedType = store.filterType;
-    _selectedLocation = store.filterLocation;
+    _selectedCategory = store.filterCategory;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Advanced Filters')),
+      backgroundColor: const Color(0xFFF9F5F1),
+      appBar: AppBar(
+        title: const Text('Advanced Filters'),
+        backgroundColor: const Color(0xFFF9F5F1),
+        surfaceTintColor: Colors.transparent,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const Text(
+              'Employment Type',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+            const SizedBox(height: 8),
             DropdownButtonFormField<String>(
-              initialValue: _selectedType,
-              decoration: const InputDecoration(labelText: 'Employment Type'),
+              value: _selectedType,
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+              ),
               items: const ['All', 'Full-time', 'Part-time', 'Contract']
                   .map((e) => DropdownMenuItem(value: e, child: Text(e)))
                   .toList(),
               onChanged: (value) => setState(() => _selectedType = value ?? 'All'),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 20),
+            const Text(
+              'Categories',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+            const SizedBox(height: 8),
             DropdownButtonFormField<String>(
-              initialValue: _selectedLocation,
-              decoration: const InputDecoration(labelText: 'Location'),
-              items: const ['All', 'Remote', 'Cairo, Egypt', 'Alex, Egypt']
+              value: _selectedCategory,
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+              items: RecruitmentSyncStore.categories
                   .map((e) => DropdownMenuItem(value: e, child: Text(e)))
                   .toList(),
               onChanged: (value) =>
-                  setState(() => _selectedLocation = value ?? 'All'),
+                  setState(() => _selectedCategory = value ?? 'All'),
             ),
             const Spacer(),
             AppButton(
@@ -57,10 +86,23 @@ class _RecruitmentJobFiltersScreenState
               onPressed: () {
                 RecruitmentSyncStore.instance.updateFilters(
                   type: _selectedType,
-                  location: _selectedLocation,
+                  category: _selectedCategory,
                 );
                 Navigator.of(context).pop();
               },
+            ),
+            const SizedBox(height: 10),
+            SizedBox(
+              width: double.infinity,
+              child: TextButton(
+                onPressed: () {
+                  setState(() {
+                    _selectedType = 'All';
+                    _selectedCategory = 'All';
+                  });
+                },
+                child: const Text('Reset All'),
+              ),
             ),
           ],
         ),
