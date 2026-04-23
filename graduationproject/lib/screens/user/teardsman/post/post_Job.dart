@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:graduationproject/shared/l10n/app_localizations.dart';
 
 class PostJob extends StatefulWidget {
   const PostJob({super.key});
@@ -9,16 +10,15 @@ class PostJob extends StatefulWidget {
 
 class _PostJobState extends State<PostJob> {
   // Controllers
+  final TextEditingController _nameController = TextEditingController();
   final TextEditingController _titleController = TextEditingController();
-  final List<TextEditingController> _descriptionControllers = [TextEditingController()];
-  final TextEditingController _skillInputController = TextEditingController();
+  final TextEditingController _priceController = TextEditingController();
 
-  final List<String> _selectedSkills = [];
-  final List<String> _days = ["Saterday", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
-  final Set<String> _selectedDays = {"Sunday", "Tuesday"};
+  final List<String> _days = ["Saturday", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+  final Set<String> _selectedDays = {};
   
   bool _isWorkTimeExpanded = false;
-  String _selectedLocation = "Select Location";
+  String _selectedLocation = "";
 
   // Egypt Locations Data
   final Map<String, List<String>> _egyptLocations = {
@@ -53,31 +53,13 @@ class _PostJobState extends State<PostJob> {
 
   @override
   void dispose() {
+    _nameController.dispose();
     _titleController.dispose();
-    for (var controller in _descriptionControllers) {
-      controller.dispose();
-    }
-    _skillInputController.dispose();
+    _priceController.dispose();
     super.dispose();
   }
 
-  void _addDescriptionPoint() {
-    setState(() {
-      _descriptionControllers.add(TextEditingController());
-    });
-  }
-
-  void _addSkill() {
-    final skill = _skillInputController.text.trim();
-    if (skill.isNotEmpty && !_selectedSkills.contains(skill)) {
-      setState(() {
-        _selectedSkills.add(skill);
-        _skillInputController.clear();
-      });
-    }
-  }
-
-  void _showLocationPicker() {
+  void _showLocationPicker(AppLocalizations t) {
     String? currentGov;
     
     showModalBottomSheet(
@@ -110,7 +92,7 @@ class _PostJobState extends State<PostJob> {
                             onPressed: () => setModalState(() => currentGov = null),
                           ),
                         Text(
-                          currentGov ?? "Select Governorate", 
+                          currentGov ?? t.tr(en: "Select Governorate", ar: "اختر المحافظة"), 
                           style: const TextStyle(color: Colors.black87, fontSize: 18, fontWeight: FontWeight.bold)
                         ),
                       ],
@@ -145,8 +127,29 @@ class _PostJobState extends State<PostJob> {
     );
   }
 
+  void _validateAndPost(AppLocalizations t) {
+    if (_nameController.text.trim().isEmpty ||
+        _titleController.text.trim().isEmpty ||
+        _priceController.text.trim().isEmpty ||
+        _selectedLocation.isEmpty ||
+        _selectedDays.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(t.tr(en: "Please fill all required fields", ar: "يرجى ملء جميع الحقول المطلوبة")),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(t.tr(en: "Service posted successfully!", ar: "تم نشر الخدمة بنجاح!"))),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: const Color(0xFFF9F5F1),
       appBar: AppBar(
@@ -154,109 +157,88 @@ class _PostJobState extends State<PostJob> {
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         automaticallyImplyLeading: false, 
-        title: Image.asset(
-          'assets/company/logo/logo.png',
-          height: 35,
-          fit: BoxFit.contain,
+        title: Row(
+          children: [
+          //  Image.asset(
+            //  'assets/company/logo/logo.png',
+             // height: 100,
+              //fit: BoxFit.contain,
+            //),
+            const SizedBox(width: 12),
+            Text(
+              t.tr(en: "Post job", ar: "نشر وظيفة"),
+              style: const TextStyle(
+                color: Color(0xFF011931),
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+              ),
+            ),
+          ],
         ),
+        centerTitle: false,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const SizedBox(height: 10),
             // Basic Information Header
-            _buildSectionHeader("Basic Information", "This information will be displayed publicly"),
-            const Divider(color: Colors.black12, height: 40),
-
-            // Job Title
-            _buildSideTitleSection(
-              title: "Job Title",
-              subtitle: "Job titles must be describe one position",
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildTextField(controller: _titleController, hint: "e.g. Software Engineer"),
-                  const SizedBox(height: 8),
-                  const Text("At least 80 characters", style: TextStyle(color: Colors.black38, fontSize: 11)),
-                ],
-              ),
+            _buildSectionHeader(
+              t.tr(en: "Basic Information", ar: "معلومات أساسية"), 
+              t.tr(en: "This information will be displayed publicly", ar: "سيتم عرض هذه المعلومات بشكل علني")
             ),
             const Divider(color: Colors.black12, height: 40),
 
-            // Job Descriptions
+            // Name
             _buildSideTitleSection(
-              title: "Job Descriptions",
-              subtitle: "Job titles must be describe one position",
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ..._descriptionControllers.map((controller) => Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: _buildTextField(controller: controller, hint: "Enter job description", maxLines: 2),
-                  )),
-                  const SizedBox(height: 12),
-                  TextButton.icon(
-                    onPressed: _addDescriptionPoint,
-                    icon: const Icon(Icons.add, size: 18, color: Color(0xFF49769F)),
-                    label: const Text("Add another point", style: TextStyle(color: Color(0xFF49769F))),
-                  ),
-                ],
-              ),
+              title: "${t.tr(en: "Full Name", ar: "الاسم بالكامل")} *",
+              subtitle: t.tr(en: "Enter your full name", ar: "أدخل اسمك بالكامل"),
+              child: _buildTextField(controller: _nameController, hint: "e.g. Ahmed Ali"),
             ),
             const Divider(color: Colors.black12, height: 40),
 
-            // Required Skills
+            // Service Title (Job Title)
             _buildSideTitleSection(
-              title: "Required Skills",
-              subtitle: "Add required skills for the job",
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildTextField(controller: _skillInputController, hint: "Type skill here..."),
-                      ),
-                      const SizedBox(width: 10),
-                      IconButton(
-                        onPressed: _addSkill,
-                        icon: const Icon(Icons.add_circle, color: Color(0xFF49769F), size: 35),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: _selectedSkills.map((skill) => _buildSkillChip(skill)).toList(),
-                  ),
-                ],
+              title: "${t.tr(en: "Service Title", ar: "عنوان الخدمة")} *",
+              subtitle: t.tr(en: "Describe your profession", ar: "صف مهنتك"),
+              child: _buildTextField(controller: _titleController, hint: "e.g. Professional Plumber"),
+            ),
+            const Divider(color: Colors.black12, height: 40),
+
+            // Starting Price
+            _buildSideTitleSection(
+              title: "${t.tr(en: "Starting Price", ar: "السعر المبدئي")} *",
+              subtitle: t.tr(en: "Price starts from...", ar: "يبدأ السعر من..."),
+              child: _buildTextField(
+                controller: _priceController, 
+                hint: "e.g. 150 EGP",
+                keyboardType: TextInputType.number,
               ),
             ),
             const Divider(color: Colors.black12, height: 40),
 
             // Location
             _buildSideTitleSection(
-              title: "Location",
-              subtitle: "Select governorate and area in Egypt",
+              title: "${t.tr(en: "Location", ar: "الموقع")} *",
+              subtitle: t.tr(en: "Select governorate and area in Egypt", ar: "اختر المحافظة والمنطقة في مصر"),
               child: GestureDetector(
-                onTap: _showLocationPicker,
-                child: _buildDropdownField(_selectedLocation),
+                onTap: () => _showLocationPicker(t),
+                child: _buildDropdownField(_selectedLocation.isEmpty ? t.tr(en: "Select Location", ar: "اختر الموقع") : _selectedLocation),
               ),
             ),
             const Divider(color: Colors.black12, height: 40),
 
             // Work Time
             _buildSideTitleSection(
-              title: "Work time",
-              subtitle: "",
+              title: "${t.tr(en: "Work time", ar: "وقت العمل")} *",
+              subtitle: t.tr(en: "Available days", ar: "الأيام المتاحة"),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   GestureDetector(
                     onTap: () => setState(() => _isWorkTimeExpanded = !_isWorkTimeExpanded),
-                    child: _buildSmallDropdown(_selectedDays.length == 7 ? "All days" : "Select"),
+                    child: _buildSmallDropdown(_selectedDays.length == 7 ? t.tr(en: "All days", ar: "كل الأيام") : t.tr(en: "Select", ar: "اختر")),
                   ),
                   if (_isWorkTimeExpanded) ...[
                     const SizedBox(height: 10),
@@ -269,7 +251,7 @@ class _PostJobState extends State<PostJob> {
                       ),
                       child: Column(
                         children: [
-                          _buildDayItem("All Days", isSpecial: true),
+                          _buildDayItem(t.tr(en: "All Days", ar: "كل الأيام"), isSpecial: true),
                           const Divider(color: Colors.black12, height: 1),
                           ..._days.map((day) => _buildDayItem(day)),
                         ],
@@ -279,27 +261,22 @@ class _PostJobState extends State<PostJob> {
                 ],
               ),
             ),
-            const Divider(color: Colors.black12, height: 40),
-
-            // Work Image
-            _buildSideTitleSection(
-              title: "Work Image",
-              subtitle: "Can Put Image For Our Your Work",
-              child: _buildUploadBox("Click to replace or drag and drop\nSVG, PNG, JPG or GIF (max. 400 x 400px)"),
-            ),
             const SizedBox(height: 40),
 
             // Bottom Button
             Align(
               alignment: Alignment.centerRight,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () => _validateAndPost(t),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF49769F),
                   padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                 ),
-                child: const Text("Save", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                child: Text(
+                  t.tr(en: "Post job", ar: "نشر وظيفة"),
+                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)
+                ),
               ),
             ),
             const SizedBox(height: 40),
@@ -346,7 +323,7 @@ class _PostJobState extends State<PostJob> {
     );
   }
 
-  Widget _buildTextField({required TextEditingController controller, required String hint, int maxLines = 1}) {
+  Widget _buildTextField({required TextEditingController controller, required String hint, int maxLines = 1, TextInputType keyboardType = TextInputType.text}) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -356,6 +333,7 @@ class _PostJobState extends State<PostJob> {
       child: TextField(
         controller: controller,
         maxLines: maxLines,
+        keyboardType: keyboardType,
         style: const TextStyle(color: Colors.black87, fontSize: 14),
         decoration: InputDecoration(
           hintText: hint,
@@ -363,32 +341,6 @@ class _PostJobState extends State<PostJob> {
           contentPadding: const EdgeInsets.all(12),
           border: InputBorder.none,
         ),
-      ),
-    );
-  }
-
-  Widget _buildSkillChip(String label) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: const Color(0xFF49769F).withOpacity(0.1),
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: const Color(0xFF49769F).withOpacity(0.2)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(label, style: const TextStyle(color: Color(0xFF49769F), fontSize: 12)),
-          const SizedBox(width: 8),
-          GestureDetector(
-            onTap: () {
-              setState(() {
-                _selectedSkills.remove(label);
-              });
-            },
-            child: const Icon(Icons.close, size: 14, color: Colors.black38),
-          ),
-        ],
       ),
     );
   }
@@ -476,34 +428,6 @@ class _PostJobState extends State<PostJob> {
                 color: isSelected ? Colors.black87 : Colors.black54,
                 fontSize: 13,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildUploadBox(String text) {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFF49769F), style: BorderStyle.solid),
-      ),
-      child: Center(
-        child: Column(
-          children: [
-            const Icon(Icons.image_outlined, color: Colors.black26, size: 32),
-            const SizedBox(height: 12),
-            RichText(
-              textAlign: TextAlign.center,
-              text: TextSpan(
-                children: [
-                  const TextSpan(text: "Click to replace ", style: TextStyle(color: Color(0xFF49769F), fontSize: 12)),
-                  TextSpan(text: "or drag and drop\n$text".replaceAll("Click to replace or drag and drop\n", ""), style: const TextStyle(color: Colors.black38, fontSize: 12)),
-                ],
               ),
             ),
           ],

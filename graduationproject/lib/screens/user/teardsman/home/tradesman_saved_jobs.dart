@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:graduationproject/shared/l10n/app_localizations.dart';
 import '../../../../../shared/state/recruitment_sync_store.dart';
+import 'tradesman_job_details_screen.dart';
 
 class TradesmanSavedJobs extends StatelessWidget {
   const TradesmanSavedJobs({super.key});
@@ -171,7 +172,14 @@ class TradesmanSavedJobs extends StatelessWidget {
                   ),
                   padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => TradesmanJobDetailsScreen(job: job),
+                    ),
+                  );
+                },
                 child: Text(
                   t.tr(en: 'View Details', ar: 'عرض التفاصيل'),
                   style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),

@@ -95,95 +95,124 @@ class _RecruitmentJobApplicationScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Apply To Job')),
+      backgroundColor: const Color(0xFFF9F5F1),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFFF9F5F1),
+        elevation: 0,
+        surfaceTintColor: Colors.transparent,
+        title: Image.asset(
+          'assets/company/logo/logo.png',
+          height: 35,
+          fit: BoxFit.contain,
+        ),
+        centerTitle: true,
+      ),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(24),
         children: [
-          Text(
-            widget.job.title,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w800,
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.grey.withOpacity(0.1)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  widget.job.title,
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w800,
+                        color: Colors.black87,
+                      ),
                 ),
+                const SizedBox(height: 6),
+                Text(
+                  '${widget.job.companyName} • ${widget.job.location}',
+                  style: const TextStyle(color: Colors.black54),
+                ),
+              ],
+            ),
           ),
-          const SizedBox(height: 6),
-          Text('${widget.job.companyName} • ${widget.job.location}'),
-          const SizedBox(height: 16),
-          TextField(
-            controller: _name,
-            decoration: const InputDecoration(labelText: 'Full name *'),
-          ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _email,
-            keyboardType: TextInputType.emailAddress,
-            decoration: const InputDecoration(labelText: 'Email *'),
-          ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _phone,
-            keyboardType: TextInputType.phone,
-            decoration: const InputDecoration(labelText: 'Phone *'),
-          ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _experience,
-            decoration: const InputDecoration(labelText: 'Years of experience'),
-          ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _portfolio,
-            decoration: const InputDecoration(labelText: 'Portfolio URL'),
-          ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _linkedIn,
-            decoration: const InputDecoration(labelText: 'LinkedIn URL'),
-          ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _cvLink,
-            decoration: const InputDecoration(labelText: 'CV link'),
-          ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 24),
+          
+          _buildInputField('Full name *', _name),
+          _buildInputField('Email *', _email, keyboardType: TextInputType.emailAddress),
+          _buildInputField('Phone *', _phone, keyboardType: TextInputType.phone),
+          _buildInputField('Years of experience', _experience),
+          _buildInputField('Portfolio URL', _portfolio),
+          _buildInputField('LinkedIn URL', _linkedIn),
+          _buildInputField('CV link', _cvLink),
+          
+          const SizedBox(height: 8),
           OutlinedButton.icon(
+            style: OutlinedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              side: BorderSide(color: Colors.grey.withOpacity(0.3)),
+            ),
             onPressed: _pickPdf,
             icon: const Icon(Icons.upload_file),
             label: Text(
               _pickedPdfName == null
                   ? 'Upload CV as PDF'
                   : 'PDF: $_pickedPdfName',
+              style: const TextStyle(color: Colors.black87),
               overflow: TextOverflow.ellipsis,
             ),
           ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _cover,
-            maxLines: 5,
-            decoration: const InputDecoration(
-              labelText: 'Cover letter *',
-              alignLabelWithHint: true,
-            ),
-          ),
+          
+          const SizedBox(height: 16),
+          _buildInputField('Cover letter *', _cover, maxLines: 5),
+          
           CheckboxListTile(
             value: _relocate,
             contentPadding: EdgeInsets.zero,
             onChanged: (value) => setState(() => _relocate = value ?? false),
-            title: const Text('Open to relocation'),
+            title: const Text('Open to relocation', style: TextStyle(fontSize: 14)),
           ),
           CheckboxListTile(
             value: _authorizedToWork,
             contentPadding: EdgeInsets.zero,
             onChanged: (value) =>
                 setState(() => _authorizedToWork = value ?? true),
-            title: const Text('Authorized to work in job location'),
+            title: const Text('Authorized to work in job location', style: TextStyle(fontSize: 14)),
           ),
-          const SizedBox(height: 10),
+          
+          const SizedBox(height: 24),
           AppButton(
             label: 'Submit Application',
             loading: _loading,
             onPressed: _loading ? null : _submit,
           ),
+          const SizedBox(height: 24),
         ],
+      ),
+    );
+  }
+
+  Widget _buildInputField(String label, TextEditingController controller, 
+      {TextInputType? keyboardType, int maxLines = 1}) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: TextField(
+        controller: controller,
+        keyboardType: keyboardType,
+        maxLines: maxLines,
+        decoration: InputDecoration(
+          labelText: label,
+          filled: true,
+          fillColor: Colors.white,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Colors.grey.withOpacity(0.1)),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Colors.grey.withOpacity(0.1)),
+          ),
+        ),
       ),
     );
   }

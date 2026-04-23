@@ -3,6 +3,8 @@ import 'package:graduationproject/shared/l10n/app_localizations.dart';
 import '../../../../../shared/state/recruitment_sync_store.dart';
 import '../post/post_job.dart';
 import '../setting/settings.dart';
+import 'tradesman_apply_job_screen.dart';
+import 'tradesman_job_details_screen.dart';
 
 class FindJobs extends StatefulWidget {
   const FindJobs({super.key});
@@ -33,10 +35,6 @@ class _FindJobsState extends State<FindJobs> {
       default:
         return Colors.grey;
     }
-  }
-
-  void _filterJobs() {
-    setState(() {});
   }
 
   void _showLocationPicker(AppLocalizations t) {
@@ -317,7 +315,14 @@ class _FindJobsState extends State<FindJobs> {
                           ),
                           padding: const EdgeInsets.symmetric(vertical: 8),
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => TradesmanJobDetailsScreen(job: job),
+                            ),
+                          );
+                        },
                         child: Text(
                           t.tr(en: 'View Details', ar: 'عرض التفاصيل'),
                           style: const TextStyle(color: Color(0xFFFF7A2A), fontWeight: FontWeight.bold, fontSize: 13),
@@ -347,7 +352,14 @@ class _FindJobsState extends State<FindJobs> {
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => TradesmanApplyJobScreen(job: job),
+                        ),
+                      );
+                    },
                     child: Text(
                       t.tr(en: 'Apply Now', ar: 'قدّم الآن'),
                       style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),

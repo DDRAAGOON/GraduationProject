@@ -235,22 +235,6 @@ class _SignUpSeeker extends State<SignUpSeeker> {
                 ),
                 const SizedBox(height: 35),
 
-                // Profile Photo Section (Matching Tradesman)
-                _buildSectionTitleWidget(t.profilePhoto, t.uploadHint),
-                const SizedBox(height: 15),
-                Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 40,
-                      backgroundColor: Colors.grey.withOpacity(0.1),
-                      child: Icon(Icons.person, size: 45, color: Colors.grey.withOpacity(0.5)),
-                    ),
-                    const SizedBox(width: 20),
-                    Expanded(child: _buildUploadBox(t.uploadHint, () {})),
-                  ],
-                ),
-                const SizedBox(height: 30),
-
                 Text(t.personalInfo, style: const TextStyle(color: Colors.black87, fontSize: 16, fontWeight: FontWeight.w600)),
                 const SizedBox(height: 20),
                 _buildTextField(_fullNameController, t.fullName, Icons.person_outline, isRequired: true),

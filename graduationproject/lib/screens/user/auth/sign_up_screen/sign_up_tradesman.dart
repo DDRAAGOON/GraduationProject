@@ -169,12 +169,10 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
         backgroundColor: const Color(0xFFF9F5F1),
         elevation: 0,
         surfaceTintColor: Colors.transparent,
-        title: Text(
-          t.registration,
-          style: TextStyle(
-            color: Theme.of(context).colorScheme.onSurface,
-            fontWeight: FontWeight.bold,
-          ),
+        title: Image.asset(
+          'assets/company/logo/logo.png',
+          height: 35,
+          fit: BoxFit.contain,
         ),
         centerTitle: true,
       ),
@@ -227,24 +225,6 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
                   ],
                 ),
                 const SizedBox(height: 35),
-
-                // Profile Photo Section
-                _buildSectionHeader(t.profilePhoto, t.uploadHint),
-                const SizedBox(height: 15),
-                Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 40,
-                      backgroundColor: Colors.grey.withOpacity(0.1),
-                      child: Icon(Icons.person, size: 45, color: Colors.grey.withOpacity(0.5)),
-                    ),
-                    const SizedBox(width: 20),
-                    Expanded(child: _buildUploadBox(t.uploadHint, () {
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Profile Photo Selected")));
-                    })),
-                  ],
-                ),
-                const SizedBox(height: 30),
 
                 // Personal Details
                 Text(t.personalInfo, style: const TextStyle(color: Colors.black87, fontSize: 16, fontWeight: FontWeight.w600)),
@@ -352,9 +332,17 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
                   decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.grey.shade300)),
                   child: Row(
                     children: [
-                      const Icon(Icons.school, color: Color(0xFF49769F), size: 20),
-                      const SizedBox(width: 12),
-                      Expanded(child: Text("${entry.value['institution']} - ${entry.value['degree']} (${entry.value['duration']})", style: const TextStyle(color: Colors.black87, fontSize: 12))),
+                      const Icon(Icons.school, color: Color(0xFF49769F)),
+                      const SizedBox(width: 15),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(entry.value['institution'] ?? "", style: const TextStyle(color: Colors.black87, fontWeight: FontWeight.bold)),
+                            Text("${entry.value['degree']} (${entry.value['duration']})", style: const TextStyle(color: Colors.black54, fontSize: 12)),
+                          ],
+                        ),
+                      ),
                       IconButton(icon: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 20), onPressed: () => setState(() => _educationList.removeAt(entry.key))),
                     ],
                   ),
