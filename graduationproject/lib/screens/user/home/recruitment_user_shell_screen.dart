@@ -1,9 +1,12 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';
 import '../../../shared/services/recruitment_sync_service.dart';
 import '../../../shared/state/recruitment_sync_store.dart';
 import '../../../shared/widgets/app_button.dart';
+import '../teardsman/setting/settings.dart';
+import '../messages/messages_list_screen.dart';
 
 class RecruitmentUserShellScreen extends StatefulWidget {
   const RecruitmentUserShellScreen({super.key});
@@ -36,15 +39,15 @@ class _RecruitmentUserShellScreenState extends State<RecruitmentUserShellScreen>
     final List<Widget> pages = <Widget>[
       const _DiscoverTab(),
       const _ApplicationsTab(),
-      const _MessagesTab(),
+      const MessagesListScreen(),
       const _SavedJobsTab(),
       const _ProfileTab(),
     ];
     return Scaffold(
       backgroundColor: const Color(0xFFF9F5F1),
       appBar: AppBar(
-        title: _isAr 
-            ? Text('مساحة المستخدم') 
+        title: _isAr
+            ? Text('مساحة المستخدم')
             : Image.asset(
                 'assets/company/logo/logo.png',
                 height: 150,
@@ -53,6 +56,15 @@ class _RecruitmentUserShellScreenState extends State<RecruitmentUserShellScreen>
         backgroundColor: const Color(0xFFF9F5F1),
         surfaceTintColor: Colors.transparent,
         centerTitle: false,
+        actions: [
+          IconButton(
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => const Settings()),
+            ),
+            icon: const Icon(Icons.settings_outlined),
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
       body: pages[_tab],
       bottomNavigationBar: NavigationBar(
@@ -70,7 +82,7 @@ class _RecruitmentUserShellScreenState extends State<RecruitmentUserShellScreen>
           ),
           NavigationDestination(
             icon: const Icon(Icons.chat_bubble),
-            label: _isAr ? 'الرسائل' : 'Inbox',
+            label: _isAr ? 'الرسائل' : 'Messages',
           ),
           NavigationDestination(
             icon: const Icon(Icons.bookmark),
@@ -233,19 +245,23 @@ class _DiscoverTab extends StatelessWidget {
                           fontWeight: FontWeight.w700,
                         ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 8),
                   Row(
                     children: [
                       const Icon(Icons.business, size: 16, color: Colors.grey),
                       const SizedBox(width: 4),
-                      Text(job.companyName),
-                      const SizedBox(width: 8),
-                      const Icon(Icons.location_on, size: 16, color: Colors.grey),
-                      const SizedBox(width: 4),
-                      Text(job.location),
+                      Text(job.companyName, style: const TextStyle(fontWeight: FontWeight.w600)),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      const Icon(Icons.location_on, size: 16, color: Colors.grey),
+                      const SizedBox(width: 4),
+                      Text(job.location, style: const TextStyle(color: Colors.black54)),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
@@ -281,15 +297,20 @@ class _DiscoverTab extends StatelessWidget {
                       Expanded(
                         child: OutlinedButton(
                           style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: Color(0xFFFF7A2A)),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
+                            padding: const EdgeInsets.symmetric(vertical: 8),
                           ),
                           onPressed: () => Navigator.of(context).pushNamed(
                             AppRoutes.userJobDetails,
                             arguments: job,
                           ),
-                          child: const Text('View Details'),
+                          child: Text(
+                            isAr ? 'عرض التفاصيل' : 'View Details',
+                            style: const TextStyle(color: Color(0xFFFF7A2A), fontWeight: FontWeight.bold),
+                          ),
                         ),
                       ),
                       const SizedBox(width: 10),
@@ -454,12 +475,16 @@ class _ProfileTab extends StatefulWidget {
 }
 
 class _ProfileTabState extends State<_ProfileTab> {
-  final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
   final _locationController = TextEditingController();
   final _aboutController = TextEditingController();
   final _skillsController = TextEditingController();
+  final _portfolioController = TextEditingController();
+  final _cvController = TextEditingController();
+  final _experienceController = TextEditingController();
+  
+  bool _isEditing = false;
 
   @override
   void initState() {
@@ -469,22 +494,26 @@ class _ProfileTabState extends State<_ProfileTab> {
 
   void _loadData() {
     final store = RecruitmentSyncStore.instance;
-    _nameController.text = store.currentUserName;
     _emailController.text = store.currentUserEmail;
     _phoneController.text = store.currentUserPhone;
     _locationController.text = store.currentUserLocation;
     _aboutController.text = store.currentUserAbout;
     _skillsController.text = store.currentUserSkills.join(', ');
+    _portfolioController.text = store.currentUserPortfolio;
+    _cvController.text = store.currentUserCvName ?? '';
+    _experienceController.text = store.currentUserExperience.map((e) => "${e['title']} (${e['duration']})").join('\n');
   }
 
   @override
   void dispose() {
-    _nameController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
     _locationController.dispose();
     _aboutController.dispose();
     _skillsController.dispose();
+    _portfolioController.dispose();
+    _cvController.dispose();
+    _experienceController.dispose();
     super.dispose();
   }
 
@@ -495,29 +524,46 @@ class _ProfileTabState extends State<_ProfileTab> {
     return AnimatedBuilder(
       animation: store,
       builder: (context, _) {
-        // Sync controllers if data changes in store
-        _loadData();
+        if (!_isEditing) _loadData();
         return Padding(
           padding: const EdgeInsets.all(16),
           child: ListView(
             children: [
               Row(
                 children: [
+                  CircleAvatar(
+                    radius: 35,
+                    backgroundColor: Colors.white,
+                    backgroundImage: store.profileImage != null && store.profileImage!.startsWith('http')
+                        ? NetworkImage(store.profileImage!)
+                        : null,
+                    child: store.profileImage == null 
+                        ? const Icon(Icons.person, size: 40, color: Color(0xFF49769F)) 
+                        : null,
+                  ),
+                  const SizedBox(width: 16),
                   Expanded(
-                    child: Text(
-                      isAr ? 'الملف الشخصي' : 'Profile',
-                      style: Theme.of(context).textTheme.headlineSmall,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          store.currentUserName,
+                          style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          store.currentUserTitle,
+                          style: const TextStyle(color: Colors.black54),
+                        ),
+                      ],
                     ),
                   ),
-                  OutlinedButton.icon(
-                    onPressed: () =>
-                        Navigator.of(context).pushNamed(AppRoutes.userSettingsNew),
-                    icon: const Icon(Icons.settings_outlined),
-                    label: Text(isAr ? 'الإعدادات' : 'Settings'),
+                  IconButton(
+                    onPressed: () => setState(() => _isEditing = !_isEditing),
+                    icon: Icon(_isEditing ? Icons.close : Icons.edit_outlined, color: const Color(0xFF49769F)),
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 24),
               Card(
                 color: Colors.white,
                 elevation: 0,
@@ -530,12 +576,14 @@ class _ProfileTabState extends State<_ProfileTab> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildProfileItem(isAr ? 'الاسم بالكامل' : 'Full Name', _nameController),
-                      _buildProfileItem(isAr ? 'البريد الإلكتروني' : 'Email', _emailController),
-                      _buildProfileItem(isAr ? 'رقم الهاتف' : 'Phone', _phoneController),
-                      _buildProfileItem(isAr ? 'الموقع' : 'Location', _locationController),
-                      _buildProfileItem(isAr ? 'نبذة عني' : 'About Me', _aboutController, maxLines: 3),
-                      _buildProfileItem(isAr ? 'المهارات' : 'Skills', _skillsController),
+                      _buildProfileItem(isAr ? 'البريد الإلكتروني' : 'Email', _emailController, enabled: _isEditing),
+                      _buildProfileItem(isAr ? 'رقم الهاتف' : 'Phone', _phoneController, enabled: _isEditing),
+                      _buildProfileItem(isAr ? 'الموقع' : 'Location', _locationController, enabled: _isEditing),
+                      _buildProfileItem(isAr ? 'نبذة عني' : 'About Me', _aboutController, maxLines: 3, enabled: _isEditing),
+                      _buildProfileItem(isAr ? 'المهارات' : 'Skills', _skillsController, enabled: _isEditing),
+                      _buildProfileItem(isAr ? 'خبرة العمل' : 'Work Experience', _experienceController, maxLines: 3, enabled: _isEditing),
+                      _buildProfileItem(isAr ? 'رابط ملف الأعمال' : 'Portfolio', _portfolioController, enabled: _isEditing),
+                      _buildProfileItem(isAr ? 'رابط السيرة الذاتية' : 'CV Link', _cvController, enabled: _isEditing),
                       
                       if (store.socialLinks.isNotEmpty) ...[
                         const SizedBox(height: 20),
@@ -563,24 +611,29 @@ class _ProfileTabState extends State<_ProfileTab> {
                         )),
                       ],
 
-                      const SizedBox(height: 20),
-                      AppButton(
-                        label: isAr ? 'حفظ التغييرات' : 'Save Profile',
-                        onPressed: () {
-                          store.updateUserProfile(
-                            fullName: _nameController.text,
-                            title: store.currentUserTitle,
-                            email: _emailController.text,
-                            phone: _phoneController.text,
-                            location: _locationController.text,
-                            about: _aboutController.text,
-                            skills: _skillsController.text.split(',').map((e) => e.trim()).toList(),
-                          );
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(isAr ? 'تم تحديث الملف الشخصي' : 'Profile updated')),
-                          );
-                        },
-                      ),
+                      if (_isEditing) ...[
+                        const SizedBox(height: 20),
+                        AppButton(
+                          label: isAr ? 'حفظ التغييرات' : 'Save Changes',
+                          onPressed: () {
+                            store.updateUserProfile(
+                              fullName: store.currentUserName,
+                              title: store.currentUserTitle,
+                              email: _emailController.text,
+                              phone: _phoneController.text,
+                              location: _locationController.text,
+                              about: _aboutController.text,
+                              skills: _skillsController.text.split(',').map((e) => e.trim()).toList(),
+                              portfolio: _portfolioController.text,
+                              cvName: _cvController.text,
+                            );
+                            setState(() => _isEditing = false);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(isAr ? 'تم تحديث الملف الشخصي' : 'Profile updated')),
+                            );
+                          },
+                        ),
+                      ],
                     ],
                   ),
                 ),
@@ -592,16 +645,19 @@ class _ProfileTabState extends State<_ProfileTab> {
     );
   }
 
-  Widget _buildProfileItem(String label, TextEditingController controller, {int maxLines = 1}) {
+  Widget _buildProfileItem(String label, TextEditingController controller, {int maxLines = 1, bool enabled = false}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: TextField(
         controller: controller,
         maxLines: maxLines,
+        enabled: enabled,
         decoration: InputDecoration(
           labelText: label,
           labelStyle: const TextStyle(fontSize: 14),
-          border: const UnderlineInputBorder(),
+          border: enabled ? const OutlineInputBorder() : const UnderlineInputBorder(borderSide: BorderSide.none),
+          filled: enabled,
+          fillColor: Colors.grey.withOpacity(0.05),
         ),
       ),
     );

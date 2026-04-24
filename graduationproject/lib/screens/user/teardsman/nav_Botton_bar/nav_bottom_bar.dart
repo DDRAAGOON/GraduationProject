@@ -50,7 +50,7 @@ class _NavbottonState extends State<Navbotton> {
           ),
           NavigationDestination(
             icon: const Icon(Icons.chat_bubble),
-            label: _isAr ? 'الرسائل' : 'Inbox',
+            label: _isAr ? 'الرسائل' : 'Messages',
           ),
           NavigationDestination(
             icon: const Icon(Icons.bookmark),

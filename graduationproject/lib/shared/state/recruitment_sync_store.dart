@@ -99,6 +99,38 @@ class RecruitmentSyncStore extends ChangeNotifier {
 
   static final RecruitmentSyncStore instance = RecruitmentSyncStore._();
 
+  static const Map<String, String> locationTranslations = {
+    'All': 'الكل',
+    'Cairo': 'القاهرة',
+    'Giza': 'الجيزة',
+    'Alexandria': 'الإسكندرية',
+    'Dakahlia': 'الدقهلية',
+    'Red Sea': 'البحر الأحمر',
+    'Beheira': 'البحيرة',
+    'Fayoum': 'الفيوم',
+    'Gharbia': 'الغربية',
+    'Ismailia': 'الإسماعيلية',
+    'Monufia': 'المنوفية',
+    'Minya': 'المنيا',
+    'Qalyubia': 'القليوبية',
+    'New Valley': 'الوادي الجديد',
+    'Sharqia': 'الشرقية',
+    'Suez': 'السويس',
+    'Aswan': 'أسوان',
+    'Assiut': 'أسيوط',
+    'Beni Suef': 'بني سويف',
+    'Port Said': 'بورسعيد',
+    'Damietta': 'دمياط',
+    'South Sinai': 'جنوب سيناء',
+    'Kafr El Sheikh': 'كفر الشيخ',
+    'Matrouh': 'مطروح',
+    'Luxor': 'الأقصر',
+    'Qena': 'قنا',
+    'Sohag': 'سوهاج',
+    'North Sinai': 'شمال سيناء',
+    'Remote': 'عن بعد',
+  };
+
   static const List<String> egyptGovernorates = [
     'All',
     'Cairo',
@@ -139,14 +171,22 @@ class RecruitmentSyncStore extends ChangeNotifier {
     'Tradesman',
   ];
 
+  static const List<String> salaryRanges = [
+    'All',
+    '10k - 20k',
+    '20k - 30k',
+    '30k - 45k',
+    'Negotiable',
+  ];
+
   final List<RecruitmentJob> _jobs = <RecruitmentJob>[
     // Technical
     RecruitmentJob(
       id: 'job_1',
       title: 'Flutter Mobile Developer',
-      companyName: 'Jobito Labs',
+      companyName: 'Valeo Egypt',
       location: 'Cairo',
-      salaryRange: '20k - 30k EGP',
+      salaryRange: '10k - 25k EGP',
       type: 'Full-time',
       category: 'Technical',
       tags: const ['Flutter', 'Dart', 'REST'],
@@ -154,19 +194,109 @@ class RecruitmentSyncStore extends ChangeNotifier {
     ),
     RecruitmentJob(
       id: 'job_2',
+      title: 'Frontend React Developer',
+      companyName: 'Orange Digital Center',
+      location: 'Cairo',
+      salaryRange: '5k - 15k EGP',
+      type: 'Part-time',
+      category: 'Technical',
+      tags: const ['Html', 'Css', 'Java'],
+      publishedAt: DateTime.now().subtract(const Duration(hours: 4)),
+    ),
+    RecruitmentJob(
+      id: 'job_3',
+      title: 'Data Analyst',
+      companyName: 'Orange Digital Center',
+      location: 'Suez',
+      salaryRange: '8k - 15k EGP',
+      type: 'Full-time',
+      category: 'Technical',
+      tags: const ['Flutter', 'Dart', 'REST'],
+      publishedAt: DateTime.now().subtract(const Duration(hours: 2)),
+    ),
+    RecruitmentJob(
+      id: 'job_4',
+      title: 'AI / Machine Learning Engineer',
+      companyName: 'IBM Egypt',
+      location: 'Cairo',
+      salaryRange: '20k - 30k EGP',
+      type: 'Part-time',
+      category: 'Technical',
+      tags: const ['Flutter', 'Dart', 'REST'],
+      publishedAt: DateTime.now().subtract(const Duration(hours: 8)),
+    ),
+
+    RecruitmentJob(
+      id: 'job_5',
       title: 'Backend Node.js Engineer',
-      companyName: 'Nexa Systems',
-      location: 'Remote',
+      companyName: 'IBM Egypt',
+      location: 'Luxor',
       salaryRange: '30k - 45k EGP',
       type: 'Full-time',
       category: 'Technical',
       tags: const ['Node.js', 'Express', 'PostgreSQL'],
-      publishedAt: DateTime.now().subtract(const Duration(hours: 7)),
+      publishedAt: DateTime.now().subtract(const Duration(hours: 12)),
     ),
+    RecruitmentJob(
+      id: 'job_6',
+      title: 'Cyber Security Analyst',
+      companyName: 'Vodafone Egypt (Technology sector)',
+      location: 'Cairo',
+      salaryRange: '30k - 45k EGP',
+      type: 'Part-time',
+      category: 'Technical',
+      tags: const ['Node.js', 'Express', 'PostgreSQL'],
+      publishedAt: DateTime.now().subtract(const Duration(hours: 12)),
+    ),
+    RecruitmentJob(
+      id: 'job_7',
+      title: 'Cyber Security Analyst',
+      companyName: 'Valeo Egypt',
+      location: 'Cairo',
+      salaryRange: '30k - 45k EGP',
+      type: 'Full-time',
+      category: 'Technical',
+      tags: const ['Node.js', 'Express', 'PostgreSQL'],
+      publishedAt: DateTime.now().subtract(const Duration(hours: 12)),
+    ),
+    RecruitmentJob(
+      id: 'job_8',
+      title: 'Cyber Security Analyst',
+      companyName: 'Nexa Systems' ,
+      location: 'Alexandria',
+      salaryRange: '30k - 45k EGP',
+      type: 'Full-time',
+      category: 'Technical',
+      tags: const ['Node.js', 'Express', 'PostgreSQL'],
+      publishedAt: DateTime.now().subtract(const Duration(hours: 12)),
+    ),
+    RecruitmentJob(
+      id: 'job_9',
+      title: 'Cyber Security Analyst',
+      companyName: 'Nexa Systems',
+      location: 'Cairo',
+      salaryRange: '30k - 45k EGP',
+      type: 'Full-time',
+      category: 'Technical',
+      tags: const ['Node.js', 'Express', 'PostgreSQL'],
+      publishedAt: DateTime.now().subtract(const Duration(hours: 12)),
+    ),
+    RecruitmentJob(
+      id: 'job_10',
+      title: 'Cyber Security Analyst',
+      companyName: 'Nexa Systems',
+      location: 'Alexandria',
+      salaryRange: '20k - 35k EGP',
+      type: 'Part-time',
+      category: 'Technical',
+      tags: const ['Node.js', 'Express', 'PostgreSQL'],
+      publishedAt: DateTime.now().subtract(const Duration(hours: 12)),
+    ),
+
     // Tradesman
     RecruitmentJob(
       id: 'tr_1',
-      title: 'نقاش محترف (Painter)',
+      title: 'نقاش محترف',
       companyName: 'مقاولات الحديثة',
       location: 'Cairo',
       salaryRange: 'Negotiable',
@@ -178,11 +308,11 @@ class RecruitmentSyncStore extends ChangeNotifier {
     ),
     RecruitmentJob(
       id: 'tr_2',
-      title: 'سباك صحي (Plumber)',
+      title: 'سباك صحي',
       companyName: 'الجزيرة للخدمات',
       location: 'Giza',
       salaryRange: 'Negotiable',
-      type: 'Full-time',
+      type: 'Part-time',
       category: 'Tradesman',
       tags: const ['Plumbing', 'Maintenance'],
       logoIcon: Icons.plumbing,
@@ -190,7 +320,7 @@ class RecruitmentSyncStore extends ChangeNotifier {
     ),
     RecruitmentJob(
       id: 'tr_3',
-      title: 'نجار أثاث (Carpenter)',
+      title: 'نجار أثاث',
       companyName: 'ورشة الإبداع',
       location: 'Damietta',
       salaryRange: 'Negotiable',
@@ -202,7 +332,7 @@ class RecruitmentSyncStore extends ChangeNotifier {
     ),
     RecruitmentJob(
       id: 'tr_4',
-      title: 'كهربائي منازل (Electrician)',
+      title: 'كهربائي منازل',
       companyName: 'النور للكهرباء',
       location: 'Alexandria',
       salaryRange: 'Negotiable',
@@ -214,11 +344,11 @@ class RecruitmentSyncStore extends ChangeNotifier {
     ),
     RecruitmentJob(
       id: 'tr_5',
-      title: 'فني تكييف (HVAC Tech)',
-      companyName: 'كول اير',
+      title: 'فني تكييف وتبريد',
+      companyName: 'كول اير للخدمات',
       location: 'Cairo',
       salaryRange: 'Negotiable',
-      type: 'Contract',
+      type: 'Full-time',
       category: 'Tradesman',
       tags: const ['AC Repair', 'Maintenance'],
       logoIcon: Icons.ac_unit,
@@ -239,10 +369,12 @@ class RecruitmentSyncStore extends ChangeNotifier {
   String _currentUserPortfolio = '';
   String _userRole = 'Job Seeker';
   String? _currentUserCvName;
+  String? _profileImage;
   String _searchQuery = '';
   String _filterType = 'All';
   String _filterLocation = 'All';
   String _filterCategory = 'All';
+  String _filterSalaryRange = 'All';
   List<Map<String, String>> _socialLinks = [];
   List<String> _currentUserSkills = [];
   List<Map<String, String>> _currentUserEducation = [];
@@ -272,10 +404,12 @@ class RecruitmentSyncStore extends ChangeNotifier {
   String get currentUserPortfolio => _currentUserPortfolio;
   String get userRole => _userRole;
   String? get currentUserCvName => _currentUserCvName;
+  String? get profileImage => _profileImage;
   String get searchQuery => _searchQuery;
   String get filterType => _filterType;
   String get filterLocation => _filterLocation;
   String get filterCategory => _filterCategory;
+  String get filterSalaryRange => _filterSalaryRange;
   List<Map<String, String>> get socialLinks => _socialLinks;
   List<String> get currentUserSkills => _currentUserSkills;
   List<Map<String, String>> get currentUserEducation => _currentUserEducation;
@@ -288,17 +422,33 @@ class RecruitmentSyncStore extends ChangeNotifier {
   List<RecruitmentJob> get filteredJobs {
     return _jobs.where((job) {
       final query = _searchQuery.toLowerCase();
-      final matchesQuery = _searchQuery.isEmpty ||
-          job.title.toLowerCase().contains(query) ||
-          job.companyName.toLowerCase().contains(query) ||
-          job.location.toLowerCase().contains(query);
+      final searchParts = query.split(RegExp(r'\s+')).where((part) => part.isNotEmpty);
+      
+      final matchesQuery = _searchQuery.isEmpty || searchParts.every((part) {
+          final titleMatch = job.title.toLowerCase().contains(part);
+          final companyMatch = job.companyName.toLowerCase().contains(part);
+          final locationEn = job.location;
+          final locationAr = locationTranslations[locationEn] ?? '';
+          final locationMatch = locationEn.toLowerCase().contains(part) || 
+                                locationAr.toLowerCase().contains(part);
+          
+          return titleMatch || companyMatch || locationMatch;
+      });
 
       final matchesType = _filterType == 'All' || job.type == _filterType;
-      final matchesLocation = _filterLocation == 'All' ||
-          job.location.toLowerCase() == _filterLocation.toLowerCase();
-      final matchesCategory = _filterCategory == 'All' || job.category == _filterCategory;
+      
+      // Smart location match supporting both EN and AR
+      bool matchesLocation = _filterLocation == 'All' || _filterLocation == 'الكل';
+      if (!matchesLocation) {
+        final currentFilterAr = locationTranslations[_filterLocation] ?? _filterLocation;
+        final jobLocationAr = locationTranslations[job.location] ?? job.location;
+        matchesLocation = job.location == _filterLocation || jobLocationAr == _filterLocation || job.location == currentFilterAr;
+      }
 
-      return matchesQuery && matchesType && matchesLocation && matchesCategory;
+      final matchesCategory = _filterCategory == 'All' || job.category == _filterCategory;
+      final matchesSalary = _filterSalaryRange == 'All' || job.salaryRange.contains(_filterSalaryRange);
+
+      return matchesQuery && matchesType && matchesLocation && matchesCategory && matchesSalary;
     }).toList();
   }
 
@@ -330,6 +480,7 @@ class RecruitmentSyncStore extends ChangeNotifier {
     String? role,
     List<Map<String, String>>? socialLinks,
     String? cvName,
+    String? profileImage,
   }) {
     _currentUserName = fullName.trim().isEmpty ? _currentUserName : fullName;
     _currentUserTitle = title.trim().isEmpty ? _currentUserTitle : title;
@@ -342,6 +493,7 @@ class RecruitmentSyncStore extends ChangeNotifier {
     if (education != null) _currentUserEducation = List.from(education);
     if (experience != null) _currentUserExperience = List.from(experience);
     if (cvName != null) _currentUserCvName = cvName;
+    if (profileImage != null) _profileImage = profileImage;
 
     if (role != null && role.isNotEmpty) {
       _userRole = role;
@@ -376,6 +528,7 @@ class RecruitmentSyncStore extends ChangeNotifier {
     String? type,
     String? location,
     String? category,
+    String? salaryRange,
   }) {
     if (searchQuery != null) {
       _searchQuery = searchQuery;
@@ -388,6 +541,9 @@ class RecruitmentSyncStore extends ChangeNotifier {
     }
     if (category != null) {
       _filterCategory = category;
+    }
+    if (salaryRange != null) {
+      _filterSalaryRange = salaryRange;
     }
     notifyListeners();
   }

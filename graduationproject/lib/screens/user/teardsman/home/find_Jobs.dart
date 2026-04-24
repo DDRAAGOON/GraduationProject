@@ -24,19 +24,6 @@ class _FindJobsState extends State<FindJobs> {
     "Damietta", "South Sinai", "Kafr El Sheikh", "Matrouh", "Luxor", "Qena", "Sohag", "North Sinai"
   ];
 
-  Color _getJobTypeColor(String type) {
-    switch (type.toLowerCase()) {
-      case 'full-time':
-        return Colors.green;
-      case 'part-time':
-        return Colors.blue;
-      case 'contract':
-        return Colors.orange;
-      default:
-        return Colors.grey;
-    }
-  }
-
   void _showLocationPicker(AppLocalizations t) {
     showModalBottomSheet(
       context: context,
@@ -215,7 +202,6 @@ class _FindJobsState extends State<FindJobs> {
 
   Widget _buildJobCard(RecruitmentJob job, AppLocalizations t) {
     final store = RecruitmentSyncStore.instance;
-    final typeColor = _getJobTypeColor(job.type);
     final bool isSaved = store.savedJobIds.contains(job.id);
 
     return Card(
@@ -258,8 +244,12 @@ class _FindJobsState extends State<FindJobs> {
               children: [
                 const Icon(Icons.business, size: 16, color: Colors.grey),
                 const SizedBox(width: 4),
-                Text(job.companyName, style: const TextStyle(color: Colors.black54)),
-                const SizedBox(width: 12),
+                Text(job.companyName, style: const TextStyle(color: Colors.black54, fontWeight: FontWeight.w600)),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Row(
+              children: [
                 const Icon(Icons.location_on, size: 16, color: Colors.grey),
                 const SizedBox(width: 4),
                 Text(job.location, style: const TextStyle(color: Colors.black54)),
@@ -270,36 +260,18 @@ class _FindJobsState extends State<FindJobs> {
               spacing: 8,
               runSpacing: 8,
               crossAxisAlignment: WrapCrossAlignment.center,
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: typeColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: typeColor.withOpacity(0.3)),
-                  ),
-                  child: Text(
-                    job.type,
-                    style: TextStyle(
-                      color: typeColor,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 12,
-                    ),
-                  ),
+              children: job.tags.map((String tag) => Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF9F5F1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.black.withOpacity(0.05)),
                 ),
-                ...job.tags.map((String tag) => Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF9F5F1),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.black.withOpacity(0.05)),
-                  ),
-                  child: Text(
-                    tag,
-                    style: const TextStyle(color: Colors.black54, fontSize: 12),
-                  ),
-                )).toList(),
-              ],
+                child: Text(
+                  tag,
+                  style: const TextStyle(color: Colors.black54, fontSize: 12),
+                ),
+              )).toList(),
             ),
             const SizedBox(height: 16),
             Column(

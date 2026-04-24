@@ -68,7 +68,7 @@ class _JobsFiltersScreenState extends State<JobsFiltersScreen> {
                 _buildCheckbox("Part-Time (5)"),
                 _buildCheckbox("Remote (2)"),
                 _buildCheckbox("Internship (24)"),
-                _buildCheckbox("Contract (3)"),
+              //  _buildCheckbox(""),
               ],
             ),
             const Divider(color: Colors.white12, height: 32),

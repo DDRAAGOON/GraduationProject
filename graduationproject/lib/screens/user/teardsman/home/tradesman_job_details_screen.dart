@@ -9,24 +9,10 @@ class TradesmanJobDetailsScreen extends StatelessWidget {
 
   final RecruitmentJob job;
 
-  Color _getJobTypeColor(String type) {
-    switch (type.toLowerCase()) {
-      case 'full-time':
-        return Colors.green;
-      case 'part-time':
-        return Colors.blue;
-      case 'contract':
-        return Colors.orange;
-      default:
-        return Colors.grey;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     final store = RecruitmentSyncStore.instance;
-    final typeColor = _getJobTypeColor(job.type);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF9F5F1),
@@ -83,8 +69,6 @@ class TradesmanJobDetailsScreen extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        _buildBadge(job.type, typeColor),
-                        const SizedBox(width: 10),
                         _buildBadge(job.salaryRange, Colors.grey),
                       ],
                     ),

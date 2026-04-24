@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:file_picker/file_picker.dart';
 
 import '../../../shared/services/recruitment_sync_service.dart';
 import '../../../shared/state/recruitment_sync_store.dart';
@@ -17,33 +16,14 @@ class RecruitmentJobApplicationScreen extends StatefulWidget {
 
 class _RecruitmentJobApplicationScreenState
     extends State<RecruitmentJobApplicationScreen> {
-  final _name = TextEditingController();
-  final _email = TextEditingController();
-  final _phone = TextEditingController();
-  final _experience = TextEditingController();
   final _portfolio = TextEditingController();
   final _cvLink = TextEditingController();
   final _cover = TextEditingController();
   final _linkedIn = TextEditingController();
-  bool _relocate = false;
-  bool _authorizedToWork = true;
   bool _loading = false;
-  String? _pickedPdfName;
-
-  @override
-  void initState() {
-    super.initState();
-    final store = RecruitmentSyncStore.instance;
-    _name.text = store.currentUserName;
-    _email.text = 'user@jobito.com';
-  }
 
   @override
   void dispose() {
-    _name.dispose();
-    _email.dispose();
-    _phone.dispose();
-    _experience.dispose();
     _portfolio.dispose();
     _cvLink.dispose();
     _cover.dispose();
@@ -52,25 +32,17 @@ class _RecruitmentJobApplicationScreenState
   }
 
   Future<void> _submit() async {
-    if (_name.text.trim().isEmpty ||
-        _email.text.trim().isEmpty ||
-        _phone.text.trim().isEmpty ||
-        _cover.text.trim().isEmpty) {
+    if (_cover.text.trim().isEmpty || _cvLink.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please complete required fields.')),
+        const SnackBar(content: Text('Please complete required fields (CV Link and Cover Letter).')),
       );
       return;
     }
-    if (_pickedPdfName == null && _cvLink.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Upload CV PDF or provide CV link.')),
-      );
-      return;
-    }
+    
     setState(() => _loading = true);
     await RecruitmentSyncService.instance.applyToJob(
       jobId: widget.job.id,
-      userName: _name.text.trim(),
+      userName: RecruitmentSyncStore.instance.currentUserName,
     );
     if (!mounted) return;
     setState(() => _loading = false);
@@ -78,18 +50,6 @@ class _RecruitmentJobApplicationScreenState
       const SnackBar(content: Text('Application submitted successfully.')),
     );
     Navigator.of(context).pop();
-  }
-
-  Future<void> _pickPdf() async {
-    final result = await FilePicker.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: const ['pdf'],
-      withData: false,
-    );
-    if (result == null || result.files.isEmpty) return;
-    setState(() {
-      _pickedPdfName = result.files.single.name;
-    });
   }
 
   @override
@@ -102,7 +62,7 @@ class _RecruitmentJobApplicationScreenState
         surfaceTintColor: Colors.transparent,
         title: Image.asset(
           'assets/company/logo/logo.png',
-          height: 35,
+          height: 150,
           fit: BoxFit.contain,
         ),
         centerTitle: true,
@@ -137,48 +97,13 @@ class _RecruitmentJobApplicationScreenState
           ),
           const SizedBox(height: 24),
           
-          _buildInputField('Full name *', _name),
-          _buildInputField('Email *', _email, keyboardType: TextInputType.emailAddress),
-          _buildInputField('Phone *', _phone, keyboardType: TextInputType.phone),
-          _buildInputField('Years of experience', _experience),
           _buildInputField('Portfolio URL', _portfolio),
           _buildInputField('LinkedIn URL', _linkedIn),
-          _buildInputField('CV link', _cvLink),
+          _buildInputField('CV Link (Google Drive/Dropbox) *', _cvLink, keyboardType: TextInputType.url),
           
           const SizedBox(height: 8),
-          OutlinedButton.icon(
-            style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 14),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              side: BorderSide(color: Colors.grey.withOpacity(0.3)),
-            ),
-            onPressed: _pickPdf,
-            icon: const Icon(Icons.upload_file),
-            label: Text(
-              _pickedPdfName == null
-                  ? 'Upload CV as PDF'
-                  : 'PDF: $_pickedPdfName',
-              style: const TextStyle(color: Colors.black87),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
           
-          const SizedBox(height: 16),
           _buildInputField('Cover letter *', _cover, maxLines: 5),
-          
-          CheckboxListTile(
-            value: _relocate,
-            contentPadding: EdgeInsets.zero,
-            onChanged: (value) => setState(() => _relocate = value ?? false),
-            title: const Text('Open to relocation', style: TextStyle(fontSize: 14)),
-          ),
-          CheckboxListTile(
-            value: _authorizedToWork,
-            contentPadding: EdgeInsets.zero,
-            onChanged: (value) =>
-                setState(() => _authorizedToWork = value ?? true),
-            title: const Text('Authorized to work in job location', style: TextStyle(fontSize: 14)),
-          ),
           
           const SizedBox(height: 24),
           AppButton(
@@ -210,7 +135,7 @@ class _RecruitmentJobApplicationScreenState
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Colors.grey.withOpacity(0.1)),
+            borderSide: BorderSide(color: Colors.grey.shade300),
           ),
         ),
       ),

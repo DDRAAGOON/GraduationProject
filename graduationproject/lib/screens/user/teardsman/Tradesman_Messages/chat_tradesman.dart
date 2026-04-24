@@ -1,6 +1,5 @@
 ﻿import 'package:flutter/material.dart';
-import '../../core/app_colors.dart';
-//import '../core/app_colors.dart';
+import '../../../../shared/l10n/app_localizations.dart';
 
 class ChatTradesman extends StatefulWidget {
   final String name;
@@ -46,13 +45,15 @@ class _ChatTradesmanState extends State<ChatTradesman> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: const Color(0xFFF9F5F1),
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: const Color(0xFFF9F5F1),
         elevation: 0,
+        surfaceTintColor: Colors.transparent,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+          icon: Icon(Icons.arrow_back_ios, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
         title: Row(
@@ -63,12 +64,12 @@ class _ChatTradesmanState extends State<ChatTradesman> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(widget.name,
-                    style: const TextStyle(
-                        color: Colors.white,
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 16,
                         fontWeight: FontWeight.bold)),
-                const Text("Online",
-                    style: TextStyle(color: Colors.green, fontSize: 12)),
+                Text(t.tr(en: "Online", ar: "متصل"),
+                    style: const TextStyle(color: Colors.green, fontSize: 12)),
               ],
             ),
           ],
@@ -76,7 +77,7 @@ class _ChatTradesmanState extends State<ChatTradesman> {
       ),
       body: Column(
         children: [
-          const Divider(color: Colors.white12, height: 1),
+          Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 1),
           Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
@@ -84,18 +85,18 @@ class _ChatTradesmanState extends State<ChatTradesman> {
               itemBuilder: (context, index) {
                 if (index == 0) return _buildHeader();
                 final msg = _messages[index - 1];
-                return _buildMessageBubble(msg);
+                return _buildMessageBubble(context, msg);
               },
             ),
           ),
-          _buildMessageInput(),
+          _buildMessageInput(context, t),
           const SizedBox(height: 20),
         ],
       ),
     );
   }
 
-  Widget _buildMessageBubble(Map<String, dynamic> msg) {
+  Widget _buildMessageBubble(BuildContext context, Map<String, dynamic> msg) {
     bool isMe = msg["isMe"];
 
     return Padding(
@@ -116,17 +117,21 @@ class _ChatTradesmanState extends State<ChatTradesman> {
                   padding:
                   const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   decoration: BoxDecoration(
-                    color: isMe ? const Color(0xFF49769F) : Colors.white,
+                    color: isMe
+                        ? Theme.of(context).colorScheme.primary
+                        : (Theme.of(context).brightness == Brightness.dark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.05)),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(msg["text"],
                       style: TextStyle(
-                          color: isMe ? Colors.white : Colors.black87)),
+                          color: isMe
+                              ? Colors.white
+                              : Theme.of(context).colorScheme.onSurface)),
                 ),
                 const SizedBox(height: 4),
                 Text(msg["time"],
                     style:
-                    const TextStyle(color: Colors.white38, fontSize: 10)),
+                    TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 10)),
               ],
             ),
           ),
@@ -136,35 +141,37 @@ class _ChatTradesmanState extends State<ChatTradesman> {
     );
   }
 
-  Widget _buildMessageInput() {
+  Widget _buildMessageInput(BuildContext context, AppLocalizations t) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Container(
         height: 60,
         decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.05),
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.white.withValues(alpha: 0.05)
+                : Colors.black.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(30)),
         child: Row(
           children: [
             IconButton(
-                icon: const Icon(Icons.attach_file, color: Colors.white54),
+                icon: Icon(Icons.attach_file, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
                 onPressed: () {}),
             Expanded(
               child: TextField(
                 controller: _messageController,
                 onChanged: (val) => setState(() {}),
-                style: const TextStyle(color: Colors.white),
-                decoration: const InputDecoration(
-                    hintText: "Type a message",
-                    hintStyle: TextStyle(color: Colors.white38),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                decoration: InputDecoration(
+                    hintText: t.tr(en: "Type a message", ar: "اكتب رسالة"),
+                    hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)),
                     border: InputBorder.none),
               ),
             ),
             IconButton(
                 icon: Icon(Icons.send,
                     color: _messageController.text.isEmpty
-                        ? Colors.white24
-                        : const Color(0xFF49769F)),
+                        ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.24)
+                        : Theme.of(context).colorScheme.primary),
                 onPressed: _messageController.text.isEmpty ? null : _sendMessage),
           ],
         ),
@@ -179,8 +186,8 @@ class _ChatTradesmanState extends State<ChatTradesman> {
           CircleAvatar(radius: 40, backgroundImage: AssetImage(widget.image)),
           const SizedBox(height: 10),
           Text(widget.name,
-              style: const TextStyle(
-                  color: Colors.white,
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 18,
                   fontWeight: FontWeight.bold)),
           const SizedBox(height: 30),
@@ -189,4 +196,3 @@ class _ChatTradesmanState extends State<ChatTradesman> {
     );
   }
 }
-

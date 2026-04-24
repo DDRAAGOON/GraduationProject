@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import '../../../../app/router/app_router.dart';
 import '../../../../../shared/l10n/app_localizations.dart';
 import '../../../../../shared/state/locale_controller.dart';
 import '../../../../../shared/state/theme_controller.dart';
+import '../../help/help_center_screen.dart';
 
 class Settings extends StatefulWidget {
   const Settings({super.key});
@@ -299,9 +301,31 @@ class _SettingsState extends State<Settings> {
                 ],
               ),
             ),
+
+            const SizedBox(height: 40),
+
+            // Logout Section
+            _buildLogoutButton(context, t),
           ],
         ),
       ),
+      floatingActionButton: SizedBox(
+        width: 45,
+        height: 45,
+        child: FloatingActionButton(
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => const HelpScreen()),
+            );
+          },
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          elevation: 4,
+          child: const Icon(Icons.help_outline, color: Colors.white, size: 20),
+        ),
+      ),
+      floatingActionButtonLocation: t.isAr 
+          ? FloatingActionButtonLocation.endFloat 
+          : FloatingActionButtonLocation.startFloat,
     );
   }
 
@@ -346,14 +370,14 @@ class _SettingsState extends State<Settings> {
                   children: [
                     Text(
                       title,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     Text(
                       subtitle,
-                      style: const TextStyle(color: Colors.white38, fontSize: 12),
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 12),
                     ),
                   ],
                 ),
@@ -458,6 +482,66 @@ class _SettingsState extends State<Settings> {
                 ],
               ),
             ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLogoutButton(BuildContext context, AppLocalizations t) {
+    return GestureDetector(
+      onTap: () {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text(t.tr(en: "Logout", ar: "تسجيل الخروج")),
+            content: Text(t.tr(
+              en: "Are you sure you want to log out of your account?",
+              ar: "هل أنت متأكد أنك تريد تسجيل الخروج من حسابك؟",
+            )),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(t.cancel),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context); // Close dialog
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                    AppRoutes.roleSelection,
+                    (route) => false,
+                  );
+                },
+                child: Text(
+                  t.tr(en: "Logout", ar: "خروج"),
+                  style: const TextStyle(color: Colors.redAccent),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        decoration: BoxDecoration(
+          color: Colors.redAccent.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(15),
+          border: Border.all(color: Colors.redAccent.withValues(alpha: 0.3)),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.logout, color: Colors.redAccent),
+            const SizedBox(width: 10),
+            Text(
+              t.tr(en: "Logout", ar: "تسجيل الخروج"),
+              style: const TextStyle(
+                color: Colors.redAccent,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
           ],
         ),
       ),
