@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';
+import '../../../shared/l10n/app_localizations.dart';
 import '../../../shared/widgets/app_button.dart';
 
 class RecruitmentUserOnboardingScreen extends StatefulWidget {
@@ -16,26 +17,28 @@ class _RecruitmentUserOnboardingScreenState
   final PageController _controller = PageController();
   int _index = 0;
 
-  final List<_OnboardingItem> _items = const [
-    _OnboardingItem(
-      title: 'Find Jobs That Match You',
-      subtitle: 'Search with filters by role, location, and salary.',
-      icon: Icons.search_rounded,
-    ),
-    _OnboardingItem(
-      title: 'Apply With Full Profile',
-      subtitle: 'Send CV, portfolio, and cover letter in one flow.',
-      icon: Icons.assignment_turned_in_rounded,
-    ),
-    _OnboardingItem(
-      title: 'Track Every Hiring Stage',
-      subtitle: 'Get live updates from review to interview and offer.',
-      icon: Icons.timeline_rounded,
-    ),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
+    
+    final List<_OnboardingItem> items = [
+      _OnboardingItem(
+        title: t.tr(en: 'Find Jobs That Match You', ar: 'ابحث عن وظائف تناسبك'),
+        subtitle: t.tr(en: 'Search with filters by role, location, and salary.', ar: 'ابحث باستخدام الفلاتر حسب الدور والموقع والراتب.'),
+        icon: Icons.search_rounded,
+      ),
+      _OnboardingItem(
+        title: t.tr(en: 'Apply With Full Profile', ar: 'قدّم بملف شخصي كامل'),
+        subtitle: t.tr(en: 'Send CV, portfolio, and cover letter in one flow.', ar: 'أرسل السيرة الذاتية ومعرض الأعمال وخطاب التقديم في مسار واحد.'),
+        icon: Icons.assignment_turned_in_rounded,
+      ),
+      _OnboardingItem(
+        title: t.tr(en: 'Track Every Hiring Stage', ar: 'تتبع كل مرحلة توظيف'),
+        subtitle: t.tr(en: 'Get live updates from review to interview and offer.', ar: 'احصل على تحديثات مباشرة من المراجعة إلى المقابلة والعرض.'),
+        icon: Icons.timeline_rounded,
+      ),
+    ];
+
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -43,10 +46,10 @@ class _RecruitmentUserOnboardingScreenState
             Expanded(
               child: PageView.builder(
                 controller: _controller,
-                itemCount: _items.length,
+                itemCount: items.length,
                 onPageChanged: (value) => setState(() => _index = value),
                 itemBuilder: (context, i) {
-                  final item = _items[i];
+                  final item = items[i];
                   return Padding(
                     padding: const EdgeInsets.all(22),
                     child: Column(
@@ -83,7 +86,7 @@ class _RecruitmentUserOnboardingScreenState
               child: Row(
                 children: [
                   ...List.generate(
-                    _items.length,
+                    items.length,
                     (i) => Container(
                       width: 24,
                       height: 6,
@@ -100,9 +103,9 @@ class _RecruitmentUserOnboardingScreenState
                   SizedBox(
                     width: 180,
                     child: AppButton(
-                      label: _index == _items.length - 1 ? 'Get Started' : 'Next',
+                      label: _index == items.length - 1 ? t.getStarted : t.next,
                       onPressed: () {
-                        if (_index == _items.length - 1) {
+                        if (_index == items.length - 1) {
                           Navigator.of(context)
                               .pushReplacementNamed(AppRoutes.userSignInNew);
                           return;

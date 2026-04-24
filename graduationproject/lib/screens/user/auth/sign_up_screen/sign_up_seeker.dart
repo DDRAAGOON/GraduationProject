@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:graduationproject/screens/user/auth/sign_up_screen/sign_up_tradesman.dart';
 import '../../../../app/router/app_router.dart';
-import '../../home/main_screen.dart';
 import '../../profile/user_data.dart';
 import '../../../../../shared/l10n/app_localizations.dart';
 import '../../../../../shared/state/recruitment_sync_store.dart';
@@ -28,6 +27,8 @@ class _SignUpSeeker extends State<SignUpSeeker> {
   final TextEditingController _skillsController = TextEditingController();
   final TextEditingController _portfolioController = TextEditingController();
   final TextEditingController _socialController = TextEditingController();
+  final TextEditingController _cvController = TextEditingController();
+  final TextEditingController _profileImageController = TextEditingController();
 
   // DOB Dropdowns
   String? _selectedDay;
@@ -51,10 +52,17 @@ class _SignUpSeeker extends State<SignUpSeeker> {
   final List<Map<String, String>> _experiencesList = [];
   final List<Map<String, String>> _educationList = [];
 
-
   String? _selectedGender;
   final List<String> _platforms = ["LinkedIn", "GitHub", "Twitter", "Instagram", "Facebook", "Other"];
   String _selectedPlatform = "LinkedIn";
+
+  @override
+  void initState() {
+    super.initState();
+    _profileImageController.addListener(() {
+      setState(() {});
+    });
+  }
 
   @override
   void dispose() {
@@ -66,6 +74,8 @@ class _SignUpSeeker extends State<SignUpSeeker> {
     _skillsController.dispose();
     _portfolioController.dispose();
     _socialController.dispose();
+    _cvController.dispose();
+    _profileImageController.dispose();
     _eduInstitutionController.dispose();
     _eduDegreeController.dispose();
     _eduDurationController.dispose();
@@ -146,6 +156,7 @@ class _SignUpSeeker extends State<SignUpSeeker> {
         experience: _experiencesList,
         role: "Job Seeker",
         socialLinks: _socialLinksList,
+        cvName: _cvController.text.isEmpty ? null : _cvController.text,
       );
 
       // Also Sync with static UserProfileData for consistency
@@ -160,6 +171,8 @@ class _SignUpSeeker extends State<SignUpSeeker> {
       UserProfileData.skills = List.from(_skillsList);
       UserProfileData.socialLinks = List.from(_socialLinksList);
       UserProfileData.experiences = List.from(_experiencesList);
+      UserProfileData.cvName = _cvController.text.isEmpty ? null : _cvController.text;
+      UserProfileData.profileImage = _profileImageController.text.isEmpty ? null : _profileImageController.text;
 
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Profile saved successfully!")));
       Navigator.of(context).pushNamedAndRemoveUntil(
@@ -180,7 +193,7 @@ class _SignUpSeeker extends State<SignUpSeeker> {
         surfaceTintColor: Colors.transparent,
         title: Image.asset(
           'assets/company/logo/logo.png',
-          height: 35,
+          height: 150,
           fit: BoxFit.contain,
         ),
         centerTitle: true,
@@ -228,16 +241,31 @@ class _SignUpSeeker extends State<SignUpSeeker> {
                   children: [
                     Expanded(child: _buildRoleOption("Job Seeker")),
                     const SizedBox(width: 8),
-                    const Text("or", style: TextStyle(color: Colors.black54, fontSize: 16, fontWeight: FontWeight.bold)),
+                    Text(t.tr(en: "or", ar: "أو"), style: const TextStyle(color: Colors.black54, fontSize: 16, fontWeight: FontWeight.bold)),
                     const SizedBox(width: 8),
                     Expanded(child: _buildRoleOption("Tradesman")),
                   ],
                 ),
                 const SizedBox(height: 35),
 
+                // Profile Image Avatar Preview (Moved to the left)
+                CircleAvatar(
+                  radius: 50,
+                  backgroundColor: Colors.white,
+                  backgroundImage: _profileImageController.text.isNotEmpty 
+                      ? NetworkImage(_profileImageController.text) as ImageProvider
+                      : null,
+                  child: _profileImageController.text.isEmpty
+                      ? const Icon(Icons.person, size: 50, color: Color(0xFF49769F))
+                      : null,
+                ),
+                const SizedBox(height: 20),
+
                 Text(t.personalInfo, style: const TextStyle(color: Colors.black87, fontSize: 16, fontWeight: FontWeight.w600)),
                 const SizedBox(height: 20),
                 _buildTextField(_fullNameController, t.fullName, Icons.person_outline, isRequired: true),
+                const SizedBox(height: 20),
+                _buildTextField(_profileImageController, t.tr(en: "Profile Image URL", ar: "رابط الصورة الشخصية"), Icons.image_outlined, hint: t.tr(en: "Paste image link here", ar: "الصق رابط الصورة هنا")),
                 const SizedBox(height: 20),
                 _buildTextField(_emailController, t.emailAddress, Icons.email_outlined, isRequired: true, validator: (v) => (v == null || !v.endsWith("@gmail.com")) ? t.enterValidEmail : null),
                 const SizedBox(height: 20),
@@ -275,13 +303,13 @@ class _SignUpSeeker extends State<SignUpSeeker> {
                 Text(t.education, style: const TextStyle(color: Colors.black87, fontSize: 16, fontWeight: FontWeight.w600)),
                 Text(t.tr(en: "Add your academic qualifications", ar: "أضف مؤهلاتك الأكاديمية"), style: const TextStyle(color: Colors.black38, fontSize: 12)),
                 const SizedBox(height: 20),
-                _buildTextField(_eduInstitutionController, "Education Institution", Icons.school_outlined),
+                _buildTextField(_eduInstitutionController, t.tr(en: "Education Institution", ar: "المؤسسة التعليمية"), Icons.school_outlined),
                 const SizedBox(height: 15),
-                _buildTextField(_eduDegreeController, "Academic Degree", Icons.workspace_premium_outlined),
+                _buildTextField(_eduDegreeController, t.tr(en: "Academic Degree", ar: "الدرجة العلمية"), Icons.workspace_premium_outlined),
                 const SizedBox(height: 15),
                 Row(
                   children: [
-                    Expanded(child: _buildTextField(_eduDurationController, "Duration", Icons.timer_outlined)),
+                    Expanded(child: _buildTextField(_eduDurationController, t.tr(en: "Duration", ar: "المدة"), Icons.timer_outlined)),
                     const SizedBox(width: 10),
                     IconButton(onPressed: _addEducation, icon: const Icon(Icons.add_circle, color: Color(0xFF49769F), size: 35)),
                   ],
@@ -298,7 +326,7 @@ class _SignUpSeeker extends State<SignUpSeeker> {
                       IconButton(icon: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 20), onPressed: () => setState(() => _educationList.removeAt(entry.key))),
                     ],
                   ),
-                )),
+                )).toList(),
 
                 const SizedBox(height: 35),
                 Text(t.tr(en: "Professional Details", ar: "تفاصيل مهنية"), style: const TextStyle(color: Colors.black87, fontSize: 16, fontWeight: FontWeight.w600)),
@@ -308,11 +336,11 @@ class _SignUpSeeker extends State<SignUpSeeker> {
                 const SizedBox(height: 25),
                 Text(t.expWork, style: const TextStyle(color: Colors.black54, fontSize: 14)),
                 const SizedBox(height: 10),
-                _buildTextField(_expJobTitleController, "Job Title", Icons.title),
+                _buildTextField(_expJobTitleController, t.tr(en: "Job Title", ar: "المسمى الوظيفي"), Icons.title),
                 const SizedBox(height: 10),
                 Row(
                   children: [
-                    Expanded(child: _buildTextField(_expDurationController, "Duration", Icons.timer)),
+                    Expanded(child: _buildTextField(_expDurationController, t.tr(en: "Duration", ar: "المدة"), Icons.timer)),
                     const SizedBox(width: 10),
                     IconButton(onPressed: _addExperience, icon: const Icon(Icons.add_circle, color: Color(0xFF49769F), size: 35)),
                   ],
@@ -329,7 +357,7 @@ class _SignUpSeeker extends State<SignUpSeeker> {
                       IconButton(icon: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 20), onPressed: () => setState(() => _experiencesList.removeAt(entry.key))),
                     ],
                   ),
-                )),
+                )).toList(),
 
                 const SizedBox(height: 25),
                 Text(t.tr(en: "Skills", ar: "المهارات"), style: const TextStyle(color: Colors.black54, fontSize: 14)),
@@ -352,7 +380,12 @@ class _SignUpSeeker extends State<SignUpSeeker> {
                 Wrap(spacing: 8, runSpacing: 8, children: _skillsList.map((s) => Chip(label: Text(s, style: const TextStyle(color: Colors.black87, fontSize: 11)), backgroundColor: const Color(0xFF49769F).withOpacity(0.1), onDeleted: () => setState(() => _skillsList.remove(s)), deleteIcon: const Icon(Icons.close, size: 14, color: Colors.black54), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))).toList()),
 
                 const SizedBox(height: 25),
-                _buildTextField(_portfolioController, "Portfolio Link (URL)", Icons.link_outlined),
+                _buildTextField(_portfolioController, t.tr(en: "Portfolio Link (URL)", ar: "رابط ملف الأعمال"), Icons.link_outlined),
+
+                const SizedBox(height: 25),
+                Text(t.tr(en: "CV Link ", ar: "رابط السيرة الذاتية "), style: const TextStyle(color: Colors.black87, fontSize: 16, fontWeight: FontWeight.w600)),
+                const SizedBox(height: 10),
+                _buildTextField(_cvController, t.tr(en: "CV Info", ar: "معلومات السيرة الذاتية"), Icons.description_outlined, hint: t.tr(en: "Paste link or type info", ar: "الصق الرابط أو اكتب المعلومات")),
 
                 const SizedBox(height: 25),
                 Text(t.socialLinks, style: const TextStyle(color: Colors.black54, fontSize: 14)),
@@ -360,43 +393,11 @@ class _SignUpSeeker extends State<SignUpSeeker> {
                 Row(children: [
                   Expanded(flex: 3, child: Container(padding: const EdgeInsets.symmetric(horizontal: 12), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(15), border: Border.all(color: Colors.grey.shade300)), child: DropdownButtonHideUnderline(child: DropdownButton<String>(value: _selectedPlatform, dropdownColor: Colors.white, isExpanded: true, style: const TextStyle(color: Colors.black87, fontSize: 12), items: _platforms.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(), onChanged: (v) => setState(() => _selectedPlatform = v!))))),
                   const SizedBox(width: 10),
-                  Expanded(flex: 5, child: TextFormField(controller: _socialController, style: const TextStyle(color: Colors.black87, fontSize: 13), decoration: InputDecoration(hintText: "Link", hintStyle: const TextStyle(color: Colors.black26, fontSize: 12), filled: true, fillColor: Colors.white, contentPadding: const EdgeInsets.all(16), border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide(color: Colors.grey.shade300))))),
+                  Expanded(flex: 5, child: TextFormField(controller: _socialController, style: const TextStyle(color: Colors.black87, fontSize: 13), decoration: InputDecoration(hintText: t.tr(en: "Link", ar: "الرابط"), hintStyle: const TextStyle(color: Colors.black26, fontSize: 12), filled: true, fillColor: Colors.white, contentPadding: const EdgeInsets.all(16), border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide(color: Colors.grey.shade300))))),
                   IconButton(onPressed: _addSocialLink, icon: const Icon(Icons.add_circle, color: Color(0xFF49769F), size: 30)),
                 ]),
                 const SizedBox(height: 10),
-                ..._socialLinksList.asMap().entries.map((entry) => Container(margin: const EdgeInsets.only(bottom: 8), padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.grey.shade300)), child: Row(children: [const Icon(Icons.link, color: Color(0xFF49769F), size: 18), const SizedBox(width: 12), Expanded(child: Text("${entry.value['platform']}: ${entry.value['url']}", style: const TextStyle(color: Colors.black87, fontSize: 11), maxLines: 1, overflow: TextOverflow.ellipsis)), IconButton(icon: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 20), onPressed: () => setState(() => _socialLinksList.removeAt(entry.key)))]))),
-
-                const SizedBox(height: 30),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(t.workImages, style: const TextStyle(color: Colors.black87, fontSize: 16, fontWeight: FontWeight.w600)),
-                    IconButton(
-                      icon: const Icon(Icons.add_a_photo, color: Color(0xFF49769F)),
-                      onPressed: () {},
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                Container(
-                  height: 120,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(15),
-                    border: Border.all(color: Colors.grey.shade300),
-                  ),
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.photo_library_outlined, color: Colors.black26, size: 40),
-                        const SizedBox(height: 8),
-                        Text(t.tr(en: "Add your work showcase", ar: "أضف معرض أعمالك"), style: const TextStyle(color: Colors.black26, fontSize: 12)),
-                      ],
-                    ),
-                  ),
-                ),
+                ..._socialLinksList.asMap().entries.map((entry) => Container(margin: const EdgeInsets.only(bottom: 8), padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.grey.shade300)), child: Row(children: [const Icon(Icons.link, color: Color(0xFF49769F), size: 18), const SizedBox(width: 12), Expanded(child: Text("${entry.value['platform']}: ${entry.value['url']}", style: const TextStyle(color: Colors.black87, fontSize: 11), maxLines: 1, overflow: TextOverflow.ellipsis)), IconButton(icon: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 20), onPressed: () => setState(() => _socialLinksList.removeAt(entry.key)))]))).toList(),
 
                 const SizedBox(height: 40),
                 SizedBox(width: double.infinity, height: 56, child: ElevatedButton(onPressed: _saveProfile, style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF49769F), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))), child: Text(t.saveProfile, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)))),
@@ -410,6 +411,14 @@ class _SignUpSeeker extends State<SignUpSeeker> {
   }
 
   Widget _buildRoleOption(String role) {
+    final t = AppLocalizations.of(context);
+    String displayLabel = role;
+    if (role == "Job Seeker") {
+      displayLabel = t.tr(en: "Job Seeker", ar: "باحث عن عمل");
+    } else if (role == "Tradesman") {
+      displayLabel = t.tr(en: "Tradesman", ar: "حرفي");
+    }
+    
     bool isSelected = _selectedRole == role;
     return GestureDetector(
       onTap: () {
@@ -430,7 +439,7 @@ class _SignUpSeeker extends State<SignUpSeeker> {
         ),
         alignment: Alignment.center,
         child: Text(
-          role,
+          displayLabel,
           style: TextStyle(
             color: isSelected ? Colors.white : Colors.black54,
             fontSize: 15,
@@ -456,43 +465,6 @@ class _SignUpSeeker extends State<SignUpSeeker> {
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide(color: Colors.grey.shade300)),
         enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide(color: Colors.grey.shade300)),
         focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: const BorderSide(color: Color(0xFF49769F))),
-      ),
-    );
-  }
-
-  Widget _buildSectionTitleWidget(String title, String subtitle) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(title, style: const TextStyle(color: Colors.black87, fontSize: 18, fontWeight: FontWeight.bold)),
-        if (subtitle.isNotEmpty) ...[
-          const SizedBox(height: 4),
-          Text(subtitle, style: const TextStyle(color: Colors.black38, fontSize: 12)),
-        ],
-      ],
-    );
-  }
-
-  Widget _buildUploadBox(String text, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.shade300, style: BorderStyle.solid),
-        ),
-        child: Center(
-          child: Column(
-            children: [
-              const Icon(Icons.cloud_upload_outlined, color: Color(0xFF49769F), size: 30),
-              const SizedBox(height: 8),
-              Text(text, textAlign: TextAlign.center, style: const TextStyle(color: Colors.black38, fontSize: 11)),
-            ],
-          ),
-        ),
       ),
     );
   }

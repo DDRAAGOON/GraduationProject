@@ -8,6 +8,8 @@ class UserProfileData {
   static String portfolioUrl = "";
   static String location = "Manchester, UK";
   static String jobTitle = "Product Designer at Twitter";
+  static String? cvName;
+  static String? profileImage;
   
   static List<String> skills = ["Facebook Ads", "Analytics", "Community Manager", "Content Planning"];
   static List<Map<String, String>> socialLinks = [];

@@ -7,6 +7,7 @@ class TradesmanProfileData {
   static String gender = "";
   static String address = "";
   static String service = "";
+  static String? profileImage;
   
   static List<String> skills = [];
   static List<Map<String, String>> education = [];

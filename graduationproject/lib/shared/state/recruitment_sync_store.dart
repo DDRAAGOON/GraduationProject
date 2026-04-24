@@ -238,6 +238,7 @@ class RecruitmentSyncStore extends ChangeNotifier {
   String _currentUserTitle = 'Mobile Developer';
   String _currentUserPortfolio = '';
   String _userRole = 'Job Seeker';
+  String? _currentUserCvName;
   String _searchQuery = '';
   String _filterType = 'All';
   String _filterLocation = 'All';
@@ -270,6 +271,7 @@ class RecruitmentSyncStore extends ChangeNotifier {
   String get currentUserTitle => _currentUserTitle;
   String get currentUserPortfolio => _currentUserPortfolio;
   String get userRole => _userRole;
+  String? get currentUserCvName => _currentUserCvName;
   String get searchQuery => _searchQuery;
   String get filterType => _filterType;
   String get filterLocation => _filterLocation;
@@ -327,6 +329,7 @@ class RecruitmentSyncStore extends ChangeNotifier {
     List<Map<String, String>>? experience,
     String? role,
     List<Map<String, String>>? socialLinks,
+    String? cvName,
   }) {
     _currentUserName = fullName.trim().isEmpty ? _currentUserName : fullName;
     _currentUserTitle = title.trim().isEmpty ? _currentUserTitle : title;
@@ -338,6 +341,7 @@ class RecruitmentSyncStore extends ChangeNotifier {
     if (skills != null) _currentUserSkills = List.from(skills);
     if (education != null) _currentUserEducation = List.from(education);
     if (experience != null) _currentUserExperience = List.from(experience);
+    if (cvName != null) _currentUserCvName = cvName;
 
     if (role != null && role.isNotEmpty) {
       _userRole = role;

@@ -25,6 +25,7 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
   final TextEditingController _aboutMeController = TextEditingController();
   final TextEditingController _serviceController = TextEditingController();
   final TextEditingController _skillsController = TextEditingController();
+  final TextEditingController _profileImageController = TextEditingController();
   
   // Education Controllers
   final TextEditingController _eduInstitutionController = TextEditingController();
@@ -47,15 +48,25 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
   final List<String> _years = List.generate(70, (i) => (DateTime.now().year - 18 - i).toString());
 
   // Services
-  final List<String> _trades = ["نجار", "فني سباكة", "نقاش", "ميكانيكي", "كهربائي", "حداد", "منظف منازل", "Other"];
-  String? _selectedTrade;
+  final List<String> _trades = [
+  "فني تكييف","نجار", "فني سباكة", "نقاش (دهانات)", "ميكانيكي", "كهربائي", "حداد", "منظف منازل",
+    "فني جبس بورد", "فني سيراميك / بلاط", "فني ألوميتال", "فني زجاج", "فني ستائر", "فني كاميرات مراقبة", "جليسة أطفال", "طباخ منزلي",
+    "بستاني", "مكافحة حشرات", "نقل عفش","حارس أمن", "حارس شخصي", "مشرف أمن", "فني أنظمة أمن",
+  ];
 
   final List<Map<String, String>> _educationList = [];
   final List<String> _skillsList = [];
   
   // Criminal Record and Work Images state
   bool _criminalRecordUploaded = false;
-  final List<String> _workImages = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _profileImageController.addListener(() {
+      setState(() {});
+    });
+  }
 
   @override
   void dispose() {
@@ -66,6 +77,7 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
     _aboutMeController.dispose();
     _serviceController.dispose();
     _skillsController.dispose();
+    _profileImageController.dispose();
     _eduInstitutionController.dispose();
     _eduDegreeController.dispose();
     _eduDurationController.dispose();
@@ -117,7 +129,7 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
       // Sync with Store
       RecruitmentSyncStore.instance.updateUserProfile(
         fullName: _fullNameController.text,
-        title: _selectedTrade ?? "Tradesman",
+        title: _serviceController.text.isNotEmpty ? _serviceController.text : "Tradesman",
         email: _emailController.text,
         phone: "+20 ${_phoneController.text}",
         location: _addressController.text,
@@ -142,18 +154,17 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
       TradesmanProfileData.service = _serviceController.text;
       TradesmanProfileData.skills = List.from(_skillsList);
       TradesmanProfileData.education = List.from(_educationList);
-      TradesmanProfileData.workImages = List.from(_workImages);
       TradesmanProfileData.socialLinks = {
         "instagram": _instagramController.text,
         "facebook": _facebookController.text,
       };
       TradesmanProfileData.criminalRecordUploaded = _criminalRecordUploaded;
+      TradesmanProfileData.profileImage = _profileImageController.text.isEmpty ? null : _profileImageController.text;
 
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Tradesman Profile saved successfully!")));
       
-      // Navigate to Home (Tradesman Home / Find Jobs)
-      Navigator.pushAndRemoveUntil(
-        context,
+      // Navigate to Tradesman Workspace (Find Jobs)
+      Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => const Navbotton()),
         (route) => false,
       );
@@ -171,7 +182,7 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
         surfaceTintColor: Colors.transparent,
         title: Image.asset(
           'assets/company/logo/logo.png',
-          height: 35,
+          height: 150,
           fit: BoxFit.contain,
         ),
         centerTitle: true,
@@ -219,17 +230,32 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
                   children: [
                     Expanded(child: _buildRoleOption("Job Seeker")),
                     const SizedBox(width: 8),
-                    const Text("or", style: TextStyle(color: Colors.black54, fontSize: 16, fontWeight: FontWeight.bold)),
+                    Text(t.tr(en: "or", ar: "أو"), style: const TextStyle(color: Colors.black54, fontSize: 16, fontWeight: FontWeight.bold)),
                     const SizedBox(width: 8),
                     Expanded(child: _buildRoleOption("Tradesman")),
                   ],
                 ),
                 const SizedBox(height: 35),
 
+                // Profile Image Avatar Preview (Left aligned)
+                CircleAvatar(
+                  radius: 50,
+                  backgroundColor: Colors.white,
+                  backgroundImage: _profileImageController.text.isNotEmpty 
+                      ? NetworkImage(_profileImageController.text) as ImageProvider
+                      : null,
+                  child: _profileImageController.text.isEmpty
+                      ? const Icon(Icons.person, size: 50, color: Color(0xFF49769F))
+                      : null,
+                ),
+                const SizedBox(height: 20),
+
                 // Personal Details
                 Text(t.personalInfo, style: const TextStyle(color: Colors.black87, fontSize: 16, fontWeight: FontWeight.w600)),
                 const SizedBox(height: 20),
                 _buildTextField(_fullNameController, t.fullName, Icons.person_outline, isRequired: true),
+                const SizedBox(height: 20),
+                _buildTextField(_profileImageController, "Profile Image URL", Icons.image_outlined, hint: "Paste image link here"),
                 const SizedBox(height: 20),
                 _buildTextField(_emailController, t.emailAddress, Icons.email_outlined, isRequired: true),
                 const SizedBox(height: 20),
@@ -289,26 +315,43 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
                 _buildTextField(_aboutMeController, t.aboutMe, Icons.info_outline, maxLines: 4),
                 const SizedBox(height: 30),
 
-                // Service (Required choice or text)
+                // Service (Unified Editable Dropdown - Old Look)
                 Text("${t.selectService} *", style: const TextStyle(color: Colors.black87, fontSize: 16, fontWeight: FontWeight.w600)),
-                Text(t.tr(en: "Select or enter the profession you provide", ar: "اختر أو أدخل المهنة التي تمارسها"), style: const TextStyle(color: Colors.black38, fontSize: 12)),
+                Text(t.tr(en: "Select from arrow or type your profession", ar: "اختر من السهم أو اكتب مهنتك"), style: const TextStyle(color: Colors.black38, fontSize: 12)),
                 const SizedBox(height: 15),
-                _buildDropdownField(
-                  label: t.selectService,
-                  icon: Icons.work_outline,
-                  value: _selectedTrade,
-                  items: _trades,
-                  onChanged: (v) => setState(() {
-                    _selectedTrade = v;
-                    if (v != "Other") { _serviceController.text = v!; }
-                    else { _serviceController.clear(); }
-                  }),
-                  isRequired: true,
+                TextFormField(
+                  controller: _serviceController,
+                  style: const TextStyle(color: Colors.black87, fontSize: 14),
+                  validator: (value) => (value == null || value.isEmpty) ? "${t.selectService} is required" : null,
+                  decoration: InputDecoration(
+                    labelText: t.selectService,
+                    labelStyle: const TextStyle(color: Colors.black54, fontSize: 14),
+                    prefixIcon: const Icon(Icons.work_outline, color: Color(0xFF49769F), size: 20),
+                    suffixIcon: PopupMenuButton<String>(
+                      padding: EdgeInsets.zero,
+                      icon: const Icon(Icons.arrow_drop_down, color: Colors.black54),
+                      onSelected: (String value) {
+                        setState(() {
+                          _serviceController.text = value;
+                        });
+                      },
+                      itemBuilder: (BuildContext context) {
+                        return _trades.map((String choice) {
+                          return PopupMenuItem<String>(
+                            value: choice,
+                            child: Text(choice, style: const TextStyle(fontSize: 14)),
+                          );
+                        }).toList();
+                      },
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide(color: Colors.grey.shade300)),
+                    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide(color: Colors.grey.shade300)),
+                    focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: const BorderSide(color: Color(0xFF49769F))),
+                  ),
                 ),
-                if (_selectedTrade == "Other") ...[
-                  const SizedBox(height: 15),
-                  _buildTextField(_serviceController, t.tr(en: "Enter Profession", ar: "أدخل المهنة"), Icons.edit_note_outlined, isRequired: true),
-                ],
                 const SizedBox(height: 30),
 
                 // Education
@@ -346,7 +389,7 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
                       IconButton(icon: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 20), onPressed: () => setState(() => _educationList.removeAt(entry.key))),
                     ],
                   ),
-                )),
+                )).toList(),
                 const SizedBox(height: 30),
 
                 // Skills
@@ -382,51 +425,6 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
                     Expanded(child: _buildTextField(_facebookController, "Facebook", Icons.facebook_outlined)),
                   ],
                 ),
-                const SizedBox(height: 30),
-
-                // Your Work
-                _buildSectionHeader(t.yourWork, t.workImagesHint),
-                const SizedBox(height: 15),
-                _buildUploadBox(
-                  t.uploadHint, 
-                  () {
-                    setState(() {
-                      _workImages.add("Work Image ${_workImages.length + 1}");
-                    });
-                  }
-                ),
-                if (_workImages.isNotEmpty) ...[
-                  const SizedBox(height: 15),
-                  SizedBox(
-                    height: 80,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: _workImages.length,
-                      itemBuilder: (context, index) => Container(
-                        width: 80,
-                        margin: const EdgeInsets.only(right: 10),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: Colors.grey.shade300),
-                        ),
-                        child: Stack(
-                          children: [
-                            const Center(child: Icon(Icons.image, color: Colors.black26)),
-                            Positioned(
-                              top: 0,
-                              right: 0,
-                              child: GestureDetector(
-                                onTap: () => setState(() => _workImages.removeAt(index)),
-                                child: const Icon(Icons.cancel, color: Colors.red, size: 20),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
                 const SizedBox(height: 40),
 
                 // Save Profile Button

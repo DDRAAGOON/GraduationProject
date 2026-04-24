@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../app/router/app_router.dart';
 import '../../constants/app_images.dart';
 import '../../shared/l10n/app_localizations.dart';
+import '../../shared/state/locale_controller.dart';
 
 /// First launch: choose Job seeker (User) or Recruiter (Company), then each flow’s onboarding.
 class LogoPage extends StatelessWidget {
@@ -14,13 +15,25 @@ class LogoPage extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.public, color: Color(0xFF1B2D4F)),
+            onPressed: () => _showLanguagePicker(context),
+          ),
+          const SizedBox(width: 8),
+        ],
+      ),
+      extendBodyBehindAppBar: true,
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: size.width * 0.08),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: size.height * 0.08),
+              SizedBox(height: size.height * 0.02),
               Text(
                 'JOBITO',
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
@@ -31,7 +44,9 @@ class LogoPage extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                'Find your next role or hire top talent faster.',
+                t.isAr 
+                  ? 'ابحث عن وظيفتك القادمة أو وظّف أفضل الكوادر بسرعة.' 
+                  : 'Find your next role or hire top talent faster.',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: cs.onSurface.withValues(alpha: 0.7),
                 ),
@@ -89,6 +104,42 @@ class LogoPage extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  void _showLanguagePicker(BuildContext context) {
+    final t = AppLocalizations.of(context);
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.symmetric(vertical: 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.language),
+                title: Text(t.english),
+                onTap: () {
+                  if (t.isAr) LocaleController.instance.toggle();
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.language),
+                title: Text(t.arabic),
+                onTap: () {
+                  if (!t.isAr) LocaleController.instance.toggle();
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
