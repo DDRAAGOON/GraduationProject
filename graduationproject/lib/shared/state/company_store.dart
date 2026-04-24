@@ -31,6 +31,11 @@ class CompanyStore extends ChangeNotifier {
   int _foundedMonth = 7;
   int _foundedYear = 2021;
 
+  // --- Registration Data ---
+  String _commercialRegister = '';
+  String _nationalNumber = '';
+  String? _customProfileImage;
+
   // Public getters to access state securely
   String get companyName => _companyName;
   String get website => _website;
@@ -47,7 +52,10 @@ class CompanyStore extends ChangeNotifier {
   int get foundedMonth => _foundedMonth;
   int get foundedYear => _foundedYear;
 
-  String get companyProfileImage => AppImages.companyProfileImage;
+  String get commercialRegister => _commercialRegister;
+  String get nationalNumber => _nationalNumber;
+
+  String get companyProfileImage => _customProfileImage ?? AppImages.companyProfileImage;
 
   String _aboutEn =
       'Nomad is a software platform for starting and running internet businesses. '
@@ -73,6 +81,19 @@ class CompanyStore extends ChangeNotifier {
   void setCompanyIntro({required String english, required String arabic}) {
     _aboutEn = english;
     _aboutAr = arabic;
+    notifyListeners();
+  }
+
+  void setRegistrationData({
+    String? companyName,
+    String? customProfileImage,
+    String? commercialRegister,
+    String? nationalNumber,
+  }) {
+    if (companyName != null && companyName.isNotEmpty) _companyName = companyName;
+    if (customProfileImage != null) _customProfileImage = customProfileImage;
+    if (commercialRegister != null) _commercialRegister = commercialRegister;
+    if (nationalNumber != null) _nationalNumber = nationalNumber;
     notifyListeners();
   }
 

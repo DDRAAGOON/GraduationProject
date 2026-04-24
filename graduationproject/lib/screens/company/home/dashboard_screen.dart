@@ -1,9 +1,10 @@
 // Company home: KPIs, shortcuts, and recent jobs.
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';
-import '../../../constants/app_images.dart';
 import '../../../shared/l10n/app_localizations.dart';
 import '../../../shared/models/job.dart';
 import '../../../shared/state/company_store.dart';
@@ -17,44 +18,51 @@ class CompanyDashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final companyStore = CompanyStore.instance;
-    return AppScaffold(
-      titleWidget: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ClipOval(
-            child: Image.asset(
-              AppImages.companyProfileImage,
-              width: 40,
-              height: 40,
-              fit: BoxFit.cover,
-            ),
+    return AnimatedBuilder(
+      animation: companyStore,
+      builder: (context, _) {
+        return AppScaffold(
+          titleWidget: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ClipOval(
+                child: companyStore.companyProfileImage.startsWith('assets/')
+                    ? Image.asset(
+                        companyStore.companyProfileImage,
+                        width: 40,
+                        height: 40,
+                        fit: BoxFit.cover,
+                      )
+                    : Image.file(
+                        File(companyStore.companyProfileImage),
+                        width: 40,
+                        height: 40,
+                        fit: BoxFit.cover,
+                      ),
+              ),
+              const SizedBox(width: 10),
+              Flexible(
+                child: Text(
+                  companyStore.companyName,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleMedium
+                      ?.copyWith(fontWeight: FontWeight.w900),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: 10),
-          Flexible(
-            child: Text(
-              companyStore.companyName,
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context)
-                  .textTheme
-                  .titleMedium
-                  ?.copyWith(fontWeight: FontWeight.w900),
-            ),
-          ),
-        ],
-      ),
-      showBack: false,
-      centerTitle: false,
-      showAppBarDivider: true,
-      body: AnimatedBuilder(
-        animation: companyStore,
-        builder: (context, _) {
-          final jobs = companyStore.jobs;
-          final t = AppLocalizations.of(context);
-          return Center(
+          showBack: false,
+          centerTitle: false,
+          showAppBarDivider: true,
+          body: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 980),
               child: LayoutBuilder(
                 builder: (context, constraints) {
+                  final jobs = companyStore.jobs;
+                  final t = AppLocalizations.of(context);
                   return ListView(
                     padding: EdgeInsets.symmetric(
                       horizontal: constraints.maxWidth < 400 ? 12 : 16,
@@ -88,10 +96,10 @@ class CompanyDashboardScreen extends StatelessWidget {
                 },
               ),
             ),
-          );
-        },
-      ),
-      bottomNavigationBar: const CompanyBottomNav(current: CompanyTab.home),
+          ),
+          bottomNavigationBar: const CompanyBottomNav(current: CompanyTab.home),
+        );
+      },
     );
   }
 }

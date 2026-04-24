@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import '../../../app/router/app_router.dart';
 import '../../../shared/l10n/app_localizations.dart';
 import '../../../shared/models/applicant.dart';
-import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_scaffold.dart';
 import '../../../shared/widgets/section_title.dart';
 import '../widgets/company_applicant_avatar.dart';
@@ -36,8 +35,8 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
                   Text(
                     applicant.fullName,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w900,
-                    ),
+                          fontWeight: FontWeight.w900,
+                        ),
                   ),
                   const SizedBox(height: 4),
                   Text(
@@ -46,14 +45,6 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
                       color: Theme.of(
                         context,
                       ).colorScheme.onSurface.withValues(alpha: 0.7),
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-                  AppButton(
-                    label: t.hiringProgress,
-                    onPressed: () => Navigator.of(context).pushNamed(
-                      AppRoutes.companyApplicantHiringHiredDeclined,
-                      arguments: applicant,
                     ),
                   ),
                 ],

@@ -73,8 +73,24 @@ class _CompanyCompanyProfileScreenState
                 )).toList(),
               ),
               const SizedBox(height: 16),
-              const SizedBox(height: 10),
               const SizedBox(height: 16),
+              if (_store.commercialRegister.isNotEmpty || _store.nationalNumber.isNotEmpty) ...[
+                SectionTitle(t.tr(en: 'Registration Info', ar: 'بيانات التسجيل')),
+                const SizedBox(height: 10),
+                if (_store.commercialRegister.isNotEmpty)
+                  _EditableLinkTile(
+                    icon: Icons.assignment_outlined,
+                    title: t.tr(en: 'Commercial Register', ar: 'السجل التجاري'),
+                    value: _store.commercialRegister,
+                  ),
+                if (_store.nationalNumber.isNotEmpty)
+                  _EditableLinkTile(
+                    icon: Icons.badge_outlined,
+                    title: t.tr(en: 'National Number', ar: 'الرقم القومي'),
+                    value: _store.nationalNumber,
+                  ),
+                const SizedBox(height: 16),
+              ],
               SectionTitle(t.contactSectionLabel),
               const SizedBox(height: 10),
               ..._store.contacts.asMap().entries.map(

@@ -1,11 +1,16 @@
 // Company registration form and navigation to next steps.
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../../app/router/app_router.dart';
 import '../../../shared/l10n/app_localizations.dart';
+import '../../../shared/state/company_store.dart';
+import '../../../shared/services/session_manager.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_scaffold.dart';
 import '../../../shared/widgets/app_text_field.dart';
@@ -25,6 +30,10 @@ class _CompanySignUpScreenState extends State<CompanySignUpScreen> {
   final _confirmPassword = TextEditingController();
   final _address = TextEditingController();
   final _taxNumber = TextEditingController();
+  final _commercialRegister = TextEditingController();
+  final _nationalNumber = TextEditingController();
+
+  String? _selectedImagePath;
 
   bool _obscure1 = true;
   bool _obscure2 = true;
@@ -46,6 +55,8 @@ class _CompanySignUpScreenState extends State<CompanySignUpScreen> {
     _confirmPassword.dispose();
     _address.dispose();
     _taxNumber.dispose();
+    _commercialRegister.dispose();
+    _nationalNumber.dispose();
     super.dispose();
   }
 
@@ -75,6 +86,24 @@ class _CompanySignUpScreenState extends State<CompanySignUpScreen> {
     setState(() => _loading = true);
     await Future<void>.delayed(const Duration(milliseconds: 700));
     if (!mounted) return;
+    
+    // Save registration data to the store so it appears in the profile.
+    CompanyStore.instance.setRegistrationData(
+      companyName: _companyName.text.trim(),
+      customProfileImage: _selectedImagePath,
+      commercialRegister: _commercialRegister.text.trim(),
+      nationalNumber: _nationalNumber.text.trim(),
+    );
+
+    // Save session for persistence
+    await SessionManager.saveCompanySession(
+      email: _email.text.trim(),
+      name: _companyName.text.trim(),
+      photoPath: _selectedImagePath,
+    );
+
+    if (!mounted) return;
+
     setState(() => _loading = false);
     Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.companyDashboard, (route) => false);
   }
@@ -94,6 +123,54 @@ class _CompanySignUpScreenState extends State<CompanySignUpScreen> {
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.w800,
                 ),
+          ),
+          const SizedBox(height: 26),
+          Center(
+            child: GestureDetector(
+              onTap: () async {
+                final picker = ImagePicker();
+                final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+                if (pickedFile != null) {
+                  setState(() {
+                    _selectedImagePath = pickedFile.path;
+                  });
+                }
+              },
+              child: Stack(
+                alignment: Alignment.bottomRight,
+                children: [
+                  CircleAvatar(
+                    radius: 45,
+                    backgroundColor: Theme.of(context).colorScheme.surfaceBright,
+                    backgroundImage: _selectedImagePath != null 
+                        ? FileImage(File(_selectedImagePath!)) as ImageProvider
+                        : null,
+                    child: _selectedImagePath == null 
+                        ? Icon(Icons.person, size: 45, color: Theme.of(context).colorScheme.primary) 
+                        : null,
+                  ),
+                  Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primary,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.camera_alt,
+                      size: 20,
+                      color: Theme.of(context).colorScheme.onPrimary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Center(
+            child: Text(
+              t.tr(en: 'Upload Photo', ar: 'رفع صورة'),
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
           ),
           const SizedBox(height: 26),
           AppTextField(
@@ -206,6 +283,19 @@ class _CompanySignUpScreenState extends State<CompanySignUpScreen> {
             label: t.taxNumber,
             controller: _taxNumber,
             hint: t.enterTaxNumber,
+            keyboardType: TextInputType.number,
+          ),
+          const SizedBox(height: 16),
+          AppTextField(
+            label: t.tr(en: 'Commercial Register', ar: 'السجل التجاري'),
+            controller: _commercialRegister,
+            hint: t.tr(en: 'Enter Commercial Register', ar: 'أدخل السجل التجاري'),
+          ),
+          const SizedBox(height: 16),
+          AppTextField(
+            label: t.tr(en: 'National Number of Official', ar: 'الرقم القومي للمسؤول'),
+            controller: _nationalNumber,
+            hint: t.tr(en: 'Enter National Number', ar: 'أدخل الرقم القومي للمسؤول'),
             keyboardType: TextInputType.number,
           ),
           const SizedBox(height: 12),

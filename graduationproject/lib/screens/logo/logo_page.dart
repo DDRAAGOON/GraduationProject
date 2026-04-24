@@ -3,6 +3,8 @@ import '../../app/router/app_router.dart';
 import '../../constants/app_images.dart';
 import '../../shared/l10n/app_localizations.dart';
 import '../../shared/state/locale_controller.dart';
+import '../../shared/state/company_store.dart';
+import '../../shared/services/session_manager.dart';
 
 /// First launch: choose Job seeker (User) or Recruiter (Company), then each flow’s onboarding.
 class LogoPage extends StatelessWidget {
@@ -88,9 +90,25 @@ class LogoPage extends StatelessWidget {
                   fallbackAr: 'شركة',
                 ),
                 color: cs.secondary,
-                onTap: () => Navigator.of(
-                  context,
-                ).pushNamed(AppRoutes.companyOnboardingNew),
+                onTap: () async {
+                  if (await SessionManager.isCompanyLoggedIn()) {
+                    final data = await SessionManager.getCompanyData();
+                    CompanyStore.instance.setRegistrationData(
+                      companyName: data['name'],
+                      customProfileImage: data['photo'],
+                    );
+                    if (context.mounted) {
+                      Navigator.of(context).pushNamedAndRemoveUntil(
+                        AppRoutes.companyDashboard,
+                        (route) => false,
+                      );
+                    }
+                  } else {
+                    if (context.mounted) {
+                      Navigator.of(context).pushNamed(AppRoutes.companyOnboardingNew);
+                    }
+                  }
+                },
               ),
               SizedBox(height: size.height * 0.012),
               TextButton.icon(
@@ -157,30 +175,35 @@ class _RoleButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: double.infinity,
-        height: 54,
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(14),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.15),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(14),
+        child: Ink(
+          width: double.infinity,
+          height: 54,
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(14),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.15),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Center(
+            child: Text(
+              label,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.3,
+              ),
             ),
-          ],
-        ),
-        alignment: Alignment.center,
-        child: Text(
-          label,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 0.3,
           ),
         ),
       ),

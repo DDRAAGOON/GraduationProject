@@ -25,6 +25,9 @@ class CompanyJobApplicantsPipelineViewScreen extends StatelessWidget {
     final shortlisted = all
         .where((a) => a.stage.toLowerCase().contains('short'))
         .toList();
+    final interview = all
+        .where((a) => a.stage.toLowerCase().contains('interview'))
+        .toList();
     final hired = all
         .where((a) => a.stage.toLowerCase().contains('hire'))
         .toList();
@@ -43,6 +46,8 @@ class CompanyJobApplicantsPipelineViewScreen extends StatelessWidget {
               _StageColumn(title: 'In Review', applicants: inReview),
               const SizedBox(width: 12),
               _StageColumn(title: 'Shortlisted', applicants: shortlisted),
+              const SizedBox(width: 12),
+              _StageColumn(title: 'Interview', applicants: interview),
               const SizedBox(width: 12),
               _StageColumn(title: 'Hired', applicants: hired),
             ],

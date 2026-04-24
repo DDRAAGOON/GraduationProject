@@ -27,20 +27,6 @@ class CompanyJobDetailsScreen extends StatefulWidget {
 
 class _CompanyJobDetailsScreenState extends State<CompanyJobDetailsScreen> {
   _JobViewTab _tab = _JobViewTab.table;
-  static const List<String> _locationOptions = <String>[
-    'Remote',
-    'Hybrid',
-    'On-site',
-    'Cairo, Egypt',
-    'Alexandria, Egypt',
-  ];
-  static const List<String> _employmentTypeOptions = <String>[
-    'Full-Time',
-    'Part-Time',
-    'Contract',
-    'Internship',
-    'Remote',
-  ];
 
   Job get _job => CompanyStore.instance.jobById(widget.job.id);
 
@@ -52,11 +38,11 @@ class _CompanyJobDetailsScreenState extends State<CompanyJobDetailsScreen> {
       title: job.title,
       showBack: true,
       actions: [
-        // IconButton(
-        //   tooltip: t.editJobTooltip,
-        //   onPressed: () => _editJob(context, job),
-        //   icon: const Icon(Icons.edit_outlined),
-        // ),
+        IconButton(
+          tooltip: t.edit,
+          onPressed: () => _editJob(context, job),
+          icon: const Icon(Icons.edit_outlined),
+        ),
         IconButton(
           tooltip: t.deleteJobTooltip,
           onPressed: () => _deleteJob(job),
@@ -100,7 +86,9 @@ class _CompanyJobDetailsScreenState extends State<CompanyJobDetailsScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                job.description.isEmpty ? t.noDescriptionYet : job.description,
+                job.description.isEmpty
+                    ? t.noDescriptionYet
+                    : job.description,
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
               const SizedBox(height: 16),
@@ -120,10 +108,7 @@ class _CompanyJobDetailsScreenState extends State<CompanyJobDetailsScreen> {
               const SizedBox(height: 18),
               SegmentedButton<_JobViewTab>(
                 segments: [
-                  ButtonSegment(
-                    value: _JobViewTab.table,
-                    label: Text(t.tableView),
-                  ),
+                  ButtonSegment(value: _JobViewTab.table, label: Text(t.tableView)),
                   ButtonSegment(
                     value: _JobViewTab.pipeline,
                     label: Text(t.pipelineView),
@@ -189,21 +174,11 @@ class _CompanyJobDetailsScreenState extends State<CompanyJobDetailsScreen> {
   Future<void> _editJob(BuildContext context, Job job) async {
     final t = AppLocalizations.of(context);
     final title = TextEditingController(text: job.title);
+    final location = TextEditingController(text: job.location);
+    final employmentType = TextEditingController(text: job.employmentType);
     final category = TextEditingController(text: job.category);
+    final salaryRange = TextEditingController(text: job.salaryRange);
     final description = TextEditingController(text: job.description);
-    final responsibilities = TextEditingController(
-      text: job.responsibilities.join('\n'),
-    );
-    final niceToHaves = TextEditingController(text: job.niceToHaves.join('\n'));
-
-    String selectedLocation = _locationOptions.contains(job.location)
-        ? job.location
-        : _locationOptions.first;
-    String selectedEmploymentType =
-        _employmentTypeOptions.contains(job.employmentType)
-        ? job.employmentType
-        : _employmentTypeOptions.first;
-    RangeValues salary = _parseSalaryRange(job.salaryRange);
 
     final saved = await showModalBottomSheet<bool>(
       context: context,
@@ -211,158 +186,68 @@ class _CompanyJobDetailsScreenState extends State<CompanyJobDetailsScreen> {
       showDragHandle: true,
       builder: (ctx) {
         final bottomInset = MediaQuery.of(ctx).viewInsets.bottom;
-        return StatefulBuilder(
-          builder: (ctx, setSheetState) => Padding(
-            padding: EdgeInsets.fromLTRB(16, 8, 16, 16 + bottomInset),
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    t.editJobTitle,
-                    style: Theme.of(ctx).textTheme.titleLarge,
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: title,
-                    decoration: InputDecoration(labelText: t.titleLabel),
-                  ),
-                  const SizedBox(height: 10),
-                  DropdownButtonFormField<String>(
-                    initialValue: selectedLocation,
-                    decoration: InputDecoration(labelText: t.locationLabel),
-                    items: _locationOptions
-                        .map(
-                          (location) => DropdownMenuItem<String>(
-                            value: location,
-                            child: Text(location),
-                          ),
-                        )
-                        .toList(),
-                    onChanged: (value) {
-                      if (value == null) return;
-                      setSheetState(() => selectedLocation = value);
-                    },
-                  ),
-                  const SizedBox(height: 10),
-                  DropdownButtonFormField<String>(
-                    initialValue: selectedEmploymentType,
-                    decoration: InputDecoration(
-                      labelText: t.employmentTypeLabel,
-                    ),
-                    items: _employmentTypeOptions
-                        .map(
-                          (type) => DropdownMenuItem<String>(
-                            value: type,
-                            child: Text(type),
-                          ),
-                        )
-                        .toList(),
-                    onChanged: (value) {
-                      if (value == null) return;
-                      setSheetState(() => selectedEmploymentType = value);
-                    },
-                  ),
-                  const SizedBox(height: 10),
-                  TextField(
-                    controller: category,
-                    decoration: InputDecoration(labelText: t.categoryLabel),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(t.salaryRangeLabel),
-                  const SizedBox(height: 6),
-                  Text(
-                    '\$${salary.start.toStringAsFixed(0)} - \$${salary.end.toStringAsFixed(0)}',
-                  ),
-                  RangeSlider(
-                    values: salary,
-                    min: 0,
-                    max: 50000,
-                    divisions: 100,
-                    onChanged: (value) => setSheetState(() => salary = value),
-                  ),
-                  const SizedBox(height: 10),
-                  TextField(
-                    controller: description,
-                    maxLines: 4,
-                    decoration: InputDecoration(
-                      labelText: t.descriptionSection,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  TextField(
-                    controller: responsibilities,
-                    maxLines: 4,
-                    decoration: InputDecoration(labelText: t.responsibilities),
-                  ),
-                  const SizedBox(height: 10),
-                  TextField(
-                    controller: niceToHaves,
-                    maxLines: 4,
-                    decoration: InputDecoration(
-                      labelText: t.niceToHavesSection,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  FilledButton(
-                    onPressed: () => Navigator.of(ctx).pop(true),
-                    child: Text(t.save),
-                  ),
-                  const SizedBox(height: 8),
-                ],
-              ),
+        return Padding(
+          padding: EdgeInsets.fromLTRB(16, 8, 16, 16 + bottomInset),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(t.editJobTitle, style: Theme.of(ctx).textTheme.titleLarge),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: title,
+                  decoration: InputDecoration(labelText: t.titleLabel),
+                ),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: location,
+                  decoration: InputDecoration(labelText: t.locationLabel),
+                ),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: employmentType,
+                  decoration: InputDecoration(labelText: t.employmentTypeLabel),
+                ),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: category,
+                  decoration: InputDecoration(labelText: t.categoryLabel),
+                ),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: salaryRange,
+                  decoration: InputDecoration(labelText: t.salaryRangeLabel),
+                ),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: description,
+                  maxLines: 4,
+                  decoration: InputDecoration(labelText: t.descriptionSection),
+                ),
+                const SizedBox(height: 12),
+                FilledButton(
+                  onPressed: () => Navigator.of(ctx).pop(true),
+                  child: Text(t.save),
+                ),
+              ],
             ),
           ),
         );
       },
     );
 
-    title.dispose();
-    category.dispose();
-    description.dispose();
-    responsibilities.dispose();
-    niceToHaves.dispose();
-
     if (saved != true) return;
     CompanyStore.instance.saveJob(
       job.copyWith(
         title: title.text.trim(),
-        location: selectedLocation,
-        employmentType: selectedEmploymentType,
+        location: location.text.trim(),
+        employmentType: employmentType.text.trim(),
         category: category.text.trim(),
-        salaryRange:
-            '\$${salary.start.toStringAsFixed(0)}-\$${salary.end.toStringAsFixed(0)} USD',
+        salaryRange: salaryRange.text.trim(),
         description: description.text.trim(),
-        responsibilities: _splitLines(responsibilities.text),
-        niceToHaves: _splitLines(niceToHaves.text),
       ),
     );
     if (mounted) setState(() {});
-  }
-
-  RangeValues _parseSalaryRange(String raw) {
-    final clean = raw.replaceAll(',', '');
-    final numbers = RegExp(r'\d+')
-        .allMatches(clean)
-        .map((m) => double.tryParse(m.group(0) ?? ''))
-        .whereType<double>()
-        .toList();
-    if (numbers.length >= 2) {
-      return RangeValues(numbers.first, numbers[1]);
-    }
-    if (numbers.length == 1) {
-      final end = numbers.first < 50000 ? numbers.first + 5000 : numbers.first;
-      return RangeValues(numbers.first, end);
-    }
-    return const RangeValues(5000, 22000);
-  }
-
-  List<String> _splitLines(String value) {
-    return value
-        .split('\n')
-        .map((line) => line.trim())
-        .where((line) => line.isNotEmpty)
-        .toList();
   }
 }
 
@@ -375,7 +260,10 @@ class _Bullets extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     if (items.isEmpty) {
-      return Text(t.noItemsYet, style: Theme.of(context).textTheme.bodyMedium);
+      return Text(
+        t.noItemsYet,
+        style: Theme.of(context).textTheme.bodyMedium,
+      );
     }
     return Column(
       children: items
@@ -433,6 +321,9 @@ class _JobApplicantsSection extends StatelessWidget {
           .toList(),
       t.shortlisted: applicants
           .where((a) => a.stage.toLowerCase().contains('short'))
+          .toList(),
+      t.interview: applicants
+          .where((a) => a.stage.toLowerCase().contains('interview'))
           .toList(),
     };
 

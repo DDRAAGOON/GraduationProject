@@ -16,7 +16,6 @@ import '../../screens/company/candidates/applicant_hiring_progress_hired_decline
 import '../../screens/company/candidates/recruitment_candidate_details_screen.dart';
 import '../../screens/company/help/help_center_screen.dart';
 import '../../screens/company/home/dashboard_screen.dart';
-import '../../screens/company/home/recruitment_company_shell_screen.dart';
 import '../../screens/company/jobs/job_analytics_screen.dart';
 import '../../screens/company/jobs/job_applicants_pipeline_view_screen.dart';
 import '../../screens/company/jobs/job_applicants_table_view_screen.dart';
@@ -215,7 +214,9 @@ final class AppRouter {
       case AppRoutes.companyDashboard:
         page = const CompanyDashboardScreen();
       case AppRoutes.companyWorkspace:
-        page = const RecruitmentCompanyShellScreen();
+        // Legacy recruitment shell kept for reference; company workspace should use
+        // the main company tabs (home/chat/job/profile/stats) via bottom nav.
+        page = const CompanyDashboardScreen();
       case AppRoutes.companyOnboardingNew:
         page = const RecruitmentCompanyOnboardingScreen();
       case AppRoutes.companySignInNew:

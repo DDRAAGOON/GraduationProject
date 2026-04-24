@@ -8,7 +8,7 @@ final class AppTheme {
   static const _darkPrimary = Color(0xFF4A6ED1);
   static const _darkAccent = Color(0xFFFF7A2A);
   static const _darkText = Color(0xFFEAF0FF);
-  static const _darkMuted = Color(0xFF9FAED2);
+  static const _darkMuted = Color(0xFFB59A90);
 
   static const _lightBg = Color(0xFFF7F9FC);
   static const _lightSurface = Color(0xFFFFFFFF);
@@ -42,20 +42,20 @@ final class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: const Color(0xFFFFFFFF),
+        fillColor: Colors.black.withValues(alpha: 0.05),
         hintStyle: const TextStyle(color: _lightMuted),
         labelStyle: const TextStyle(color: _lightMuted),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: const Color(0xFFE5E7EB)),
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: Colors.black.withValues(alpha: 0.1)),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(8),
           borderSide: const BorderSide(color: _lightPrimary, width: 1.3),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: const Color(0xFFE5E7EB)),
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: Colors.black.withValues(alpha: 0.1)),
         ),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 14,
