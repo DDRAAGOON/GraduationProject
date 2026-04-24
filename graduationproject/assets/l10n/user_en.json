@@ -31,6 +31,7 @@
   "common.no": "No",
   "common.upload": "Upload",
   "common.required": "Required",
+  "common.notYet": "not yet",
   "validation.enterValidEmail": "Enter a valid email",
   "validation.min8Chars": "Minimum 8 characters",
   "validation.passwordsNoMatch": "Passwords do not match",

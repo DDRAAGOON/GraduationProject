@@ -322,9 +322,6 @@ class _JobApplicantsSection extends StatelessWidget {
       t.shortlisted: applicants
           .where((a) => a.stage.toLowerCase().contains('short'))
           .toList(),
-      t.interview: applicants
-          .where((a) => a.stage.toLowerCase().contains('interview'))
-          .toList(),
     };
 
     return SingleChildScrollView(

@@ -1,17 +1,17 @@
 class UserProfileData {
-  static String fullName = "Jake Gyll";
-  static String aboutMe = "I'm a product designer + filmmaker currently working remotely at Twitter from beautiful Manchester, United Kingdom.";
-  static String phone = "+44 1245 572 135";
-  static String email = "jakegyll@email.com";
-  static String dob = "1998-12-12";
-  static String gender = "Male";
+  static String fullName = "";
+  static String aboutMe = "";
+  static String phone = "";
+  static String email = "";
+  static String dob = "";
+  static String gender = "";
   static String portfolioUrl = "";
-  static String location = "Manchester, UK";
-  static String jobTitle = "Product Designer at Twitter";
+  static String location = "";
+  static String jobTitle = "";
   static String? cvName;
   static String? profileImage;
   
-  static List<String> skills = ["Facebook Ads", "Analytics", "Community Manager", "Content Planning"];
+  static List<String> skills = [];
   static List<Map<String, String>> socialLinks = [];
 
   // أضفت هذا السطر لحل المشكلة

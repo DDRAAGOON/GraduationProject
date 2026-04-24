@@ -34,7 +34,7 @@ class _RecruitmentUserOnboardingScreenState
       ),
       _OnboardingItem(
         title: t.tr(en: 'Track Every Hiring Stage', ar: 'تتبع كل مرحلة توظيف'),
-        subtitle: t.tr(en: 'Get live updates from review to interview and offer.', ar: 'احصل على تحديثات مباشرة من المراجعة إلى المقابلة والعرض.'),
+        subtitle: t.tr(en: 'Get live updates from review to offer.', ar: 'احصل على تحديثات مباشرة من المراجعة إلى العرض.'),
         icon: Icons.timeline_rounded,
       ),
     ];

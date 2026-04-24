@@ -28,7 +28,6 @@ class _CompanyJobApplicantsTableViewScreenState
   static const _stageOptions = <String>[
     'In Review',
     'Shortlisted',
-    'Interview',
     'Hired',
     'Declined',
   ];
@@ -257,7 +256,6 @@ class _ApplicantRow extends StatelessWidget {
     final stage = applicant.stage.toLowerCase();
     if (stage.contains('declin')) return Theme.of(context).colorScheme.error;
     if (stage.contains('hire')) return Colors.tealAccent.shade700;
-    if (stage.contains('interview')) return Colors.orangeAccent;
     return Theme.of(context).colorScheme.primary;
   }
 

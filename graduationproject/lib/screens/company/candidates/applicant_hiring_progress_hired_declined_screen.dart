@@ -52,7 +52,6 @@ class _CompanyApplicantHiringProgressHiredDeclinedScreenState
           const SizedBox(height: 10),
           SegmentedButton<String>(
             segments: [
-              ButtonSegment(value: 'Interview', label: Text(t.interview)),
               ButtonSegment(value: 'Hired', label: Text(t.hired)),
               ButtonSegment(value: 'Declined', label: Text(t.declined)),
             ],
@@ -66,9 +65,7 @@ class _CompanyApplicantHiringProgressHiredDeclinedScreenState
               child: Text(
                 _stage == 'Hired'
                     ? t.candidateHiredMsg
-                    : _stage == 'Declined'
-                        ? t.candidateDeclinedMsg
-                        : t.interviewSchedule,
+                    : t.candidateDeclinedMsg,
               ),
             ),
           ),

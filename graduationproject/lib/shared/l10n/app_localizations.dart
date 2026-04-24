@@ -87,6 +87,7 @@ class AppLocalizations {
   String get no => userTr('common.no', fallbackEn: 'No', fallbackAr: 'لا');
   String get upload => userTr('common.upload', fallbackEn: 'Upload', fallbackAr: 'رفع');
   String get required => userTr('common.required', fallbackEn: 'Required', fallbackAr: 'مطلوب');
+  String get notYet => userTr('common.notYet', fallbackEn: 'not yet', fallbackAr: 'ليس بعد');
 
   // ── Validation ─────────────────────────────────────────────────────────────
   String get enterValidEmail => userTr('validation.enterValidEmail', fallbackEn: 'Enter a valid email', fallbackAr: 'أدخل بريدًا إلكترونيًا صحيحًا');
@@ -266,12 +267,8 @@ class AppLocalizations {
   String get candidateDeclinedMsg => userTr('candidates.candidateDeclinedMsg', fallbackEn: 'Candidate has been declined', fallbackAr: 'تم رفض المرشح');
   String get hiringProgress => userTr('candidates.hiringProgress', fallbackEn: 'Hiring Progress', fallbackAr: 'تقدم التوظيف');
   String get currentStage => userTr('candidates.currentStage', fallbackEn: 'Current Stage', fallbackAr: 'المرحلة الحالية');
-  String get interview => userTr('candidates.interview', fallbackEn: 'Interview', fallbackAr: 'المقابلة');
   String get moveToNextStep => userTr('candidates.moveToNextStep', fallbackEn: 'Move to Next Step', fallbackAr: 'الانتقال للخطوة التالية');
   String get notes => userTr('candidates.notes', fallbackEn: 'Notes', fallbackAr: 'الملاحظات');
-  String get interviewSchedule => userTr('candidates.interviewSchedule', fallbackEn: 'Interview Schedule', fallbackAr: 'جدول المقابلات');
-  String get addScheduleInterview => userTr('candidates.addScheduleInterview', fallbackEn: 'Add Schedule Interview', fallbackAr: 'إضافة موعد مقابلة');
-  String get interviewList => userTr('candidates.interviewList', fallbackEn: 'Interview List', fallbackAr: 'قائمة المقابلات');
   String get addFeedback => userTr('candidates.addFeedback', fallbackEn: 'Add Feedback', fallbackAr: 'إضافة ملاحظات');
   String get mostRelevant => userTr('candidates.mostRelevant', fallbackEn: 'Most Relevant', fallbackAr: 'الأكثر صلة');
 

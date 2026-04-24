@@ -57,22 +57,27 @@ class _CompanyCompanyProfileScreenState
                 t.isAr
                     ? (_store.companyAboutAr.trim().isNotEmpty
                         ? _store.companyAboutAr
-                        : _store.companyAboutEn) // Fallback to English if Arabic is not provided
-                    : _store.companyAboutEn,
-                style: Theme.of(context).textTheme.bodyMedium,
+                        : (_store.companyAboutEn.trim().isNotEmpty ? _store.companyAboutEn : t.notYet))
+                    : (_store.companyAboutEn.trim().isNotEmpty ? _store.companyAboutEn : t.notYet),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: (_store.companyAboutAr.isEmpty && _store.companyAboutEn.isEmpty)
+                      ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4)
+                      : null,
+                ),
               ),
               const SizedBox(height: 16),
               SectionTitle(t.locationInfo),
               const SizedBox(height: 10),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: _store.locations.map((item) => Chip(
-                  label: Text(item, style: const TextStyle(fontSize: 12)),
-                  visualDensity: VisualDensity.compact,
-                )).toList(),
-              ),
-              const SizedBox(height: 16),
+              _store.locations.isEmpty
+                  ? Text(t.notYet, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4)))
+                  : Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: _store.locations.map((item) => Chip(
+                        label: Text(item, style: const TextStyle(fontSize: 12)),
+                        visualDensity: VisualDensity.compact,
+                      )).toList(),
+                    ),
               const SizedBox(height: 16),
               if (_store.commercialRegister.isNotEmpty || _store.nationalNumber.isNotEmpty) ...[
                 SectionTitle(t.tr(en: 'Registration Info', ar: 'بيانات التسجيل')),
@@ -93,13 +98,16 @@ class _CompanyCompanyProfileScreenState
               ],
               SectionTitle(t.contactSectionLabel),
               const SizedBox(height: 10),
-              ..._store.contacts.asMap().entries.map(
-                (entry) => _EditableLinkTile(
-                  icon: Icons.link_outlined,
-                  title: entry.value.name,
-                  value: entry.value.value,
+              if (_store.contacts.isEmpty)
+                Text(t.notYet, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4)))
+              else
+                ..._store.contacts.asMap().entries.map(
+                  (entry) => _EditableLinkTile(
+                    icon: Icons.link_outlined,
+                    title: entry.value.name,
+                    value: entry.value.value,
+                  ),
                 ),
-              ),
             ],
           );
         },
@@ -227,19 +235,23 @@ class _CompanyStatsBar extends StatelessWidget {
                 item(
                   icon: Icons.local_fire_department_outlined,
                   label: t.tr(en: 'Founded', ar: 'تاريخ التأسيس'),
-                  value: t.tr(
-                    en: '$foundedMonth/$foundedDay/$foundedYear', 
-                    ar: '$foundedYear/$foundedMonth/$foundedDay'.replaceAll('0', '٠').replaceAll('1', '١').replaceAll('2', '٢').replaceAll('3', '٣').replaceAll('4', '٤').replaceAll('5', '٥').replaceAll('6', '٦').replaceAll('7', '٧').replaceAll('8', '٨').replaceAll('9', '٩')
-                  ),
+                  value: (foundedDay == 0 || foundedMonth == 0 || foundedYear == 0)
+                      ? t.notYet
+                      : t.tr(
+                          en: '$foundedMonth/$foundedDay/$foundedYear', 
+                          ar: '$foundedYear/$foundedMonth/$foundedDay'.replaceAll('0', '٠').replaceAll('1', '١').replaceAll('2', '٢').replaceAll('3', '٣').replaceAll('4', '٤').replaceAll('5', '٥').replaceAll('6', '٦').replaceAll('7', '٧').replaceAll('8', '٨').replaceAll('9', '٩')
+                        ),
                 ),
                 const SizedBox(width: 14),
                 item(
                   icon: Icons.location_on_outlined,
                   label: t.locationInfo,
-                  value: t.tr(
-                    en: '$countriesCount countries', 
-                    ar: '${countriesCount.toString().replaceAll('0', '٠').replaceAll('1', '١').replaceAll('2', '٢').replaceAll('3', '٣').replaceAll('4', '٤').replaceAll('5', '٥').replaceAll('6', '٦').replaceAll('7', '٧').replaceAll('8', '٨').replaceAll('9', '٩')} دولة'
-                  ),
+                  value: countriesCount == 0
+                      ? t.notYet
+                      : t.tr(
+                          en: '$countriesCount countries', 
+                          ar: '${countriesCount.toString().replaceAll('0', '٠').replaceAll('1', '١').replaceAll('2', '٢').replaceAll('3', '٣').replaceAll('4', '٤').replaceAll('5', '٥').replaceAll('6', '٦').replaceAll('7', '٧').replaceAll('8', '٨').replaceAll('9', '٩')} دولة'
+                        ),
                 ),
               ],
             ),
@@ -249,13 +261,13 @@ class _CompanyStatsBar extends StatelessWidget {
                 item(
                   icon: Icons.groups_outlined,
                   label: t.employee,
-                  value: employee,
+                  value: employee.isEmpty ? t.notYet : employee,
                 ),
                 const SizedBox(width: 14),
                 item(
                   icon: Icons.account_balance_outlined,
                   label: t.industry,
-                  value: industry,
+                  value: industry.isEmpty ? t.notYet : industry,
                 ),
               ],
             ),
