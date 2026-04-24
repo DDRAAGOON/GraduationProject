@@ -121,7 +121,7 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
                       children: [
                         Expanded(
                           child: Text(
-                            UserProfileData.fullName,
+                            UserProfileData.fullName.isEmpty ? t.notYet : UserProfileData.fullName,
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onSurface, 
                               fontSize: 20,
@@ -151,7 +151,7 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      UserProfileData.jobTitle,
+                      UserProfileData.jobTitle.isEmpty ? t.notYet : UserProfileData.jobTitle,
                       style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 14),
                     ),
                     const SizedBox(height: 8),
@@ -159,7 +159,7 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
                       children: [
                         Icon(Icons.location_on_outlined, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), size: 16),
                         const SizedBox(width: 4),
-                        Text(UserProfileData.location, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 14)),
+                        Text(UserProfileData.location.isEmpty ? t.notYet : UserProfileData.location, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 14)),
                       ],
                     ),
                   ],
@@ -199,7 +199,7 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Text(
-                  UserProfileData.aboutMe,
+                  UserProfileData.aboutMe.isEmpty ? t.notYet : UserProfileData.aboutMe,
                   style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 14, height: 1.5),
                 ),
               ),
@@ -229,11 +229,13 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
               _buildSectionTitle(t.skills),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Wrap(
-                  spacing: 10,
-                  runSpacing: 10,
-                  children: UserProfileData.skills.map((skill) => _buildSkillTag(skill)).toList(),
-                ),
+                child: UserProfileData.skills.isEmpty
+                    ? Text(t.notYet, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 12))
+                    : Wrap(
+                        spacing: 10,
+                        runSpacing: 10,
+                        children: UserProfileData.skills.map((skill) => _buildSkillTag(skill)).toList(),
+                      ),
               ),
 
               const SizedBox(height: 30),
@@ -243,8 +245,13 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Text(
-                  UserProfileData.portfolioUrl.isEmpty ? "No portfolio added" : UserProfileData.portfolioUrl,
-                  style: const TextStyle(color: Colors.blueAccent, fontSize: 16),
+                  UserProfileData.portfolioUrl.isEmpty ? t.notYet : UserProfileData.portfolioUrl,
+                  style: TextStyle(
+                    color: UserProfileData.portfolioUrl.isEmpty 
+                        ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)
+                        : Colors.blueAccent, 
+                    fontSize: 16
+                  ),
                 ),
               ),
 
@@ -350,6 +357,7 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
   }
 
   Widget _buildDetailItem(IconData icon, String title, String value) {
+    final t = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.only(bottom: 20),
       child: Row(
@@ -363,7 +371,17 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
               children: [
                 Text(title, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 2),
-                Text(value, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 13), maxLines: 1, overflow: TextOverflow.ellipsis),
+                Text(
+                  value.isEmpty ? t.notYet : value, 
+                  style: TextStyle(
+                    color: value.isEmpty 
+                        ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)
+                        : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), 
+                    fontSize: 13
+                  ), 
+                  maxLines: 1, 
+                  overflow: TextOverflow.ellipsis
+                ),
               ],
             ),
           ),

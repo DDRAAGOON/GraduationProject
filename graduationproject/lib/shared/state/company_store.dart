@@ -17,19 +17,24 @@ class CompanyStore extends ChangeNotifier {
   static final CompanyStore instance = CompanyStore._();
 
   // --- Company Basic Details ---
-  String _companyName = 'Nomad';
-  String _website = 'https://www.nomad.com';
-  String _employee = '1 - 50';
-  String _industry = 'Technology';
+  String _companyName = '';
+  String _website = '';
+  String _employee = '';
+  String _industry = '';
 
   // --- Company Extended Details ---
-  List<String> _locations = ['England', 'Japan', 'Australia'];
-  List<String> _techStack = ['HTML 5', 'CSS 3', 'Javascript'];
+  List<String> _locations = [];
+  List<String> _techStack = [];
 
   // --- Date Founded ---
-  int _foundedDay = 31;
-  int _foundedMonth = 7;
-  int _foundedYear = 2021;
+  int _foundedDay = 0;
+  int _foundedMonth = 0;
+  int _foundedYear = 0;
+
+  // --- Registration Data ---
+  String _commercialRegister = '';
+  String _nationalNumber = '';
+  String? _customProfileImage;
 
   // Public getters to access state securely
   String get companyName => _companyName;
@@ -47,21 +52,13 @@ class CompanyStore extends ChangeNotifier {
   int get foundedMonth => _foundedMonth;
   int get foundedYear => _foundedYear;
 
-  String get companyProfileImage => AppImages.companyProfileImage;
+  String get commercialRegister => _commercialRegister;
+  String get nationalNumber => _nationalNumber;
 
-  String _aboutEn =
-      'Nomad is a software platform for starting and running internet businesses. '
-      'Millions of businesses rely on Stripe’s software tools to accept payments, '
-      'expand globally, and manage their businesses online.\n\n'
-      'Stripe has been at the forefront of expanding internet commerce. '
-      'Our mission is to increase the GDP of the internet...';
+  String get companyProfileImage => _customProfileImage ?? AppImages.companyProfileImage;
 
-  String _aboutAr =
-      'تُعد Nomad منصّة برمجية لإطلاق وإدارة الأعمال عبر الإنترنت. يعتمد ملايين '
-      'الشركات على أدوات Stripe لقبول المدفوعات والتوسّع عالميًا وإدارة أعمالها '
-      'رقميًا بكفاءة.\n\n'
-      'ظلّ Stripe في مقدمة توسيع التجارة الإلكترونية، ورسالتنا هي دعم ازدهار '
-      'اقتصاد الإنترنت عبر حلول موثوقة وقابلة للتوسّع.';
+  String _aboutEn = '';
+  String _aboutAr = '';
 
   String get companyAboutEn => _aboutEn;
   String get companyAboutAr => _aboutAr;
@@ -73,6 +70,19 @@ class CompanyStore extends ChangeNotifier {
   void setCompanyIntro({required String english, required String arabic}) {
     _aboutEn = english;
     _aboutAr = arabic;
+    notifyListeners();
+  }
+
+  void setRegistrationData({
+    String? companyName,
+    String? customProfileImage,
+    String? commercialRegister,
+    String? nationalNumber,
+  }) {
+    if (companyName != null && companyName.isNotEmpty) _companyName = companyName;
+    if (customProfileImage != null) _customProfileImage = customProfileImage;
+    if (commercialRegister != null) _commercialRegister = commercialRegister;
+    if (nationalNumber != null) _nationalNumber = nationalNumber;
     notifyListeners();
   }
 

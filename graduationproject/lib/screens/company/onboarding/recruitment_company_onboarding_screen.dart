@@ -24,7 +24,7 @@ class _RecruitmentCompanyOnboardingScreenState
     ),
     _CompanySlide(
       title: 'Manage Candidate Pipeline',
-      subtitle: 'Move applicants through review, shortlist, interview, and hire.',
+      subtitle: 'Move applicants through review, shortlist, and hire.',
       icon: Icons.groups_2_rounded,
     ),
     _CompanySlide(

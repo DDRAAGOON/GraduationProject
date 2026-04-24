@@ -23,53 +23,76 @@ class AppButton extends StatelessWidget {
     final bool isPrimary = variant == AppButtonVariant.primary;
     return SizedBox(
       width: double.infinity,
+      height: 56,
       child: isPrimary
-          ? FilledButton(
-        onPressed: loading ? null : onPressed,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 2),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (loading) ...[
-                const SizedBox(
-                  width: 18,
-                  height: 18,
-                  child: CircularProgressIndicator(strokeWidth: 2),
+          ? Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Theme.of(context).colorScheme.primary,
+                    Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
+                    Theme.of(context).colorScheme.secondary.withValues(alpha: 0.6),
+                  ],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
                 ),
-                const SizedBox(width: 10),
-              ] else if (icon != null) ...[
-                Icon(icon, size: 18),
-                const SizedBox(width: 10),
-              ],
-              Text(label),
-            ],
-          ),
-        ),
-      )
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(70),
+                  bottomLeft: Radius.circular(25),
+                  topRight: Radius.circular(25),
+                  bottomRight: Radius.circular(70),
+                ),
+              ),
+              child: ElevatedButton(
+                onPressed: loading ? null : onPressed,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  foregroundColor: Colors.white,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(70),
+                      bottomLeft: Radius.circular(25),
+                      topRight: Radius.circular(25),
+                      bottomRight: Radius.circular(70),
+                    ),
+                  ),
+                ),
+                child: _buildContent(context),
+              ),
+            )
           : OutlinedButton(
-        onPressed: loading ? null : onPressed,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 2),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (loading) ...[
-                const SizedBox(
-                  width: 18,
-                  height: 18,
-                  child: CircularProgressIndicator(strokeWidth: 2),
+              onPressed: loading ? null : onPressed,
+              style: OutlinedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
                 ),
-                const SizedBox(width: 10),
-              ] else if (icon != null) ...[
-                Icon(icon, size: 18),
-                const SizedBox(width: 10),
-              ],
-              Text(label),
-            ],
+              ),
+              child: _buildContent(context),
+            ),
+    );
+  }
+
+  Widget _buildContent(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        if (loading) ...[
+          const SizedBox(
+            width: 18,
+            height: 18,
+            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
           ),
+          const SizedBox(width: 10),
+        ] else if (icon != null) ...[
+          Icon(icon, size: 18),
+          const SizedBox(width: 10),
+        ],
+        Text(
+          label,
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
         ),
-      ),
+      ],
     );
   }
 }

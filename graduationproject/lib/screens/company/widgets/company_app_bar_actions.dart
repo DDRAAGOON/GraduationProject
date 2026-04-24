@@ -1,9 +1,11 @@
 // Shared app-bar icons (e.g. messages) for company shell screens.
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';
-import '../../../constants/app_images.dart';
+import '../../../shared/state/company_store.dart';
 
 import '../../../shared/l10n/app_localizations.dart';
 
@@ -13,17 +15,27 @@ class CompanyProfileLeading extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
+    final profileImage = CompanyStore.instance.companyProfileImage;
+    final isAsset = profileImage.startsWith('assets/');
+
     return IconButton(
       tooltip: t.profile,
       onPressed: () =>
           Navigator.of(context).pushNamed(AppRoutes.companyProfileOverview),
       icon: ClipOval(
-        child: Image.asset(
-          AppImages.companyProfileImage,
-          width: 40,
-          height: 40,
-          fit: BoxFit.cover,
-        ),
+        child: isAsset
+            ? Image.asset(
+                profileImage,
+                width: 40,
+                height: 40,
+                fit: BoxFit.cover,
+              )
+            : Image.file(
+                File(profileImage),
+                width: 40,
+                height: 40,
+                fit: BoxFit.cover,
+              ),
       ),
     );
   }

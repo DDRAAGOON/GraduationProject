@@ -1,15 +1,18 @@
 // Profile settings hub for the company account.
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../../app/router/app_router.dart';
-import '../../../constants/app_images.dart';
 import '../../../shared/l10n/app_localizations.dart';
 import '../../../shared/state/company_store.dart';
 import '../../../shared/state/locale_controller.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_scaffold.dart';
 import '../../../shared/widgets/app_text_field.dart';
+import '../../../shared/services/session_manager.dart';
 
 class CompanyProfileSettingsOverviewScreen extends StatefulWidget {
   const CompanyProfileSettingsOverviewScreen({super.key});
@@ -84,6 +87,16 @@ class _CompanyProfileSettingsOverviewScreenState
       foundedMonth: _selectedMonth,
       foundedYear: _selectedYear,
     );
+
+    // Persist company name change
+    final data = await SessionManager.getCompanyData();
+    await SessionManager.saveCompanySession(
+      email: data['email'] ?? '',
+      name: _companyName.text,
+      photoPath: store.companyProfileImage,
+    );
+
+    if (!mounted) return;
 
     setState(() => _loading = false);
     ScaffoldMessenger.of(
@@ -207,13 +220,27 @@ class _CompanyProfileSettingsOverviewScreenState
               padding: const EdgeInsets.all(14),
               child: Row(
                 children: [
-                  ClipOval(
-                    child: Image.asset(
-                      AppImages.companyProfileImage,
-                      width: 44,
-                      height: 44,
-                      fit: BoxFit.cover,
-                    ),
+                  AnimatedBuilder(
+                    animation: CompanyStore.instance,
+                    builder: (context, _) {
+                      final profileImage = CompanyStore.instance.companyProfileImage;
+                      final isAsset = profileImage.startsWith('assets/');
+                      return ClipOval(
+                        child: isAsset
+                            ? Image.asset(
+                                profileImage,
+                                width: 44,
+                                height: 44,
+                                fit: BoxFit.cover,
+                              )
+                            : Image.file(
+                                File(profileImage),
+                                width: 44,
+                                height: 44,
+                                fit: BoxFit.cover,
+                              ),
+                      );
+                    },
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -222,7 +249,24 @@ class _CompanyProfileSettingsOverviewScreenState
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ),
-                  OutlinedButton(onPressed: () {}, child: Text(t.upload)),
+                  OutlinedButton(
+                    onPressed: () async {
+                      final picker = ImagePicker();
+                      final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+                      if (pickedFile != null) {
+                        CompanyStore.instance.setRegistrationData(customProfileImage: pickedFile.path);
+                        
+                        // Persist photo change
+                        final data = await SessionManager.getCompanyData();
+                        await SessionManager.saveCompanySession(
+                          email: data['email'] ?? '',
+                          name: data['name'] ?? '',
+                          photoPath: pickedFile.path,
+                        );
+                      }
+                    }, 
+                    child: Text(t.upload),
+                  ),
                 ],
               ),
             ),

@@ -36,16 +36,6 @@ class AnalysisScreen extends StatelessWidget {
                 icon: Icons.description_outlined,
               ),
               const SizedBox(height: 16),
-
-              // Interviewed Card
-              _buildStatCard(
-                context,
-                title: t.tr(en: "Interviewed", ar: "تمت المقابلة"),
-                value: "18",
-                icon: Icons.question_answer_outlined,
-              ),
-              const SizedBox(height: 16),
-
               // Jobs Applied Status Card
               _buildChartCard(context, t),
               const SizedBox(height: 100),
@@ -170,9 +160,7 @@ class AnalysisScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 40),
-          _buildLegendItem(context, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), text: "60%", subtext: t.tr(en: "Unsuitable", ar: "غير مناسب")),
-          const SizedBox(height: 16),
-          _buildLegendItem(context, color: Theme.of(context).colorScheme.primary, text: "40%", subtext: t.tr(en: "Interviewed", ar: "تمت المقابلة")),
+          _buildLegendItem(context, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), text: "100%", subtext: t.tr(en: "Unsuitable", ar: "غير مناسب")),
         ],
       ),
     );

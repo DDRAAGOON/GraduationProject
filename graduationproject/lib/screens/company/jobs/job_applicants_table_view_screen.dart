@@ -26,6 +26,7 @@ class _CompanyJobApplicantsTableViewScreenState
   final _searchController = TextEditingController();
 
   static const _stageOptions = <String>[
+    'In Review',
     'Shortlisted',
     'Hired',
     'Declined',

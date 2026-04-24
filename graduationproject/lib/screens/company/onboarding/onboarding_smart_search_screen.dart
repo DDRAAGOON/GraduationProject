@@ -28,43 +28,34 @@ class CompanyOnboardingSmartSearchScreen extends StatelessWidget {
             ),
             const SizedBox(height: 22),
             Text(
-              t.companyTr(
-                'onboarding.title1',
-                fallbackEn: 'Your Next Job Is Closer Than\nYou Think',
-                fallbackAr: 'وظيفتك القادمة أقرب مما\nتتوقع',
+              t.tr(
+                en: 'Your Next Job Is Closer Than\nYou Think',
+                ar: 'وظيفتك القادمة أقرب مما\nتتوقع',
               ),
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w700,
                 fontSize: 24,
               ),
             ),
             const SizedBox(height: 10),
             Text(
-              t.companyTr(
-                'onboarding.subtitle1',
-                fallbackEn:
-                    'Thousands of job opportunities are waiting\nfor you',
-                fallbackAr: 'آلاف فرص العمل في انتظارك',
+              t.tr(
+                en: 'Thousands of job opportunities are waiting\nfor you',
+                ar: 'آلاف فرص العمل في انتظارك',
               ),
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(
-                  context,
-                ).colorScheme.onSurface.withValues(alpha: 0.7),
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                 fontSize: 16,
               ),
             ),
             const Spacer(),
             AppButton(
-              label: t.companyTr(
-                'next',
-                fallbackEn: 'Next',
-                fallbackAr: 'التالي',
+              label: t.tr(en: 'Next', ar: 'التالي'),
+              onPressed: () => Navigator.of(context).pushNamed(
+                AppRoutes.companyOnboardingNextJobCloser,
               ),
-              onPressed: () => Navigator.of(
-                context,
-              ).pushNamed(AppRoutes.companyOnboardingNextJobCloser),
             ),
             const SizedBox(height: 10),
           ],
@@ -73,3 +64,4 @@ class CompanyOnboardingSmartSearchScreen extends StatelessWidget {
     );
   }
 }
+

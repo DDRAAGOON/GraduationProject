@@ -5,6 +5,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../app/router/app_router.dart';
 import '../../../shared/l10n/app_localizations.dart';
+import '../../../shared/state/company_store.dart';
+import '../../../shared/services/session_manager.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_scaffold.dart';
 import '../../../shared/widgets/app_text_field.dart';
@@ -47,6 +49,21 @@ class _CompanySignInScreenState extends State<CompanySignInScreen> {
     setState(() => _loading = true);
     await Future<void>.delayed(const Duration(milliseconds: 700));
     if (!mounted) return;
+
+    // In a real app, you'd fetch the company name from a database. 
+    // Here we'll use a placeholder or just save the email as a name part for demo.
+    await SessionManager.saveCompanySession(
+      email: _email.text.trim(),
+      name: _email.text.split('@').first,
+    );
+    
+    if (!mounted) return;
+
+    // Update store
+    CompanyStore.instance.setRegistrationData(
+      companyName: _email.text.split('@').first,
+    );
+
     setState(() => _loading = false);
     Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.companyDashboard, (route) => false);
   }
