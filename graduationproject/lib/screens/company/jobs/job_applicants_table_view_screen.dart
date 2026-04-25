@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';
 import '../../../constants/app_images.dart';
-import '../../../shared/mock/mock_data.dart';
 import '../../../shared/models/applicant.dart';
 import '../../../shared/models/job.dart';
+import '../../../shared/state/recruitment_sync_store.dart';
 import '../../../shared/widgets/app_scaffold.dart';
 import '../widgets/company_app_bar_actions.dart';
 import '../widgets/company_bottom_nav.dart';
