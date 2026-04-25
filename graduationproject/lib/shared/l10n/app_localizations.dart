@@ -176,10 +176,10 @@ class AppLocalizations {
 
   // ── Jobs ───────────────────────────────────────────────────────────────────
   String get postJob => userTr('jobs.postJob', fallbackEn: 'Post a Job', fallbackAr: 'نشر وظيفة');
-  String get step1Label => userTr('jobs.step1Label', fallbackEn: 'Step 1/3 • Job Information', fallbackAr: 'الخطوة 1/3 • معلومات الوظيفة');
-  String get step2Label => userTr('jobs.step2Label', fallbackEn: 'Step 2/3 • Job Description', fallbackAr: 'الخطوة 2/3 • وصف الوظيفة');
-  String get step1Short => userTr('jobs.step1Short', fallbackEn: 'Step 1/3', fallbackAr: 'الخطوة 1/3');
-  String get step2Short => userTr('jobs.step2Short', fallbackEn: 'Step 2/3', fallbackAr: 'الخطوة 2/3');
+  String get step1Label => userTr('jobs.step1Label', fallbackEn: 'Step 1/2 • Job Information', fallbackAr: 'الخطوة 1/2 • معلومات الوظيفة');
+  String get step2Label => userTr('jobs.step2Label', fallbackEn: 'Step 2/2 • Job Description', fallbackAr: 'الخطوة 2/2 • وصف الوظيفة');
+  String get step1Short => userTr('jobs.step1Short', fallbackEn: 'Step 1/2', fallbackAr: 'الخطوة 1/2');
+  String get step2Short => userTr('jobs.step2Short', fallbackEn: 'Step 2/2', fallbackAr: 'الخطوة 2/2');
   String get jobTitle => userTr('jobs.jobTitle', fallbackEn: 'Job title', fallbackAr: 'مسمى الوظيفة');
   String get jobTitleHint => userTr('jobs.jobTitleHint', fallbackEn: 'e.g. Software Engineer', fallbackAr: 'مثال: مهندس برمجيات');
   String get typeOfEmployment => userTr('jobs.typeOfEmployment', fallbackEn: 'Type of Employment', fallbackAr: 'نوع التوظيف');
@@ -265,7 +265,7 @@ class AppLocalizations {
   String get declined => userTr('candidates.declined', fallbackEn: 'Declined', fallbackAr: 'مرفوض');
   String get candidateHiredMsg => userTr('candidates.candidateHiredMsg', fallbackEn: 'Candidate has been hired', fallbackAr: 'تم توظيف المرشح');
   String get candidateDeclinedMsg => userTr('candidates.candidateDeclinedMsg', fallbackEn: 'Candidate has been declined', fallbackAr: 'تم رفض المرشح');
-  String get hiringProgress => userTr('candidates.hiringProgress', fallbackEn: 'Hiring Progress', fallbackAr: 'تقدم التوظيف');
+  String get hiringProgress => userTr('candidates.hiringProgress', fallbackEn: 'Hiring Pipeline', fallbackAr: 'مسار التوظيف');
   String get currentStage => userTr('candidates.currentStage', fallbackEn: 'Current Stage', fallbackAr: 'المرحلة الحالية');
   String get moveToNextStep => userTr('candidates.moveToNextStep', fallbackEn: 'Move to Next Step', fallbackAr: 'الانتقال للخطوة التالية');
   String get notes => userTr('candidates.notes', fallbackEn: 'Notes', fallbackAr: 'الملاحظات');

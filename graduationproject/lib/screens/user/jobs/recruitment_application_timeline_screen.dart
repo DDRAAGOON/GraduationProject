@@ -29,14 +29,11 @@ class RecruitmentApplicationTimelineScreen extends StatelessWidget {
       'تم التوظيف',
     ];
 
-    final normalizedStatus =
-        application.status == 'Interview' ? 'Final Review' : application.status;
+    final normalizedStatus = application.status;
     final currentIndex = steps.indexOf(normalizedStatus);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF9F5F1),
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF9F5F1),
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         title: Image.asset(

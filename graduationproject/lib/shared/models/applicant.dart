@@ -37,30 +37,6 @@ final class Applicant {
         appliedDateLabel: '2 days ago',
       );
 
-  static List<Applicant> mockList() => [
-        mock(),
-        Applicant(
-          id: 'app_2',
-          fullName: 'Jake Gyll',
-          role: 'Product Designer',
-          rating: 0.0,
-          stage: 'In Review',
-          email: 'jake@email.com',
-          phone: '+44 1245 111 111',
-          location: 'Paris, France',
-          appliedDateLabel: '13 July, 2021',
-        ),
-        Applicant(
-          id: 'app_3',
-          fullName: 'Jenny Wilson',
-          role: 'Brand Designer',
-          rating: 4.8,
-          stage: 'Hired',
-          email: 'jenny@email.com',
-          phone: '+44 1245 222 222',
-          location: 'Berlin, Germany',
-          appliedDateLabel: '9 July, 2021',
-        ),
-      ];
+  static List<Applicant> mockList() => [];
 }
 

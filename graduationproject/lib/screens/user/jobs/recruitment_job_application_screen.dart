@@ -95,9 +95,7 @@ class _RecruitmentJobApplicationScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF9F5F1),
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF9F5F1),
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         title: Image.asset(

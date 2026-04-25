@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';
+import '../../../shared/services/session_manager.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_text_field.dart';
 import 'sign_up_screen/sign_up_seeker.dart';
@@ -29,7 +30,7 @@ class _RecruitmentUserSignInScreenState extends State<RecruitmentUserSignInScree
     super.dispose();
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     setState(() {
       _emailError = _email.text.contains('@')
           ? null
@@ -39,6 +40,13 @@ class _RecruitmentUserSignInScreenState extends State<RecruitmentUserSignInScree
           : (_isAr ? 'كلمة المرور 8 حروف على الأقل' : 'Min 8 characters');
     });
     if (_emailError != null || _passError != null) return;
+
+    await SessionManager.saveUserSession(
+      email: _email.text.trim(),
+      name: 'User',
+    );
+
+    if (!mounted) return;
     Navigator.of(context).pushNamedAndRemoveUntil(
       AppRoutes.userWorkspace,
       (route) => false,
@@ -48,11 +56,8 @@ class _RecruitmentUserSignInScreenState extends State<RecruitmentUserSignInScree
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF9F5F1),
       appBar: AppBar(
         title: Text(_isAr ? 'تسجيل دخول المستخدم' : 'User Sign In'),
-        backgroundColor: const Color(0xFFF9F5F1),
-        surfaceTintColor: Colors.transparent,
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),

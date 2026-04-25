@@ -8,6 +8,8 @@ class NotificationsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
+    final List<dynamic> notifications = []; // Currently empty to show 'no notification' state
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
@@ -22,70 +24,43 @@ class NotificationsScreen extends StatelessWidget {
           style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 20, fontWeight: FontWeight.bold),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 24.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 8),
-            Text(
-              t.tr(en: "You have 2 Notifications today.", ar: "لديك إشعاران اليوم."),
-              style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 14),
+      body: notifications.isEmpty
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.notifications_off_outlined,
+                    size: 80,
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    t.tr(en: "No notifications yet", ar: "لا توجد إشعارات بعد"),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38),
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            )
+          : SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 8),
+                  Text(
+                    t.tr(en: "You have ${notifications.length} Notifications today.", ar: "لديك ${notifications.length} إشعارات اليوم."),
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 14),
+                  ),
+                  const SizedBox(height: 32),
+                  // List would go here...
+                ],
+              ),
             ),
-            const SizedBox(height: 32),
-
-            // Today Section
-            Text(
-              t.tr(en: "Today", ar: "اليوم"),
-              style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 24),
-            _buildNotificationItem(
-              context,
-              name: "Joe Bartmann",
-              action: "Send you a message",
-              time: "2h ago",
-              image: AppImages.companyProfile2,
-              isUnread: true,
-            ),
-            Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 48),
-            _buildNotificationItem(
-              context,
-              name: "Ally Wales",
-              action: "Send you a message",
-              time: "9h ago",
-              image: AppImages.companyProfile3,
-              isUnread: true,
-            ),
-            Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 48),
-
-            // This Week Section
-            Text(
-              t.tr(en: "This Week", ar: "هذا الأسبوع"),
-              style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 24),
-            _buildNotificationItem(
-              context,
-              name: "Ruben Culhane",
-              action: "Liked your posted",
-              time: "2D ago",
-              image: AppImages.companyProfile6,
-              isUnread: true,
-            ),
-            Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 48),
-            _buildNotificationItem(
-              context,
-              name: "Warren Buffet",
-              action: "Liked your posted",
-              time: "6D ago",
-              initials: "WA",
-              isUnread: true,
-            ),
-            Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 48),
-          ],
-        ),
-      ),
     );
   }
 

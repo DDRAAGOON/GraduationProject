@@ -22,11 +22,7 @@ class _CompanyPostJobStep1InformationScreenState
   final _jobTitle = TextEditingController();
   final Set<String> _types = {'Full-Time'};
   RangeValues _salary = const RangeValues(5000, 22000);
-  final List<String> _skills = [
-    'Graphic Design',
-    'Communication',
-    'Illustrator',
-  ];
+  final List<String> _skills = [];
   bool _loading = false;
   String? _titleError;
 
@@ -141,11 +137,6 @@ class _CompanyPostJobStep1InformationScreenState
                 label: 'Remote',
                 selected: _types.contains('Remote'),
                 onTap: () => _toggle('Remote'),
-              ),
-              _TypeChip(
-                label: 'Contract',
-                selected: _types.contains('Contract'),
-                onTap: () => _toggle('Contract'),
               ),
               _TypeChip(
                 label: 'Part-Time',

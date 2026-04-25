@@ -27,10 +27,8 @@ class _RecruitmentJobFiltersScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF9F5F1),
       appBar: AppBar(
         title: const Text('Advanced Filters'),
-        backgroundColor: const Color(0xFFF9F5F1),
         surfaceTintColor: Colors.transparent,
       ),
       body: Padding(

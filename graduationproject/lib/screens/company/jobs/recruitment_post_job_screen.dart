@@ -19,7 +19,8 @@ class _RecruitmentPostJobScreenState extends State<RecruitmentPostJobScreen> {
   final _requirementsController = TextEditingController();
   final _benefitsController = TextEditingController();
   final _screeningController = TextEditingController();
-  final _skillsController = TextEditingController(text: 'Communication, Teamwork');
+  final _niceToHave = TextEditingController();
+  final _skillsController = TextEditingController();
   int _step = 0;
   bool _loading = false;
 
@@ -34,6 +35,7 @@ class _RecruitmentPostJobScreenState extends State<RecruitmentPostJobScreen> {
     _requirementsController.dispose();
     _benefitsController.dispose();
     _screeningController.dispose();
+    _niceToHave.dispose();
     _skillsController.dispose();
     super.dispose();
   }
@@ -58,7 +60,7 @@ class _RecruitmentPostJobScreenState extends State<RecruitmentPostJobScreen> {
             );
             return;
           }
-          if (_step < 3) {
+          if (_step < 1) {
             setState(() => _step += 1);
             return;
           }
@@ -81,6 +83,11 @@ class _RecruitmentPostJobScreenState extends State<RecruitmentPostJobScreen> {
                 .map((e) => e.trim())
                 .where((e) => e.isNotEmpty)
                 .toList(),
+            niceToHaves: _niceToHave.text
+                .split(',')
+                .map((e) => e.trim())
+                .where((e) => e.isNotEmpty)
+                .toList(),
           );
           if (!context.mounted) return;
           setState(() => _loading = false);
@@ -98,7 +105,7 @@ class _RecruitmentPostJobScreenState extends State<RecruitmentPostJobScreen> {
         },
         steps: [
           Step(
-            title: const Text('Job Basics'),
+            title: const Text('Job Information'),
             isActive: _step == 0,
             content: Column(
               children: [
@@ -120,51 +127,43 @@ class _RecruitmentPostJobScreenState extends State<RecruitmentPostJobScreen> {
                 TextField(
                   controller: _typeController,
                   decoration: const InputDecoration(
-                    labelText: 'Employment type (Full-time / Part-time / Contract) *',
+                    labelText: 'Employment type (Full-time / Part-time) *',
                   ),
                 ),
-              ],
-            ),
-          ),
-          Step(
-            title: const Text('Description'),
-            isActive: _step == 1,
-            content: Column(
-              children: [
+                const SizedBox(height: 10),
                 TextField(
                   controller: _descriptionController,
-                  maxLines: 4,
+                  maxLines: 3,
                   decoration: const InputDecoration(
                     labelText: 'Job description',
                     alignLabelWithHint: true,
                   ),
                 ),
-                const SizedBox(height: 10),
+              ],
+            ),
+          ),
+          Step(
+            title: const Text('Requirements & Compensation'),
+            isActive: _step == 1,
+            content: Column(
+              children: [
                 TextField(
                   controller: _requirementsController,
-                  maxLines: 3,
+                  maxLines: 2,
                   decoration: const InputDecoration(
                     labelText: 'Requirements',
                     alignLabelWithHint: true,
                   ),
                 ),
-                const SizedBox(height: 10),
                 TextField(
-                  controller: _benefitsController,
+                  controller: _niceToHave,
                   maxLines: 2,
                   decoration: const InputDecoration(
-                    labelText: 'Benefits',
+                    labelText: 'Nice-to-haves (optional)',
                     alignLabelWithHint: true,
                   ),
                 ),
-              ],
-            ),
-          ),
-          Step(
-            title: const Text('Compensation & Screening'),
-            isActive: _step == 2,
-            content: Column(
-              children: [
+                const SizedBox(height: 10),
                 TextField(
                   controller: _salaryController,
                   decoration: const InputDecoration(labelText: 'Salary range'),
@@ -173,7 +172,7 @@ class _RecruitmentPostJobScreenState extends State<RecruitmentPostJobScreen> {
                 TextField(
                   controller: _skillsController,
                   decoration: const InputDecoration(
-                    labelText: 'Key skills (comma separated)',
+                    labelText: 'Required Skills (comma separated)',
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -185,47 +184,11 @@ class _RecruitmentPostJobScreenState extends State<RecruitmentPostJobScreen> {
                     alignLabelWithHint: true,
                   ),
                 ),
+                if (_loading) ...[
+                  const SizedBox(height: 20),
+                  const LinearProgressIndicator(),
+                ],
               ],
-            ),
-          ),
-          Step(
-            title: const Text('Preview'),
-            isActive: _step == 3,
-            content: Card(
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      _titleController.text.trim().isEmpty
-                          ? 'Untitled Role'
-                          : _titleController.text.trim(),
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w800,
-                          ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      '${_departmentController.text} • ${_locationController.text} • ${_typeController.text}',
-                    ),
-                    const SizedBox(height: 6),
-                    Text('Salary: ${_salaryController.text}'),
-                    if (_descriptionController.text.trim().isNotEmpty) ...[
-                      const SizedBox(height: 8),
-                      Text(_descriptionController.text.trim()),
-                    ],
-                    if (_screeningController.text.trim().isNotEmpty) ...[
-                      const SizedBox(height: 8),
-                      Text('Screening: ${_screeningController.text.trim()}'),
-                    ],
-                    if (_loading) ...[
-                      const SizedBox(height: 10),
-                      const LinearProgressIndicator(),
-                    ],
-                  ],
-                ),
-              ),
             ),
           ),
         ],

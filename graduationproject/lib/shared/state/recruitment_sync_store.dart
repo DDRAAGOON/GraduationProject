@@ -13,6 +13,7 @@ class RecruitmentJob {
     required this.tags,
     required this.publishedAt,
     this.logoIcon,
+    this.niceToHaves = const [],
   });
 
   final String id;
@@ -25,6 +26,7 @@ class RecruitmentJob {
   final List<String> tags;
   final DateTime publishedAt;
   final IconData? logoIcon;
+  final List<String> niceToHaves;
 }
 
 class RecruitmentApplication {

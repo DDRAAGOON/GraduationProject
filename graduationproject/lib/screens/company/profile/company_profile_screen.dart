@@ -1,6 +1,7 @@
 // Public-style company profile with tabs and store data.
 
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../shared/l10n/app_localizations.dart';
 import '../../../shared/state/company_store.dart';
@@ -83,31 +84,32 @@ class _CompanyCompanyProfileScreenState
                 SectionTitle(t.tr(en: 'Registration Info', ar: 'بيانات التسجيل')),
                 const SizedBox(height: 10),
                 if (_store.commercialRegister.isNotEmpty)
-                  _EditableLinkTile(
+                  _RegistrationInfoTile(
                     icon: Icons.assignment_outlined,
                     title: t.tr(en: 'Commercial Register', ar: 'السجل التجاري'),
                     value: _store.commercialRegister,
                   ),
                 if (_store.nationalNumber.isNotEmpty)
-                  _EditableLinkTile(
+                  _RegistrationInfoTile(
                     icon: Icons.badge_outlined,
                     title: t.tr(en: 'National Number', ar: 'الرقم القومي'),
                     value: _store.nationalNumber,
                   ),
                 const SizedBox(height: 16),
               ],
-              SectionTitle(t.contactSectionLabel),
-              const SizedBox(height: 10),
-              if (_store.contacts.isEmpty)
-                Text(t.notYet, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4)))
-              else
+              if (_store.contacts.isNotEmpty) ...[
+                SectionTitle(t.contactSectionLabel),
+                const SizedBox(height: 10),
                 ..._store.contacts.asMap().entries.map(
                   (entry) => _EditableLinkTile(
-                    icon: Icons.link_outlined,
+                    icon: entry.value.name.toLowerCase().contains('email') 
+                        ? Icons.email_outlined 
+                        : Icons.link_outlined,
                     title: entry.value.name,
                     value: entry.value.value,
                   ),
                 ),
+              ],
             ],
           );
         },
@@ -130,6 +132,21 @@ class _EditableLinkTile extends StatelessWidget {
   final String title;
   final String value;
 
+  Future<void> _launch() async {
+    String urlStr = value;
+    if (!urlStr.contains('://') && !urlStr.startsWith('mailto:')) {
+      if (urlStr.contains('@')) {
+        urlStr = 'mailto:$urlStr';
+      } else {
+        urlStr = 'https://$urlStr';
+      }
+    }
+    final uri = Uri.tryParse(urlStr);
+    if (uri != null) {
+      await launchUrl(uri);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -138,7 +155,31 @@ class _EditableLinkTile extends StatelessWidget {
         leading: Icon(icon),
         title: Text(title),
         subtitle: Text(value),
-        onTap: () {},
+        onTap: _launch,
+      ),
+    );
+  }
+}
+
+class _RegistrationInfoTile extends StatelessWidget {
+  const _RegistrationInfoTile({
+    required this.icon,
+    required this.title,
+    required this.value,
+  });
+
+  final IconData icon;
+  final String title;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 10),
+      child: ListTile(
+        leading: Icon(icon),
+        title: Text(title),
+        subtitle: Text(value),
       ),
     );
   }

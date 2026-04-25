@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';
 import '../../../shared/l10n/app_localizations.dart';
+import '../../../shared/services/session_manager.dart';
 import '../../../shared/widgets/app_scaffold.dart';
 
 class CompanySettingsScreen extends StatelessWidget {
@@ -52,9 +53,12 @@ class CompanySettingsScreen extends StatelessWidget {
                   ),
                 ),
                 TextButton.icon(
-                  onPressed: () {
-                    // TODO: Implement actual logout
-                    Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.companySignIn, (route) => false);
+                  onPressed: () async {
+                    await SessionManager.logoutCompany();
+                    if (context.mounted) {
+                      Navigator.of(context).pushNamedAndRemoveUntil(
+                          AppRoutes.roleSelection, (route) => false);
+                    }
                   },
                   icon: const Icon(Icons.logout),
                   label: Text(

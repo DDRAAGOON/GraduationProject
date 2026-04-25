@@ -18,27 +18,31 @@ class CompanyDashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final companyStore = CompanyStore.instance;
-    return AnimatedBuilder(
-      animation: companyStore,
+    return ListenableBuilder(
+      listenable: Listenable.merge([companyStore, RecruitmentSyncStore.instance]),
       builder: (context, _) {
         return AppScaffold(
           titleWidget: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              ClipOval(
-                child: companyStore.companyProfileImage.startsWith('assets/')
-                    ? Image.asset(
-                        companyStore.companyProfileImage,
-                        width: 40,
-                        height: 40,
-                        fit: BoxFit.cover,
-                      )
-                    : Image.file(
-                        File(companyStore.companyProfileImage),
-                        width: 40,
-                        height: 40,
-                        fit: BoxFit.cover,
-                      ),
+              InkWell(
+                onTap: () => Navigator.of(context).pushNamed(AppRoutes.companyProfileOverview),
+                borderRadius: BorderRadius.circular(20),
+                child: ClipOval(
+                  child: companyStore.companyProfileImage.startsWith('assets/')
+                      ? Image.asset(
+                          companyStore.companyProfileImage,
+                          width: 40,
+                          height: 40,
+                          fit: BoxFit.cover,
+                        )
+                      : Image.file(
+                          File(companyStore.companyProfileImage),
+                          width: 40,
+                          height: 40,
+                          fit: BoxFit.cover,
+                        ),
+                ),
               ),
               const SizedBox(width: 10),
               Flexible(
@@ -133,13 +137,13 @@ class _StatsGrid extends StatelessWidget {
     final cards = [
       _MetricCard(
         title: t.newCandidates,
-        value: t.tr(en: '76', ar: '٧٦'),
+        value: RecruitmentSyncStore.instance.applications.length.toString(),
         color: cs.primary.withValues(alpha: 0.2),
         onTap: onTapNewCandidates,
       ),
       _MetricCard(
         title: t.messagesReceived,
-        value: t.tr(en: '24', ar: '٢٤'),
+        value: RecruitmentSyncStore.instance.messages.length.toString(),
         color: Colors.orange.withValues(alpha: 0.25),
         onTap: () => Navigator.of(context)
             .pushReplacementNamed(AppRoutes.companyMessagesList),

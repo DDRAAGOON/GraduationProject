@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';
+import '../../../constants/app_images.dart';
 import '../../../shared/services/recruitment_sync_service.dart';
 import '../../../shared/state/recruitment_sync_store.dart';
 import '../../../shared/widgets/app_button.dart';
@@ -41,8 +42,17 @@ class _RecruitmentUserShellScreenState extends State<RecruitmentUserShellScreen>
       const _ProfileTab(),
     ];
     return Scaffold(
-      backgroundColor: const Color(0xFFF9F5F1),
       appBar: AppBar(
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 12),
+          child: InkWell(
+            onTap: () => Navigator.of(context).pushNamed(AppRoutes.userEditProfile),
+            borderRadius: BorderRadius.circular(20),
+            child: const CircleAvatar(
+              backgroundImage: AssetImage(AppImages.companyProfile1),
+            ),
+          ),
+        ),
         title: _isAr 
             ? Text('مساحة المستخدم') 
             : Image.asset(
@@ -50,7 +60,6 @@ class _RecruitmentUserShellScreenState extends State<RecruitmentUserShellScreen>
                 height: 150,
                 fit: BoxFit.contain,
               ),
-        backgroundColor: const Color(0xFFF9F5F1),
         surfaceTintColor: Colors.transparent,
         centerTitle: false,
       ),

@@ -1,11 +1,8 @@
 // Company registration form and navigation to next steps.
 
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
-import 'package:image_picker/image_picker.dart';
 
 import '../../../app/router/app_router.dart';
 import '../../../shared/l10n/app_localizations.dart';
@@ -32,8 +29,6 @@ class _CompanySignUpScreenState extends State<CompanySignUpScreen> {
   final _taxNumber = TextEditingController();
   final _commercialRegister = TextEditingController();
   final _nationalNumber = TextEditingController();
-
-  String? _selectedImagePath;
 
   bool _obscure1 = true;
   bool _obscure2 = true;
@@ -90,7 +85,7 @@ class _CompanySignUpScreenState extends State<CompanySignUpScreen> {
     // Save registration data to the store so it appears in the profile.
     CompanyStore.instance.setRegistrationData(
       companyName: _companyName.text.trim(),
-      customProfileImage: _selectedImagePath,
+      customProfileImage: null,
       commercialRegister: _commercialRegister.text.trim(),
       nationalNumber: _nationalNumber.text.trim(),
     );
@@ -99,7 +94,7 @@ class _CompanySignUpScreenState extends State<CompanySignUpScreen> {
     await SessionManager.saveCompanySession(
       email: _email.text.trim(),
       name: _companyName.text.trim(),
-      photoPath: _selectedImagePath,
+      photoPath: null,
     );
 
     if (!mounted) return;
@@ -125,53 +120,6 @@ class _CompanySignUpScreenState extends State<CompanySignUpScreen> {
                 ),
           ),
           const SizedBox(height: 26),
-          Center(
-            child: GestureDetector(
-              onTap: () async {
-                final picker = ImagePicker();
-                final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-                if (pickedFile != null) {
-                  setState(() {
-                    _selectedImagePath = pickedFile.path;
-                  });
-                }
-              },
-              child: Stack(
-                alignment: Alignment.bottomRight,
-                children: [
-                  CircleAvatar(
-                    radius: 45,
-                    backgroundColor: Theme.of(context).colorScheme.surfaceBright,
-                    backgroundImage: _selectedImagePath != null 
-                        ? FileImage(File(_selectedImagePath!)) as ImageProvider
-                        : null,
-                    child: _selectedImagePath == null 
-                        ? Icon(Icons.person, size: 45, color: Theme.of(context).colorScheme.primary) 
-                        : null,
-                  ),
-                  Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primary,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Icons.camera_alt,
-                      size: 20,
-                      color: Theme.of(context).colorScheme.onPrimary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Center(
-            child: Text(
-              t.tr(en: 'Upload Photo', ar: 'رفع صورة'),
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-          ),
           const SizedBox(height: 26),
           AppTextField(
             label: t.companyName,

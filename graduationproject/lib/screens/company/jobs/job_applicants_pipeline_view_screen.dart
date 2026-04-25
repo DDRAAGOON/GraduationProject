@@ -18,18 +18,36 @@ class CompanyJobApplicantsPipelineViewScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final all = MockData.applicants();
-    final inReview = all
-        .where((a) => a.stage.toLowerCase().contains('review'))
-        .toList();
-    final shortlisted = all
-        .where((a) => a.stage.toLowerCase().contains('short'))
-        .toList();
-    final hired = all
-        .where((a) => a.stage.toLowerCase().contains('hire'))
-        .toList();
+    return ListenableBuilder(
+      listenable: RecruitmentSyncStore.instance,
+      builder: (context, _) {
+        final allApps = RecruitmentSyncStore.instance.applications
+            .where((app) => app.jobId == job.id || job.id == 'fallback')
+            .toList();
 
-    return AppScaffold(
+        final all = allApps.map((app) => Applicant(
+          id: app.id,
+          fullName: app.userName,
+          role: app.jobTitle,
+          rating: 4.5,
+          stage: app.status,
+          email: 'candidate@jobito.com',
+          phone: '+20 123 456 789',
+          location: 'Egypt',
+          appliedDateLabel: 'Today',
+        )).toList();
+
+        final inReview = all
+            .where((a) => a.stage.toLowerCase().contains('review'))
+            .toList();
+        final shortlisted = all
+            .where((a) => a.stage.toLowerCase().contains('short'))
+            .toList();
+        final hired = all
+            .where((a) => a.stage.toLowerCase().contains('hire'))
+            .toList();
+
+        return AppScaffold(
       title: job.title,
       showBack: false,
       leading: const CompanyProfileLeading(),
@@ -52,6 +70,8 @@ class CompanyJobApplicantsPipelineViewScreen extends StatelessWidget {
       bottomNavigationBar: const CompanyBottomNav(
         current: CompanyTab.applicants,
       ),
+    );
+      },
     );
   }
 }

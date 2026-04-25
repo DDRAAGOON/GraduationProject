@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';
+import '../../../shared/services/session_manager.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_text_field.dart';
 
@@ -43,6 +44,12 @@ class _RecruitmentCompanySignInScreenState
     setState(() => _loading = true);
     await Future<void>.delayed(const Duration(milliseconds: 600));
     if (!mounted) return;
+
+    await SessionManager.saveCompanySession(
+      email: _email.text.trim(),
+      name: 'Company User', 
+    );
+
     setState(() => _loading = false);
     Navigator.of(context).pushNamedAndRemoveUntil(
       AppRoutes.companyWorkspace,

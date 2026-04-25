@@ -86,31 +86,5 @@ final class Job {
     capacity: 10,
   );
 
-  static List<Job> mockList() => [
-    mock(),
-    Job(
-      id: 'job_2',
-      title: 'Brand Designer',
-      companyName: 'Dropbox',
-      location: 'San Francisco, USA',
-      employmentType: 'Full-Time',
-      category: 'Design',
-      salaryRange: r'$12k-$60k USD',
-      description: 'Design and evolve product brand systems across channels.',
-      appliedCount: 5,
-      capacity: 10,
-    ),
-    Job(
-      id: 'job_3',
-      title: 'Interactive Developer',
-      companyName: 'Terraform',
-      location: 'Hamburg, Germany',
-      employmentType: 'Full-Time',
-      category: 'Marketing',
-      salaryRange: r'$10k-$55k USD',
-      description: 'Build engaging interactive web experiences and campaigns.',
-      appliedCount: 8,
-      capacity: 10,
-    ),
-  ];
+  static List<Job> mockList() => [];
 }

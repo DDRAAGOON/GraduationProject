@@ -99,6 +99,8 @@ class CompanyStore extends ChangeNotifier {
     required int foundedDay,
     required int foundedMonth,
     required int foundedYear,
+    required String commercialRegister,
+    required String nationalNumber,
   }) {
     _companyName = name;
     _website = website;
@@ -111,6 +113,8 @@ class CompanyStore extends ChangeNotifier {
     _foundedDay = foundedDay;
     _foundedMonth = foundedMonth;
     _foundedYear = foundedYear;
+    _commercialRegister = commercialRegister;
+    _nationalNumber = nationalNumber;
     notifyListeners();
   }
 
@@ -120,12 +124,7 @@ class CompanyStore extends ChangeNotifier {
   final List<Job> _jobs = [...Job.mockList()];
   
   /// Holds contact details like social links and emails.
-  final List<ContactEntry> _contacts = [
-    const ContactEntry(name: 'Twitter', value: 'twitter.com/Nomad'),
-    const ContactEntry(name: 'Facebook', value: 'facebook.com/NomadHQ'),
-    const ContactEntry(name: 'LinkedIn', value: 'linkedin.com/company/nomad'),
-    const ContactEntry(name: 'Email', value: 'nomad@gmail.com'),
-  ];
+  final List<ContactEntry> _contacts = [];
 
   List<Job> get jobs => List<Job>.unmodifiable(_jobs);
   List<ContactEntry> get contacts => List<ContactEntry>.unmodifiable(_contacts);

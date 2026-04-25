@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
+import '../../../app/router/app_router.dart';
+import '../../../constants/app_images.dart';
 import '../notifications/notifications_screen.dart';
 import '../settings/setting_screen.dart';
 import '../../../shared/l10n/app_localizations.dart';
@@ -124,13 +126,25 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
 
   Widget _buildTopBar() {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        _buildTopIconButton(Icons.notifications_none, 
-          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const NotificationsScreen()))),
-        const SizedBox(width: 12),
-        _buildTopIconButton(Icons.settings_outlined, 
-          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingScreen()))),
+        InkWell(
+          onTap: () => Navigator.of(context).pushNamed(AppRoutes.userEditProfile),
+          borderRadius: BorderRadius.circular(20),
+          child: const CircleAvatar(
+            radius: 20,
+            backgroundImage: AssetImage(AppImages.companyProfile1),
+          ),
+        ),
+        Row(
+          children: [
+            _buildTopIconButton(Icons.notifications_none, 
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const NotificationsScreen()))),
+            const SizedBox(width: 12),
+            _buildTopIconButton(Icons.settings_outlined, 
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingScreen()))),
+          ],
+        ),
       ],
     );
   }

@@ -49,6 +49,7 @@ import '../../screens/user/jobs/recruitment_job_details_screen.dart';
 import '../../screens/user/auth/recruitment_user_sign_in_screen.dart';
 import '../../screens/user/onboarding/onboarding.dart';
 import '../../screens/user/onboarding/recruitment_user_onboarding_screen.dart';
+import '../../screens/user/profile/edit_profile_screen.dart';
 import '../../screens/user/settings/recruitment_user_settings_screen.dart';
 import '../../screens/user/home/recruitment_user_shell_screen.dart';
 import '../../shared/state/recruitment_sync_store.dart';
@@ -72,6 +73,7 @@ final class AppRoutes {
   static const userOnboardingNew = '/user/onboarding/new';
   static const userSettingsNew = '/user/settings/new';
   static const userSignInNew = '/user/auth/sign_in_new';
+  static const userEditProfile = '/user/profile/edit';
   static const adminPanel = '/admin/panel';
 
   // --- Company Onboarding Routes ---
@@ -187,6 +189,8 @@ final class AppRouter {
         page = const RecruitmentUserSettingsScreen();
       case AppRoutes.userSignInNew:
         page = const RecruitmentUserSignInScreen();
+      case AppRoutes.userEditProfile:
+        page = const EditProfileScreen();
       case AppRoutes.adminPanel:
         page = const AdminPanelScreen();
       case AppRoutes.companyOnboardingSmartSearch:

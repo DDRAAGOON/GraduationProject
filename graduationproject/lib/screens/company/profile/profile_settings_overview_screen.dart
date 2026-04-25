@@ -29,6 +29,8 @@ class _CompanyProfileSettingsOverviewScreenState
   late final TextEditingController _employee;
   late final TextEditingController _industry;
   late final TextEditingController _about;
+  late final TextEditingController _commercialRegister;
+  late final TextEditingController _nationalNumber;
   
   late List<String> _locations;
   late List<String> _techStack;
@@ -48,6 +50,8 @@ class _CompanyProfileSettingsOverviewScreenState
     _employee = TextEditingController(text: store.employee);
     _industry = TextEditingController(text: store.industry);
     _about = TextEditingController(text: isAr ? store.companyAboutAr : store.companyAboutEn);
+    _commercialRegister = TextEditingController(text: store.commercialRegister);
+    _nationalNumber = TextEditingController(text: store.nationalNumber);
     _locations = List.from(store.locations);
     _techStack = List.from(store.techStack);
     _selectedDay = store.foundedDay;
@@ -62,6 +66,8 @@ class _CompanyProfileSettingsOverviewScreenState
     _employee.dispose();
     _industry.dispose();
     _about.dispose();
+    _commercialRegister.dispose();
+    _nationalNumber.dispose();
     super.dispose();
   }
 
@@ -86,6 +92,8 @@ class _CompanyProfileSettingsOverviewScreenState
       foundedDay: _selectedDay,
       foundedMonth: _selectedMonth,
       foundedYear: _selectedYear,
+      commercialRegister: _commercialRegister.text.trim(),
+      nationalNumber: _nationalNumber.text.trim(),
     );
 
     // Persist company name change
@@ -293,8 +301,10 @@ class _CompanyProfileSettingsOverviewScreenState
                 flex: 1,
                 child: _buildDropdown<int>(
                   value: _selectedDay,
-                  items: List.generate(31, (i) => i + 1),
-                  labelBuilder: (v) => t.tr(
+                  items: _selectedDay == 0 
+                      ? [0, ...List.generate(31, (i) => i + 1)] 
+                      : List.generate(31, (i) => i + 1),
+                  labelBuilder: (v) => v == 0 ? (t.isAr ? 'اليوم' : 'Day') : t.tr(
                     en: v.toString(), 
                     ar: v.toString().replaceAll('0', '٠').replaceAll('1', '١').replaceAll('2', '٢').replaceAll('3', '٣').replaceAll('4', '٤').replaceAll('5', '٥').replaceAll('6', '٦').replaceAll('7', '٧').replaceAll('8', '٨').replaceAll('9', '٩')
                   ),
@@ -306,11 +316,16 @@ class _CompanyProfileSettingsOverviewScreenState
                 flex: 1,
                 child: _buildDropdown<int>(
                   value: _selectedMonth,
-                  items: List.generate(12, (i) => i + 1),
-                  labelBuilder: (v) => t.isAr ? [
-                    'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
-                    'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
-                  ][v - 1] : months[v - 1],
+                  items: _selectedMonth == 0 
+                      ? [0, ...List.generate(12, (i) => i + 1)] 
+                      : List.generate(12, (i) => i + 1),
+                  labelBuilder: (v) {
+                    if (v == 0) return t.isAr ? 'الشهر' : 'Month';
+                    return t.isAr ? [
+                      'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
+                      'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
+                    ][v - 1] : months[v - 1];
+                  },
                   onChanged: (v) => setState(() => _selectedMonth = v!),
                 ),
               ),
@@ -319,8 +334,10 @@ class _CompanyProfileSettingsOverviewScreenState
                 flex: 1,
                 child: _buildDropdown<int>(
                   value: _selectedYear,
-                  items: List.generate(50, (i) => 2024 - i),
-                  labelBuilder: (v) => t.tr(
+                  items: _selectedYear == 0 
+                      ? [0, ...List.generate(50, (i) => 2024 - i)] 
+                      : List.generate(50, (i) => 2024 - i),
+                  labelBuilder: (v) => v == 0 ? (t.isAr ? 'السنة' : 'Year') : t.tr(
                     en: v.toString(), 
                     ar: v.toString().replaceAll('0', '٠').replaceAll('1', '١').replaceAll('2', '٢').replaceAll('3', '٣').replaceAll('4', '٤').replaceAll('5', '٥').replaceAll('6', '٦').replaceAll('7', '٧').replaceAll('8', '٨').replaceAll('9', '٩')
                   ),
@@ -334,6 +351,16 @@ class _CompanyProfileSettingsOverviewScreenState
 
           const SizedBox(height: 16),
           AppTextField(label: t.aboutCompany, controller: _about, maxLines: 4),
+          const SizedBox(height: 16),
+          AppTextField(
+            label: t.tr(en: 'Commercial Register', ar: 'السجل التجاري'),
+            controller: _commercialRegister,
+          ),
+          const SizedBox(height: 16),
+          AppTextField(
+            label: t.tr(en: 'National Number', ar: 'الرقم القومي'),
+            controller: _nationalNumber,
+          ),
           const SizedBox(height: 18),
           AppButton(label: t.saveChange, loading: _loading, onPressed: _save),
           const SizedBox(height: 10),

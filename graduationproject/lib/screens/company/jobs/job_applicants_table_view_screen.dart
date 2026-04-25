@@ -129,104 +129,120 @@ class _CompanyJobApplicantsTableViewScreenState
 
   @override
   Widget build(BuildContext context) {
-    final all = MockData.applicants();
-    final filtered = all
-        .where((a) => _matchesStages(a) && _matchesSearch(a))
-        .toList();
+    return ListenableBuilder(
+      listenable: RecruitmentSyncStore.instance,
+      builder: (context, _) {
+        final allApps = RecruitmentSyncStore.instance.applications
+            .where((app) => app.jobId == widget.job.id || widget.job.id == 'fallback')
+            .toList();
 
-    return AppScaffold(
-      title: widget.job.title,
-      showBack: false,
-      leading: const CompanyProfileLeading(),
-      actions: const [CompanyAppBarActions()],
-      body: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: filtered.isEmpty ? 2 : filtered.length + 1,
-        itemBuilder: (_, i) {
-          if (i == 0) {
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final isNarrow = constraints.maxWidth < 420;
-                  if (isNarrow) {
-                    return Column(
-                      children: [
-                        TextField(
-                          controller: _searchController,
-                          onChanged: (_) => setState(() {}),
-                          decoration: const InputDecoration(
-                            hintText: 'Search jobs',
-                            prefixIcon: Icon(Icons.search),
+        final filtered = allApps.map((app) => Applicant(
+          id: app.id,
+          fullName: app.userName,
+          role: app.jobTitle,
+          rating: 4.5, // Default rating
+          stage: app.status,
+          email: 'candidate@jobito.com',
+          phone: '+20 123 456 789',
+          location: 'Egypt',
+          appliedDateLabel: 'Today',
+        )).where((a) => _matchesStages(a) && _matchesSearch(a)).toList();
+
+        return AppScaffold(
+          title: widget.job.title,
+          showBack: false,
+          leading: const CompanyProfileLeading(),
+          actions: const [CompanyAppBarActions()],
+          body: ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: filtered.isEmpty ? 2 : filtered.length + 1,
+            itemBuilder: (_, i) {
+              if (i == 0) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final isNarrow = constraints.maxWidth < 420;
+                      if (isNarrow) {
+                        return Column(
+                          children: [
+                            TextField(
+                              controller: _searchController,
+                              onChanged: (_) => setState(() {}),
+                              decoration: const InputDecoration(
+                                hintText: 'Search jobs',
+                                prefixIcon: Icon(Icons.search),
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            SizedBox(
+                              width: double.infinity,
+                              child: OutlinedButton.icon(
+                                onPressed: _openFilterSheet,
+                                icon: const Icon(Icons.filter_list),
+                                label: const Text('Filter'),
+                              ),
+                            ),
+                          ],
+                        );
+                      }
+                      return Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: _searchController,
+                              onChanged: (_) => setState(() {}),
+                              decoration: const InputDecoration(
+                                hintText: 'Search jobs',
+                                prefixIcon: Icon(Icons.search),
+                              ),
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 10),
-                        SizedBox(
-                          width: double.infinity,
-                          child: OutlinedButton.icon(
+                          const SizedBox(width: 12),
+                          OutlinedButton.icon(
                             onPressed: _openFilterSheet,
                             icon: const Icon(Icons.filter_list),
                             label: const Text('Filter'),
                           ),
+                        ],
+                      );
+                    },
+                  ),
+                );
+              }
+
+              if (filtered.isEmpty) {
+                return Padding(
+                  padding: const EdgeInsets.only(top: 18),
+                  child: Text(
+                    'No jobs',
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withValues(alpha: 0.7),
                         ),
-                      ],
-                    );
-                  }
-                  return Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: _searchController,
-                          onChanged: (_) => setState(() {}),
-                          decoration: const InputDecoration(
-                            hintText: 'Search jobs',
-                            prefixIcon: Icon(Icons.search),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      OutlinedButton.icon(
-                        onPressed: _openFilterSheet,
-                        icon: const Icon(Icons.filter_list),
-                        label: const Text('Filter'),
-                      ),
-                    ],
+                  ),
+                );
+              }
+
+              final a = filtered[i - 1];
+              return _ApplicantRow(
+                applicant: a,
+                onTap: () {
+                  Navigator.of(context).pushNamed(
+                    AppRoutes.companyApplicantDetailsProfile,
+                    arguments: a,
                   );
                 },
-              ),
-            );
-          }
-
-          if (filtered.isEmpty) {
-            return Padding(
-              padding: const EdgeInsets.only(top: 18),
-              child: Text(
-                'No jobs',
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.onSurface.withValues(alpha: 0.7),
-                ),
-              ),
-            );
-          }
-
-          final a = filtered[i - 1];
-          return _ApplicantRow(
-            applicant: a,
-            onTap: () {
-              Navigator.of(context).pushNamed(
-                AppRoutes.companyApplicantDetailsProfile,
-                arguments: a,
+                avatarIndex: i - 1,
               );
             },
-            avatarIndex: i - 1,
-          );
-        },
-      ),
-      bottomNavigationBar: const CompanyBottomNav(
-        current: CompanyTab.applicants,
-      ),
+          ),
+          bottomNavigationBar: const CompanyBottomNav(
+            current: CompanyTab.applicants,
+          ),
+        );
+      },
     );
   }
 }
