@@ -176,16 +176,20 @@ class AppLocalizations {
 
   // ── Jobs ───────────────────────────────────────────────────────────────────
   String get postJob => userTr('jobs.postJob', fallbackEn: 'Post a Job', fallbackAr: 'نشر وظيفة');
-  String get step1Label => userTr('jobs.step1Label', fallbackEn: 'Step 1/2 • Job Information', fallbackAr: 'الخطوة 1/2 • معلومات الوظيفة');
-  String get step2Label => userTr('jobs.step2Label', fallbackEn: 'Step 2/2 • Job Description', fallbackAr: 'الخطوة 2/2 • وصف الوظيفة');
-  String get step1Short => userTr('jobs.step1Short', fallbackEn: 'Step 1/2', fallbackAr: 'الخطوة 1/2');
-  String get step2Short => userTr('jobs.step2Short', fallbackEn: 'Step 2/2', fallbackAr: 'الخطوة 2/2');
+  String get editJob => userTr('jobs.editJob', fallbackEn: 'Edit Job', fallbackAr: 'تعديل الوظيفة');
+  String get step1Label => userTr('jobs.step1Label', fallbackEn: 'Step 1/3 • Job Information', fallbackAr: 'الخطوة 1/3 • معلومات الوظيفة');
+  String get step2Label => userTr('jobs.step2Label', fallbackEn: 'Step 2/3 • Job Description', fallbackAr: 'الخطوة 2/3 • وصف الوظيفة');
+  String get step3Label => userTr('jobs.step3Label', fallbackEn: 'Step 3/3 • Perks & Benefits', fallbackAr: 'الخطوة 3/3 • المزايا والفوائد');
+  String get qualifications => userTr('jobs.qualifications', fallbackEn: 'Qualifications', fallbackAr: 'المؤهلات');
+  String get step1Short => userTr('jobs.step1Short', fallbackEn: 'Step 1/3', fallbackAr: 'الخطوة 1/3');
+  String get step2Short => userTr('jobs.step2Short', fallbackEn: 'Step 2/3', fallbackAr: 'الخطوة 2/3');
+  String get step3Short => userTr('jobs.step3Short', fallbackEn: 'Step 3/3', fallbackAr: 'الخطوة 3/3');
   String get jobTitle => userTr('jobs.jobTitle', fallbackEn: 'Job title', fallbackAr: 'مسمى الوظيفة');
   String get jobTitleHint => userTr('jobs.jobTitleHint', fallbackEn: 'e.g. Software Engineer', fallbackAr: 'مثال: مهندس برمجيات');
   String get typeOfEmployment => userTr('jobs.typeOfEmployment', fallbackEn: 'Type of Employment', fallbackAr: 'نوع التوظيف');
   String get salary => userTr('jobs.salary', fallbackEn: 'Salary', fallbackAr: 'الراتب');
   String get requiredSkills => userTr('jobs.requiredSkills', fallbackEn: 'Required skills', fallbackAr: 'المهارات المطلوبة');
-  String get jobDescriptions => userTr('jobs.jobDescriptions', fallbackEn: 'Job Descriptions', fallbackAr: 'وصف الوظيفة');
+  String get jobDescriptions => userTr('jobs.jobDescriptions', fallbackEn: 'Job Description', fallbackAr: 'وصف الوظيفة');
   String get addDescription => userTr('jobs.addDescription', fallbackEn: 'Add the description of the job...', fallbackAr: 'أضف وصف الوظيفة...');
   String get whatWeProvide => userTr('jobs.whatWeProvide', fallbackEn: 'What we provide (optional)', fallbackAr: 'ما نقدمه (اختياري)');
   String get addPreferredQual => userTr('jobs.addPreferredQual', fallbackEn: 'Add preferred candidate qualifications', fallbackAr: 'أضف مؤهلات المرشح المفضلة');
@@ -304,6 +308,20 @@ class AppLocalizations {
   String get quickActions => userTr('candidates.quickActions', fallbackEn: 'Quick Actions', fallbackAr: 'الإجراءات السريعة');
   String get resumeLabel => userTr('candidates.resumeLabel', fallbackEn: 'Resume', fallbackAr: 'السيرة الذاتية');
   String get lastUsed => userTr('candidates.lastUsed', fallbackEn: 'Last Used', fallbackAr: 'آخر استخدام');
+
+  String get technical => tr(en: 'Technical', ar: 'تقني');
+  String get nonTechnical => tr(en: 'Non-Technical', ar: 'غير تقني');
+  String get benefits => tr(en: 'Benefits', ar: 'المزايا');
+  String get addBenefit => tr(en: 'Add Benefit', ar: 'إضافة ميزة');
+
+  String get accountSecurity => tr(en: 'Account Security', ar: 'أمان الحساب');
+  String get linkGoogleAccount => tr(en: 'Link Google Account', ar: 'ربط حساب جوجل');
+  String get linkGoogleDesc => tr(en: 'Link your account to enable one-tap login.', ar: 'اربط حسابك لتفعيل تسجيل الدخول بضغطة واحدة.');
+  String get accountNotLinked => tr(en: 'Account not linked yet', ar: 'الحساب غير مرتبط بعد');
+  String get continueWithGoogle => tr(en: 'Continue with Google', ar: 'المتابعة باستخدام جوجل');
+  String get currentPassword => tr(en: 'Current Password', ar: 'كلمة المرور الحالية');
+  String get newPasswordLabel => tr(en: 'New Password', ar: 'كلمة المرور الجديدة');
+  String get confirmNewPassword => tr(en: 'Confirm New Password', ar: 'تأكيد كلمة المرور الجديدة');
 
   // ── Unknown route ──────────────────────────────────────────────────────────
   String get unknownRoute => userTr('common.unknownRoute', fallbackEn: 'Unknown route', fallbackAr: 'مسار غير معروف');

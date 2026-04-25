@@ -1,9 +1,11 @@
 // Post job wizard — step 1: core job fields.
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../../../app/router/app_router.dart';
 import '../../../../shared/l10n/app_localizations.dart';
+import '../../../../shared/models/job.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_scaffold.dart';
 import '../../../../shared/widgets/app_text_field.dart';
@@ -20,15 +22,61 @@ class CompanyPostJobStep1InformationScreen extends StatefulWidget {
 class _CompanyPostJobStep1InformationScreenState
     extends State<CompanyPostJobStep1InformationScreen> {
   final _jobTitle = TextEditingController();
+  final _jobDescription = TextEditingController();
+  final _salaryController = TextEditingController();
+  final _positions = TextEditingController(text: '1');
+  final _department = TextEditingController();
+  DateTime? _deadline = DateTime.now().add(const Duration(days: 30));
+  String _salaryFrequency = 'Monthly';
+  String _category = 'Technical'; // Technical, Non-Technical, Services
   final Set<String> _types = {'Full-Time'};
-  RangeValues _salary = const RangeValues(5000, 22000);
   final List<String> _skills = [];
   bool _loading = false;
   String? _titleError;
 
+  bool _initialized = false;
+  Job? _editingJob;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_initialized) {
+      final args = ModalRoute.of(context)?.settings.arguments;
+      if (args is Job) {
+        _editingJob = args;
+        _jobTitle.text = args.title;
+        _jobDescription.text = args.description;
+        _positions.text = args.capacity?.toString() ?? '1';
+        _department.text = args.department;
+        _category = args.category;
+        
+        _types.clear();
+        _types.add(args.employmentType);
+
+        // Simple salary parsing: "EGP 5000-22000 / monthly"
+        final salary = args.salaryRange;
+        if (salary.contains('-')) {
+          final rangePart = salary.split('/').first.trim(); // "EGP 5000-22000"
+          _salaryController.text = args.salaryRange;
+        }
+        _positions.text = args.capacity.toString();
+        _types.clear();
+        _types.addAll(args.employmentType.split(' • '));
+        _skills.clear();
+        // Since we don't have separate skills list in model, we use responsibilities or qualifications
+        // For now, let's keep it as is or leave empty.
+      }
+      _initialized = true;
+    }
+  }
+
   @override
   void dispose() {
     _jobTitle.dispose();
+    _jobDescription.dispose();
+    _salaryController.dispose();
+    _positions.dispose();
+    _department.dispose();
     super.dispose();
   }
 
@@ -51,10 +99,20 @@ class _CompanyPostJobStep1InformationScreenState
     Navigator.of(context).pushNamed(
       AppRoutes.companyPostJobStep2,
       arguments: {
+        'jobId': _editingJob?.id,
         'title': _jobTitle.text.trim(),
-        'employmentType': _types.isNotEmpty ? _types.first : 'Full-Time',
-        'salaryRange':
-            '\$${_salary.start.toStringAsFixed(0)}-\$${_salary.end.toStringAsFixed(0)} USD',
+        'employmentType': _types.join(' • '),
+        'salaryRange': _salaryController.text.trim().isEmpty ? 'Competitive' : _salaryController.text.trim(),
+        'description': _jobDescription.text.trim(),
+        'positions': int.tryParse(_positions.text) ?? 1,
+        'category': _category,
+        'department': _department.text.trim(),
+        'skills': _skills,
+        // Pass existing lists if editing
+        'responsibilities': _editingJob?.responsibilities,
+        'qualifications': _editingJob?.qualifications,
+        'niceToHaves': _editingJob?.niceToHaves,
+        'benefits': _editingJob?.benefits,
       },
     );
   }
@@ -92,6 +150,18 @@ class _CompanyPostJobStep1InformationScreenState
     }
   }
 
+  Future<void> _selectDeadline() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _deadline ?? DateTime.now().add(const Duration(days: 30)),
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
+    );
+    if (picked != null) {
+      setState(() => _deadline = picked);
+    }
+  }
+
   void _toggle(String type) {
     setState(() {
       if (_types.contains(type)) {
@@ -106,10 +176,11 @@ class _CompanyPostJobStep1InformationScreenState
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     return AppScaffold(
-      title: t.postJob,
+      title: _editingJob != null ? t.editJob : t.postJob,
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          const SizedBox(height: 10),
           SectionTitle(t.step1Label),
           const SizedBox(height: 16),
           AppTextField(
@@ -118,7 +189,14 @@ class _CompanyPostJobStep1InformationScreenState
             hint: t.jobTitleHint,
             validatorText: _titleError,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 24),
+          AppTextField(
+            label: t.jobDescriptions,
+            controller: _jobDescription,
+            hint: t.addDescription,
+            maxLines: 5,
+          ),
+          const Divider(height: 48),
           Text(
             t.typeOfEmployment,
             style: Theme.of(context).textTheme.titleSmall,
@@ -148,22 +226,27 @@ class _CompanyPostJobStep1InformationScreenState
                 selected: _types.contains('Internship'),
                 onTap: () => _toggle('Internship'),
               ),
+              _TypeChip(
+                label: 'One Time',
+                selected: _types.contains('One Time'),
+                onTap: () => _toggle('One Time'),
+              ),
+              _TypeChip(
+                label: 'Freelance',
+                selected: _types.contains('Freelance'),
+                onTap: () => _toggle('Freelance'),
+              ),
             ],
           ),
-          const SizedBox(height: 16),
-          Text(t.salary, style: Theme.of(context).textTheme.titleSmall),
-          const SizedBox(height: 8),
-          Text(
-            '\$${_salary.start.toStringAsFixed(0)} - \$${_salary.end.toStringAsFixed(0)}',
+          const Divider(height: 48),
+          AppTextField(
+            label: t.salary,
+            controller: _salaryController,
+            keyboardType: TextInputType.number,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            hint: t.tr(en: "e.g. 5000 - 7000", ar: "مثال: 5000 - 7000"),
           ),
-          RangeSlider(
-            values: _salary,
-            min: 0,
-            max: 50000,
-            divisions: 100,
-            onChanged: (v) => setState(() => _salary = v),
-          ),
-          const SizedBox(height: 12),
+          const Divider(height: 48),
           Text(
             t.requiredSkills,
             style: Theme.of(context).textTheme.titleSmall,
@@ -188,10 +271,145 @@ class _CompanyPostJobStep1InformationScreenState
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const Divider(height: 48),
+
+          // Number of Positions
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                t.tr(en: "Positions", ar: "العدد المطلوب"),
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w900, fontSize: 15),
+              ),
+              const SizedBox(height: 12),
+              AppTextField(
+                label: '',
+                controller: _positions,
+                hint: t.tr(en: "e.g. 1", ar: "حدد عدد المقاعد المتاحة لهذا المنصب"),
+                keyboardType: TextInputType.number,
+              ),
+            ],
+          ),
+          const Divider(height: 48),
+
+          // Category
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                t.tr(en: "Category", ar: "التصنيف"),
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w900, fontSize: 15),
+              ),
+              const SizedBox(height: 12),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    _buildRadioChip(t.tr(en: "Technical", ar: "تقني"), "Technical"),
+                    const SizedBox(width: 8),
+                    _buildRadioChip(t.tr(en: "Non-Technical", ar: "غير تقني"), "Non-Technical"),
+                    const SizedBox(width: 8),
+                    _buildRadioChip(t.tr(en: "Services", ar: "خدمات"), "Services"),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const Divider(height: 48),
+
+          // Department
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                t.tr(en: "Job Department", ar: "القسم الوظيفي"),
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w900, fontSize: 15),
+              ),
+              const SizedBox(height: 12),
+              AppTextField(
+                label: '',
+                controller: _department,
+                hint: t.tr(en: "e.g. Engineering, Marketing...", ar: "اكتب فئة الوظيفة المناسبة... مثال: هندسة، تسويق"),
+              ),
+            ],
+          ),
+          const Divider(height: 48),
+
+          // Deadline
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                t.tr(en: "Deadline", ar: "تاريخ انتهاء التقديم"),
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w900, fontSize: 15),
+              ),
+              const SizedBox(height: 12),
+              InkWell(
+                onTap: _selectDeadline,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1)),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        _deadline == null 
+                          ? (t.isAr ? 'متى سيغلق باب التقديم؟' : 'When will it close?')
+                          : "${_deadline!.month.toString().padLeft(2, '0')}/${_deadline!.day.toString().padLeft(2, '0')}/${_deadline!.year}",
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                      ),
+                      Icon(Icons.calendar_month_outlined, size: 20, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const Divider(height: 48),
+          
           AppButton(label: t.nextStep, loading: _loading, onPressed: _next),
           const SizedBox(height: 10),
         ],
+      ),
+    );
+  }
+
+  Widget _buildRadioChip(String label, String value) {
+    final selected = _category == value;
+    final color = selected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1);
+    return InkWell(
+      onTap: () => setState(() => _category = value),
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: selected ? color.withValues(alpha: 0.05) : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: color.withValues(alpha: selected ? 0.3 : 0.2)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              selected ? Icons.radio_button_checked : Icons.radio_button_off,
+              size: 16,
+              color: color,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: TextStyle(
+                color: selected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface,
+                fontSize: 12,
+                fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

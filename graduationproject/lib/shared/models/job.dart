@@ -1,3 +1,15 @@
+final class JobBenefit {
+  JobBenefit({required this.title, required this.description});
+  final String title;
+  final String description;
+
+  Map<String, String> toMap() => {'title': title, 'description': description};
+  factory JobBenefit.fromMap(Map<String, dynamic> map) => JobBenefit(
+    title: map['title'] ?? '',
+    description: map['description'] ?? '',
+  );
+}
+
 /// The [Job] model represents a job posting created by a company.
 /// It holds critical details used across the jobs hub and analytics screens.
 final class Job {
@@ -13,6 +25,9 @@ final class Job {
     this.description = '',
     this.responsibilities = const [],
     this.niceToHaves = const [],
+    this.qualifications = const [],
+    this.benefits = const [],
+    this.department = '',
     this.appliedCount,
     this.capacity,
   });
@@ -23,10 +38,13 @@ final class Job {
   final String location;
   final String employmentType;
   final String category;
+  final String department;
   final String salaryRange;
   final String description;
   final List<String> responsibilities;
   final List<String> niceToHaves;
+  final List<String> qualifications;
+  final List<JobBenefit> benefits;
   final int? appliedCount;
   final int? capacity;
 
@@ -38,10 +56,13 @@ final class Job {
     String? location,
     String? employmentType,
     String? category,
+    String? department,
     String? salaryRange,
     String? description,
     List<String>? responsibilities,
     List<String>? niceToHaves,
+    List<String>? qualifications,
+    List<JobBenefit>? benefits,
     int? appliedCount,
     int? capacity,
   }) {
@@ -52,10 +73,13 @@ final class Job {
       location: location ?? this.location,
       employmentType: employmentType ?? this.employmentType,
       category: category ?? this.category,
+      department: department ?? this.department,
       salaryRange: salaryRange ?? this.salaryRange,
       description: description ?? this.description,
       responsibilities: responsibilities ?? this.responsibilities,
       niceToHaves: niceToHaves ?? this.niceToHaves,
+      qualifications: qualifications ?? this.qualifications,
+      benefits: benefits ?? this.benefits,
       appliedCount: appliedCount ?? this.appliedCount,
       capacity: capacity ?? this.capacity,
     );

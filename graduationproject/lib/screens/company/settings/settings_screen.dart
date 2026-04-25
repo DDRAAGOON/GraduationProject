@@ -28,6 +28,12 @@ class CompanySettingsScreen extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           _SettingTile(
+            title: t.accountSecurity,
+            icon: Icons.security_outlined,
+            onTap: () => Navigator.of(context).pushNamed(AppRoutes.companyAccountSecurity),
+          ),
+          const SizedBox(height: 8),
+          _SettingTile(
             title: t.tr(en: 'Appearance', ar: 'المظهر'),
             icon: Icons.palette_outlined,
             onTap: () => Navigator.of(context).pushNamed(AppRoutes.companyAppearanceLight),

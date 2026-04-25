@@ -16,4 +16,8 @@ class UserProfileData {
 
   // أضفت هذا السطر لحل المشكلة
   static List<Map<String, String>> experiences = [];
+  
+  static double minSalary = 0;
+  static double maxSalary = 0;
+  static String salaryFrequency = "Monthly"; // Monthly or Yearly
 }

@@ -49,7 +49,7 @@ class _CompanyJobsHubScreenState extends State<CompanyJobsHubScreen> {
                         onSelected: (value) async {
                           if (value == 'edit') {
                             Navigator.of(context).pushNamed(
-                              AppRoutes.companyJobDetails,
+                              AppRoutes.companyPostJobStep1,
                               arguments: j,
                             );
                             return;

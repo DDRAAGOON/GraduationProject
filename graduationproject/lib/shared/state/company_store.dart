@@ -31,6 +31,10 @@ class CompanyStore extends ChangeNotifier {
   int _foundedMonth = 0;
   int _foundedYear = 0;
 
+  // --- Category and Benefits ---
+  String _category = '';
+  List<String> _benefits = [];
+
   // --- Registration Data ---
   String _commercialRegister = '';
   String _nationalNumber = '';
@@ -52,10 +56,13 @@ class CompanyStore extends ChangeNotifier {
   int get foundedMonth => _foundedMonth;
   int get foundedYear => _foundedYear;
 
+  String get category => _category;
+  List<String> get benefits => List.unmodifiable(_benefits);
+
   String get commercialRegister => _commercialRegister;
   String get nationalNumber => _nationalNumber;
 
-  String get companyProfileImage => _customProfileImage ?? AppImages.companyProfileImage;
+  String? get companyProfileImage => _customProfileImage;
 
   String _aboutEn = '';
   String _aboutAr = '';
@@ -99,6 +106,8 @@ class CompanyStore extends ChangeNotifier {
     required int foundedDay,
     required int foundedMonth,
     required int foundedYear,
+    required String category,
+    required List<String> benefits,
     required String commercialRegister,
     required String nationalNumber,
   }) {
@@ -113,6 +122,8 @@ class CompanyStore extends ChangeNotifier {
     _foundedDay = foundedDay;
     _foundedMonth = foundedMonth;
     _foundedYear = foundedYear;
+    _category = category;
+    _benefits = List.from(benefits);
     _commercialRegister = commercialRegister;
     _nationalNumber = nationalNumber;
     notifyListeners();

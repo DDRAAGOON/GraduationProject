@@ -30,19 +30,29 @@ class CompanyDashboardScreen extends StatelessWidget {
                 onTap: () => Navigator.of(context).pushNamed(AppRoutes.companyProfileOverview),
                 borderRadius: BorderRadius.circular(20),
                 child: ClipOval(
-                  child: companyStore.companyProfileImage.startsWith('assets/')
-                      ? Image.asset(
-                          companyStore.companyProfileImage,
-                          width: 40,
-                          height: 40,
-                          fit: BoxFit.cover,
-                        )
-                      : Image.file(
-                          File(companyStore.companyProfileImage),
-                          width: 40,
-                          height: 40,
-                          fit: BoxFit.cover,
+                  child: companyStore.companyProfileImage == null
+                    ? Container(
+                        width: 40,
+                        height: 40,
+                        color: Theme.of(context).colorScheme.surfaceBright,
+                        child: Icon(
+                          Icons.business,
+                          color: Theme.of(context).colorScheme.primary,
                         ),
+                      )
+                    : companyStore.companyProfileImage!.startsWith('assets/')
+                        ? Image.asset(
+                            companyStore.companyProfileImage!,
+                            width: 40,
+                            height: 40,
+                            fit: BoxFit.cover,
+                          )
+                        : Image.file(
+                            File(companyStore.companyProfileImage!),
+                            width: 40,
+                            height: 40,
+                            fit: BoxFit.cover,
+                          ),
                 ),
               ),
               const SizedBox(width: 10),
@@ -79,8 +89,7 @@ class CompanyDashboardScreen extends StatelessWidget {
                         onTapNewCandidates: () =>
                             Navigator.of(context).pushNamed(
                               AppRoutes.companyApplicantsTable,
-                              arguments:
-                              jobs.isNotEmpty ? jobs.first : Job.mock(),
+                              arguments: jobs.isNotEmpty ? jobs.first : Job.mock(),
                             ),
                       ),
                       const SizedBox(height: 18),
@@ -261,32 +270,11 @@ class _JobUpdateCard extends StatelessWidget {
                         maxLines: 1,
                       ),
                     ),
-                    IconButton(
-                      tooltip: t.edit,
-                      constraints: const BoxConstraints(
-                        minWidth: 36,
-                        minHeight: 36,
-                      ),
-                      padding: EdgeInsets.zero,
-                      onPressed: () => Navigator.of(context)
-                          .pushNamed(AppRoutes.companyJobDetails, arguments: job),
-                      icon: const Icon(Icons.edit_outlined, size: 20),
-                    ),
-                    IconButton(
-                      tooltip: t.delete,
-                      constraints: const BoxConstraints(
-                        minWidth: 36,
-                        minHeight: 36,
-                      ),
-                      padding: EdgeInsets.zero,
-                      onPressed: () => _confirmDelete(context),
-                      icon: const Icon(Icons.delete_outline, size: 20),
-                    ),
                   ],
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '${job.companyName} • ${job.location} • ${job.employmentType}',
+                  '${job.companyName} • ${job.employmentType}',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: Theme.of(context)
                         .colorScheme
@@ -316,12 +304,13 @@ class _JobUpdateCard extends StatelessWidget {
                       ),
                   ],
                 ),
-              ],
-            ),
+            ]
           ),
         ),
+    ),
       ),
-    );
+      );
+
   }
 
   Future<void> _confirmDelete(BuildContext context) async {

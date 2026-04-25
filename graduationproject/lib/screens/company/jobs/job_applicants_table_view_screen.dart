@@ -133,20 +133,28 @@ class _CompanyJobApplicantsTableViewScreenState
       listenable: RecruitmentSyncStore.instance,
       builder: (context, _) {
         final allApps = RecruitmentSyncStore.instance.applications
-            .where((app) => app.jobId == widget.job.id || widget.job.id == 'fallback')
+            .where(
+              (app) =>
+                  app.jobId == widget.job.id || widget.job.id == 'fallback',
+            )
             .toList();
 
-        final filtered = allApps.map((app) => Applicant(
-          id: app.id,
-          fullName: app.userName,
-          role: app.jobTitle,
-          rating: 4.5, // Default rating
-          stage: app.status,
-          email: 'candidate@jobito.com',
-          phone: '+20 123 456 789',
-          location: 'Egypt',
-          appliedDateLabel: 'Today',
-        )).where((a) => _matchesStages(a) && _matchesSearch(a)).toList();
+        final filtered = allApps
+            .map(
+              (app) => Applicant(
+                id: app.id,
+                fullName: app.userName,
+                role: app.jobTitle,
+                rating: 4.5, // Default rating
+                stage: app.status,
+                email: 'candidate@jobito.com',
+                phone: '+20 123 456 789',
+                location: 'Egypt',
+                appliedDateLabel: 'Today',
+              ),
+            )
+            .where((a) => _matchesStages(a) && _matchesSearch(a))
+            .toList();
 
         return AppScaffold(
           title: widget.job.title,
@@ -217,10 +225,10 @@ class _CompanyJobApplicantsTableViewScreenState
                   child: Text(
                     'No jobs',
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.onSurface.withValues(alpha: 0.7),
-                        ),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.7),
+                    ),
                   ),
                 );
               }

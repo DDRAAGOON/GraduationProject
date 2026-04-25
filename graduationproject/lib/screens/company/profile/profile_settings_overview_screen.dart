@@ -29,8 +29,6 @@ class _CompanyProfileSettingsOverviewScreenState
   late final TextEditingController _employee;
   late final TextEditingController _industry;
   late final TextEditingController _about;
-  late final TextEditingController _commercialRegister;
-  late final TextEditingController _nationalNumber;
   
   late List<String> _locations;
   late List<String> _techStack;
@@ -50,8 +48,6 @@ class _CompanyProfileSettingsOverviewScreenState
     _employee = TextEditingController(text: store.employee);
     _industry = TextEditingController(text: store.industry);
     _about = TextEditingController(text: isAr ? store.companyAboutAr : store.companyAboutEn);
-    _commercialRegister = TextEditingController(text: store.commercialRegister);
-    _nationalNumber = TextEditingController(text: store.nationalNumber);
     _locations = List.from(store.locations);
     _techStack = List.from(store.techStack);
     _selectedDay = store.foundedDay;
@@ -66,8 +62,6 @@ class _CompanyProfileSettingsOverviewScreenState
     _employee.dispose();
     _industry.dispose();
     _about.dispose();
-    _commercialRegister.dispose();
-    _nationalNumber.dispose();
     super.dispose();
   }
 
@@ -92,8 +86,10 @@ class _CompanyProfileSettingsOverviewScreenState
       foundedDay: _selectedDay,
       foundedMonth: _selectedMonth,
       foundedYear: _selectedYear,
-      commercialRegister: _commercialRegister.text.trim(),
-      nationalNumber: _nationalNumber.text.trim(),
+      commercialRegister: store.commercialRegister,
+      nationalNumber: store.nationalNumber,
+      benefits: store.benefits,
+      category: store.category,
     );
 
     // Persist company name change
@@ -232,21 +228,31 @@ class _CompanyProfileSettingsOverviewScreenState
                     animation: CompanyStore.instance,
                     builder: (context, _) {
                       final profileImage = CompanyStore.instance.companyProfileImage;
-                      final isAsset = profileImage.startsWith('assets/');
                       return ClipOval(
-                        child: isAsset
-                            ? Image.asset(
-                                profileImage,
+                        child: profileImage == null
+                            ? Container(
                                 width: 44,
                                 height: 44,
-                                fit: BoxFit.cover,
+                                color: Theme.of(context).colorScheme.surfaceBright,
+                                child: Icon(
+                                  Icons.business,
+                                  color: Theme.of(context).colorScheme.primary,
+                                  size: 24,
+                                ),
                               )
-                            : Image.file(
-                                File(profileImage),
-                                width: 44,
-                                height: 44,
-                                fit: BoxFit.cover,
-                              ),
+                            : profileImage.startsWith('assets/')
+                                ? Image.asset(
+                                    profileImage,
+                                    width: 44,
+                                    height: 44,
+                                    fit: BoxFit.cover,
+                                  )
+                                : Image.file(
+                                    File(profileImage),
+                                    width: 44,
+                                    height: 44,
+                                    fit: BoxFit.cover,
+                                  ),
                       );
                     },
                   ),
@@ -351,16 +357,6 @@ class _CompanyProfileSettingsOverviewScreenState
 
           const SizedBox(height: 16),
           AppTextField(label: t.aboutCompany, controller: _about, maxLines: 4),
-          const SizedBox(height: 16),
-          AppTextField(
-            label: t.tr(en: 'Commercial Register', ar: 'السجل التجاري'),
-            controller: _commercialRegister,
-          ),
-          const SizedBox(height: 16),
-          AppTextField(
-            label: t.tr(en: 'National Number', ar: 'الرقم القومي'),
-            controller: _nationalNumber,
-          ),
           const SizedBox(height: 18),
           AppButton(label: t.saveChange, loading: _loading, onPressed: _save),
           const SizedBox(height: 10),

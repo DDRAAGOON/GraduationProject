@@ -22,7 +22,8 @@ import '../../screens/company/jobs/job_applicants_table_view_screen.dart';
 import '../../screens/company/jobs/job_details_screen.dart';
 import '../../screens/company/jobs/jobs_hub_screen.dart';
 import '../../screens/company/jobs/post_job/post_job_step1_information_screen.dart';
-import '../../screens/company/jobs/post_job/post_job_step2_description_screen.dart';
+import '../../screens/company/jobs/post_job/post_job_step2_requirements_screen.dart';
+import '../../screens/company/jobs/post_job/post_job_step3_benefits_screen.dart';
 import '../../screens/company/jobs/recruitment_post_job_screen.dart';
 import '../../screens/company/messages/chat_thread_candidate_v2_screen.dart';
 import '../../screens/company/messages/chat_thread_screen.dart';
@@ -36,6 +37,7 @@ import '../../screens/company/profile/company_profile_screen.dart';
 import '../../screens/company/profile/profile_settings_overview_screen.dart';
 import '../../screens/company/profile/profile_settings_social_links_screen.dart';
 import '../../screens/company/profile/recruitment_company_profile_screen.dart';
+import '../../screens/company/settings/account_security_screen.dart';
 import '../../screens/company/settings/appearance_settings_dark_screen.dart';
 import '../../screens/company/settings/appearance_settings_light_screen.dart';
 import '../../screens/company/settings/notification_setting_screen.dart';
@@ -111,6 +113,8 @@ final class AppRoutes {
   static const companyJobAnalytics = '/company/jobs/analytics';
   static const companyPostJobStep1 = '/company/jobs/post/step1';
   static const companyPostJobStep2 = '/company/jobs/post/step2';
+  static const companyPostJobStep3 = '/company/jobs/post/step3';
+  static const companyJobApplicants = '/company/job-applicants';
 
   static const companyApplicantDetailsProfile = '/company/candidates/profile';
   static const companyApplicantDetailsResume = '/company/candidates/resume';
@@ -128,6 +132,7 @@ final class AppRoutes {
   static const companyNotificationSetting = '/company/settings/notification';
   static const companyNotifications = '/company/notifications';
   static const companyHelpCenter = '/company/help/center';
+  static const companyAccountSecurity = '/company/settings/account_security';
 }
 
 /// The [AppRouter] is responsible for generating route transitions and providing
@@ -272,6 +277,8 @@ final class AppRouter {
         page = const CompanyPostJobStep1InformationScreen();
       case AppRoutes.companyPostJobStep2:
         page = const CompanyPostJobStep2DescriptionScreen();
+      case AppRoutes.companyPostJobStep3:
+        page = const CompanyPostJobStep3BenefitsScreen();
       case AppRoutes.companyApplicantDetailsProfile:
         page = CompanyApplicantDetailsProfileScreen(
           applicant: args is Applicant ? args : Applicant.mock(),
@@ -308,6 +315,8 @@ final class AppRouter {
         page = const CompanyNotificationsScreen();
       case AppRoutes.companyHelpCenter:
         page = const CompanyHelpCenterScreen();
+      case AppRoutes.companyAccountSecurity:
+        page = const CompanyAccountSecurityScreen();
       default:
         page = const _UnknownRouteScreen();
     }

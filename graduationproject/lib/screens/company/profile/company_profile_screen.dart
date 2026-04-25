@@ -44,6 +44,7 @@ class _CompanyCompanyProfileScreenState
                 countriesCount: _store.locations.length,
                 employee: _store.employee,
                 industry: _store.industry,
+                category: _store.category,
               ),
               const SizedBox(height: 14),
               Divider(
@@ -77,6 +78,20 @@ class _CompanyCompanyProfileScreenState
                       children: _store.locations.map((item) => Chip(
                         label: Text(item, style: const TextStyle(fontSize: 12)),
                         visualDensity: VisualDensity.compact,
+                      )).toList(),
+                    ),
+              const SizedBox(height: 16),
+              SectionTitle(t.benefits),
+              const SizedBox(height: 10),
+              _store.benefits.isEmpty
+                  ? Text(t.notYet, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4)))
+                  : Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: _store.benefits.map((item) => Chip(
+                        label: Text(item, style: const TextStyle(fontSize: 12)),
+                        visualDensity: VisualDensity.compact,
+                        backgroundColor: Theme.of(context).colorScheme.secondaryContainer.withValues(alpha: 0.3),
                       )).toList(),
                     ),
               const SizedBox(height: 16),
@@ -193,6 +208,7 @@ class _CompanyStatsBar extends StatelessWidget {
     required this.countriesCount,
     required this.employee,
     required this.industry,
+    required this.category,
   });
 
   final int foundedDay;
@@ -201,6 +217,7 @@ class _CompanyStatsBar extends StatelessWidget {
   final int countriesCount;
   final String employee;
   final String industry;
+  final String category;
 
   @override
   Widget build(BuildContext context) {
@@ -306,9 +323,9 @@ class _CompanyStatsBar extends StatelessWidget {
                 ),
                 const SizedBox(width: 14),
                 item(
-                  icon: Icons.account_balance_outlined,
-                  label: t.industry,
-                  value: industry.isEmpty ? t.notYet : industry,
+                  icon: Icons.category_outlined,
+                  label: t.categoryLabel,
+                  value: category.isEmpty ? t.notYet : (category == 'Technical' ? t.technical : t.nonTechnical),
                 ),
               ],
             ),
