@@ -94,12 +94,7 @@ class LogoPage extends StatelessWidget {
                     Navigator.of(context).pushNamed(AppRoutes.companySignInNew),
               ),
               SizedBox(height: size.height * 0.012),
-              TextButton.icon(
-                onPressed: () =>
-                    Navigator.of(context).pushNamed(AppRoutes.adminPanel),
-                icon: const Icon(Icons.admin_panel_settings_outlined),
-                label: const Text('Admin'),
-              ),
+
               SizedBox(height: size.height * 0.07),
             ],
           ),

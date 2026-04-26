@@ -41,7 +41,7 @@ class _JobsListScreenState extends State<JobsListScreen> {
 
               // Popular Tags
               Text(
-                "${t.tr(en: "Popular", ar: "شائع")} : UI Designer, UX Researcher, Android, Admin",
+                "${t.tr(en: "Popular", ar: "شائع")} : UI Designer, UX Researcher, Android",
                 style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 11),
               ),
               const SizedBox(height: 25),

@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 
-import '../../screens/admin/admin_panel_screen.dart';
+
 import '../../screens/company/auth/forgot_password_screen.dart';
 import '../../screens/company/auth/otp_email_verification_screen.dart';
 import '../../screens/company/auth/password_changed_dialog_screen.dart';
@@ -77,7 +77,7 @@ final class AppRoutes {
   static const userSettingsNew = '/user/settings/new';
   static const userSignInNew = '/user/auth/sign_in_new';
   static const userEditProfile = '/user/profile/edit';
-  static const adminPanel = '/admin/panel';
+
 
   // --- Company Onboarding Routes ---
   static const companyOnboardingSmartSearch =
@@ -198,8 +198,7 @@ final class AppRouter {
         page = const RecruitmentUserSignInScreen();
       case AppRoutes.userEditProfile:
         page = const EditProfileScreen();
-      case AppRoutes.adminPanel:
-        page = const AdminPanelScreen();
+
       case AppRoutes.companyOnboardingSmartSearch:
         page = const CompanyOnboardingSmartSearchScreen();
       case AppRoutes.companyOnboardingNextJobCloser:
