@@ -167,7 +167,7 @@ class _CompanyPostJobStep3BenefitsScreenState
           Text(
             t.tr(en: "This job comes with many perks and benefits.", ar: "هذه الوظيفة تأتي مع العديد من المزايا والفوائد"),
             style: TextStyle(
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
               fontSize: 14,
             ),
           ),
@@ -216,10 +216,10 @@ class _BenefitCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.05)),
+        border: Border.all(color: Theme.of(context).colorScheme.outline.withOpacity(0.05)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
+            color: Colors.black.withOpacity(0.02),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -241,7 +241,7 @@ class _BenefitCard extends StatelessWidget {
               ),
               InkWell(
                 onTap: onDelete,
-                child: Icon(Icons.close, size: 16, color: Theme.of(context).colorScheme.error.withValues(alpha: 0.5)),
+                child: Icon(Icons.close, size: 16, color: Theme.of(context).colorScheme.error.withOpacity(0.5)),
               ),
             ],
           ),
@@ -250,7 +250,7 @@ class _BenefitCard extends StatelessWidget {
             child: Text(
               benefit.description,
               style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                 fontSize: 12,
                 height: 1.4,
               ),
@@ -276,10 +276,10 @@ class _AddBenefitCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(16),
       child: Container(
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.02),
+          color: Theme.of(context).colorScheme.primary.withOpacity(0.02),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+            color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
             style: BorderStyle.solid,
             width: 1,
           ),

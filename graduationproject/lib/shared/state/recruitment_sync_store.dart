@@ -37,6 +37,17 @@ class RecruitmentApplication {
     required this.userName,
     required this.status,
     required this.updatedAt,
+    this.gender,
+    this.birthDate,
+    this.languages = const [],
+    this.about,
+    this.experienceYears = 0,
+    this.education,
+    this.skills = const [],
+    this.hasCv = false,
+    this.email,
+    this.phone,
+    this.location,
   });
 
   final String id;
@@ -46,6 +57,19 @@ class RecruitmentApplication {
   final String userName;
   final String status;
   final DateTime updatedAt;
+
+  // Detailed fields
+  final String? gender;
+  final String? birthDate;
+  final List<String> languages;
+  final String? about;
+  final int experienceYears;
+  final String? education;
+  final List<String> skills;
+  final bool hasCv;
+  final String? email;
+  final String? phone;
+  final String? location;
 
   RecruitmentApplication copyWith({
     String? status,
@@ -59,6 +83,17 @@ class RecruitmentApplication {
       userName: userName,
       status: status ?? this.status,
       updatedAt: updatedAt ?? this.updatedAt,
+      gender: gender,
+      birthDate: birthDate,
+      languages: languages,
+      about: about,
+      experienceYears: experienceYears,
+      education: education,
+      skills: skills,
+      hasCv: hasCv,
+      email: email,
+      phone: phone,
+      location: location,
     );
   }
 }
@@ -141,7 +176,6 @@ class RecruitmentSyncStore extends ChangeNotifier {
   ];
 
   final List<RecruitmentJob> _jobs = <RecruitmentJob>[
-    // Technical
     RecruitmentJob(
       id: 'job_1',
       title: 'Flutter Mobile Developer',
@@ -164,7 +198,28 @@ class RecruitmentSyncStore extends ChangeNotifier {
       tags: const ['Node.js', 'Express', 'PostgreSQL'],
       publishedAt: DateTime.now().subtract(const Duration(hours: 7)),
     ),
-    // Tradesman
+    RecruitmentJob(
+      id: 'job_3',
+      title: 'UI/UX Designer',
+      companyName: 'Creative Hub',
+      location: 'Giza',
+      salaryRange: '15k - 25k EGP',
+      type: 'Full-time',
+      category: 'Technical',
+      tags: const ['Figma', 'UI', 'UX'],
+      publishedAt: DateTime.now().subtract(const Duration(days: 2)),
+    ),
+    RecruitmentJob(
+      id: 'job_4',
+      title: 'Social Media Manager',
+      companyName: 'Marketing Pro',
+      location: 'Cairo',
+      salaryRange: '10k - 18k EGP',
+      type: 'Part-time',
+      category: 'Non-technical',
+      tags: const ['Social Media', 'Content'],
+      publishedAt: DateTime.now().subtract(const Duration(days: 4)),
+    ),
     RecruitmentJob(
       id: 'tr_1',
       title: 'نقاش محترف (Painter)',
@@ -213,21 +268,100 @@ class RecruitmentSyncStore extends ChangeNotifier {
       logoIcon: Icons.electrical_services,
       publishedAt: DateTime.now().subtract(const Duration(days: 4)),
     ),
-    RecruitmentJob(
-      id: 'tr_5',
-      title: 'فني تكييف (HVAC Tech)',
-      companyName: 'كول اير',
-      location: 'Cairo',
-      salaryRange: 'Negotiable',
-      type: 'Contract',
-      category: 'Tradesman',
-      tags: const ['AC Repair', 'Maintenance'],
-      logoIcon: Icons.ac_unit,
-      publishedAt: DateTime.now().subtract(const Duration(days: 5)),
-    ),
   ];
 
-  final List<RecruitmentApplication> _applications = <RecruitmentApplication>[];
+  final List<RecruitmentApplication> _applications = <RecruitmentApplication>[
+    RecruitmentApplication(
+      id: 'app_1',
+      jobId: 'job_1',
+      jobTitle: 'Flutter Mobile Developer',
+      companyName: 'Jobito Labs',
+      userName: 'Omar Khaled',
+      status: 'In Review',
+      updatedAt: DateTime.now().subtract(const Duration(days: 1)),
+      gender: 'Male',
+      birthDate: '1992-03-20',
+      languages: ['Arabic', 'English'],
+      about: 'Flutter enthusiast with 4 years of experience.',
+      experienceYears: 4,
+      education: 'BSc Computer Science',
+      skills: ['Flutter', 'Dart', 'Clean Architecture'],
+      hasCv: true,
+      email: 'omar.khaled@jobito.com',
+      phone: '+20 111 222 333',
+      location: 'Cairo, Egypt',
+    ),
+    RecruitmentApplication(
+      id: 'app_2',
+      jobId: 'job_1',
+      jobTitle: 'Flutter Mobile Developer',
+      companyName: 'Jobito Labs',
+      userName: 'Mariam Ali',
+      status: 'Shortlisted',
+      updatedAt: DateTime.now().subtract(const Duration(hours: 5)),
+      gender: 'Female',
+      birthDate: '1996-07-10',
+      languages: ['Arabic', 'French'],
+      about: 'UI-focused developer with a passion for beautiful apps.',
+      experienceYears: 2,
+      education: 'BSc Information Systems',
+      skills: ['Flutter', 'UI Design', 'Lottie'],
+      hasCv: true,
+      email: 'mariam.ali@jobito.com',
+      phone: '+20 444 555 666',
+      location: 'Giza, Egypt',
+    ),
+    RecruitmentApplication(
+      id: 'app_3',
+      jobId: 'job_2',
+      jobTitle: 'Backend Node.js Engineer',
+      companyName: 'Nexa Systems',
+      userName: 'Youssef Ahmed',
+      status: 'In Review',
+      updatedAt: DateTime.now().subtract(const Duration(days: 2)),
+      gender: 'Male',
+      birthDate: '1990-11-05',
+      languages: ['Arabic', 'German'],
+      about: 'Node.js expert specializing in microservices.',
+      experienceYears: 6,
+      education: 'MSc Computer Engineering',
+      skills: ['Node.js', 'PostgreSQL', 'Docker'],
+      hasCv: true,
+      email: 'youssef.ahmed@nexa.com',
+      phone: '+20 777 888 999',
+      location: 'Remote',
+    ),
+    RecruitmentApplication(
+      id: 'app_4',
+      jobId: 'tr_1',
+      jobTitle: 'نقاش محترف (Painter)',
+      companyName: 'مقاولات الحديثة',
+      userName: 'Mostafa Said',
+      status: 'Hired',
+      updatedAt: DateTime.now().subtract(const Duration(days: 3)),
+      gender: 'Male',
+      languages: ['Arabic'],
+      experienceYears: 10,
+      email: 'mostafa.said@mail.com',
+      phone: '+20 000 111 222',
+      location: 'Cairo, Egypt',
+    ),
+    RecruitmentApplication(
+      id: 'app_user_1',
+      jobId: 'job_1',
+      jobTitle: 'Flutter Mobile Developer',
+      companyName: 'Jobito Labs',
+      userName: 'Ahmed User',
+      status: 'In Review',
+      updatedAt: DateTime.now().subtract(const Duration(days: 1)),
+      gender: 'Male',
+      languages: ['Arabic', 'English'],
+      experienceYears: 1,
+      email: 'user@jobito.com',
+      phone: '+20 333 444 555',
+      location: 'Cairo, Egypt',
+    ),
+  ];
   final List<RecruitmentMessage> _messages = <RecruitmentMessage>[];
   final Set<String> _savedJobIds = <String>{};
   
@@ -305,7 +439,53 @@ class RecruitmentSyncStore extends ChangeNotifier {
 
   void companyPostJob(RecruitmentJob job) {
     _jobs.insert(0, job);
+    generateMockApplicants(job.id, job.title, job.companyName);
     notifyListeners();
+  }
+
+  void generateMockApplicants(String jobId, String jobTitle, String companyName) {
+    _applications.insertAll(0, [
+      RecruitmentApplication(
+        id: 'app_m_${DateTime.now().millisecondsSinceEpoch}_1',
+        jobId: jobId,
+        jobTitle: jobTitle,
+        companyName: companyName,
+        userName: 'Dragon',
+        status: 'In Review',
+        updatedAt: DateTime.now(),
+        gender: 'لم يحدد',
+        birthDate: 'غير متوفر',
+        languages: ['العربية'],
+        about: 'لا يوجد نبذة تعريفية متاحة لهذا المتقدم.',
+        experienceYears: 0,
+        education: 'غير متوفر',
+        skills: [],
+        hasCv: false,
+        email: 'mahmoudessam936@gmail.com',
+        phone: '+20 123 456 789',
+        location: 'غير محدد',
+      ),
+      RecruitmentApplication(
+        id: 'app_m_${DateTime.now().millisecondsSinceEpoch}_2',
+        jobId: jobId,
+        jobTitle: jobTitle,
+        companyName: companyName,
+        userName: 'Sara Hassan',
+        status: 'Applied',
+        updatedAt: DateTime.now(),
+        gender: 'Female',
+        birthDate: '1995-05-15',
+        languages: ['Arabic', 'English'],
+        about: 'Experienced Flutter developer looking for new opportunities.',
+        experienceYears: 3,
+        education: 'Bachelor of Computer Science',
+        skills: ['Flutter', 'Dart', 'Firebase'],
+        hasCv: true,
+        email: 'sara.hassan@example.com',
+        phone: '+20 987 654 321',
+        location: 'Alexandria',
+      ),
+    ]);
   }
 
   void toggleSaveJob(String jobId) {

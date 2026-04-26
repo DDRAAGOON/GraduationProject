@@ -14,7 +14,7 @@ class PostJobStepper extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.05)),
+        border: Border.all(color: colorScheme.outline.withOpacity(0.05)),
       ),
       child: Row(
         children: [
@@ -54,10 +54,10 @@ class PostJobStepper extends StatelessWidget {
           width: 28,
           height: 28,
           decoration: BoxDecoration(
-            color: isCompleted ? primary : (isActive ? primary.withValues(alpha: 0.1) : colorScheme.surface),
+            color: isCompleted ? primary : (isActive ? primary.withOpacity(0.1) : colorScheme.surface),
             shape: BoxShape.circle,
             border: Border.all(
-              color: isCompleted || isActive ? primary : colorScheme.outline.withValues(alpha: 0.2),
+              color: isCompleted || isActive ? primary : colorScheme.outline.withOpacity(0.2),
               width: 2,
             ),
           ),
@@ -86,7 +86,7 @@ class PostJobStepper extends StatelessWidget {
       decoration: BoxDecoration(
         color: isActive 
           ? Theme.of(context).colorScheme.primary 
-          : Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
+          : Theme.of(context).colorScheme.outline.withOpacity(0.1),
         borderRadius: BorderRadius.circular(2),
       ),
     );

@@ -147,10 +147,18 @@ class _CompanyJobApplicantsTableViewScreenState
                 role: app.jobTitle,
                 rating: 4.5, // Default rating
                 stage: app.status,
-                email: 'candidate@jobito.com',
-                phone: '+20 123 456 789',
-                location: 'Egypt',
+                email: app.email ?? 'candidate@jobito.com',
+                phone: app.phone ?? '+20 123 456 789',
+                location: app.location ?? 'Egypt',
                 appliedDateLabel: 'Today',
+                gender: app.gender,
+                birthDate: app.birthDate,
+                languages: app.languages,
+                about: app.about,
+                experienceYears: app.experienceYears,
+                education: app.education,
+                skills: app.skills,
+                hasCv: app.hasCv,
               ),
             )
             .where((a) => _matchesStages(a) && _matchesSearch(a))
@@ -227,7 +235,7 @@ class _CompanyJobApplicantsTableViewScreenState
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       color: Theme.of(
                         context,
-                      ).colorScheme.onSurface.withValues(alpha: 0.7),
+                      ).colorScheme.onSurface.withOpacity(0.7),
                     ),
                   ),
                 );
@@ -293,7 +301,7 @@ class _ApplicantRow extends StatelessWidget {
         leading: CircleAvatar(
           backgroundColor: Theme.of(
             context,
-          ).colorScheme.primary.withValues(alpha: 0.2),
+          ).colorScheme.primary.withOpacity(0.2),
           backgroundImage: AssetImage(avatar),
         ),
         title: Text(applicant.fullName),
@@ -303,9 +311,9 @@ class _ApplicantRow extends StatelessWidget {
         trailing: Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           decoration: BoxDecoration(
-            color: chipColor.withValues(alpha: 0.15),
+            color: chipColor.withOpacity(0.15),
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: chipColor.withValues(alpha: 0.35)),
+            border: Border.all(color: chipColor.withOpacity(0.35)),
           ),
           child: Text(applicant.stage),
         ),

@@ -226,7 +226,7 @@ class _CompanyAnalyticsTab extends StatelessWidget {
               LinearProgressIndicator(
                 value: ratio.clamp(0, 1),
                 color: color,
-                backgroundColor: color.withValues(alpha: 0.2),
+                backgroundColor: color.withOpacity(0.2),
               ),
             ],
           ),

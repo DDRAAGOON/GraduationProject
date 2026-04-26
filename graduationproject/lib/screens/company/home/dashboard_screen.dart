@@ -148,13 +148,13 @@ class _StatsGrid extends StatelessWidget {
       _MetricCard(
         title: t.newCandidates,
         value: RecruitmentSyncStore.instance.applications.length.toString(),
-        color: cs.primary.withValues(alpha: 0.2),
+        color: cs.primary.withOpacity(0.2),
         onTap: onTapNewCandidates,
       ),
       _MetricCard(
         title: t.messagesReceived,
         value: RecruitmentSyncStore.instance.messages.length.toString(),
-        color: Colors.orange.withValues(alpha: 0.25),
+        color: Colors.orange.withOpacity(0.25),
         onTap: () => Navigator.of(context)
             .pushReplacementNamed(AppRoutes.companyMessagesList),
       ),
@@ -279,7 +279,7 @@ class _JobUpdateCard extends StatelessWidget {
                     color: Theme.of(context)
                         .colorScheme
                         .onSurface
-                        .withValues(alpha: 0.7),
+                        .withOpacity(0.7),
                   ),
                   overflow: TextOverflow.ellipsis,
                   maxLines: 2,
@@ -292,16 +292,22 @@ class _JobUpdateCard extends StatelessWidget {
                   children: [
                     _Chip(job.category),
                     _Chip(job.employmentType),
-                    if (job.appliedCount != null && job.capacity != null)
-                      Text(
-                        '${job.appliedCount} ${t.appliedOf} ${job.capacity}',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSurface
-                              .withValues(alpha: 0.7),
-                        ),
-                      ),
+                    Builder(
+                      builder: (context) {
+                        final count = RecruitmentSyncStore.instance.applications
+                            .where((a) => a.jobId == job.id)
+                            .length;
+                        return Text(
+                          '$count ${t.appliedOf} ${job.capacity ?? 10}',
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withOpacity(0.7),
+                          ),
+                        );
+                      },
+                    ),
                   ],
                 ),
             ]
@@ -313,32 +319,6 @@ class _JobUpdateCard extends StatelessWidget {
 
   }
 
-  Future<void> _confirmDelete(BuildContext context) async {
-    final t = AppLocalizations.of(context);
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(t.deleteJobTitle),
-        content: Text(t.deleteJobContent(job.title)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text(t.cancel),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text(t.delete),
-          ),
-        ],
-      ),
-    );
-    if (confirmed != true) return;
-    CompanyStore.instance.deleteJob(job.id);
-    if (context.mounted) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(t.jobDeleted)));
-    }
-  }
 }
 
 class _Chip extends StatelessWidget {
@@ -351,7 +331,7 @@ class _Chip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.15),
+        color: Theme.of(context).colorScheme.primary.withOpacity(0.15),
         borderRadius: BorderRadius.circular(14),
       ),
       child: Text(

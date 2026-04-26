@@ -184,7 +184,7 @@ class _CompanySignUpScreenState extends State<CompanySignUpScreen> {
                 dropdownDecoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                    color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+                    color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
                   ),
                 ),
                 onChanged: (phone) {
@@ -281,12 +281,12 @@ class _CompanySignUpScreenState extends State<CompanySignUpScreen> {
           const SizedBox(height: 18),
           Row(
             children: [
-              Expanded(child: Divider(color: Colors.white.withValues(alpha: 0.15))),
+              Expanded(child: Divider(color: Colors.white.withOpacity(0.15))),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 child: Text(t.orSignInWith),
               ),
-              Expanded(child: Divider(color: Colors.white.withValues(alpha: 0.15))),
+              Expanded(child: Divider(color: Colors.white.withOpacity(0.15))),
             ],
           ),
           const SizedBox(height: 14),
@@ -306,7 +306,7 @@ class _CompanySignUpScreenState extends State<CompanySignUpScreen> {
               Text(
                 t.alreadyRegistered,
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                 ),
               ),
               TextButton(

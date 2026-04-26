@@ -266,7 +266,7 @@ class _CompanyPostJobStep1InformationScreenState
                 label: Text(t.tr(en: '+ Add', ar: '+ إضافة'), style: const TextStyle(fontSize: 12)),
                 onPressed: _addSkill,
                 visualDensity: VisualDensity.compact,
-                backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                 side: BorderSide.none,
               ),
             ],
@@ -351,7 +351,7 @@ class _CompanyPostJobStep1InformationScreenState
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1)),
+                    border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -362,7 +362,7 @@ class _CompanyPostJobStep1InformationScreenState
                           : "${_deadline!.month.toString().padLeft(2, '0')}/${_deadline!.day.toString().padLeft(2, '0')}/${_deadline!.year}",
                         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                       ),
-                      Icon(Icons.calendar_month_outlined, size: 20, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
+                      Icon(Icons.calendar_month_outlined, size: 20, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5)),
                     ],
                   ),
                 ),
@@ -380,14 +380,14 @@ class _CompanyPostJobStep1InformationScreenState
 
   Widget _buildRadioChip(String label, String value) {
     final selected = _category == value;
-    final color = selected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1);
+    final color = selected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface.withOpacity(0.1);
     return InkWell(
       onTap: () => setState(() => _category = value),
       borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          color: selected ? color.withValues(alpha: 0.05) : Colors.transparent,
+          color: selected ? color.withOpacity(0.05) : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: color.withValues(alpha: selected ? 0.3 : 0.2)),
         ),
@@ -431,7 +431,7 @@ class _TypeChip extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     final color = selected
         ? cs.primary
-        : cs.onSurface.withValues(alpha: 0.12);
+        : cs.onSurface.withOpacity(0.12);
     
     return InkWell(
       onTap: onTap,
@@ -439,7 +439,7 @@ class _TypeChip extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
-          color: selected ? color.withValues(alpha: 0.15) : Colors.transparent,
+          color: selected ? color.withOpacity(0.15) : Colors.transparent,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(color: color.withValues(alpha: selected ? 0.3 : 0.5)),
         ),

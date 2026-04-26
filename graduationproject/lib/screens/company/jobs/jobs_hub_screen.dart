@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../app/router/app_router.dart';
 import '../../../shared/l10n/app_localizations.dart';
 import '../../../shared/state/company_store.dart';
+import '../../../shared/state/recruitment_sync_store.dart';
 import '../../../shared/widgets/app_scaffold.dart';
 import '../widgets/company_app_bar_actions.dart';
 import '../widgets/company_bottom_nav.dart';
@@ -44,7 +45,17 @@ class _CompanyJobsHubScreenState extends State<CompanyJobsHubScreen> {
                     margin: const EdgeInsets.only(bottom: 12),
                     child: ListTile(
                       title: Text(j.title),
-                      subtitle: Text('${j.companyName} • ${j.location}'),
+                      subtitle: Builder(
+                        builder: (context) {
+                          final count = RecruitmentSyncStore.instance.applications
+                              .where((a) => a.jobId == j.id)
+                              .length;
+                          return Text(
+                            '${j.companyName} • ${j.location}\n$count applicants',
+                          );
+                        },
+                      ),
+                      isThreeLine: true,
                       trailing: PopupMenuButton<String>(
                         onSelected: (value) async {
                           if (value == 'edit') {

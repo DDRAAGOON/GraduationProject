@@ -62,7 +62,7 @@ class _CompanyJobDetailsScreenState extends State<CompanyJobDetailsScreen> {
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Theme.of(
                     context,
-                  ).colorScheme.onSurface.withValues(alpha: 0.7),
+                  ).colorScheme.onSurface.withOpacity(0.7),
                 ),
               ),
               const SizedBox(height: 16),
@@ -97,7 +97,7 @@ class _CompanyJobDetailsScreenState extends State<CompanyJobDetailsScreen> {
               SectionTitle(t.benefits),
               const SizedBox(height: 10),
               if (job.benefits.isEmpty)
-                Text(t.notYet, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4)))
+                Text(t.notYet, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)))
               else
                 Wrap(
                   spacing: 8,
@@ -326,7 +326,7 @@ class _InfoRow extends StatelessWidget {
                   style: TextStyle(
                     color: Theme.of(
                       context,
-                    ).colorScheme.onSurface.withValues(alpha: 0.8),
+                    ).colorScheme.onSurface.withOpacity(0.8),
                   ),
                 ),
               ],
@@ -340,7 +340,7 @@ class _InfoRow extends StatelessWidget {
                     style: TextStyle(
                       color: Theme.of(
                         context,
-                      ).colorScheme.onSurface.withValues(alpha: 0.8),
+                      ).colorScheme.onSurface.withOpacity(0.8),
                     ),
                   ),
                 ),

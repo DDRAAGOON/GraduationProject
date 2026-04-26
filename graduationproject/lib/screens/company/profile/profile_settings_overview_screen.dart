@@ -154,7 +154,7 @@ class _CompanyProfileSettingsOverviewScreenState
           constraints: const BoxConstraints(minHeight: 56),
           decoration: BoxDecoration(
             border: Border.all(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2)),
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2)),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Wrap(
@@ -176,7 +176,7 @@ class _CompanyProfileSettingsOverviewScreenState
                 label: Text(t.tr(en: '+ Add', ar: '+ إضافة'), style: const TextStyle(fontSize: 12)),
                 onPressed: onAdd,
                 visualDensity: VisualDensity.compact,
-                backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                 side: BorderSide.none,
               ),
             ],
@@ -381,7 +381,7 @@ class _CompanyProfileSettingsOverviewScreenState
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
         border: Border.all(
-            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2)),
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2)),
         borderRadius: BorderRadius.circular(12),
       ),
       child: DropdownButtonHideUnderline(

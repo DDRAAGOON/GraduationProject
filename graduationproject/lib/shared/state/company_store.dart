@@ -1,6 +1,7 @@
 // [ChangeNotifier] holding company profile, jobs, and contacts.
 
 import 'package:flutter/foundation.dart';
+import 'package:graduationproject/shared/state/recruitment_sync_store.dart';
 
 import '../../constants/app_images.dart';
 import '../models/contact_entry.dart';
@@ -152,6 +153,12 @@ class CompanyStore extends ChangeNotifier {
       _jobs[index] = job;
     } else {
       _jobs.insert(0, job);
+      // Generate mock applicants for the new job to demonstrate the pipeline
+      RecruitmentSyncStore.instance.generateMockApplicants(
+        job.id,
+        job.title,
+        job.companyName,
+      );
     }
     notifyListeners();
   }

@@ -82,7 +82,7 @@ class _CompanyChatThreadCandidateV2ScreenState
                             style: TextStyle(
                               color: Theme.of(
                                 context,
-                              ).colorScheme.onSurface.withValues(alpha: 0.7),
+                              ).colorScheme.onSurface.withOpacity(0.7),
                             ),
                           ),
                         ],
@@ -144,8 +144,8 @@ class _ChatBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bg = bubble.fromMe
-        ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.25)
-        : Colors.white.withValues(alpha: 0.10);
+        ? Theme.of(context).colorScheme.primary.withOpacity(0.25)
+        : Colors.white.withOpacity(0.10);
     final align = bubble.fromMe ? AlignmentDirectional.centerEnd : AlignmentDirectional.centerStart;
     final maxBubbleWidth = MediaQuery.of(context).size.width * 0.72;
 

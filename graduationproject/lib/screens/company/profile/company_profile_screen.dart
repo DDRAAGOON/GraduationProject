@@ -50,7 +50,7 @@ class _CompanyCompanyProfileScreenState
               Divider(
                 height: 1,
                 thickness: 1,
-                color: Theme.of(context).dividerColor.withValues(alpha: 0.2),
+                color: Theme.of(context).dividerColor.withOpacity(0.2),
               ),
               const SizedBox(height: 16),
               SectionTitle(t.about),
@@ -63,7 +63,7 @@ class _CompanyCompanyProfileScreenState
                     : (_store.companyAboutEn.trim().isNotEmpty ? _store.companyAboutEn : t.notYet),
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: (_store.companyAboutAr.isEmpty && _store.companyAboutEn.isEmpty)
-                      ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4)
+                      ? Theme.of(context).colorScheme.onSurface.withOpacity(0.4)
                       : null,
                 ),
               ),
@@ -71,7 +71,7 @@ class _CompanyCompanyProfileScreenState
               SectionTitle(t.locationInfo),
               const SizedBox(height: 10),
               _store.locations.isEmpty
-                  ? Text(t.notYet, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4)))
+                  ? Text(t.notYet, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)))
                   : Wrap(
                       spacing: 8,
                       runSpacing: 8,
@@ -84,14 +84,14 @@ class _CompanyCompanyProfileScreenState
               SectionTitle(t.benefits),
               const SizedBox(height: 10),
               _store.benefits.isEmpty
-                  ? Text(t.notYet, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4)))
+                  ? Text(t.notYet, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)))
                   : Wrap(
                       spacing: 8,
                       runSpacing: 8,
                       children: _store.benefits.map((item) => Chip(
                         label: Text(item, style: const TextStyle(fontSize: 12)),
                         visualDensity: VisualDensity.compact,
-                        backgroundColor: Theme.of(context).colorScheme.secondaryContainer.withValues(alpha: 0.3),
+                        backgroundColor: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.3),
                       )).toList(),
                     ),
               const SizedBox(height: 16),
@@ -225,10 +225,10 @@ class _CompanyStatsBar extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     final labelColor = Theme.of(
       context,
-    ).colorScheme.onSurface.withValues(alpha: 0.65);
+    ).colorScheme.onSurface.withOpacity(0.65);
     final iconColor = Theme.of(
       context,
-    ).colorScheme.onSurface.withValues(alpha: 0.9);
+    ).colorScheme.onSurface.withOpacity(0.9);
 
     Widget item({
       required IconData icon,
@@ -242,7 +242,7 @@ class _CompanyStatsBar extends StatelessWidget {
               width: 34,
               height: 34,
               decoration: BoxDecoration(
-                color: cs.primary.withValues(alpha: 0.10),
+                color: cs.primary.withOpacity(0.10),
                 shape: BoxShape.circle,
               ),
               child: Icon(icon, color: iconColor, size: 18),

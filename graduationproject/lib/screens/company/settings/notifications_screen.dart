@@ -21,13 +21,13 @@ class CompanyNotificationsScreen extends StatelessWidget {
                   Icon(
                     Icons.notifications_off_outlined,
                     size: 80,
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12),
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.12),
                   ),
                   const SizedBox(height: 16),
                   Text(
                     t.tr(en: "No notifications yet", ar: "لا توجد إشعارات بعد"),
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38),
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.38),
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),

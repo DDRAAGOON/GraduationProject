@@ -178,7 +178,7 @@ class _CompanyPostJobStep2DescriptionScreenState
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
+                  color: Theme.of(context).colorScheme.outline.withOpacity(0.1),
                 ),
               ),
               child: TextField(
@@ -201,10 +201,10 @@ class _CompanyPostJobStep2DescriptionScreenState
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.05),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                 style: BorderStyle.solid,
               ),
             ),

@@ -31,10 +31,18 @@ class CompanyJobApplicantsPipelineViewScreen extends StatelessWidget {
           role: app.jobTitle,
           rating: 4.5,
           stage: app.status,
-          email: 'candidate@jobito.com',
-          phone: '+20 123 456 789',
-          location: 'Egypt',
+          email: app.email ?? 'candidate@jobito.com',
+          phone: app.phone ?? '+20 123 456 789',
+          location: app.location ?? 'Egypt',
           appliedDateLabel: 'Today',
+          gender: app.gender,
+          birthDate: app.birthDate,
+          languages: app.languages,
+          about: app.about,
+          experienceYears: app.experienceYears,
+          education: app.education,
+          skills: app.skills,
+          hasCv: app.hasCv,
         )).toList();
 
         final inReview = all
@@ -112,7 +120,7 @@ class _StageColumn extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Theme.of(
                         context,
-                      ).colorScheme.primary.withValues(alpha: 0.15),
+                      ).colorScheme.primary.withOpacity(0.15),
                       borderRadius: BorderRadius.circular(14),
                     ),
                     child: Text('${applicants.length}'),
@@ -128,7 +136,7 @@ class _StageColumn extends StatelessWidget {
                     style: TextStyle(
                       color: Theme.of(
                         context,
-                      ).colorScheme.onSurface.withValues(alpha: 0.7),
+                      ).colorScheme.onSurface.withOpacity(0.7),
                     ),
                   ),
                 )

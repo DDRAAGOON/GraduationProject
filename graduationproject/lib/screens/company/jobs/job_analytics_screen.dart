@@ -184,7 +184,7 @@ class _ApplicationsLineChart extends StatelessWidget {
                     drawVerticalLine: false,
                     horizontalInterval: 5,
                     getDrawingHorizontalLine: (_) => FlLine(
-                      color: Colors.black.withValues(alpha: 0.06),
+                      color: Colors.black.withOpacity(0.06),
                       strokeWidth: 1,
                     ),
                   ),
@@ -192,7 +192,7 @@ class _ApplicationsLineChart extends StatelessWidget {
                     touchTooltipData: LineTouchTooltipData(
                       getTooltipColor: (_) => Colors.white,
                       tooltipBorder: BorderSide(
-                        color: Colors.black.withValues(alpha: 0.08),
+                        color: Colors.black.withOpacity(0.08),
                       ),
                       getTooltipItems: (spots) => spots
                           .map(
@@ -255,7 +255,7 @@ class _ApplicationsLineChart extends StatelessWidget {
                       ),
                       belowBarData: BarAreaData(
                         show: true,
-                        color: chartColor.withValues(alpha: 0.12),
+                        color: chartColor.withOpacity(0.12),
                       ),
                     ),
                   ],

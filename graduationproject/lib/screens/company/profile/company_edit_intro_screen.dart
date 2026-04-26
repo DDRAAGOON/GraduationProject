@@ -180,7 +180,7 @@ class _CompanyEditIntroScreenState extends State<CompanyEditIntroScreen>
                         color: Theme.of(context)
                             .colorScheme
                             .onSurface
-                            .withValues(alpha: 0.75),
+                            .withOpacity(0.75),
                       ),
                 ),
                 const SizedBox(height: 12),

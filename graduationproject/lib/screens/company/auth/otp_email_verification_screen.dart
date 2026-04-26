@@ -96,7 +96,7 @@ class _CompanyOtpEmailVerificationScreenState
           Text(
             '${t.otpSubtitle}\n${widget.email}',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                 ),
           ),
           const SizedBox(height: 22),
@@ -125,7 +125,7 @@ class _CompanyOtpEmailVerificationScreenState
               Text(
                 t.didntReceiveCode,
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                 ),
               ),
               TextButton(onPressed: _resend, child: Text(t.resend)),
