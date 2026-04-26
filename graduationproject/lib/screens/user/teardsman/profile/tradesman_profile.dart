@@ -163,7 +163,7 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
                       const SizedBox(height: 20),
                       
                       // Social Links Section
-                      if (store.socialLinks.isNotEmpty) ...[
+                      if (store.socialLinks.isNotEmpty && !_isEditing) ...[
                         Text(
                           t.socialLinks,
                           style: const TextStyle(color: Colors.black87, fontSize: 18, fontWeight: FontWeight.bold),
