@@ -73,7 +73,7 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
               const SizedBox(height: 25),
               _buildSearchSection(),
               const SizedBox(height: 15),
-              Text("${t.tr(en: "Popular", ar: "شائع")} : UI Designer, UX Researcher, Android, Admin", 
+              Text("${t.tr(en: "Popular", ar: "شائع")} : UI Designer, UX Researcher, Android", 
                 style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 11)),
               const SizedBox(height: 25),
 
