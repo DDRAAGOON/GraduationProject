@@ -1,6 +1,7 @@
 // Styled text field with label, hint, and inline validation text.
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class AppTextField extends StatelessWidget {
   const AppTextField({
@@ -15,6 +16,7 @@ class AppTextField extends StatelessWidget {
     this.onChanged,
     this.maxLines = 1,
     this.prefixIcon,
+    this.inputFormatters,
   });
 
   final String label;
@@ -27,6 +29,7 @@ class AppTextField extends StatelessWidget {
   final ValueChanged<String>? onChanged;
   final int maxLines;
   final IconData? prefixIcon;
+  final List<TextInputFormatter>? inputFormatters;
 
   @override
   Widget build(BuildContext context) {
@@ -41,6 +44,7 @@ class AppTextField extends StatelessWidget {
           obscureText: obscureText,
           onChanged: onChanged,
           maxLines: maxLines,
+          inputFormatters: inputFormatters,
           decoration: InputDecoration(
             hintText: hint,
             errorText: validatorText,

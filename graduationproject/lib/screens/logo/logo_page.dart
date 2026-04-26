@@ -90,25 +90,8 @@ class LogoPage extends StatelessWidget {
                   fallbackAr: 'شركة',
                 ),
                 color: cs.secondary,
-                onTap: () async {
-                  if (await SessionManager.isCompanyLoggedIn()) {
-                    final data = await SessionManager.getCompanyData();
-                    CompanyStore.instance.setRegistrationData(
-                      companyName: data['name'],
-                      customProfileImage: data['photo'],
-                    );
-                    if (context.mounted) {
-                      Navigator.of(context).pushNamedAndRemoveUntil(
-                        AppRoutes.companyDashboard,
-                        (route) => false,
-                      );
-                    }
-                  } else {
-                    if (context.mounted) {
-                      Navigator.of(context).pushNamed(AppRoutes.companyOnboardingNew);
-                    }
-                  }
-                },
+                onTap: () =>
+                    Navigator.of(context).pushNamed(AppRoutes.companySignInNew),
               ),
               SizedBox(height: size.height * 0.012),
               TextButton.icon(

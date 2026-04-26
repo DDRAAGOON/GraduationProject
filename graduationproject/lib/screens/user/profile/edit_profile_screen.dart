@@ -22,6 +22,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   late TextEditingController _emailController;
   late TextEditingController _dobController;
   late TextEditingController _portfolioController;
+  late TextEditingController _minSalaryController;
+  late TextEditingController _maxSalaryController;
+  late String _salaryFrequency;
 
   @override
   void initState() {
@@ -32,7 +35,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _phoneController = TextEditingController(text: "");
     _emailController = TextEditingController(text: "");
     _dobController = TextEditingController(text: "");
-    _portfolioController = TextEditingController(text: "");
+    _portfolioController = TextEditingController(text: UserProfileData.portfolioUrl);
+    _minSalaryController = TextEditingController(
+      text: UserProfileData.minSalary > 0 ? UserProfileData.minSalary.toInt().toString() : "",
+    );
+    _maxSalaryController = TextEditingController(
+      text: UserProfileData.maxSalary > 0 ? UserProfileData.maxSalary.toInt().toString() : "",
+    );
+    _salaryFrequency = UserProfileData.salaryFrequency;
   }
 
   @override
@@ -43,13 +53,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _emailController.dispose();
     _dobController.dispose();
     _portfolioController.dispose();
+    _minSalaryController.dispose();
+    _maxSalaryController.dispose();
     super.dispose();
   }
 
   void _saveData() {
     setState(() {
-      UserProfileData.aboutMe = _aboutMeController.text;
       UserProfileData.fullName = _fullNameController.text;
+      UserProfileData.minSalary = double.tryParse(_minSalaryController.text.replaceAll(',', '')) ?? 0;
+      UserProfileData.maxSalary = double.tryParse(_maxSalaryController.text.replaceAll(',', '')) ?? 0;
+      UserProfileData.salaryFrequency = _salaryFrequency;
     });
     Navigator.pop(context);
   }
@@ -191,6 +205,36 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             _buildTextField(_portfolioController, t.tr(en: "Link to your portfolio URL", ar: "رابط لمحفظتك")),
             Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 40),
 
+            // Salary Expectations
+            Text(t.tr(en: "Salary Expectations", ar: "الراتب (بالجنيه)"), style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            Text(t.tr(en: "Please specify your expected salary range.", ar: "يرجى تحديد الراتب المتوقع."), style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 12)),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildTextField(_minSalaryController, t.tr(en: "Min", ar: "الحد الأدنى"), keyboardType: TextInputType.number),
+                ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  child: Text("-"),
+                ),
+                Expanded(
+                  child: _buildTextField(_maxSalaryController, t.tr(en: "Max", ar: "الحد الأقصى"), keyboardType: TextInputType.number),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            SegmentedButton<String>(
+              segments: [
+                ButtonSegment(value: "Monthly", label: Text(t.tr(en: "Monthly", ar: "شهرياً"))),
+                ButtonSegment(value: "Yearly", label: Text(t.tr(en: "Yearly", ar: "سنوياً"))),
+              ],
+              selected: {_salaryFrequency},
+              onSelectionChanged: (set) => setState(() => _salaryFrequency = set.first),
+            ),
+            Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 40),
+
             // Account Type
             Text(t.tr(en: "Account Type", ar: "نوع الحساب"), style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
@@ -244,10 +288,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String hint, {int maxLines = 1}) {
+  Widget _buildTextField(TextEditingController controller, String hint, {int maxLines = 1, TextInputType? keyboardType}) {
     return TextField(
       controller: controller,
       maxLines: maxLines,
+      keyboardType: keyboardType,
       style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
       decoration: InputDecoration(
         hintText: hint,

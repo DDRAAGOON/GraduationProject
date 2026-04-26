@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';
 import '../../../shared/l10n/app_localizations.dart';
+import '../../../shared/services/session_manager.dart';
 import '../../../shared/widgets/app_scaffold.dart';
 
 class CompanySettingsScreen extends StatelessWidget {
@@ -24,6 +25,12 @@ class CompanySettingsScreen extends StatelessWidget {
             title: t.profileSettings,
             icon: Icons.person_outline,
             onTap: () => Navigator.of(context).pushNamed(AppRoutes.companyProfileOverview),
+          ),
+          const SizedBox(height: 8),
+          _SettingTile(
+            title: t.accountSecurity,
+            icon: Icons.security_outlined,
+            onTap: () => Navigator.of(context).pushNamed(AppRoutes.companyAccountSecurity),
           ),
           const SizedBox(height: 8),
           _SettingTile(
@@ -52,9 +59,12 @@ class CompanySettingsScreen extends StatelessWidget {
                   ),
                 ),
                 TextButton.icon(
-                  onPressed: () {
-                    // TODO: Implement actual logout
-                    Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.companySignIn, (route) => false);
+                  onPressed: () async {
+                    await SessionManager.logoutCompany();
+                    if (context.mounted) {
+                      Navigator.of(context).pushNamedAndRemoveUntil(
+                          AppRoutes.roleSelection, (route) => false);
+                    }
                   },
                   icon: const Icon(Icons.logout),
                   label: Text(
@@ -90,7 +100,7 @@ class _SettingTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 0,
-      color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+      color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: ListTile(
         leading: Icon(icon, color: Theme.of(context).colorScheme.primary),

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../app/router/app_router.dart';
+import '../../../constants/app_images.dart';
 import '../../../shared/l10n/app_localizations.dart';
 
 class AnalysisScreen extends StatelessWidget {
@@ -17,13 +19,25 @@ class AnalysisScreen extends StatelessWidget {
             children: [
               // Top Bar Icons
               Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _buildTopIconButton(context, Icons.add),
-                  const SizedBox(width: 12),
-                  _buildTopIconButton(context, Icons.notifications_none, hasBadge: true),
-                  const SizedBox(width: 12),
-                  _buildTopIconButton(context, Icons.settings_outlined),
+                  InkWell(
+                    onTap: () => Navigator.of(context).pushNamed(AppRoutes.userEditProfile),
+                    borderRadius: BorderRadius.circular(20),
+                    child: const CircleAvatar(
+                      radius: 20,
+                      backgroundImage: AssetImage(AppImages.companyProfile1),
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      _buildTopIconButton(context, Icons.add),
+                      const SizedBox(width: 12),
+                      _buildTopIconButton(context, Icons.notifications_none, hasBadge: false),
+                      const SizedBox(width: 12),
+                      _buildTopIconButton(context, Icons.settings_outlined),
+                    ],
+                  ),
                 ],
               ),
               const SizedBox(height: 30),

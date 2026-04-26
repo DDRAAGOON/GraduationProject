@@ -120,7 +120,7 @@ class _CompanyProfileSettingsSocialLinksScreenState
             style: TextStyle(
               color: Theme.of(
                 context,
-              ).colorScheme.onSurface.withValues(alpha: 0.7),
+              ).colorScheme.onSurface.withOpacity(0.7),
             ),
           ),
           const SizedBox(height: 16),

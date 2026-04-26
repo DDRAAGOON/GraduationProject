@@ -58,6 +58,7 @@ class RecruitmentSyncService {
     String companyName = 'Jobito Labs',
     String type = 'Full-time',
     List<String> tags = const <String>['General'],
+    List<String> niceToHaves = const <String>[],
   }) async {
     try {
       final auth = await _client.login(
@@ -84,6 +85,7 @@ class RecruitmentSyncService {
           salaryRange: salaryRange,
           type: type,
           tags: tags,
+          niceToHaves: niceToHaves,
           publishedAt: DateTime.now(), category: '',
         ),
       );

@@ -176,16 +176,20 @@ class AppLocalizations {
 
   // ── Jobs ───────────────────────────────────────────────────────────────────
   String get postJob => userTr('jobs.postJob', fallbackEn: 'Post a Job', fallbackAr: 'نشر وظيفة');
+  String get editJob => userTr('jobs.editJob', fallbackEn: 'Edit Job', fallbackAr: 'تعديل الوظيفة');
   String get step1Label => userTr('jobs.step1Label', fallbackEn: 'Step 1/3 • Job Information', fallbackAr: 'الخطوة 1/3 • معلومات الوظيفة');
   String get step2Label => userTr('jobs.step2Label', fallbackEn: 'Step 2/3 • Job Description', fallbackAr: 'الخطوة 2/3 • وصف الوظيفة');
+  String get step3Label => userTr('jobs.step3Label', fallbackEn: 'Step 3/3 • Perks & Benefits', fallbackAr: 'الخطوة 3/3 • المزايا والفوائد');
+  String get qualifications => userTr('jobs.qualifications', fallbackEn: 'Qualifications', fallbackAr: 'المؤهلات');
   String get step1Short => userTr('jobs.step1Short', fallbackEn: 'Step 1/3', fallbackAr: 'الخطوة 1/3');
   String get step2Short => userTr('jobs.step2Short', fallbackEn: 'Step 2/3', fallbackAr: 'الخطوة 2/3');
+  String get step3Short => userTr('jobs.step3Short', fallbackEn: 'Step 3/3', fallbackAr: 'الخطوة 3/3');
   String get jobTitle => userTr('jobs.jobTitle', fallbackEn: 'Job title', fallbackAr: 'مسمى الوظيفة');
   String get jobTitleHint => userTr('jobs.jobTitleHint', fallbackEn: 'e.g. Software Engineer', fallbackAr: 'مثال: مهندس برمجيات');
   String get typeOfEmployment => userTr('jobs.typeOfEmployment', fallbackEn: 'Type of Employment', fallbackAr: 'نوع التوظيف');
   String get salary => userTr('jobs.salary', fallbackEn: 'Salary', fallbackAr: 'الراتب');
   String get requiredSkills => userTr('jobs.requiredSkills', fallbackEn: 'Required skills', fallbackAr: 'المهارات المطلوبة');
-  String get jobDescriptions => userTr('jobs.jobDescriptions', fallbackEn: 'Job Descriptions', fallbackAr: 'وصف الوظيفة');
+  String get jobDescriptions => userTr('jobs.jobDescriptions', fallbackEn: 'Job Description', fallbackAr: 'وصف الوظيفة');
   String get addDescription => userTr('jobs.addDescription', fallbackEn: 'Add the description of the job...', fallbackAr: 'أضف وصف الوظيفة...');
   String get whatWeProvide => userTr('jobs.whatWeProvide', fallbackEn: 'What we provide (optional)', fallbackAr: 'ما نقدمه (اختياري)');
   String get addPreferredQual => userTr('jobs.addPreferredQual', fallbackEn: 'Add preferred candidate qualifications', fallbackAr: 'أضف مؤهلات المرشح المفضلة');
@@ -265,7 +269,7 @@ class AppLocalizations {
   String get declined => userTr('candidates.declined', fallbackEn: 'Declined', fallbackAr: 'مرفوض');
   String get candidateHiredMsg => userTr('candidates.candidateHiredMsg', fallbackEn: 'Candidate has been hired', fallbackAr: 'تم توظيف المرشح');
   String get candidateDeclinedMsg => userTr('candidates.candidateDeclinedMsg', fallbackEn: 'Candidate has been declined', fallbackAr: 'تم رفض المرشح');
-  String get hiringProgress => userTr('candidates.hiringProgress', fallbackEn: 'Hiring Progress', fallbackAr: 'تقدم التوظيف');
+  String get hiringProgress => userTr('candidates.hiringProgress', fallbackEn: 'Hiring Pipeline', fallbackAr: 'مسار التوظيف');
   String get currentStage => userTr('candidates.currentStage', fallbackEn: 'Current Stage', fallbackAr: 'المرحلة الحالية');
   String get moveToNextStep => userTr('candidates.moveToNextStep', fallbackEn: 'Move to Next Step', fallbackAr: 'الانتقال للخطوة التالية');
   String get notes => userTr('candidates.notes', fallbackEn: 'Notes', fallbackAr: 'الملاحظات');
@@ -304,6 +308,31 @@ class AppLocalizations {
   String get quickActions => userTr('candidates.quickActions', fallbackEn: 'Quick Actions', fallbackAr: 'الإجراءات السريعة');
   String get resumeLabel => userTr('candidates.resumeLabel', fallbackEn: 'Resume', fallbackAr: 'السيرة الذاتية');
   String get lastUsed => userTr('candidates.lastUsed', fallbackEn: 'Last Used', fallbackAr: 'آخر استخدام');
+
+  String get technical => tr(en: 'Technical', ar: 'تقني');
+  String get nonTechnical => tr(en: 'Non-Technical', ar: 'غير تقني');
+  String get benefits => tr(en: 'Benefits', ar: 'المزايا');
+  String get addBenefit => tr(en: 'Add Benefit', ar: 'إضافة ميزة');
+
+  String get accountSecurity => tr(en: 'Account Security', ar: 'أمان الحساب');
+  String get linkGoogleAccount => tr(en: 'Link Google Account', ar: 'ربط حساب جوجل');
+  String get linkGoogleDesc => tr(en: 'Link your account to enable one-tap login.', ar: 'اربط حسابك لتفعيل تسجيل الدخول بضغطة واحدة.');
+  String get accountNotLinked => tr(en: 'Account not linked yet', ar: 'الحساب غير مرتبط بعد');
+  String get continueWithGoogle => tr(en: 'Continue with Google', ar: 'المتابعة باستخدام جوجل');
+  String get currentPassword => tr(en: 'Current Password', ar: 'كلمة المرور الحالية');
+  String get newPasswordLabel => tr(en: 'New Password', ar: 'كلمة المرور الجديدة');
+  String get confirmNewPassword => tr(en: 'Confirm New Password', ar: 'تأكيد كلمة المرور الجديدة');
+  String get hiredStatusUpdate => tr(en: 'Applicant status updated to:', ar: 'تم تحديث حالة المتقدم إلى:');
+  String get newChat => tr(en: 'New Chat', ar: 'محادثة جديدة');
+  String get searchUsersHint => tr(en: 'Search users by name or email...', ar: 'ابحث عن مستخدمين بالاسم أو الإيميل...');
+  String get startNewConversation => tr(en: 'Starting a new conversation...', ar: 'بدء محادثة جديدة...');
+  String get applicantAcceptedTitle => tr(en: 'Applicant Accepted!', ar: 'تم قبول المتقدم بنجاح!');
+  String hiredCongratulation(String name) => isAr ? 'تهانينا! لقد قمت بتوظيف $name.' : 'Congratulations! You have hired $name.';
+  String get evaluationReminder => tr(
+    en: 'Reminder: We will notify you to evaluate the employee and write feedback about their performance in 2 months.',
+    ar: 'تنبيه: سنقوم بتذكيرك لتقييم الموظف وكتابة تعليق عن أدائه بعد شهرين من الآن.',
+  );
+  String hiredProgressMsg(int count, int total) => isAr ? '$count تم قبولهم من أصل $total' : '$count hired of $total capacity';
 
   // ── Unknown route ──────────────────────────────────────────────────────────
   String get unknownRoute => userTr('common.unknownRoute', fallbackEn: 'Unknown route', fallbackAr: 'مسار غير معروف');

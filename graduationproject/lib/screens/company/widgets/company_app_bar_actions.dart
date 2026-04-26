@@ -16,26 +16,36 @@ class CompanyProfileLeading extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     final profileImage = CompanyStore.instance.companyProfileImage;
-    final isAsset = profileImage.startsWith('assets/');
 
     return IconButton(
       tooltip: t.profile,
       onPressed: () =>
           Navigator.of(context).pushNamed(AppRoutes.companyProfileOverview),
       icon: ClipOval(
-        child: isAsset
-            ? Image.asset(
-                profileImage,
-                width: 40,
-                height: 40,
-                fit: BoxFit.cover,
+        child: profileImage == null
+            ? Container(
+                width: 32,
+                height: 32,
+                color: Theme.of(context).colorScheme.surfaceBright,
+                child: Icon(
+                  Icons.business,
+                  color: Theme.of(context).colorScheme.primary,
+                  size: 20,
+                ),
               )
-            : Image.file(
-                File(profileImage),
-                width: 40,
-                height: 40,
-                fit: BoxFit.cover,
-              ),
+            : profileImage.startsWith('assets/')
+                ? Image.asset(
+                    profileImage,
+                    width: 32,
+                    height: 32,
+                    fit: BoxFit.cover,
+                  )
+                : Image.file(
+                    File(profileImage),
+                    width: 32,
+                    height: 32,
+                    fit: BoxFit.cover,
+                  ),
       ),
     );
   }

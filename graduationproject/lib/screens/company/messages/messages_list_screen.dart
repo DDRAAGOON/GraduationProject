@@ -27,10 +27,14 @@ class CompanyMessagesListScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         itemBuilder: (_, i) => _ThreadTile(thread: threads[i], avatarIndex: i),
         separatorBuilder: (_, i) =>
-            Divider(color: Colors.white.withValues(alpha: 0.12), height: 1),
+            Divider(color: Theme.of(context).colorScheme.outlineVariant.withOpacity(0.5), height: 1),
         itemCount: threads.length,
       ),
       bottomNavigationBar: const CompanyBottomNav(current: CompanyTab.chat),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => Navigator.of(context).pushNamed(AppRoutes.companyNewChat),
+        child: const Icon(Icons.add),
+      ),
     );
   }
 }
@@ -58,7 +62,7 @@ class _ThreadTile extends StatelessWidget {
     return ListTile(
       leading: CircleAvatar(
         radius: 20,
-        backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+        backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
         backgroundImage: AssetImage(path),
       ),
       title: Text(thread.title),
@@ -70,7 +74,7 @@ class _ThreadTile extends StatelessWidget {
       trailing: Text(
         t.isAr ? thread.lastTimeLabelAr : thread.lastTimeLabelEn,
         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
             ),
       ),
       onTap: () => Navigator.of(context).pushNamed(AppRoutes.companyChatThread, arguments: thread),

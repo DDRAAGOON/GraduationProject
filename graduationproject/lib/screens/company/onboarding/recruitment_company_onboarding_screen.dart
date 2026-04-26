@@ -55,7 +55,7 @@ class _RecruitmentCompanyOnboardingScreenState
                         CircleAvatar(
                           radius: 56,
                           backgroundColor:
-                              Theme.of(context).colorScheme.secondary.withValues(alpha: 0.2),
+                              Theme.of(context).colorScheme.secondary.withOpacity(0.2),
                           child: Icon(slide.icon, size: 56),
                         ),
                         const SizedBox(height: 20),
@@ -91,7 +91,7 @@ class _RecruitmentCompanyOnboardingScreenState
                       decoration: BoxDecoration(
                         color: i == _index
                             ? Theme.of(context).colorScheme.secondary
-                            : Theme.of(context).colorScheme.secondary.withValues(alpha: 0.25),
+                            : Theme.of(context).colorScheme.secondary.withOpacity(0.25),
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),

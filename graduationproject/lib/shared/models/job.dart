@@ -1,3 +1,15 @@
+final class JobBenefit {
+  JobBenefit({required this.title, required this.description});
+  final String title;
+  final String description;
+
+  Map<String, String> toMap() => {'title': title, 'description': description};
+  factory JobBenefit.fromMap(Map<String, dynamic> map) => JobBenefit(
+    title: map['title'] ?? '',
+    description: map['description'] ?? '',
+  );
+}
+
 /// The [Job] model represents a job posting created by a company.
 /// It holds critical details used across the jobs hub and analytics screens.
 final class Job {
@@ -13,8 +25,12 @@ final class Job {
     this.description = '',
     this.responsibilities = const [],
     this.niceToHaves = const [],
+    this.qualifications = const [],
+    this.benefits = const [],
+    this.department = '',
     this.appliedCount,
     this.capacity,
+    this.status = 'Open',
   });
 
   final String id;
@@ -23,12 +39,16 @@ final class Job {
   final String location;
   final String employmentType;
   final String category;
+  final String department;
   final String salaryRange;
   final String description;
   final List<String> responsibilities;
   final List<String> niceToHaves;
+  final List<String> qualifications;
+  final List<JobBenefit> benefits;
   final int? appliedCount;
   final int? capacity;
+  final String status;
 
   /// Creates a copy of the current [Job] while allowing specific fields to be updated.
   Job copyWith({
@@ -38,12 +58,16 @@ final class Job {
     String? location,
     String? employmentType,
     String? category,
+    String? department,
     String? salaryRange,
     String? description,
     List<String>? responsibilities,
     List<String>? niceToHaves,
+    List<String>? qualifications,
+    List<JobBenefit>? benefits,
     int? appliedCount,
     int? capacity,
+    String? status,
   }) {
     return Job(
       id: id ?? this.id,
@@ -52,12 +76,16 @@ final class Job {
       location: location ?? this.location,
       employmentType: employmentType ?? this.employmentType,
       category: category ?? this.category,
+      department: department ?? this.department,
       salaryRange: salaryRange ?? this.salaryRange,
       description: description ?? this.description,
       responsibilities: responsibilities ?? this.responsibilities,
       niceToHaves: niceToHaves ?? this.niceToHaves,
+      qualifications: qualifications ?? this.qualifications,
+      benefits: benefits ?? this.benefits,
       appliedCount: appliedCount ?? this.appliedCount,
       capacity: capacity ?? this.capacity,
+      status: status ?? this.status,
     );
   }
 
@@ -66,7 +94,7 @@ final class Job {
     id: 'job_1',
     title: 'Social Media Assistant',
     companyName: 'Nomad',
-    location: 'Paris, France',
+    location: '',
     employmentType: 'Full-Time',
     category: 'Marketing',
     salaryRange: r'$15k-$85k USD',
@@ -86,31 +114,5 @@ final class Job {
     capacity: 10,
   );
 
-  static List<Job> mockList() => [
-    mock(),
-    Job(
-      id: 'job_2',
-      title: 'Brand Designer',
-      companyName: 'Dropbox',
-      location: 'San Francisco, USA',
-      employmentType: 'Full-Time',
-      category: 'Design',
-      salaryRange: r'$12k-$60k USD',
-      description: 'Design and evolve product brand systems across channels.',
-      appliedCount: 5,
-      capacity: 10,
-    ),
-    Job(
-      id: 'job_3',
-      title: 'Interactive Developer',
-      companyName: 'Terraform',
-      location: 'Hamburg, Germany',
-      employmentType: 'Full-Time',
-      category: 'Marketing',
-      salaryRange: r'$10k-$55k USD',
-      description: 'Build engaging interactive web experiences and campaigns.',
-      appliedCount: 8,
-      capacity: 10,
-    ),
-  ];
+  static List<Job> mockList() => [];
 }

@@ -13,6 +13,7 @@ final class ApplicantDto {
     required this.phone,
     required this.location,
     required this.appliedDateLabel,
+    required this.jobId,
   });
 
   final String id;
@@ -24,6 +25,7 @@ final class ApplicantDto {
   final String phone;
   final String location;
   final String appliedDateLabel;
+  final String jobId;
 
   factory ApplicantDto.fromJson(Map<String, dynamic> json) {
     double asDouble(dynamic value) {
@@ -43,6 +45,7 @@ final class ApplicantDto {
       phone: (json['phone'] ?? '').toString(),
       location: (json['location'] ?? '').toString(),
       appliedDateLabel: (json['appliedDateLabel'] ?? '').toString(),
+      jobId: (json['jobId'] ?? 'job_1').toString(),
     );
   }
 
@@ -57,6 +60,7 @@ final class ApplicantDto {
       phone: phone,
       location: location,
       appliedDateLabel: appliedDateLabel,
+      jobId: jobId,
     );
   }
 }

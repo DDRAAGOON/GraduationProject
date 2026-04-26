@@ -1,6 +1,7 @@
 // Public-style company profile with tabs and store data.
 
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../shared/l10n/app_localizations.dart';
 import '../../../shared/state/company_store.dart';
@@ -43,12 +44,13 @@ class _CompanyCompanyProfileScreenState
                 countriesCount: _store.locations.length,
                 employee: _store.employee,
                 industry: _store.industry,
+                category: _store.category,
               ),
               const SizedBox(height: 14),
               Divider(
                 height: 1,
                 thickness: 1,
-                color: Theme.of(context).dividerColor.withValues(alpha: 0.2),
+                color: Theme.of(context).dividerColor.withOpacity(0.2),
               ),
               const SizedBox(height: 16),
               SectionTitle(t.about),
@@ -61,21 +63,23 @@ class _CompanyCompanyProfileScreenState
                     : (_store.companyAboutEn.trim().isNotEmpty ? _store.companyAboutEn : t.notYet),
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: (_store.companyAboutAr.isEmpty && _store.companyAboutEn.isEmpty)
-                      ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4)
+                      ? Theme.of(context).colorScheme.onSurface.withOpacity(0.4)
                       : null,
                 ),
               ),
               const SizedBox(height: 16),
-              SectionTitle(t.locationInfo),
+              const SizedBox(height: 16),
+              SectionTitle(t.benefits),
               const SizedBox(height: 10),
-              _store.locations.isEmpty
-                  ? Text(t.notYet, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4)))
+              _store.benefits.isEmpty
+                  ? Text(t.notYet, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)))
                   : Wrap(
                       spacing: 8,
                       runSpacing: 8,
-                      children: _store.locations.map((item) => Chip(
+                      children: _store.benefits.map((item) => Chip(
                         label: Text(item, style: const TextStyle(fontSize: 12)),
                         visualDensity: VisualDensity.compact,
+                        backgroundColor: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.3),
                       )).toList(),
                     ),
               const SizedBox(height: 16),
@@ -83,31 +87,32 @@ class _CompanyCompanyProfileScreenState
                 SectionTitle(t.tr(en: 'Registration Info', ar: 'بيانات التسجيل')),
                 const SizedBox(height: 10),
                 if (_store.commercialRegister.isNotEmpty)
-                  _EditableLinkTile(
+                  _RegistrationInfoTile(
                     icon: Icons.assignment_outlined,
                     title: t.tr(en: 'Commercial Register', ar: 'السجل التجاري'),
                     value: _store.commercialRegister,
                   ),
                 if (_store.nationalNumber.isNotEmpty)
-                  _EditableLinkTile(
+                  _RegistrationInfoTile(
                     icon: Icons.badge_outlined,
                     title: t.tr(en: 'National Number', ar: 'الرقم القومي'),
                     value: _store.nationalNumber,
                   ),
                 const SizedBox(height: 16),
               ],
-              SectionTitle(t.contactSectionLabel),
-              const SizedBox(height: 10),
-              if (_store.contacts.isEmpty)
-                Text(t.notYet, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4)))
-              else
+              if (_store.contacts.isNotEmpty) ...[
+                SectionTitle(t.contactSectionLabel),
+                const SizedBox(height: 10),
                 ..._store.contacts.asMap().entries.map(
                   (entry) => _EditableLinkTile(
-                    icon: Icons.link_outlined,
+                    icon: entry.value.name.toLowerCase().contains('email') 
+                        ? Icons.email_outlined 
+                        : Icons.link_outlined,
                     title: entry.value.name,
                     value: entry.value.value,
                   ),
                 ),
+              ],
             ],
           );
         },
@@ -130,6 +135,21 @@ class _EditableLinkTile extends StatelessWidget {
   final String title;
   final String value;
 
+  Future<void> _launch() async {
+    String urlStr = value;
+    if (!urlStr.contains('://') && !urlStr.startsWith('mailto:')) {
+      if (urlStr.contains('@')) {
+        urlStr = 'mailto:$urlStr';
+      } else {
+        urlStr = 'https://$urlStr';
+      }
+    }
+    final uri = Uri.tryParse(urlStr);
+    if (uri != null) {
+      await launchUrl(uri);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -138,7 +158,31 @@ class _EditableLinkTile extends StatelessWidget {
         leading: Icon(icon),
         title: Text(title),
         subtitle: Text(value),
-        onTap: () {},
+        onTap: _launch,
+      ),
+    );
+  }
+}
+
+class _RegistrationInfoTile extends StatelessWidget {
+  const _RegistrationInfoTile({
+    required this.icon,
+    required this.title,
+    required this.value,
+  });
+
+  final IconData icon;
+  final String title;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 10),
+      child: ListTile(
+        leading: Icon(icon),
+        title: Text(title),
+        subtitle: Text(value),
       ),
     );
   }
@@ -152,6 +196,7 @@ class _CompanyStatsBar extends StatelessWidget {
     required this.countriesCount,
     required this.employee,
     required this.industry,
+    required this.category,
   });
 
   final int foundedDay;
@@ -160,6 +205,7 @@ class _CompanyStatsBar extends StatelessWidget {
   final int countriesCount;
   final String employee;
   final String industry;
+  final String category;
 
   @override
   Widget build(BuildContext context) {
@@ -167,10 +213,10 @@ class _CompanyStatsBar extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     final labelColor = Theme.of(
       context,
-    ).colorScheme.onSurface.withValues(alpha: 0.65);
+    ).colorScheme.onSurface.withOpacity(0.65);
     final iconColor = Theme.of(
       context,
-    ).colorScheme.onSurface.withValues(alpha: 0.9);
+    ).colorScheme.onSurface.withOpacity(0.9);
 
     Widget item({
       required IconData icon,
@@ -184,7 +230,7 @@ class _CompanyStatsBar extends StatelessWidget {
               width: 34,
               height: 34,
               decoration: BoxDecoration(
-                color: cs.primary.withValues(alpha: 0.10),
+                color: cs.primary.withOpacity(0.10),
                 shape: BoxShape.circle,
               ),
               child: Icon(icon, color: iconColor, size: 18),
@@ -242,17 +288,6 @@ class _CompanyStatsBar extends StatelessWidget {
                           ar: '$foundedYear/$foundedMonth/$foundedDay'.replaceAll('0', '٠').replaceAll('1', '١').replaceAll('2', '٢').replaceAll('3', '٣').replaceAll('4', '٤').replaceAll('5', '٥').replaceAll('6', '٦').replaceAll('7', '٧').replaceAll('8', '٨').replaceAll('9', '٩')
                         ),
                 ),
-                const SizedBox(width: 14),
-                item(
-                  icon: Icons.location_on_outlined,
-                  label: t.locationInfo,
-                  value: countriesCount == 0
-                      ? t.notYet
-                      : t.tr(
-                          en: '$countriesCount countries', 
-                          ar: '${countriesCount.toString().replaceAll('0', '٠').replaceAll('1', '١').replaceAll('2', '٢').replaceAll('3', '٣').replaceAll('4', '٤').replaceAll('5', '٥').replaceAll('6', '٦').replaceAll('7', '٧').replaceAll('8', '٨').replaceAll('9', '٩')} دولة'
-                        ),
-                ),
               ],
             ),
             const SizedBox(height: 14),
@@ -265,9 +300,9 @@ class _CompanyStatsBar extends StatelessWidget {
                 ),
                 const SizedBox(width: 14),
                 item(
-                  icon: Icons.account_balance_outlined,
-                  label: t.industry,
-                  value: industry.isEmpty ? t.notYet : industry,
+                  icon: Icons.category_outlined,
+                  label: t.categoryLabel,
+                  value: category.isEmpty ? t.notYet : (category == 'Technical' ? t.technical : t.nonTechnical),
                 ),
               ],
             ),

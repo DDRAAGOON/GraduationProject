@@ -12,6 +12,15 @@ final class Applicant {
     required this.phone,
     required this.location,
     required this.appliedDateLabel,
+    this.gender,
+    this.birthDate,
+    this.languages = const [],
+    this.about,
+    this.experienceYears = 0,
+    this.education,
+    this.skills = const [],
+    this.hasCv = false,
+    required this.jobId,
   });
 
   final String id;
@@ -24,43 +33,39 @@ final class Applicant {
   final String location;
   final String appliedDateLabel;
 
+  // Additional fields from screenshot
+  final String? gender;
+  final String? birthDate;
+  final List<String> languages;
+  final String? about;
+  final int experienceYears;
+  final String? education;
+  final List<String> skills;
+  final bool hasCv;
+  final String jobId;
+
   /// Generates a static mock [Applicant] to populate the UI templates.
   static Applicant mock() => Applicant(
         id: 'app_1',
-        fullName: 'Jerome Bell',
-        role: 'Product Designer',
-        rating: 4.0,
-        stage: 'Interview',
-        email: 'jeromebell45@email.com',
-        phone: '+44 1245 572 135',
-        location: 'Manchester, UK',
-        appliedDateLabel: '2 days ago',
+        fullName: 'Dragon',
+        role: 'متخصص',
+        rating: 4.5,
+        stage: 'In Review',
+        email: 'mahmoudessam936@gmail.com',
+        phone: '+20 123 456 789',
+        location: 'غير محدد',
+        appliedDateLabel: 'Today',
+        gender: 'لم يحدد',
+        birthDate: 'غير متوفر',
+        languages: ['العربية'],
+        about: 'لا يوجد نبذة تعريفية متاحة لهذا المتقدم.',
+        experienceYears: 0,
+        education: 'غير متوفر',
+        skills: [],
+        hasCv: false,
+        jobId: 'job_1',
       );
 
-  static List<Applicant> mockList() => [
-        mock(),
-        Applicant(
-          id: 'app_2',
-          fullName: 'Jake Gyll',
-          role: 'Product Designer',
-          rating: 0.0,
-          stage: 'In Review',
-          email: 'jake@email.com',
-          phone: '+44 1245 111 111',
-          location: 'Paris, France',
-          appliedDateLabel: '13 July, 2021',
-        ),
-        Applicant(
-          id: 'app_3',
-          fullName: 'Jenny Wilson',
-          role: 'Brand Designer',
-          rating: 4.8,
-          stage: 'Hired',
-          email: 'jenny@email.com',
-          phone: '+44 1245 222 222',
-          location: 'Berlin, Germany',
-          appliedDateLabel: '9 July, 2021',
-        ),
-      ];
+  static List<Applicant> mockList() => [];
 }
 

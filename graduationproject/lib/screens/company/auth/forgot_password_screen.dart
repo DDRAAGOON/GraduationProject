@@ -76,7 +76,7 @@ class _CompanyForgotPasswordScreenState
               ar: 'أدخل بريدك الإلكتروني لاستلام رمز التأكيد\nلإعادة تعيين كلمة المرور.',
             ),
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                 ),
           ),
           const SizedBox(height: 22),
@@ -131,7 +131,7 @@ class _CompanyForgotPasswordScreenState
                 dropdownDecoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                    color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+                    color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
                   ),
                 ),
                 onChanged: (phone) {

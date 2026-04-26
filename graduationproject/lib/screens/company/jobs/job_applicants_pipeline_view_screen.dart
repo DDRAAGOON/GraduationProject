@@ -3,9 +3,9 @@
 import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';
-import '../../../shared/mock/mock_data.dart';
 import '../../../shared/models/applicant.dart';
 import '../../../shared/models/job.dart';
+import '../../../shared/state/recruitment_sync_store.dart';
 import '../../../shared/widgets/app_scaffold.dart';
 import '../widgets/company_app_bar_actions.dart';
 import '../widgets/company_bottom_nav.dart';
@@ -18,18 +18,45 @@ class CompanyJobApplicantsPipelineViewScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final all = MockData.applicants();
-    final inReview = all
-        .where((a) => a.stage.toLowerCase().contains('review'))
-        .toList();
-    final shortlisted = all
-        .where((a) => a.stage.toLowerCase().contains('short'))
-        .toList();
-    final hired = all
-        .where((a) => a.stage.toLowerCase().contains('hire'))
-        .toList();
+    return ListenableBuilder(
+      listenable: RecruitmentSyncStore.instance,
+      builder: (context, _) {
+        final allApps = RecruitmentSyncStore.instance.applications
+            .where((app) => app.jobId == job.id || job.id == 'fallback')
+            .toList();
 
-    return AppScaffold(
+        final all = allApps.map((app) => Applicant(
+          id: app.id,
+          fullName: app.userName,
+          role: app.jobTitle,
+          rating: 4.5,
+          stage: app.status,
+          email: app.email ?? 'candidate@jobito.com',
+          phone: app.phone ?? '+20 123 456 789',
+          location: app.location ?? 'Egypt',
+          appliedDateLabel: 'Today',
+          gender: app.gender,
+          birthDate: app.birthDate,
+          languages: app.languages,
+          about: app.about,
+          experienceYears: app.experienceYears,
+          education: app.education,
+          skills: app.skills,
+          hasCv: app.hasCv,
+          jobId: app.jobId,
+        )).toList();
+
+        final inReview = all
+            .where((a) => a.stage.toLowerCase().contains('review'))
+            .toList();
+        final shortlisted = all
+            .where((a) => a.stage.toLowerCase().contains('short'))
+            .toList();
+        final hired = all
+            .where((a) => a.stage.toLowerCase().contains('hire'))
+            .toList();
+
+        return AppScaffold(
       title: job.title,
       showBack: false,
       leading: const CompanyProfileLeading(),
@@ -52,6 +79,8 @@ class CompanyJobApplicantsPipelineViewScreen extends StatelessWidget {
       bottomNavigationBar: const CompanyBottomNav(
         current: CompanyTab.applicants,
       ),
+    );
+      },
     );
   }
 }
@@ -92,7 +121,7 @@ class _StageColumn extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Theme.of(
                         context,
-                      ).colorScheme.primary.withValues(alpha: 0.15),
+                      ).colorScheme.primary.withOpacity(0.15),
                       borderRadius: BorderRadius.circular(14),
                     ),
                     child: Text('${applicants.length}'),
@@ -108,7 +137,7 @@ class _StageColumn extends StatelessWidget {
                     style: TextStyle(
                       color: Theme.of(
                         context,
-                      ).colorScheme.onSurface.withValues(alpha: 0.7),
+                      ).colorScheme.onSurface.withOpacity(0.7),
                     ),
                   ),
                 )

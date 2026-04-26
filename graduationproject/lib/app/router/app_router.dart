@@ -22,11 +22,13 @@ import '../../screens/company/jobs/job_applicants_table_view_screen.dart';
 import '../../screens/company/jobs/job_details_screen.dart';
 import '../../screens/company/jobs/jobs_hub_screen.dart';
 import '../../screens/company/jobs/post_job/post_job_step1_information_screen.dart';
-import '../../screens/company/jobs/post_job/post_job_step2_description_screen.dart';
+import '../../screens/company/jobs/post_job/post_job_step2_requirements_screen.dart';
+import '../../screens/company/jobs/post_job/post_job_step3_benefits_screen.dart';
 import '../../screens/company/jobs/recruitment_post_job_screen.dart';
 import '../../screens/company/messages/chat_thread_candidate_v2_screen.dart';
 import '../../screens/company/messages/chat_thread_screen.dart';
 import '../../screens/company/messages/messages_list_screen.dart';
+import '../../screens/company/messages/new_chat_screen.dart';
 import '../../screens/company/onboarding/onboarding_future_starts_screen.dart';
 import '../../screens/company/onboarding/onboarding_next_job_closer_screen.dart';
 import '../../screens/company/onboarding/onboarding_smart_search_screen.dart';
@@ -36,6 +38,7 @@ import '../../screens/company/profile/company_profile_screen.dart';
 import '../../screens/company/profile/profile_settings_overview_screen.dart';
 import '../../screens/company/profile/profile_settings_social_links_screen.dart';
 import '../../screens/company/profile/recruitment_company_profile_screen.dart';
+import '../../screens/company/settings/account_security_screen.dart';
 import '../../screens/company/settings/appearance_settings_dark_screen.dart';
 import '../../screens/company/settings/appearance_settings_light_screen.dart';
 import '../../screens/company/settings/notification_setting_screen.dart';
@@ -49,6 +52,7 @@ import '../../screens/user/jobs/recruitment_job_details_screen.dart';
 import '../../screens/user/auth/recruitment_user_sign_in_screen.dart';
 import '../../screens/user/onboarding/onboarding.dart';
 import '../../screens/user/onboarding/recruitment_user_onboarding_screen.dart';
+import '../../screens/user/profile/edit_profile_screen.dart';
 import '../../screens/user/settings/recruitment_user_settings_screen.dart';
 import '../../screens/user/home/recruitment_user_shell_screen.dart';
 import '../../shared/state/recruitment_sync_store.dart';
@@ -72,6 +76,7 @@ final class AppRoutes {
   static const userOnboardingNew = '/user/onboarding/new';
   static const userSettingsNew = '/user/settings/new';
   static const userSignInNew = '/user/auth/sign_in_new';
+  static const userEditProfile = '/user/profile/edit';
   static const adminPanel = '/admin/panel';
 
   // --- Company Onboarding Routes ---
@@ -101,6 +106,7 @@ final class AppRoutes {
   static const companyMessagesList = '/company/messages/list';
   static const companyChatThread = '/company/messages/thread';
   static const companyChatThreadCandidateV2 = '/company/messages/thread_v2';
+  static const companyNewChat = '/company/messages/new_chat';
 
   static const companyJobsHub = '/company/jobs';
   static const companyApplicantsTable = '/company/jobs/applicants_table';
@@ -109,6 +115,8 @@ final class AppRoutes {
   static const companyJobAnalytics = '/company/jobs/analytics';
   static const companyPostJobStep1 = '/company/jobs/post/step1';
   static const companyPostJobStep2 = '/company/jobs/post/step2';
+  static const companyPostJobStep3 = '/company/jobs/post/step3';
+  static const companyJobApplicants = '/company/job-applicants';
 
   static const companyApplicantDetailsProfile = '/company/candidates/profile';
   static const companyApplicantDetailsResume = '/company/candidates/resume';
@@ -126,6 +134,7 @@ final class AppRoutes {
   static const companyNotificationSetting = '/company/settings/notification';
   static const companyNotifications = '/company/notifications';
   static const companyHelpCenter = '/company/help/center';
+  static const companyAccountSecurity = '/company/settings/account_security';
 }
 
 /// The [AppRouter] is responsible for generating route transitions and providing
@@ -187,6 +196,8 @@ final class AppRouter {
         page = const RecruitmentUserSettingsScreen();
       case AppRoutes.userSignInNew:
         page = const RecruitmentUserSignInScreen();
+      case AppRoutes.userEditProfile:
+        page = const EditProfileScreen();
       case AppRoutes.adminPanel:
         page = const AdminPanelScreen();
       case AppRoutes.companyOnboardingSmartSearch:
@@ -250,6 +261,8 @@ final class AppRouter {
         page = CompanyChatThreadCandidateV2Screen(
           thread: args is MessageThread ? args : MessageThread.mock(),
         );
+      case AppRoutes.companyNewChat:
+        page = const CompanyNewChatScreen();
       case AppRoutes.companyJobsHub:
         page = const CompanyJobsHubScreen();
       case AppRoutes.companyApplicantsTable:
@@ -268,6 +281,8 @@ final class AppRouter {
         page = const CompanyPostJobStep1InformationScreen();
       case AppRoutes.companyPostJobStep2:
         page = const CompanyPostJobStep2DescriptionScreen();
+      case AppRoutes.companyPostJobStep3:
+        page = const CompanyPostJobStep3BenefitsScreen();
       case AppRoutes.companyApplicantDetailsProfile:
         page = CompanyApplicantDetailsProfileScreen(
           applicant: args is Applicant ? args : Applicant.mock(),
@@ -304,6 +319,8 @@ final class AppRouter {
         page = const CompanyNotificationsScreen();
       case AppRoutes.companyHelpCenter:
         page = const CompanyHelpCenterScreen();
+      case AppRoutes.companyAccountSecurity:
+        page = const CompanyAccountSecurityScreen();
       default:
         page = const _UnknownRouteScreen();
     }

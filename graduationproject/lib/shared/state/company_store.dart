@@ -1,6 +1,7 @@
 // [ChangeNotifier] holding company profile, jobs, and contacts.
 
 import 'package:flutter/foundation.dart';
+import 'package:graduationproject/shared/state/recruitment_sync_store.dart';
 
 import '../../constants/app_images.dart';
 import '../models/contact_entry.dart';
@@ -31,6 +32,10 @@ class CompanyStore extends ChangeNotifier {
   int _foundedMonth = 0;
   int _foundedYear = 0;
 
+  // --- Category and Benefits ---
+  String _category = '';
+  List<String> _benefits = [];
+
   // --- Registration Data ---
   String _commercialRegister = '';
   String _nationalNumber = '';
@@ -52,10 +57,13 @@ class CompanyStore extends ChangeNotifier {
   int get foundedMonth => _foundedMonth;
   int get foundedYear => _foundedYear;
 
+  String get category => _category;
+  List<String> get benefits => List.unmodifiable(_benefits);
+
   String get commercialRegister => _commercialRegister;
   String get nationalNumber => _nationalNumber;
 
-  String get companyProfileImage => _customProfileImage ?? AppImages.companyProfileImage;
+  String? get companyProfileImage => _customProfileImage;
 
   String _aboutEn = '';
   String _aboutAr = '';
@@ -99,6 +107,10 @@ class CompanyStore extends ChangeNotifier {
     required int foundedDay,
     required int foundedMonth,
     required int foundedYear,
+    required String category,
+    required List<String> benefits,
+    required String commercialRegister,
+    required String nationalNumber,
   }) {
     _companyName = name;
     _website = website;
@@ -111,6 +123,10 @@ class CompanyStore extends ChangeNotifier {
     _foundedDay = foundedDay;
     _foundedMonth = foundedMonth;
     _foundedYear = foundedYear;
+    _category = category;
+    _benefits = List.from(benefits);
+    _commercialRegister = commercialRegister;
+    _nationalNumber = nationalNumber;
     notifyListeners();
   }
 
@@ -120,12 +136,7 @@ class CompanyStore extends ChangeNotifier {
   final List<Job> _jobs = [...Job.mockList()];
   
   /// Holds contact details like social links and emails.
-  final List<ContactEntry> _contacts = [
-    const ContactEntry(name: 'Twitter', value: 'twitter.com/Nomad'),
-    const ContactEntry(name: 'Facebook', value: 'facebook.com/NomadHQ'),
-    const ContactEntry(name: 'LinkedIn', value: 'linkedin.com/company/nomad'),
-    const ContactEntry(name: 'Email', value: 'nomad@gmail.com'),
-  ];
+  final List<ContactEntry> _contacts = [];
 
   List<Job> get jobs => List<Job>.unmodifiable(_jobs);
   List<ContactEntry> get contacts => List<ContactEntry>.unmodifiable(_contacts);
@@ -142,6 +153,12 @@ class CompanyStore extends ChangeNotifier {
       _jobs[index] = job;
     } else {
       _jobs.insert(0, job);
+      // Generate mock applicants for the new job to demonstrate the pipeline
+      RecruitmentSyncStore.instance.generateMockApplicants(
+        job.id,
+        job.title,
+        job.companyName,
+      );
     }
     notifyListeners();
   }

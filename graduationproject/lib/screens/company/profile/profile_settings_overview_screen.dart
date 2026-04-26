@@ -86,6 +86,10 @@ class _CompanyProfileSettingsOverviewScreenState
       foundedDay: _selectedDay,
       foundedMonth: _selectedMonth,
       foundedYear: _selectedYear,
+      commercialRegister: store.commercialRegister,
+      nationalNumber: store.nationalNumber,
+      benefits: store.benefits,
+      category: store.category,
     );
 
     // Persist company name change
@@ -150,7 +154,7 @@ class _CompanyProfileSettingsOverviewScreenState
           constraints: const BoxConstraints(minHeight: 56),
           decoration: BoxDecoration(
             border: Border.all(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2)),
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2)),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Wrap(
@@ -172,7 +176,7 @@ class _CompanyProfileSettingsOverviewScreenState
                 label: Text(t.tr(en: '+ Add', ar: '+ إضافة'), style: const TextStyle(fontSize: 12)),
                 onPressed: onAdd,
                 visualDensity: VisualDensity.compact,
-                backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                 side: BorderSide.none,
               ),
             ],
@@ -224,21 +228,31 @@ class _CompanyProfileSettingsOverviewScreenState
                     animation: CompanyStore.instance,
                     builder: (context, _) {
                       final profileImage = CompanyStore.instance.companyProfileImage;
-                      final isAsset = profileImage.startsWith('assets/');
                       return ClipOval(
-                        child: isAsset
-                            ? Image.asset(
-                                profileImage,
+                        child: profileImage == null
+                            ? Container(
                                 width: 44,
                                 height: 44,
-                                fit: BoxFit.cover,
+                                color: Theme.of(context).colorScheme.surfaceBright,
+                                child: Icon(
+                                  Icons.business,
+                                  color: Theme.of(context).colorScheme.primary,
+                                  size: 24,
+                                ),
                               )
-                            : Image.file(
-                                File(profileImage),
-                                width: 44,
-                                height: 44,
-                                fit: BoxFit.cover,
-                              ),
+                            : profileImage.startsWith('assets/')
+                                ? Image.asset(
+                                    profileImage,
+                                    width: 44,
+                                    height: 44,
+                                    fit: BoxFit.cover,
+                                  )
+                                : Image.file(
+                                    File(profileImage),
+                                    width: 44,
+                                    height: 44,
+                                    fit: BoxFit.cover,
+                                  ),
                       );
                     },
                   ),
@@ -293,8 +307,10 @@ class _CompanyProfileSettingsOverviewScreenState
                 flex: 1,
                 child: _buildDropdown<int>(
                   value: _selectedDay,
-                  items: List.generate(31, (i) => i + 1),
-                  labelBuilder: (v) => t.tr(
+                  items: _selectedDay == 0 
+                      ? [0, ...List.generate(31, (i) => i + 1)] 
+                      : List.generate(31, (i) => i + 1),
+                  labelBuilder: (v) => v == 0 ? (t.isAr ? 'اليوم' : 'Day') : t.tr(
                     en: v.toString(), 
                     ar: v.toString().replaceAll('0', '٠').replaceAll('1', '١').replaceAll('2', '٢').replaceAll('3', '٣').replaceAll('4', '٤').replaceAll('5', '٥').replaceAll('6', '٦').replaceAll('7', '٧').replaceAll('8', '٨').replaceAll('9', '٩')
                   ),
@@ -306,11 +322,16 @@ class _CompanyProfileSettingsOverviewScreenState
                 flex: 1,
                 child: _buildDropdown<int>(
                   value: _selectedMonth,
-                  items: List.generate(12, (i) => i + 1),
-                  labelBuilder: (v) => t.isAr ? [
-                    'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
-                    'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
-                  ][v - 1] : months[v - 1],
+                  items: _selectedMonth == 0 
+                      ? [0, ...List.generate(12, (i) => i + 1)] 
+                      : List.generate(12, (i) => i + 1),
+                  labelBuilder: (v) {
+                    if (v == 0) return t.isAr ? 'الشهر' : 'Month';
+                    return t.isAr ? [
+                      'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
+                      'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
+                    ][v - 1] : months[v - 1];
+                  },
                   onChanged: (v) => setState(() => _selectedMonth = v!),
                 ),
               ),
@@ -319,8 +340,10 @@ class _CompanyProfileSettingsOverviewScreenState
                 flex: 1,
                 child: _buildDropdown<int>(
                   value: _selectedYear,
-                  items: List.generate(50, (i) => 2024 - i),
-                  labelBuilder: (v) => t.tr(
+                  items: _selectedYear == 0 
+                      ? [0, ...List.generate(50, (i) => 2024 - i)] 
+                      : List.generate(50, (i) => 2024 - i),
+                  labelBuilder: (v) => v == 0 ? (t.isAr ? 'السنة' : 'Year') : t.tr(
                     en: v.toString(), 
                     ar: v.toString().replaceAll('0', '٠').replaceAll('1', '١').replaceAll('2', '٢').replaceAll('3', '٣').replaceAll('4', '٤').replaceAll('5', '٥').replaceAll('6', '٦').replaceAll('7', '٧').replaceAll('8', '٨').replaceAll('9', '٩')
                   ),
@@ -358,7 +381,7 @@ class _CompanyProfileSettingsOverviewScreenState
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
         border: Border.all(
-            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2)),
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2)),
         borderRadius: BorderRadius.circular(12),
       ),
       child: DropdownButtonHideUnderline(

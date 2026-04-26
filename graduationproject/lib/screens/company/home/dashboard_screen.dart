@@ -8,6 +8,7 @@ import '../../../app/router/app_router.dart';
 import '../../../shared/l10n/app_localizations.dart';
 import '../../../shared/models/job.dart';
 import '../../../shared/state/company_store.dart';
+import '../../../shared/state/recruitment_sync_store.dart';
 import '../../../shared/widgets/app_scaffold.dart';
 import '../../../shared/widgets/section_title.dart';
 import '../widgets/company_bottom_nav.dart';
@@ -18,27 +19,41 @@ class CompanyDashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final companyStore = CompanyStore.instance;
-    return AnimatedBuilder(
-      animation: companyStore,
+    return ListenableBuilder(
+      listenable: Listenable.merge([companyStore, RecruitmentSyncStore.instance]),
       builder: (context, _) {
         return AppScaffold(
           titleWidget: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              ClipOval(
-                child: companyStore.companyProfileImage.startsWith('assets/')
-                    ? Image.asset(
-                        companyStore.companyProfileImage,
+              InkWell(
+                onTap: () => Navigator.of(context).pushNamed(AppRoutes.companyProfileOverview),
+                borderRadius: BorderRadius.circular(20),
+                child: ClipOval(
+                  child: companyStore.companyProfileImage == null
+                    ? Container(
                         width: 40,
                         height: 40,
-                        fit: BoxFit.cover,
+                        color: Theme.of(context).colorScheme.surfaceBright,
+                        child: Icon(
+                          Icons.business,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
                       )
-                    : Image.file(
-                        File(companyStore.companyProfileImage),
-                        width: 40,
-                        height: 40,
-                        fit: BoxFit.cover,
-                      ),
+                    : companyStore.companyProfileImage!.startsWith('assets/')
+                        ? Image.asset(
+                            companyStore.companyProfileImage!,
+                            width: 40,
+                            height: 40,
+                            fit: BoxFit.cover,
+                          )
+                        : Image.file(
+                            File(companyStore.companyProfileImage!),
+                            width: 40,
+                            height: 40,
+                            fit: BoxFit.cover,
+                          ),
+                ),
               ),
               const SizedBox(width: 10),
               Flexible(
@@ -74,8 +89,7 @@ class CompanyDashboardScreen extends StatelessWidget {
                         onTapNewCandidates: () =>
                             Navigator.of(context).pushNamed(
                               AppRoutes.companyApplicantsTable,
-                              arguments:
-                              jobs.isNotEmpty ? jobs.first : Job.mock(),
+                              arguments: jobs.isNotEmpty ? jobs.first : Job.mock(),
                             ),
                       ),
                       const SizedBox(height: 18),
@@ -133,14 +147,17 @@ class _StatsGrid extends StatelessWidget {
     final cards = [
       _MetricCard(
         title: t.newCandidates,
-        value: t.tr(en: '76', ar: '٧٦'),
-        color: cs.primary.withValues(alpha: 0.2),
+        value: RecruitmentSyncStore.instance.applications
+            .where((app) => CompanyStore.instance.jobs.any((j) => j.id == app.jobId))
+            .length
+            .toString(),
+        color: cs.primary.withOpacity(0.2),
         onTap: onTapNewCandidates,
       ),
       _MetricCard(
         title: t.messagesReceived,
-        value: t.tr(en: '24', ar: '٢٤'),
-        color: Colors.orange.withValues(alpha: 0.25),
+        value: RecruitmentSyncStore.instance.messages.length.toString(),
+        color: Colors.orange.withOpacity(0.25),
         onTap: () => Navigator.of(context)
             .pushReplacementNamed(AppRoutes.companyMessagesList),
       ),
@@ -234,6 +251,9 @@ class _JobUpdateCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
+    final syncStore = RecruitmentSyncStore.instance;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: InkWell(
@@ -241,75 +261,82 @@ class _JobUpdateCard extends StatelessWidget {
             .pushNamed(AppRoutes.companyJobDetails, arguments: job),
         borderRadius: BorderRadius.circular(18),
         child: Card(
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+            side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant.withOpacity(0.5)),
+          ),
           child: Padding(
-            padding: const EdgeInsets.all(14),
+            padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        job.title,
-                        style: Theme.of(context).textTheme.titleMedium,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                      ),
-                    ),
-                    IconButton(
-                      tooltip: t.edit,
-                      constraints: const BoxConstraints(
-                        minWidth: 36,
-                        minHeight: 36,
-                      ),
-                      padding: EdgeInsets.zero,
-                      onPressed: () => Navigator.of(context)
-                          .pushNamed(AppRoutes.companyJobDetails, arguments: job),
-                      icon: const Icon(Icons.edit_outlined, size: 20),
-                    ),
-                    IconButton(
-                      tooltip: t.delete,
-                      constraints: const BoxConstraints(
-                        minWidth: 36,
-                        minHeight: 36,
-                      ),
-                      padding: EdgeInsets.zero,
-                      onPressed: () => _confirmDelete(context),
-                      icon: const Icon(Icons.delete_outline, size: 20),
-                    ),
-                  ],
+                Text(
+                  job.title,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                  overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '${job.companyName} • ${job.location} • ${job.employmentType}',
+                  '${job.companyName} • ${job.employmentType}',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withValues(alpha: 0.7),
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                   ),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 2,
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 16),
                 Wrap(
                   spacing: 8,
-                  runSpacing: 6,
-                  alignment: WrapAlignment.spaceBetween,
+                  runSpacing: 8,
                   children: [
                     _Chip(job.category),
                     _Chip(job.employmentType),
-                    if (job.appliedCount != null && job.capacity != null)
-                      Text(
-                        '${job.appliedCount} ${t.appliedOf} ${job.capacity}',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSurface
-                              .withValues(alpha: 0.7),
-                        ),
-                      ),
                   ],
+                ),
+                const SizedBox(height: 20),
+                ListenableBuilder(
+                  listenable: syncStore,
+                  builder: (context, _) {
+                    final hiredCount = syncStore.applications
+                        .where((a) => a.jobId == job.id && a.status.toLowerCase().contains('hire'))
+                        .length;
+                    final capacity = job.capacity ?? 10;
+                    final progress = (hiredCount / capacity).clamp(0.0, 1.0);
+
+                    // Auto-close logic (Reactive)
+                    if (hiredCount >= capacity && job.status == 'Open') {
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        CompanyStore.instance.saveJob(job.copyWith(status: 'Closed'));
+                      });
+                    }
+
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(4),
+                          child: LinearProgressIndicator(
+                            value: progress,
+                            backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                            color: const Color(0xFF00D2B4), // Keeping the green progress bar as requested
+                            minHeight: 6,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        RichText(
+                          text: TextSpan(
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                            ),
+                            children: [
+                              TextSpan(
+                                text: t.hiredProgressMsg(hiredCount, capacity),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
               ],
             ),
@@ -318,51 +345,32 @@ class _JobUpdateCard extends StatelessWidget {
       ),
     );
   }
-
-  Future<void> _confirmDelete(BuildContext context) async {
-    final t = AppLocalizations.of(context);
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(t.deleteJobTitle),
-        content: Text(t.deleteJobContent(job.title)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text(t.cancel),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text(t.delete),
-          ),
-        ],
-      ),
-    );
-    if (confirmed != true) return;
-    CompanyStore.instance.deleteJob(job.id);
-    if (context.mounted) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(t.jobDeleted)));
-    }
-  }
 }
 
 class _Chip extends StatelessWidget {
-  const _Chip(this.text);
+  const _Chip(this.text, {this.isDark = false});
 
   final String text;
+  final bool isDark;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.15),
+        color: isDark 
+            ? Colors.white.withOpacity(0.08)
+            : Theme.of(context).colorScheme.primary.withOpacity(0.15),
         borderRadius: BorderRadius.circular(14),
+        border: isDark 
+            ? Border.all(color: Colors.white.withOpacity(0.1))
+            : null,
       ),
       child: Text(
         text,
-        style: Theme.of(context).textTheme.labelSmall,
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+          color: isDark ? Colors.white : null,
+        ),
         overflow: TextOverflow.ellipsis,
       ),
     );

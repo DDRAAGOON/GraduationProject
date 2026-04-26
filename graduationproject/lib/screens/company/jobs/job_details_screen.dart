@@ -39,16 +39,6 @@ class _CompanyJobDetailsScreenState extends State<CompanyJobDetailsScreen> {
       showBack: true,
       actions: [
         IconButton(
-          tooltip: t.edit,
-          onPressed: () => _editJob(context, job),
-          icon: const Icon(Icons.edit_outlined),
-        ),
-        IconButton(
-          tooltip: t.deleteJobTooltip,
-          onPressed: () => _deleteJob(job),
-          icon: const Icon(Icons.delete_outline),
-        ),
-        IconButton(
           onPressed: () => Navigator.of(
             context,
           ).pushNamed(AppRoutes.companyApplicantsTable, arguments: job),
@@ -68,11 +58,11 @@ class _CompanyJobDetailsScreenState extends State<CompanyJobDetailsScreen> {
             padding: const EdgeInsets.all(16),
             children: [
               Text(
-                '${job.companyName} • ${job.location} • ${job.employmentType}',
+                '${job.companyName} • ${job.employmentType}',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Theme.of(
                     context,
-                  ).colorScheme.onSurface.withValues(alpha: 0.7),
+                  ).colorScheme.onSurface.withOpacity(0.7),
                 ),
               ),
               const SizedBox(height: 16),
@@ -99,6 +89,25 @@ class _CompanyJobDetailsScreenState extends State<CompanyJobDetailsScreen> {
               SectionTitle(t.niceToHavesSection),
               const SizedBox(height: 10),
               _Bullets(items: job.niceToHaves),
+              const SizedBox(height: 16),
+              SectionTitle(t.qualifications),
+              const SizedBox(height: 10),
+              _Bullets(items: job.qualifications),
+              const SizedBox(height: 16),
+              SectionTitle(t.benefits),
+              const SizedBox(height: 10),
+              if (job.benefits.isEmpty)
+                Text(t.notYet, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)))
+              else
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: job.benefits.map((b) => Chip(
+                    label: Text(b.title),
+                    avatar: Icon(Icons.check_circle_outline, size: 16, color: Theme.of(context).colorScheme.primary),
+                    visualDensity: VisualDensity.compact,
+                  )).toList(),
+                ),
               const SizedBox(height: 16),
               SectionTitle(t.aboutThisRole),
               const SizedBox(height: 10),
@@ -172,82 +181,10 @@ class _CompanyJobDetailsScreenState extends State<CompanyJobDetailsScreen> {
   }
 
   Future<void> _editJob(BuildContext context, Job job) async {
-    final t = AppLocalizations.of(context);
-    final title = TextEditingController(text: job.title);
-    final location = TextEditingController(text: job.location);
-    final employmentType = TextEditingController(text: job.employmentType);
-    final category = TextEditingController(text: job.category);
-    final salaryRange = TextEditingController(text: job.salaryRange);
-    final description = TextEditingController(text: job.description);
-
-    final saved = await showModalBottomSheet<bool>(
-      context: context,
-      isScrollControlled: true,
-      showDragHandle: true,
-      builder: (ctx) {
-        final bottomInset = MediaQuery.of(ctx).viewInsets.bottom;
-        return Padding(
-          padding: EdgeInsets.fromLTRB(16, 8, 16, 16 + bottomInset),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(t.editJobTitle, style: Theme.of(ctx).textTheme.titleLarge),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: title,
-                  decoration: InputDecoration(labelText: t.titleLabel),
-                ),
-                const SizedBox(height: 10),
-                TextField(
-                  controller: location,
-                  decoration: InputDecoration(labelText: t.locationLabel),
-                ),
-                const SizedBox(height: 10),
-                TextField(
-                  controller: employmentType,
-                  decoration: InputDecoration(labelText: t.employmentTypeLabel),
-                ),
-                const SizedBox(height: 10),
-                TextField(
-                  controller: category,
-                  decoration: InputDecoration(labelText: t.categoryLabel),
-                ),
-                const SizedBox(height: 10),
-                TextField(
-                  controller: salaryRange,
-                  decoration: InputDecoration(labelText: t.salaryRangeLabel),
-                ),
-                const SizedBox(height: 10),
-                TextField(
-                  controller: description,
-                  maxLines: 4,
-                  decoration: InputDecoration(labelText: t.descriptionSection),
-                ),
-                const SizedBox(height: 12),
-                FilledButton(
-                  onPressed: () => Navigator.of(ctx).pop(true),
-                  child: Text(t.save),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
+    Navigator.of(context).pushNamed(
+      AppRoutes.companyPostJobStep1,
+      arguments: job,
     );
-
-    if (saved != true) return;
-    CompanyStore.instance.saveJob(
-      job.copyWith(
-        title: title.text.trim(),
-        location: location.text.trim(),
-        employmentType: employmentType.text.trim(),
-        category: category.text.trim(),
-        salaryRange: salaryRange.text.trim(),
-        description: description.text.trim(),
-      ),
-    );
-    if (mounted) setState(() {});
   }
 }
 
@@ -389,7 +326,7 @@ class _InfoRow extends StatelessWidget {
                   style: TextStyle(
                     color: Theme.of(
                       context,
-                    ).colorScheme.onSurface.withValues(alpha: 0.8),
+                    ).colorScheme.onSurface.withOpacity(0.8),
                   ),
                 ),
               ],
@@ -403,7 +340,7 @@ class _InfoRow extends StatelessWidget {
                     style: TextStyle(
                       color: Theme.of(
                         context,
-                      ).colorScheme.onSurface.withValues(alpha: 0.8),
+                      ).colorScheme.onSurface.withOpacity(0.8),
                     ),
                   ),
                 ),
