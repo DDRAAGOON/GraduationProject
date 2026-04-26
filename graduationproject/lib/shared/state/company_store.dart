@@ -86,11 +86,21 @@ class CompanyStore extends ChangeNotifier {
     String? customProfileImage,
     String? commercialRegister,
     String? nationalNumber,
+    String? email,
   }) {
     if (companyName != null && companyName.isNotEmpty) _companyName = companyName;
     if (customProfileImage != null) _customProfileImage = customProfileImage;
     if (commercialRegister != null) _commercialRegister = commercialRegister;
     if (nationalNumber != null) _nationalNumber = nationalNumber;
+    
+    if (email != null && email.isNotEmpty) {
+      final existingEmailIndex = _contacts.indexWhere((c) => c.name.toLowerCase() == 'email' || c.name == 'البريد الإلكتروني');
+      if (existingEmailIndex >= 0) {
+         _contacts[existingEmailIndex] = _contacts[existingEmailIndex].copyWith(value: email);
+      } else {
+         _contacts.add(ContactEntry(name: 'Email', value: email));
+      }
+    }
     notifyListeners();
   }
 
@@ -154,11 +164,14 @@ class CompanyStore extends ChangeNotifier {
     } else {
       _jobs.insert(0, job);
       // Generate mock applicants for the new job to demonstrate the pipeline
+      // Mock generation disabled to keep stats clean for backend
+      /*
       RecruitmentSyncStore.instance.generateMockApplicants(
         job.id,
         job.title,
         job.companyName,
       );
+      */
     }
     notifyListeners();
   }

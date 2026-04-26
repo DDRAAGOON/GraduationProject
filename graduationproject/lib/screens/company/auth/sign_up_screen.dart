@@ -88,6 +88,7 @@ class _CompanySignUpScreenState extends State<CompanySignUpScreen> {
       customProfileImage: null,
       commercialRegister: _commercialRegister.text.trim(),
       nationalNumber: _nationalNumber.text.trim(),
+      email: _email.text.trim(),
     );
 
     // Save session for persistence
@@ -277,27 +278,6 @@ class _CompanySignUpScreenState extends State<CompanySignUpScreen> {
             label: t.continueBtn,
             loading: _loading,
             onPressed: _submit,
-          ),
-          const SizedBox(height: 18),
-          Row(
-            children: [
-              Expanded(child: Divider(color: Colors.white.withOpacity(0.15))),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: Text(t.orSignInWith),
-              ),
-              Expanded(child: Divider(color: Colors.white.withOpacity(0.15))),
-            ],
-          ),
-          const SizedBox(height: 14),
-          OutlinedButton.icon(
-            onPressed: _loading ? null : _submit,
-            icon: SvgPicture.asset(
-              'assets/company/icon/google_g.svg',
-              width: 18,
-              height: 18,
-            ),
-            label: const Text('Google'),
           ),
           const SizedBox(height: 10),
           Row(

@@ -26,8 +26,10 @@ class _CompanyJobApplicantsTableViewScreenState
   final _searchController = TextEditingController();
 
   static const _stageOptions = <String>[
+    'Applied',
     'In Review',
     'Shortlisted',
+    'Waitlist',
     'Hired',
     'Declined',
   ];
@@ -187,7 +189,7 @@ class _CompanyJobApplicantsTableViewScreenState
                               controller: _searchController,
                               onChanged: (_) => setState(() {}),
                               decoration: const InputDecoration(
-                                hintText: 'Search jobs',
+                                hintText: 'Search applicants',
                                 prefixIcon: Icon(Icons.search),
                               ),
                             ),
@@ -210,7 +212,7 @@ class _CompanyJobApplicantsTableViewScreenState
                               controller: _searchController,
                               onChanged: (_) => setState(() {}),
                               decoration: const InputDecoration(
-                                hintText: 'Search jobs',
+                                hintText: 'Search applicants',
                                 prefixIcon: Icon(Icons.search),
                               ),
                             ),
@@ -232,7 +234,7 @@ class _CompanyJobApplicantsTableViewScreenState
                 return Padding(
                   padding: const EdgeInsets.only(top: 18),
                   child: Text(
-                    'No jobs',
+                    'No applicants',
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       color: Theme.of(
                         context,

@@ -62,6 +62,7 @@ class _CompanySignInScreenState extends State<CompanySignInScreen> {
     // Update store
     CompanyStore.instance.setRegistrationData(
       companyName: _email.text.split('@').first,
+      email: _email.text.trim(),
     );
 
     setState(() => _loading = false);

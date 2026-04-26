@@ -24,21 +24,5 @@ final class MessageThread {
         lastTimeLabelAr: 'منذ ١٢ دقيقة',
       );
 
-  static List<MessageThread> mockList() => [
-        mock(),
-        const MessageThread(
-          id: 'thread_2',
-          title: 'Angelina Swann',
-          subtitle: 'Hey thanks for your interview...',
-          lastTimeLabelEn: '3:40 PM',
-          lastTimeLabelAr: '٣:٤٠ م',
-        ),
-        const MessageThread(
-          id: 'thread_3',
-          title: 'James Gardner',
-          subtitle: 'Hey thanks for your interview...',
-          lastTimeLabelEn: '11:15 AM',
-          lastTimeLabelAr: '١١:١٥ ص',
-        ),
-      ];
+  static List<MessageThread> mockList() => [];
 }

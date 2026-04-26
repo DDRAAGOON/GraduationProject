@@ -25,10 +25,10 @@ class CompanyProfileSettingsOverviewScreen extends StatefulWidget {
 class _CompanyProfileSettingsOverviewScreenState
     extends State<CompanyProfileSettingsOverviewScreen> {
   late final TextEditingController _companyName;
-  late final TextEditingController _website;
   late final TextEditingController _employee;
-  late final TextEditingController _industry;
   late final TextEditingController _about;
+  late String _selectedCategory;
+  late List<String> _benefits;
   
   late List<String> _locations;
   late List<String> _techStack;
@@ -44,10 +44,14 @@ class _CompanyProfileSettingsOverviewScreenState
     final store = CompanyStore.instance;
     final isAr = LocaleController.instance.locale.value.languageCode == 'ar';
     _companyName = TextEditingController(text: store.companyName);
-    _website = TextEditingController(text: store.website);
     _employee = TextEditingController(text: store.employee);
-    _industry = TextEditingController(text: store.industry);
     _about = TextEditingController(text: isAr ? store.companyAboutAr : store.companyAboutEn);
+    _benefits = List.from(store.benefits);
+    
+    _selectedCategory = store.category;
+    if (_selectedCategory != 'technical' && _selectedCategory != 'nontechnical') {
+      _selectedCategory = 'technical';
+    }
     _locations = List.from(store.locations);
     _techStack = List.from(store.techStack);
     _selectedDay = store.foundedDay;
@@ -58,9 +62,7 @@ class _CompanyProfileSettingsOverviewScreenState
   @override
   void dispose() {
     _companyName.dispose();
-    _website.dispose();
     _employee.dispose();
-    _industry.dispose();
     _about.dispose();
     super.dispose();
   }
@@ -76,9 +78,9 @@ class _CompanyProfileSettingsOverviewScreenState
     
     CompanyStore.instance.updateProfile(
       name: _companyName.text,
-      website: _website.text,
+      website: store.website,
       employee: _employee.text,
-      industry: _industry.text,
+      industry: store.industry,
       aboutEn: isAr ? store.companyAboutEn : _about.text,
       aboutAr: isAr ? _about.text : store.companyAboutAr,
       locations: _locations,
@@ -88,8 +90,8 @@ class _CompanyProfileSettingsOverviewScreenState
       foundedYear: _selectedYear,
       commercialRegister: store.commercialRegister,
       nationalNumber: store.nationalNumber,
-      benefits: store.benefits,
-      category: store.category,
+      benefits: _benefits,
+      category: _selectedCategory,
     );
 
     // Persist company name change
@@ -288,15 +290,18 @@ class _CompanyProfileSettingsOverviewScreenState
           const SizedBox(height: 16),
           AppTextField(label: t.companyName, controller: _companyName),
           const SizedBox(height: 16),
-          AppTextField(label: t.website, controller: _website),
-          const SizedBox(height: 16),
-          
-          _buildChipField(t.locationInfo, _locations, () => _addTagDialog(t.locationInfo, _locations)),
-          const SizedBox(height: 16),
-          
           AppTextField(label: t.employee, controller: _employee),
           const SizedBox(height: 16),
-          AppTextField(label: t.industry, controller: _industry),
+          Text(t.categoryLabel, style: Theme.of(context).textTheme.labelLarge),
+          const SizedBox(height: 8),
+          _buildDropdown<String>(
+            value: _selectedCategory,
+            items: const ['technical', 'nontechnical'],
+            labelBuilder: (v) => v == 'technical' ? t.technical : t.nonTechnical,
+            onChanged: (v) => setState(() => _selectedCategory = v!),
+          ),
+          const SizedBox(height: 16),
+          _buildChipField(t.locationInfo, _locations, () => _addTagDialog(t.locationInfo, _locations)),
           const SizedBox(height: 16),
 
           Text(t.dateFounded, style: Theme.of(context).textTheme.labelLarge),
@@ -354,9 +359,9 @@ class _CompanyProfileSettingsOverviewScreenState
           ),
           
           const SizedBox(height: 16),
-
-          const SizedBox(height: 16),
           AppTextField(label: t.aboutCompany, controller: _about, maxLines: 4),
+          const SizedBox(height: 16),
+          _buildChipField(t.benefits, _benefits, () => _addTagDialog(t.benefits, _benefits)),
           const SizedBox(height: 18),
           AppButton(label: t.saveChange, loading: _loading, onPressed: _save),
           const SizedBox(height: 10),

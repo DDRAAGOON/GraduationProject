@@ -288,6 +288,12 @@ class _CompanyStatsBar extends StatelessWidget {
                           ar: '$foundedYear/$foundedMonth/$foundedDay'.replaceAll('0', '٠').replaceAll('1', '١').replaceAll('2', '٢').replaceAll('3', '٣').replaceAll('4', '٤').replaceAll('5', '٥').replaceAll('6', '٦').replaceAll('7', '٧').replaceAll('8', '٨').replaceAll('9', '٩')
                         ),
                 ),
+                const SizedBox(width: 14),
+                item(
+                  icon: Icons.location_on_outlined,
+                  label: t.locationInfo,
+                  value: countriesCount == 0 ? t.notYet : countriesCount.toString(),
+                ),
               ],
             ),
             const SizedBox(height: 14),

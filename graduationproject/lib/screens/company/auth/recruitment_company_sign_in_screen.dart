@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';
 import '../../../shared/services/session_manager.dart';
+import '../../../shared/state/company_store.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_text_field.dart';
 
@@ -48,6 +49,11 @@ class _RecruitmentCompanySignInScreenState
     await SessionManager.saveCompanySession(
       email: _email.text.trim(),
       name: 'Company User', 
+    );
+    
+    CompanyStore.instance.setRegistrationData(
+      companyName: 'Company User',
+      email: _email.text.trim(),
     );
 
     setState(() => _loading = false);

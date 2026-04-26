@@ -216,182 +216,7 @@ class RecruitmentSyncStore extends ChangeNotifier {
     'Negotiable',
   ];
 
-  final List<RecruitmentJob> _jobs = <RecruitmentJob>[
-    // Technical
-    RecruitmentJob(
-      id: 'job_1',
-      title: 'Flutter Mobile Developer',
-      companyName: 'Valeo Egypt',
-      location: 'Cairo',
-      salaryRange: '10k - 25k EGP',
-      type: 'Full-time',
-      category: 'Technical',
-      tags: const ['Flutter', 'Dart', 'REST'],
-      publishedAt: DateTime.now().subtract(const Duration(hours: 3)),
-    ),
-    RecruitmentJob(
-      id: 'job_2',
-      title: 'Frontend React Developer',
-      companyName: 'Orange Digital Center',
-      location: 'Cairo',
-      salaryRange: '5k - 15k EGP',
-      type: 'Part-time',
-      category: 'Technical',
-      tags: const ['Html', 'Css', 'Java'],
-      publishedAt: DateTime.now().subtract(const Duration(hours: 4)),
-    ),
-    RecruitmentJob(
-      id: 'job_3',
-      title: 'Data Analyst',
-      companyName: 'Orange Digital Center',
-      location: 'Suez',
-      salaryRange: '8k - 15k EGP',
-      type: 'Full-time',
-      category: 'Technical',
-      tags: const ['Flutter', 'Dart', 'REST'],
-      publishedAt: DateTime.now().subtract(const Duration(hours: 2)),
-    ),
-    RecruitmentJob(
-      id: 'job_4',
-      title: 'AI / Machine Learning Engineer',
-      companyName: 'IBM Egypt',
-      location: 'Cairo',
-      salaryRange: '20k - 30k EGP',
-      type: 'Part-time',
-      category: 'Technical',
-      tags: const ['Flutter', 'Dart', 'REST'],
-      publishedAt: DateTime.now().subtract(const Duration(hours: 8)),
-    ),
-
-    RecruitmentJob(
-      id: 'job_5',
-      title: 'Backend Node.js Engineer',
-      companyName: 'IBM Egypt',
-      location: 'Luxor',
-      salaryRange: '30k - 45k EGP',
-      type: 'Full-time',
-      category: 'Technical',
-      tags: const ['Node.js', 'Express', 'PostgreSQL'],
-      publishedAt: DateTime.now().subtract(const Duration(hours: 12)),
-    ),
-    RecruitmentJob(
-      id: 'job_6',
-      title: 'Cyber Security Analyst',
-      companyName: 'Vodafone Egypt (Technology sector)',
-      location: 'Cairo',
-      salaryRange: '30k - 45k EGP',
-      type: 'Part-time',
-      category: 'Technical',
-      tags: const ['Node.js', 'Express', 'PostgreSQL'],
-      publishedAt: DateTime.now().subtract(const Duration(hours: 12)),
-    ),
-    RecruitmentJob(
-      id: 'job_7',
-      title: 'Cyber Security Analyst',
-      companyName: 'Valeo Egypt',
-      location: 'Cairo',
-      salaryRange: '30k - 45k EGP',
-      type: 'Full-time',
-      category: 'Technical',
-      tags: const ['Node.js', 'Express', 'PostgreSQL'],
-      publishedAt: DateTime.now().subtract(const Duration(hours: 12)),
-    ),
-    RecruitmentJob(
-      id: 'job_8',
-      title: 'Cyber Security Analyst',
-      companyName: 'Nexa Systems' ,
-      location: 'Alexandria',
-      salaryRange: '30k - 45k EGP',
-      type: 'Full-time',
-      category: 'Technical',
-      tags: const ['Node.js', 'Express', 'PostgreSQL'],
-      publishedAt: DateTime.now().subtract(const Duration(hours: 12)),
-    ),
-    RecruitmentJob(
-      id: 'job_9',
-      title: 'Cyber Security Analyst',
-      companyName: 'Nexa Systems',
-      location: 'Cairo',
-      salaryRange: '30k - 45k EGP',
-      type: 'Full-time',
-      category: 'Technical',
-      tags: const ['Node.js', 'Express', 'PostgreSQL'],
-      publishedAt: DateTime.now().subtract(const Duration(hours: 12)),
-    ),
-    RecruitmentJob(
-      id: 'job_10',
-      title: 'Cyber Security Analyst',
-      companyName: 'Nexa Systems',
-      location: 'Alexandria',
-      salaryRange: '20k - 35k EGP',
-      type: 'Part-time',
-      category: 'Technical',
-      tags: const ['Node.js', 'Express', 'PostgreSQL'],
-      publishedAt: DateTime.now().subtract(const Duration(hours: 12)),
-    ),
-
-    // Tradesman
-    RecruitmentJob(
-      id: 'tr_1',
-      title: 'نقاش محترف',
-      companyName: 'مقاولات الحديثة',
-      location: 'Cairo',
-      salaryRange: 'Negotiable',
-      type: 'Full-time',
-      category: 'Tradesman',
-      tags: const ['Painting', 'Interior'],
-      logoIcon: Icons.brush,
-      publishedAt: DateTime.now().subtract(const Duration(days: 1)),
-    ),
-    RecruitmentJob(
-      id: 'tr_2',
-      title: 'سباك صحي',
-      companyName: 'الجزيرة للخدمات',
-      location: 'Giza',
-      salaryRange: 'Negotiable',
-      type: 'Part-time',
-      category: 'Tradesman',
-      tags: const ['Plumbing', 'Maintenance'],
-      logoIcon: Icons.plumbing,
-      publishedAt: DateTime.now().subtract(const Duration(days: 2)),
-    ),
-    RecruitmentJob(
-      id: 'tr_3',
-      title: 'نجار أثاث',
-      companyName: 'ورشة الإبداع',
-      location: 'Damietta',
-      salaryRange: 'Negotiable',
-      type: 'Full-time',
-      category: 'Tradesman',
-      tags: const ['Carpentry', 'Furniture'],
-      logoIcon: Icons.carpenter,
-      publishedAt: DateTime.now().subtract(const Duration(days: 3)),
-    ),
-    RecruitmentJob(
-      id: 'tr_4',
-      title: 'كهربائي منازل',
-      companyName: 'النور للكهرباء',
-      location: 'Alexandria',
-      salaryRange: 'Negotiable',
-      type: 'Part-time',
-      category: 'Tradesman',
-      tags: const ['Electrical', 'Repair'],
-      logoIcon: Icons.electrical_services,
-      publishedAt: DateTime.now().subtract(const Duration(days: 4)),
-    ),
-    RecruitmentJob(
-      id: 'tr_5',
-      title: 'فني تكييف وتبريد',
-      companyName: 'كول اير للخدمات',
-      location: 'Cairo',
-      salaryRange: 'Negotiable',
-      type: 'Full-time',
-      category: 'Tradesman',
-      tags: const ['AC Repair', 'Maintenance'],
-      logoIcon: Icons.ac_unit,
-      publishedAt: DateTime.now().subtract(const Duration(days: 5)),
-    ),
-  ];
+  final List<RecruitmentJob> _jobs = <RecruitmentJob>[];
 
   final List<RecruitmentApplication> _applications = <RecruitmentApplication>[];
   final List<RecruitmentMessage> _messages = <RecruitmentMessage>[];
@@ -416,16 +241,7 @@ class RecruitmentSyncStore extends ChangeNotifier {
   List<String> _currentUserSkills = [];
   List<Map<String, String>> _currentUserEducation = [];
   List<Map<String, String>> _currentUserExperience = [];
-  final List<ServiceRequestPost> _serviceRequests = <ServiceRequestPost>[
-    ServiceRequestPost(
-      id: 'sr_1',
-      title: 'Need Electrician Worker',
-      description: 'Home maintenance for wiring and switches.',
-      budget: '3k EGP',
-      requestedBy: 'Mona Ali',
-      createdAt: DateTime.now().subtract(const Duration(hours: 5)),
-    ),
-  ];
+  final List<ServiceRequestPost> _serviceRequests = <ServiceRequestPost>[];
 
   List<RecruitmentJob> get jobs => List<RecruitmentJob>.unmodifiable(_jobs);
   List<RecruitmentApplication> get applications => List<RecruitmentApplication>.unmodifiable(_applications);
@@ -491,53 +307,12 @@ class RecruitmentSyncStore extends ChangeNotifier {
 
   void companyPostJob(RecruitmentJob job) {
     _jobs.insert(0, job);
-    generateMockApplicants(job.id, job.title, job.companyName);
+    // generateMockApplicants(job.id, job.title, job.companyName);
     notifyListeners();
   }
 
   void generateMockApplicants(String jobId, String jobTitle, String companyName) {
-    _applications.insertAll(0, [
-      RecruitmentApplication(
-        id: 'app_m_${DateTime.now().millisecondsSinceEpoch}_1',
-        jobId: jobId,
-        jobTitle: jobTitle,
-        companyName: companyName,
-        userName: 'Dragon',
-        status: 'In Review',
-        updatedAt: DateTime.now(),
-        gender: 'لم يحدد',
-        birthDate: 'غير متوفر',
-        languages: ['العربية'],
-        about: 'لا يوجد نبذة تعريفية متاحة لهذا المتقدم.',
-        experienceYears: 0,
-        education: 'غير متوفر',
-        skills: [],
-        hasCv: false,
-        email: 'mahmoudessam936@gmail.com',
-        phone: '+20 123 456 789',
-        location: 'غير محدد',
-      ),
-      RecruitmentApplication(
-        id: 'app_m_${DateTime.now().millisecondsSinceEpoch}_2',
-        jobId: jobId,
-        jobTitle: jobTitle,
-        companyName: companyName,
-        userName: 'Sara Hassan',
-        status: 'Applied',
-        updatedAt: DateTime.now(),
-        gender: 'Female',
-        birthDate: '1995-05-15',
-        languages: ['Arabic', 'English'],
-        about: 'Experienced Flutter developer looking for new opportunities.',
-        experienceYears: 3,
-        education: 'Bachelor of Computer Science',
-        skills: ['Flutter', 'Dart', 'Firebase'],
-        hasCv: true,
-        email: 'sara.hassan@example.com',
-        phone: '+20 987 654 321',
-        location: 'Alexandria',
-      ),
-    ]);
+    // Disabled for backend integration
   }
 
   void toggleSaveJob(String jobId) {

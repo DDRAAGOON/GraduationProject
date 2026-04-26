@@ -5,15 +5,12 @@ import 'package:flutter/material.dart';
 import '../../../app/router/app_router.dart';
 import '../../../shared/l10n/app_localizations.dart';
 import '../../../shared/mock/mock_data.dart';
-import '../../../shared/models/applicant.dart';
 import '../../../shared/models/job.dart';
 import '../../../shared/state/company_store.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_scaffold.dart';
 import '../../../shared/widgets/section_title.dart';
 import '../widgets/company_bottom_nav.dart';
-
-enum _JobViewTab { table, pipeline }
 
 class CompanyJobDetailsScreen extends StatefulWidget {
   const CompanyJobDetailsScreen({super.key, required this.job});
@@ -26,8 +23,6 @@ class CompanyJobDetailsScreen extends StatefulWidget {
 }
 
 class _CompanyJobDetailsScreenState extends State<CompanyJobDetailsScreen> {
-  _JobViewTab _tab = _JobViewTab.table;
-
   Job get _job => CompanyStore.instance.jobById(widget.job.id);
 
   @override
@@ -115,28 +110,12 @@ class _CompanyJobDetailsScreenState extends State<CompanyJobDetailsScreen> {
               _InfoRow(label: t.jobTypeLabel, value: job.employmentType),
               _InfoRow(label: t.categoryLabel, value: job.category),
               const SizedBox(height: 18),
-              SegmentedButton<_JobViewTab>(
-                segments: [
-                  ButtonSegment(value: _JobViewTab.table, label: Text(t.tableView)),
-                  ButtonSegment(
-                    value: _JobViewTab.pipeline,
-                    label: Text(t.pipelineView),
-                  ),
-                ],
-                selected: {_tab},
-                onSelectionChanged: (s) => setState(() => _tab = s.first),
-              ),
-              const SizedBox(height: 12),
-              _JobApplicantsSection(tab: _tab),
+              _JobApplicantsSection(),
               const SizedBox(height: 14),
               AppButton(
-                label: _tab == _JobViewTab.table
-                    ? t.openFullTable
-                    : t.openFullPipeline,
+                label: t.openFullTable,
                 onPressed: () => Navigator.of(context).pushNamed(
-                  _tab == _JobViewTab.table
-                      ? AppRoutes.companyApplicantsTable
-                      : AppRoutes.companyApplicantsPipeline,
+                  AppRoutes.companyApplicantsTable,
                   arguments: job,
                 ),
               ),
@@ -226,76 +205,21 @@ class _Bullets extends StatelessWidget {
 }
 
 class _JobApplicantsSection extends StatelessWidget {
-  const _JobApplicantsSection({required this.tab});
-
-  final _JobViewTab tab;
+  const _JobApplicantsSection();
 
   @override
   Widget build(BuildContext context) {
-    final t = AppLocalizations.of(context);
     final applicants = MockData.applicants();
-    if (tab == _JobViewTab.table) {
-      return Card(
-        child: Column(
-          children: applicants
-              .take(4)
-              .map(
-                (a) => ListTile(
-                  dense: true,
-                  title: Text(a.fullName),
-                  subtitle: Text('${a.role} • ${a.stage}'),
-                  trailing: const Icon(Icons.chevron_right),
-                ),
-              )
-              .toList(),
-        ),
-      );
-    }
-
-    final stages = <String, List<Applicant>>{
-      t.inReview: applicants
-          .where((a) => a.stage.toLowerCase().contains('review'))
-          .toList(),
-      t.shortlisted: applicants
-          .where((a) => a.stage.toLowerCase().contains('short'))
-          .toList(),
-    };
-
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: stages.entries
+    return Card(
+      child: Column(
+        children: applicants
+            .take(4)
             .map(
-              (entry) => Container(
-                width: 180,
-                margin: const EdgeInsets.only(right: 10),
-                child: Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          entry.key,
-                          style: Theme.of(context).textTheme.titleSmall,
-                        ),
-                        const SizedBox(height: 6),
-                        ...entry.value
-                            .take(3)
-                            .map(
-                              (a) => Padding(
-                                padding: const EdgeInsets.only(bottom: 6),
-                                child: Text(
-                                  a.fullName,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ),
-                      ],
-                    ),
-                  ),
-                ),
+              (a) => ListTile(
+                dense: true,
+                title: Text(a.fullName),
+                subtitle: Text('${a.role} • ${a.stage}'),
+                trailing: const Icon(Icons.chevron_right),
               ),
             )
             .toList(),

@@ -31,7 +31,8 @@ final class Job {
     this.appliedCount,
     this.capacity,
     this.status = 'Open',
-  });
+    DateTime? createdAt,
+  }) : createdAt = createdAt ?? DateTime.now();
 
   final String id;
   final String title;
@@ -49,6 +50,7 @@ final class Job {
   final int? appliedCount;
   final int? capacity;
   final String status;
+  final DateTime createdAt;
 
   /// Creates a copy of the current [Job] while allowing specific fields to be updated.
   Job copyWith({
@@ -68,6 +70,7 @@ final class Job {
     int? appliedCount,
     int? capacity,
     String? status,
+    DateTime? createdAt,
   }) {
     return Job(
       id: id ?? this.id,
@@ -86,6 +89,7 @@ final class Job {
       appliedCount: appliedCount ?? this.appliedCount,
       capacity: capacity ?? this.capacity,
       status: status ?? this.status,
+      createdAt: createdAt ?? this.createdAt,
     );
   }
 

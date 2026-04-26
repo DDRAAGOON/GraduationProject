@@ -5,11 +5,81 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="89a40d2e-dee6-4edc-af06-e2e78f633ab0" name="Changes" comment="v2.5">
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/libraries/Dart_SDK.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Dart_SDK.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/post/post_Job.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/post/post_Job.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/profile/tradesman_profile.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/profile/tradesman_profile.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/company_p01.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/company_p02.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/company_p03.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/company_p04.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/company_p05.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/company_p06.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/company_p07.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/company_p08.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/company_p09.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/company_p10.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/company_p11.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/company_p12.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/company_p13.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/company_p14.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/company_p15.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/company_p16.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/company_p17.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/company_p18.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/company_p19.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/company_p20.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/company_p21.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/company_p22.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/company_p23.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/company_p24.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/company_p25.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/company_p26.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/company_p27.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/company_p28.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/company_p29.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/company_p30.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/company_p31.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/company_p32.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/company_p33.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/user_p01.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/user_p02.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/user_p03.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/user_p04.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/user_p05.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/user_p06.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/user_p07.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/user_p08.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/user_p09.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/user_p10.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/user_p11.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/user_p12.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/user_p13.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/user_p14.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/user_p15.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/user_p16.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/user_p17.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/user_p18.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/user_p19.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/user_p20.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/user_p21.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/user_p22.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/user_p23.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/user_p24.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/.tmp_pdf/user_p25.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/lib/app/router/app_router.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/app/router/app_router.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/company/auth/recruitment_company_sign_in_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/company/auth/recruitment_company_sign_in_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/company/auth/sign_in_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/company/auth/sign_in_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/company/auth/sign_up_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/company/auth/sign_up_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/company/candidates/applicant_details_profile_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/company/candidates/applicant_details_profile_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/company/jobs/job_analytics_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/company/jobs/job_analytics_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/company/jobs/job_applicants_pipeline_view_screen.dart" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/company/jobs/job_applicants_table_view_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/company/jobs/job_applicants_table_view_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/company/jobs/job_details_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/company/jobs/job_details_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/company/jobs/jobs_hub_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/company/jobs/jobs_hub_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/company/profile/company_profile_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/company/profile/company_profile_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/company/profile/profile_settings_overview_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/company/profile/profile_settings_overview_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/lib/shared/models/job.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/shared/models/job.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/lib/shared/models/message_thread.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/shared/models/message_thread.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/lib/shared/state/company_store.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/shared/state/company_store.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/graduationproject/lib/shared/state/recruitment_sync_store.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/shared/state/recruitment_sync_store.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -197,7 +267,15 @@
       <option name="project" value="LOCAL" />
       <updated>1777170674445</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="v2.5">
+      <option name="closed" value="true" />
+      <created>1777174359077</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1777174359077</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">

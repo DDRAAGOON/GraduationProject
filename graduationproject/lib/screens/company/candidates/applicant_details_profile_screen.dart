@@ -144,7 +144,47 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
         const SizedBox(height: 32),
 
         // Professional Info
-        _buildSectionTitle(isAr ? 'المعلومات المهنية' : 'Professional Information'),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _buildSectionTitle(isAr ? 'المعلومات المهنية' : 'Professional Information'),
+            if (applicant.hasCv)
+              OutlinedButton.icon(
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (ctx) => AlertDialog(
+                      title: Text(isAr ? 'السيرة الذاتية' : 'Curriculum Vitae (CV)'),
+                      content: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.picture_as_pdf, size: 64, color: Colors.redAccent),
+                          const SizedBox(height: 16),
+                          Text(isAr ? 'جاري عرض ملف السيرة الذاتية للمتقدم...' : 'Opening applicant CV file...'),
+                        ],
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.of(ctx).pop(),
+                          child: Text(isAr ? 'إغلاق' : 'Close'),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.picture_as_pdf_outlined, color: Colors.red),
+                label: Text(
+                  isAr ? 'عرض السيرة الذاتية' : 'View CV',
+                  style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                ),
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(color: Colors.red.shade200),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                ),
+              ),
+          ],
+        ),
         const SizedBox(height: 16),
         _buildDetailRow(isAr ? 'نبذة عني' : 'About Me', applicant.about ?? (isAr ? 'لا يوجد نبذة تعريفية متاحة لهذا المتقدم.' : 'No about available.')),
         const SizedBox(height: 24),

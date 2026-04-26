@@ -17,7 +17,7 @@ import '../../screens/company/candidates/recruitment_candidate_details_screen.da
 import '../../screens/company/help/help_center_screen.dart';
 import '../../screens/company/home/dashboard_screen.dart';
 import '../../screens/company/jobs/job_analytics_screen.dart';
-import '../../screens/company/jobs/job_applicants_pipeline_view_screen.dart';
+
 import '../../screens/company/jobs/job_applicants_table_view_screen.dart';
 import '../../screens/company/jobs/job_details_screen.dart';
 import '../../screens/company/jobs/jobs_hub_screen.dart';
@@ -266,10 +266,6 @@ final class AppRouter {
         page = const CompanyJobsHubScreen();
       case AppRoutes.companyApplicantsTable:
         page = CompanyJobApplicantsTableViewScreen(
-          job: args is Job ? args : Job.mock(),
-        );
-      case AppRoutes.companyApplicantsPipeline:
-        page = CompanyJobApplicantsPipelineViewScreen(
           job: args is Job ? args : Job.mock(),
         );
       case AppRoutes.companyJobDetails:
