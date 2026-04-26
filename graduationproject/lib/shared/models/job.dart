@@ -30,6 +30,7 @@ final class Job {
     this.department = '',
     this.appliedCount,
     this.capacity,
+    this.status = 'Open',
   });
 
   final String id;
@@ -47,6 +48,7 @@ final class Job {
   final List<JobBenefit> benefits;
   final int? appliedCount;
   final int? capacity;
+  final String status;
 
   /// Creates a copy of the current [Job] while allowing specific fields to be updated.
   Job copyWith({
@@ -65,6 +67,7 @@ final class Job {
     List<JobBenefit>? benefits,
     int? appliedCount,
     int? capacity,
+    String? status,
   }) {
     return Job(
       id: id ?? this.id,
@@ -82,6 +85,7 @@ final class Job {
       benefits: benefits ?? this.benefits,
       appliedCount: appliedCount ?? this.appliedCount,
       capacity: capacity ?? this.capacity,
+      status: status ?? this.status,
     );
   }
 
@@ -90,7 +94,7 @@ final class Job {
     id: 'job_1',
     title: 'Social Media Assistant',
     companyName: 'Nomad',
-    location: 'Paris, France',
+    location: '',
     employmentType: 'Full-Time',
     category: 'Marketing',
     salaryRange: r'$15k-$85k USD',

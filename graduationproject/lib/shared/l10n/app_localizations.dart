@@ -322,6 +322,17 @@ class AppLocalizations {
   String get currentPassword => tr(en: 'Current Password', ar: 'كلمة المرور الحالية');
   String get newPasswordLabel => tr(en: 'New Password', ar: 'كلمة المرور الجديدة');
   String get confirmNewPassword => tr(en: 'Confirm New Password', ar: 'تأكيد كلمة المرور الجديدة');
+  String get hiredStatusUpdate => tr(en: 'Applicant status updated to:', ar: 'تم تحديث حالة المتقدم إلى:');
+  String get newChat => tr(en: 'New Chat', ar: 'محادثة جديدة');
+  String get searchUsersHint => tr(en: 'Search users by name or email...', ar: 'ابحث عن مستخدمين بالاسم أو الإيميل...');
+  String get startNewConversation => tr(en: 'Starting a new conversation...', ar: 'بدء محادثة جديدة...');
+  String get applicantAcceptedTitle => tr(en: 'Applicant Accepted!', ar: 'تم قبول المتقدم بنجاح!');
+  String hiredCongratulation(String name) => isAr ? 'تهانينا! لقد قمت بتوظيف $name.' : 'Congratulations! You have hired $name.';
+  String get evaluationReminder => tr(
+    en: 'Reminder: We will notify you to evaluate the employee and write feedback about their performance in 2 months.',
+    ar: 'تنبيه: سنقوم بتذكيرك لتقييم الموظف وكتابة تعليق عن أدائه بعد شهرين من الآن.',
+  );
+  String hiredProgressMsg(int count, int total) => isAr ? '$count تم قبولهم من أصل $total' : '$count hired of $total capacity';
 
   // ── Unknown route ──────────────────────────────────────────────────────────
   String get unknownRoute => userTr('common.unknownRoute', fallbackEn: 'Unknown route', fallbackAr: 'مسار غير معروف');

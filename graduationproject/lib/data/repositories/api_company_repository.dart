@@ -49,6 +49,7 @@ final class ApiCompanyRepository implements CompanyRepository {
             phone: '-',
             location: 'N/A',
             appliedDateLabel: item['updatedAt']?.toString() ?? '',
+            jobId: jobId,
           ),
         )
         .toList();

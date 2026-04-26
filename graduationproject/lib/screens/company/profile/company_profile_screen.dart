@@ -68,18 +68,6 @@ class _CompanyCompanyProfileScreenState
                 ),
               ),
               const SizedBox(height: 16),
-              SectionTitle(t.locationInfo),
-              const SizedBox(height: 10),
-              _store.locations.isEmpty
-                  ? Text(t.notYet, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)))
-                  : Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: _store.locations.map((item) => Chip(
-                        label: Text(item, style: const TextStyle(fontSize: 12)),
-                        visualDensity: VisualDensity.compact,
-                      )).toList(),
-                    ),
               const SizedBox(height: 16),
               SectionTitle(t.benefits),
               const SizedBox(height: 10),
@@ -298,17 +286,6 @@ class _CompanyStatsBar extends StatelessWidget {
                       : t.tr(
                           en: '$foundedMonth/$foundedDay/$foundedYear', 
                           ar: '$foundedYear/$foundedMonth/$foundedDay'.replaceAll('0', '٠').replaceAll('1', '١').replaceAll('2', '٢').replaceAll('3', '٣').replaceAll('4', '٤').replaceAll('5', '٥').replaceAll('6', '٦').replaceAll('7', '٧').replaceAll('8', '٨').replaceAll('9', '٩')
-                        ),
-                ),
-                const SizedBox(width: 14),
-                item(
-                  icon: Icons.location_on_outlined,
-                  label: t.locationInfo,
-                  value: countriesCount == 0
-                      ? t.notYet
-                      : t.tr(
-                          en: '$countriesCount countries', 
-                          ar: '${countriesCount.toString().replaceAll('0', '٠').replaceAll('1', '١').replaceAll('2', '٢').replaceAll('3', '٣').replaceAll('4', '٤').replaceAll('5', '٥').replaceAll('6', '٦').replaceAll('7', '٧').replaceAll('8', '٨').replaceAll('9', '٩')} دولة'
                         ),
                 ),
               ],

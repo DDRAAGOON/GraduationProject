@@ -159,6 +159,7 @@ class _CompanyJobApplicantsTableViewScreenState
                 education: app.education,
                 skills: app.skills,
                 hasCv: app.hasCv,
+                jobId: app.jobId,
               ),
             )
             .where((a) => _matchesStages(a) && _matchesSearch(a))

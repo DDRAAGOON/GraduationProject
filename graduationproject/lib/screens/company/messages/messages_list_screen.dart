@@ -27,10 +27,14 @@ class CompanyMessagesListScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         itemBuilder: (_, i) => _ThreadTile(thread: threads[i], avatarIndex: i),
         separatorBuilder: (_, i) =>
-            Divider(color: Colors.white.withOpacity(0.12), height: 1),
+            Divider(color: Theme.of(context).colorScheme.outlineVariant.withOpacity(0.5), height: 1),
         itemCount: threads.length,
       ),
       bottomNavigationBar: const CompanyBottomNav(current: CompanyTab.chat),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => Navigator.of(context).pushNamed(AppRoutes.companyNewChat),
+        child: const Icon(Icons.add),
+      ),
     );
   }
 }

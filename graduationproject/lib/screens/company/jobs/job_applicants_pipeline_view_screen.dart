@@ -43,6 +43,7 @@ class CompanyJobApplicantsPipelineViewScreen extends StatelessWidget {
           education: app.education,
           skills: app.skills,
           hasCv: app.hasCv,
+          jobId: app.jobId,
         )).toList();
 
         final inReview = all

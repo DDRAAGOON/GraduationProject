@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import '../../../shared/l10n/app_localizations.dart';
 import '../../../shared/models/message_thread.dart';
 import '../../../shared/widgets/app_scaffold.dart';
-import '../widgets/company_applicant_avatar.dart';
 
 class CompanyChatThreadCandidateV2Screen extends StatefulWidget {
   const CompanyChatThreadCandidateV2Screen({super.key, required this.thread});
@@ -56,44 +55,6 @@ class _CompanyChatThreadCandidateV2ScreenState
       title: widget.thread.title,
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 10, 16, 8),
-            child: Card(
-              child: Padding(
-                padding: const EdgeInsets.all(14),
-                child: Row(
-                  children: [
-                    CompanyApplicantAvatar(seed: widget.thread.id, radius: 22),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            widget.thread.title,
-                            style: Theme.of(context).textTheme.titleMedium
-                                ?.copyWith(fontWeight: FontWeight.w900),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            widget.thread.subtitle,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.onSurface.withOpacity(0.7),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                  ],
-                ),
-              ),
-            ),
-          ),
           Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.all(16),
@@ -143,25 +104,54 @@ class _ChatBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    
     final bg = bubble.fromMe
-        ? Theme.of(context).colorScheme.primary.withOpacity(0.25)
-        : Colors.white.withOpacity(0.10);
-    final align = bubble.fromMe ? AlignmentDirectional.centerEnd : AlignmentDirectional.centerStart;
-    final maxBubbleWidth = MediaQuery.of(context).size.width * 0.72;
+        ? cs.primary
+        : cs.surfaceContainerHigh;
+        
+    final textColor = bubble.fromMe
+        ? cs.onPrimary
+        : cs.onSurface;
+
+    final align = bubble.fromMe 
+        ? AlignmentDirectional.centerEnd 
+        : AlignmentDirectional.centerStart;
+        
+    final borderRadius = BorderRadius.only(
+      topLeft: const Radius.circular(20),
+      topRight: const Radius.circular(20),
+      bottomLeft: Radius.circular(bubble.fromMe ? 20 : 4),
+      bottomRight: Radius.circular(bubble.fromMe ? 4 : 20),
+    );
 
     return Align(
       alignment: align,
       child: Container(
         constraints: BoxConstraints(
-          maxWidth: maxBubbleWidth.clamp(220.0, 360.0),
+          maxWidth: MediaQuery.of(context).size.width * 0.75,
         ),
-        margin: const EdgeInsets.symmetric(vertical: 6),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        margin: const EdgeInsets.symmetric(vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
           color: bg,
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: borderRadius,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 5,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
-        child: Text(bubble.text),
+        child: Text(
+          bubble.text,
+          style: TextStyle(
+            color: textColor,
+            fontSize: 14,
+            height: 1.4,
+          ),
+        ),
       ),
     );
   }

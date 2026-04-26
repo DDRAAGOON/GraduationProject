@@ -28,6 +28,7 @@ import '../../screens/company/jobs/recruitment_post_job_screen.dart';
 import '../../screens/company/messages/chat_thread_candidate_v2_screen.dart';
 import '../../screens/company/messages/chat_thread_screen.dart';
 import '../../screens/company/messages/messages_list_screen.dart';
+import '../../screens/company/messages/new_chat_screen.dart';
 import '../../screens/company/onboarding/onboarding_future_starts_screen.dart';
 import '../../screens/company/onboarding/onboarding_next_job_closer_screen.dart';
 import '../../screens/company/onboarding/onboarding_smart_search_screen.dart';
@@ -105,6 +106,7 @@ final class AppRoutes {
   static const companyMessagesList = '/company/messages/list';
   static const companyChatThread = '/company/messages/thread';
   static const companyChatThreadCandidateV2 = '/company/messages/thread_v2';
+  static const companyNewChat = '/company/messages/new_chat';
 
   static const companyJobsHub = '/company/jobs';
   static const companyApplicantsTable = '/company/jobs/applicants_table';
@@ -259,6 +261,8 @@ final class AppRouter {
         page = CompanyChatThreadCandidateV2Screen(
           thread: args is MessageThread ? args : MessageThread.mock(),
         );
+      case AppRoutes.companyNewChat:
+        page = const CompanyNewChatScreen();
       case AppRoutes.companyJobsHub:
         page = const CompanyJobsHubScreen();
       case AppRoutes.companyApplicantsTable:

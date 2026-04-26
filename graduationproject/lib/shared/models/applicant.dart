@@ -20,6 +20,7 @@ final class Applicant {
     this.education,
     this.skills = const [],
     this.hasCv = false,
+    required this.jobId,
   });
 
   final String id;
@@ -41,6 +42,7 @@ final class Applicant {
   final String? education;
   final List<String> skills;
   final bool hasCv;
+  final String jobId;
 
   /// Generates a static mock [Applicant] to populate the UI templates.
   static Applicant mock() => Applicant(
@@ -61,6 +63,7 @@ final class Applicant {
         education: 'غير متوفر',
         skills: [],
         hasCv: false,
+        jobId: 'job_1',
       );
 
   static List<Applicant> mockList() => [];
