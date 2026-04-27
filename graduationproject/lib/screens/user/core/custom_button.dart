@@ -1,5 +1,4 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 
 class Bottom extends StatelessWidget {
@@ -11,6 +10,7 @@ class Bottom extends StatelessWidget {
     required this.isLoading,
     required this.onPressed,
   });
+  
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -19,9 +19,9 @@ class Bottom extends StatelessWidget {
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Color(0xFF0A2A4A),
-            Color(0xFF2F5F8F),
-            Color.fromARGB(255, 118, 159, 178),
+            Color(0xFF4A6ED1), // Blue
+            Color(0xFF8A8FD9), // Purple/Light Blue
+            Color(0xFFFF7A2A), // Orange (Match requested color)
           ],
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,

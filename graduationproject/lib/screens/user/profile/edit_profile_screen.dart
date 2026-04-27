@@ -13,36 +13,41 @@ class EditProfileScreen extends StatefulWidget {
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
-  String _accountType = "Job Seeker";
-  String _selectedGender = "Male";
-
   late TextEditingController _aboutMeController;
   late TextEditingController _fullNameController;
   late TextEditingController _phoneController;
   late TextEditingController _emailController;
   late TextEditingController _dobController;
-  late TextEditingController _portfolioController;
-  late TextEditingController _minSalaryController;
-  late TextEditingController _maxSalaryController;
-  late String _salaryFrequency;
+  late TextEditingController _locationController;
+  late TextEditingController _skillController;
+  String _selectedGender = "Male";
+
+  // Local state to hold changes before saving
+  late List<Map<String, String>> _experiences;
+  late List<Map<String, String>> _education;
+  late List<String> _skills;
+  late List<Map<String, String>> _socialLinks;
+  late List<String> _portfolioImages;
 
   @override
   void initState() {
     super.initState();
 
-    _aboutMeController = TextEditingController(text: "");
-    _fullNameController = TextEditingController(text: "");
-    _phoneController = TextEditingController(text: "");
-    _emailController = TextEditingController(text: "");
-    _dobController = TextEditingController(text: "");
-    _portfolioController = TextEditingController(text: UserProfileData.portfolioUrl);
-    _minSalaryController = TextEditingController(
-      text: UserProfileData.minSalary > 0 ? UserProfileData.minSalary.toInt().toString() : "",
-    );
-    _maxSalaryController = TextEditingController(
-      text: UserProfileData.maxSalary > 0 ? UserProfileData.maxSalary.toInt().toString() : "",
-    );
-    _salaryFrequency = UserProfileData.salaryFrequency;
+    _aboutMeController = TextEditingController(text: UserProfileData.aboutMe);
+    _fullNameController = TextEditingController(text: UserProfileData.fullName);
+    _phoneController = TextEditingController(text: UserProfileData.phone);
+    _emailController = TextEditingController(text: UserProfileData.email);
+    _dobController = TextEditingController(text: UserProfileData.dob);
+    _locationController = TextEditingController(text: UserProfileData.location);
+    _skillController = TextEditingController();
+    _selectedGender = UserProfileData.gender.isEmpty ? "Male" : UserProfileData.gender;
+
+    // Initialize local lists with copies of current data
+    _experiences = List.from(UserProfileData.experiences);
+    _education = List.from(UserProfileData.education);
+    _skills = List.from(UserProfileData.skills);
+    _socialLinks = List.from(UserProfileData.socialLinks);
+    _portfolioImages = List.from(UserProfileData.portfolioImages);
   }
 
   @override
@@ -52,20 +57,69 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _phoneController.dispose();
     _emailController.dispose();
     _dobController.dispose();
-    _portfolioController.dispose();
-    _minSalaryController.dispose();
-    _maxSalaryController.dispose();
+    _locationController.dispose();
+    _skillController.dispose();
     super.dispose();
   }
 
   void _saveData() {
     setState(() {
       UserProfileData.fullName = _fullNameController.text;
-      UserProfileData.minSalary = double.tryParse(_minSalaryController.text.replaceAll(',', '')) ?? 0;
-      UserProfileData.maxSalary = double.tryParse(_maxSalaryController.text.replaceAll(',', '')) ?? 0;
-      UserProfileData.salaryFrequency = _salaryFrequency;
+      UserProfileData.phone = _phoneController.text;
+      UserProfileData.email = _emailController.text;
+      UserProfileData.dob = _dobController.text;
+      UserProfileData.location = _locationController.text;
+      UserProfileData.gender = _selectedGender;
+      UserProfileData.aboutMe = _aboutMeController.text;
+
+      // Commit local lists to global store
+      UserProfileData.experiences = List.from(_experiences);
+      UserProfileData.education = List.from(_education);
+      UserProfileData.skills = List.from(_skills);
+      UserProfileData.socialLinks = List.from(_socialLinks);
+      UserProfileData.portfolioImages = List.from(_portfolioImages);
     });
     Navigator.pop(context);
+  }
+
+  void _showAddItemDialog({
+    required String title,
+    required List<String> fieldLabels,
+    required Function(Map<String, String>) onSave,
+  }) {
+    final controllers = fieldLabels.map((_) => TextEditingController()).toList();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: List.generate(fieldLabels.length, (index) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: TextField(
+                controller: controllers[index],
+                decoration: InputDecoration(labelText: fieldLabels[index], border: const OutlineInputBorder()),
+              ),
+            );
+          }),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
+          ElevatedButton(
+            onPressed: () {
+              final data = <String, String>{};
+              for (int i = 0; i < fieldLabels.length; i++) {
+                data[fieldLabels[i].toLowerCase()] = controllers[i].text;
+              }
+              onSave(data);
+              Navigator.pop(context);
+            },
+            child: const Text("Add"),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -126,13 +180,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             // Profile Photo
             Text(t.tr(en: "Profile Photo", ar: "صورة الملف الشخصي"), style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
-            Text(t.tr(en: "This image will be shown publicly as your profile picture, it will help recruiters recognize you!", ar: "ستظهر هذه الصورة علنًا كصورة ملفك الشخصي، وسوف تساعد الموظفين على التعرف عليك!"), style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 12)),
+            Text(t.tr(en: "This image will be shown publicly as your profile picture.", ar: "ستظهر هذه الصورة علنًا كصورة ملفك الشخصي."), style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 12)),
             const SizedBox(height: 20),
             Row(
               children: [
-                const CircleAvatar(
+                CircleAvatar(
                   radius: 35,
-                  backgroundImage: AssetImage(AppImages.companyProfile1),
+                  backgroundImage: UserProfileData.profileImage != null
+                      ? NetworkImage(UserProfileData.profileImage!)
+                      : const AssetImage(AppImages.companyProfile1) as ImageProvider,
                 ),
                 const SizedBox(width: 20),
                 Expanded(
@@ -147,19 +203,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         Icon(Icons.image_outlined, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), size: 30),
                         const SizedBox(height: 8),
                         Text(t.tr(en: "Click to replace or drag and drop", ar: "انقر للاستبدال أو السحب والإفلات"), style: const TextStyle(color: Colors.blueAccent, fontSize: 12)),
-                        Text(t.tr(en: "SVG, PNG, JPG or GIF (max. 400 x 400px)", ar: "SVG, PNG, JPG أو GIF (بحد أقصى 400 × 400 بكسل)"), style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 10)),
                       ],
                     ),
                   ),
                 ),
               ],
             ),
-            Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 40),
-
-            // About Me
-            Text(t.aboutMe, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 12),
-            _buildTextField(_aboutMeController, t.tr(en: "Enter About Me", ar: "أدخل معلومات عنك"), maxLines: 3),
             Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 40),
 
             // Personal Details
@@ -181,68 +230,128 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               ],
             ),
             const SizedBox(height: 20),
+            _buildTextFieldWithLabel(_locationController, t.address, t.tr(en: "Enter Address", ar: "أدخل العنوان"), suffixIcon: Icons.location_on_outlined),
+            const SizedBox(height: 20),
             _buildDropdownField(t.gender, [t.male, t.female]),
             Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 40),
 
-            // Skills
-            Text(t.tr(en: "Skills", ar: "المهارات"), style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 15),
-            Wrap(
-              spacing: 10,
-              runSpacing: 10,
-              children: [
-                _buildSkillTag("Facebook Ads"),
-                _buildSkillTag("Content Planning"),
-                _buildSkillTag("Analytics"),
-                _buildSkillTag("Community Manager"),
-              ],
-            ),
-            Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 40),
-
-            // Portfolio URL
-            Text(t.tr(en: "Portfolio URL", ar: "رابط الأعمال"), style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16, fontWeight: FontWeight.bold)),
+            // About Me
+            Text(t.aboutMe, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16, fontWeight: FontWeight.bold)),
             const SizedBox(height: 12),
-            _buildTextField(_portfolioController, t.tr(en: "Link to your portfolio URL", ar: "رابط لمحفظتك")),
+            _buildTextField(_aboutMeController, t.tr(en: "Enter About Me", ar: "أدخل معلومات عنك"), maxLines: 3),
             Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 40),
 
-            // Salary Expectations
-            Text(t.tr(en: "Salary Expectations", ar: "الراتب (بالجنيه)"), style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            Text(t.tr(en: "Please specify your expected salary range.", ar: "يرجى تحديد الراتب المتوقع."), style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 12)),
-            const SizedBox(height: 20),
+            // 1. Experiences
+            _buildSectionHeader(t.workExperience, () {
+              _showAddItemDialog(
+                title: t.tr(en: "Add Experience", ar: "إضافة خبرة"),
+                fieldLabels: ["Title", "Company", "Duration"],
+                onSave: (data) => setState(() => _experiences.add(data)),
+              );
+            }),
+            ..._experiences.map((exp) => _buildRemovableItem(
+              exp['title'] ?? "", 
+              exp['company'] ?? "", 
+              () => setState(() => _experiences.remove(exp)),
+            )),
+            Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 40),
+
+            // 2. Education
+            _buildSectionHeader(t.education, () {
+              _showAddItemDialog(
+                title: t.tr(en: "Add Education", ar: "إضافة تعليم"),
+                fieldLabels: ["Institution", "Degree", "Duration"],
+                onSave: (data) => setState(() => _education.add(data)),
+              );
+            }),
+            ..._education.map((edu) => _buildRemovableItem(
+              edu['institution'] ?? "", 
+              edu['degree'] ?? "", 
+              () => setState(() => _education.remove(edu)),
+            )),
+            Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 40),
+
+            // 3. Skills
+            Text(t.skills, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: _skills.map((skill) => Chip(
+                label: Text(skill, style: const TextStyle(fontSize: 12)),
+                onDeleted: () => setState(() => _skills.remove(skill)),
+              )).toList(),
+            ),
+            const SizedBox(height: 12),
             Row(
               children: [
-                Expanded(
-                  child: _buildTextField(_minSalaryController, t.tr(en: "Min", ar: "الحد الأدنى"), keyboardType: TextInputType.number),
-                ),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 10),
-                  child: Text("-"),
-                ),
-                Expanded(
-                  child: _buildTextField(_maxSalaryController, t.tr(en: "Max", ar: "الحد الأقصى"), keyboardType: TextInputType.number),
-                ),
+                Expanded(child: _buildTextField(_skillController, t.tr(en: "Add Skill", ar: "إضافة مهارة"))),
+                IconButton(
+                  icon: const Icon(Icons.add_circle, color: Colors.blueAccent),
+                  onPressed: () {
+                    if (_skillController.text.isNotEmpty) {
+                      setState(() {
+                        _skills.add(_skillController.text);
+                        _skillController.clear();
+                      });
+                    }
+                  },
+                )
               ],
-            ),
-            const SizedBox(height: 12),
-            SegmentedButton<String>(
-              segments: [
-                ButtonSegment(value: "Monthly", label: Text(t.tr(en: "Monthly", ar: "شهرياً"))),
-                ButtonSegment(value: "Yearly", label: Text(t.tr(en: "Yearly", ar: "سنوياً"))),
-              ],
-              selected: {_salaryFrequency},
-              onSelectionChanged: (set) => setState(() => _salaryFrequency = set.first),
             ),
             Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 40),
 
-            // Account Type
-            Text(t.tr(en: "Account Type", ar: "نوع الحساب"), style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            Text(t.tr(en: "You can update your account type", ar: "يمكنك تحديث نوع حسابك"), style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 13)),
-            const SizedBox(height: 20),
-            _buildRadioOption(t.tr(en: "Job Seeker", ar: "باحث عن عمل"), t.tr(en: "Looking for a job", ar: "تبحث عن وظيفة")),
-            _buildRadioOption(t.tr(en: "Workers", ar: "عمال"), t.tr(en: "Hiring, sourcing candidates, or posting a jobs", ar: "التوظيف ، البحث عن مرشحين ، أو نشر الوظائف")),
-            
+            // 4. Social Media
+            _buildSectionHeader(t.socialMedia, () {
+              _showAddItemDialog(
+                title: t.tr(en: "Add Social Link", ar: "إضافة رابط تواصل"),
+                fieldLabels: ["Platform", "URL"],
+                onSave: (data) => setState(() => _socialLinks.add(data)),
+              );
+            }),
+            ..._socialLinks.map((link) => _buildRemovableItem(
+              link['platform'] ?? "", 
+              link['url'] ?? "", 
+              () => setState(() => _socialLinks.remove(link)),
+            )),
+            Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 40),
+
+            // 5. Gallery
+            _buildSectionHeader(t.tr(en: "Gallery", ar: "المعرض"), () {
+               _showAddItemDialog(
+                title: t.tr(en: "Add Image URL", ar: "إضافة رابط صورة"),
+                fieldLabels: ["URL"],
+                onSave: (data) => setState(() {
+                  if (data['url'] != null && data['url']!.isNotEmpty) {
+                    _portfolioImages.add(data['url']!);
+                  }
+                }),
+              );
+            }),
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3, crossAxisSpacing: 10, mainAxisSpacing: 10,
+              ),
+              itemCount: _portfolioImages.length,
+              itemBuilder: (context, index) => Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.network(_portfolioImages[index], fit: BoxFit.cover, width: double.infinity, height: double.infinity, errorBuilder: (_,__,___) => const Icon(Icons.broken_image)),
+                  ),
+                  Positioned(
+                    top: 2, right: 2,
+                    child: GestureDetector(
+                      onTap: () => setState(() => _portfolioImages.removeAt(index)),
+                      child: Container(decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle), child: const Icon(Icons.close, size: 16, color: Colors.white)),
+                    ),
+                  )
+                ],
+              ),
+            ),
+
             const SizedBox(height: 40),
             Align(
               alignment: Alignment.centerRight,
@@ -260,6 +369,25 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildSectionHeader(String title, VoidCallback onAdd) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(title, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16, fontWeight: FontWeight.bold)),
+        IconButton(icon: const Icon(Icons.add_circle_outline, color: Colors.blueAccent), onPressed: onAdd),
+      ],
+    );
+  }
+
+  Widget _buildRemovableItem(String title, String subtitle, VoidCallback onDelete) {
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      title: Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+      subtitle: Text(subtitle, style: const TextStyle(fontSize: 12)),
+      trailing: IconButton(icon: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 20), onPressed: onDelete),
     );
   }
 
@@ -379,50 +507,4 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       ],
     );
   }
-
-  Widget _buildSkillTag(String skill) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(skill, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 13)),
-          const SizedBox(width: 8),
-          Icon(Icons.close, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), size: 14),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildRadioOption(String title, String subtitle) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 20),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Radio<String>(
-            value: title,
-            groupValue: _accountType,
-            activeColor: Theme.of(context).colorScheme.primary,
-            onChanged: (value) => setState(() => _accountType = value!),
-          ),
-          const SizedBox(width: 8),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(title, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold, fontSize: 15)),
-              const SizedBox(height: 4),
-              Text(subtitle, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 12)),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
 }
-

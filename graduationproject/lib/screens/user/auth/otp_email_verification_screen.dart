@@ -1,8 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:graduationproject/screens/user/auth/sign_up_screen/sign_up_seeker.dart';
+import '../../../app/router/app_router.dart';
 import 'package:graduationproject/screens/user/core/custom_button.dart';
+import '../../../shared/l10n/app_localizations.dart';
 
 class OtpEmailVerificationScreen extends StatefulWidget {
   final String email;
@@ -57,7 +58,7 @@ class _OtpEmailVerificationScreenState extends State<OtpEmailVerificationScreen>
     super.dispose();
   }
 
-  void _showSuccessPopup() {
+  void _showSuccessPopup(AppLocalizations t) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -80,35 +81,28 @@ class _OtpEmailVerificationScreenState extends State<OtpEmailVerificationScreen>
                 fit: BoxFit.contain,
               ),
               const SizedBox(height: 30),
-              const Text(
-                "Account Created",
-                style: TextStyle(color: Color(0xFF0D2D4D), fontSize: 24, fontWeight: FontWeight.bold),
+              Text(
+                t.tr(en: "Account Created", ar: "تم إنشاء الحساب"),
+                style: const TextStyle(color: Color(0xFF0D2D4D), fontSize: 24, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 12),
-              const Text(
-                "Your account has been created successfully,\nnow you can continue to the app.",
+              Text(
+                t.tr(
+                  en: "Your account has been created successfully,\nnow you can continue to the app.",
+                  ar: "تم إنشاء حسابك بنجاح،\nالآن يمكنك المتابعة إلى التطبيق."
+                ),
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.black54, fontSize: 14, height: 1.5),
+                style: const TextStyle(color: Colors.black54, fontSize: 14, height: 1.5),
               ),
               const SizedBox(height: 40),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    // Navigate to Complete Profile Screen
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => const SignUpSeeker()),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF49769F),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                  ),
-                  child: const Text("Continue", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
-                ),
+              Bottom(
+                isLoading: false,
+                onPressed: () {
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                    AppRoutes.userWorkspace,
+                    (route) => false,
+                  );
+                },
               ),
               const SizedBox(height: 20),
             ],
@@ -120,16 +114,17 @@ class _OtpEmailVerificationScreenState extends State<OtpEmailVerificationScreen>
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: const Color(0xFF011931),
+      backgroundColor: const Color(0xFFF9F5F1),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 20),
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.black87, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text("OTP", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+        title: Text(t.otpTitle, style: const TextStyle(color: Colors.black87, fontSize: 18, fontWeight: FontWeight.bold)),
         centerTitle: true,
       ),
       body: SafeArea(
@@ -139,9 +134,9 @@ class _OtpEmailVerificationScreenState extends State<OtpEmailVerificationScreen>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 40),
-              const Text("Email verification", style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
+              Text(t.otpTitle, style: const TextStyle(color: Colors.black87, fontSize: 24, fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
-              const Text("Enter the verification code we send you on your email.", style: TextStyle(color: Colors.white70, fontSize: 14)),
+              Text(t.otpSubtitle, style: const TextStyle(color: Colors.black54, fontSize: 14)),
               const SizedBox(height: 50),
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: List.generate(4, (index) => _buildOtpBox(index))),
               const SizedBox(height: 40),
@@ -149,9 +144,9 @@ class _OtpEmailVerificationScreenState extends State<OtpEmailVerificationScreen>
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.access_time, color: Colors.white60, size: 20),
+                    const Icon(Icons.access_time, color: Colors.black45, size: 20),
                     const SizedBox(width: 8),
-                    Text(timerText, style: const TextStyle(color: Colors.white60, fontSize: 16)),
+                    Text(timerText, style: const TextStyle(color: Colors.black45, fontSize: 16)),
                   ],
                 ),
               ),
@@ -161,9 +156,9 @@ class _OtpEmailVerificationScreenState extends State<OtpEmailVerificationScreen>
                 onPressed: () {
                   String otp = _controllers.map((e) => e.text).join();
                   if (otp.length == 4) {
-                    _showSuccessPopup();
+                    _showSuccessPopup(t);
                   } else {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Please enter full OTP")));
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.tr(en: "Please enter full OTP", ar: "يرجى إدخال رمز التحقق كاملاً"))));
                   }
                 },
               ),
@@ -179,9 +174,9 @@ class _OtpEmailVerificationScreenState extends State<OtpEmailVerificationScreen>
     return Container(
       width: 75, height: 90,
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.05),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white24, width: 1.5),
+        border: Border.all(color: Colors.grey.shade300, width: 1.5),
       ),
       child: Center(
         child: TextField(
@@ -190,7 +185,7 @@ class _OtpEmailVerificationScreenState extends State<OtpEmailVerificationScreen>
           textAlign: TextAlign.center,
           keyboardType: TextInputType.number,
           inputFormatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(1)],
-          style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
+          style: const TextStyle(color: Colors.black87, fontSize: 32, fontWeight: FontWeight.bold),
           decoration: const InputDecoration(border: InputBorder.none),
           onChanged: (value) {
             if (value.isNotEmpty && index < 3) FocusScope.of(context).requestFocus(_focusNodes[index + 1]);
@@ -200,4 +195,3 @@ class _OtpEmailVerificationScreenState extends State<OtpEmailVerificationScreen>
     );
   }
 }
-

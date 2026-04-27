@@ -1,5 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import '../../../../constants/app_images.dart';
+import '../../../user/messages/new_chat_screen.dart';
 import '../notifications/teardsman_notifications.dart';
 import '../post/post_Job.dart';
 import '../setting/settings.dart';
@@ -84,6 +85,14 @@ class _MessagesListState extends State<MessagesList> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF9F5F1),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+           Navigator.push(context, MaterialPageRoute(builder: (context) => const NewChatScreen()));
+        },
+        backgroundColor: const Color(0xFFDDE6FF),
+        elevation: 4,
+        child: const Icon(Icons.add, color: Color(0xFF011931)),
+      ),
       appBar: AppBar(
         backgroundColor: const Color(0xFFF9F5F1),
         elevation: 0,

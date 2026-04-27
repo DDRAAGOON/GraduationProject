@@ -11,8 +11,6 @@ class RecruitmentJobDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final store = RecruitmentSyncStore.instance;
-    final isSaved = store.savedJobIds.contains(job.id);
     return Scaffold(
       appBar: AppBar(title: const Text('Job Details')),
       body: ListView(
@@ -50,12 +48,6 @@ class RecruitmentJobDetailsScreen extends StatelessWidget {
               AppRoutes.userJobApplication,
               arguments: job,
             ),
-          ),
-          const SizedBox(height: 10),
-          AppButton(
-            label: isSaved ? 'Remove from saved' : 'Save Job',
-            variant: AppButtonVariant.secondary,
-            onPressed: () => store.toggleSaveJob(job.id),
           ),
         ],
       ),

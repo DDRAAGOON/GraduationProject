@@ -1,9 +1,9 @@
 ﻿import 'package:flutter/material.dart';
-import 'package:country_picker/country_picker.dart';
-import 'package:graduationproject/screens/user/core/custom_button.dart';
-import '../../../../constants/app_images.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import '../../../../shared/l10n/app_localizations.dart';
+import '../../../../shared/widgets/app_button.dart';
+import '../../../../shared/widgets/app_text_field.dart';
 import '../otp_email_verification_screen.dart';
-import '../sign_in_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -13,438 +13,169 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+  
   bool _obscurePassword = true;
-  bool _agreeToTerms = false;
-
+  bool _obscureConfirm = true;
+  
   String? _emailError;
-  String? _phoneError;
-  String? _usernameError;
-  String? _passwordError;
-
-  Country _selectedCountry = Country(
-    phoneCode: "20",
-    countryCode: "EG",
-    e164Sc: 0,
-    geographic: true,
-    level: 1,
-    name: "Egypt",
-    example: "Egypt",
-    displayName: "Egypt",
-    displayNameNoCountryCode: "Egypt",
-    e164Key: "",
-  );
-
-  bool _isValidEmail(String email) {
-    return email.contains('@') && email.endsWith('gmail.com');
-  }
-
-  bool _isValidPassword(String password) {
-    return password.length >= 8;
-  }
-
-  bool _isValidPhone(String phone) {
-    return phone.length >= 10;
-  }
+  String? _passError;
+  String? _confirmError;
 
   @override
   void dispose() {
     _emailController.dispose();
-    _phoneController.dispose();
-    _usernameController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
+  }
+
+  void _submit() {
+    final t = AppLocalizations.of(context);
+    setState(() {
+      _emailError = _emailController.text.contains('@') ? null : t.enterValidEmail;
+      _passError = _passwordController.text.length >= 8 ? null : t.min8Chars;
+      _confirmError = _confirmPasswordController.text == _passwordController.text ? null : t.passwordsNoMatch;
+    });
+
+    if (_emailError == null && _passError == null && _confirmError == null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => OtpEmailVerificationScreen(email: _emailController.text.trim()),
+        ),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
+
     return Scaffold(
-      backgroundColor: const Color(0xFF011931),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 40),
-              const Text(
-                "Create your new\naccount",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 40),
-              
-              // Email Address Header with Error
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    "Email Address",
-                    style: TextStyle(color: Colors.white70, fontSize: 14),
-                  ),
-                  if (_emailError != null)
-                    Text(
-                      _emailError!,
-                      style: const TextStyle(color: Colors.red, fontSize: 12),
-                    ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              _buildTextField(
-                controller: _emailController,
-                hintText: "Enter your email",
-                hasError: _emailError != null,
-              ),
-              
-              const SizedBox(height: 24),
-              
-              // Mobile Number Header with Error
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    "Mobile Number",
-                    style: TextStyle(color: Colors.white70, fontSize: 14),
-                  ),
-                  if (_phoneError != null)
-                    Text(
-                      _phoneError!,
-                      style: const TextStyle(color: Colors.red, fontSize: 12),
-                    ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      showCountryPicker(
-                        context: context,
-                        showPhoneCode: true,
-                        onSelect: (Country country) {
-                          setState(() {
-                            _selectedCountry = country;
-                          });
-                        },
-                        countryListTheme: CountryListThemeData(
-                          backgroundColor: const Color(0xFF011931),
-                          textStyle: const TextStyle(color: Colors.white),
-                          searchTextStyle: const TextStyle(color: Colors.white),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                      );
-                    },
-                    child: Container(
-                      height: 56,
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.05),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: _phoneError != null ? Colors.red : Colors.white24,
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          Text(
-                            _selectedCountry.flagEmoji,
-                            style: const TextStyle(fontSize: 20),
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            "+${_selectedCountry.phoneCode}",
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _buildTextField(
-                      controller: _phoneController,
-                      hintText: "Enter Mobile Number",
-                      keyboardType: TextInputType.phone,
-                      hasError: _phoneError != null,
-                    ),
-                  ),
-                ],
-              ),
-              
-              const SizedBox(height: 24),
-              
-              // User Name Header with Error
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    "User Name",
-                    style: TextStyle(color: Colors.white70, fontSize: 14),
-                  ),
-                  if (_usernameError != null)
-                    Text(
-                      _usernameError!,
-                      style: const TextStyle(color: Colors.red, fontSize: 12),
-                    ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              _buildTextField(
-                controller: _usernameController,
-                hintText: "Enter Username",
-                hasError: _usernameError != null,
-              ),
-              
-              const SizedBox(height: 24),
-              
-              // Password Header with Error
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    "Password",
-                    style: TextStyle(color: Colors.white70, fontSize: 14),
-                  ),
-                  if (_passwordError != null)
-                    Text(
-                      _passwordError!,
-                      style: const TextStyle(color: Colors.red, fontSize: 12),
-                    ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              _buildTextField(
-                controller: _passwordController,
-                hintText: "•••••••••••",
-                obscureText: _obscurePassword,
-                hasError: _passwordError != null,
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                    color: Colors.white70,
-                  ),
-                  onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
-                ),
-              ),
-              
-              const SizedBox(height: 20),
-              
-              // Terms and Conditions
-              Row(
-                children: [
-                  Theme(
-                    data: ThemeData(unselectedWidgetColor: Colors.white24),
-                    child: Checkbox(
-                      value: _agreeToTerms,
-                      activeColor: Colors.blue,
-                      onChanged: (value) => setState(() => _agreeToTerms = value!),
-                    ),
-                  ),
-                  Expanded(
-                    child: RichText(
-                      text: TextSpan(
-                        text: "I Agree with ",
-                        style: const TextStyle(color: Colors.white70, fontSize: 13),
-                        children: [
-                          TextSpan(
-                            text: "Terms of Service",
-                            style: TextStyle(color: Colors.blue[300]),
-                          ),
-                          const TextSpan(text: " and "),
-                          TextSpan(
-                            text: "Privacy Policy",
-                            style: TextStyle(color: Colors.blue[300]),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              
-              const SizedBox(height: 30),
-              
-              // Continue Button
-              Bottom(
-                isLoading: false,
-                onPressed: () {
-                  final email = _emailController.text.trim();
-                  final phone = _phoneController.text.trim();
-                  final username = _usernameController.text.trim();
-                  final password = _passwordController.text.trim();
-
-                  setState(() {
-                    _emailError = null;
-                    _phoneError = null;
-                    _usernameError = null;
-                    _passwordError = null;
-                  });
-
-                  bool hasError = false;
-
-                  if (email.isEmpty) {
-                    _emailError = "Email is required";
-                    hasError = true;
-                  } else if (!_isValidEmail(email)) {
-                    _emailError = "Must contain @ and gmail.com";
-                    hasError = true;
-                  }
-
-                  if (phone.isEmpty) {
-                    _phoneError = "Phone is required";
-                    hasError = true;
-                  } else if (!_isValidPhone(phone)) {
-                    _phoneError = "Invalid phone number";
-                    hasError = true;
-                  }
-
-                  if (username.isEmpty) {
-                    _usernameError = "Username is required";
-                    hasError = true;
-                  }
-
-                  if (password.isEmpty) {
-                    _passwordError = "Password is required";
-                    hasError = true;
-                  } else if (!_isValidPassword(password)) {
-                    _passwordError = "At least 8 characters required";
-                    hasError = true;
-                  }
-
-                  if (!_agreeToTerms) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Please agree to terms")),
-                    );
-                    hasError = true;
-                  }
-
-                  setState(() {});
-
-                  if (hasError) return;
-
-                  // Proceed to OTP Screen after validation
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => OtpEmailVerificationScreen(email: email),
-                    ),
-                  );
-                },
-              ),
-              
-              const SizedBox(height: 40),
-              
-              // Divider
-              Row(
-                children: [
-                  Expanded(child: Divider(color: Colors.white24)),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Text(
-                      "Or sign in with",
-                      style: TextStyle(color: Colors.white38, fontSize: 14),
-                    ),
-                  ),
-                  Expanded(child: Divider(color: Colors.white24)),
-                ],
-              ),
-              
-              const SizedBox(height: 30),
-              
-              // Google Login
-              Center(
-                child: Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                  ),
-                  child:  Image.asset(
-                      AppImages.companyIconVector,
-                      width: 24,
-                      height: 24,
-                      fit: BoxFit.contain,
-                      errorBuilder: (context, error, stackTrace) => const Icon(Icons.error, color: Colors.red),
-                    )
-                ),
-              ),
-              
-              const SizedBox(height: 30),
-              
-              // Already Registered
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    "Already Registered? ",
-                    style: TextStyle(color: Colors.white70),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => const SignInScreen()),
-                      );
-                    },
-                    child: const Text(
-                      "Sign In",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-            ],
-          ),
+      backgroundColor: const Color(0xFFF9F5F1),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFFF9F5F1),
+        elevation: 0,
+        surfaceTintColor: Colors.transparent,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: Color(0xFF011931)),
+          onPressed: () => Navigator.pop(context),
         ),
+        title: Text(t.signUpBtn),
+        centerTitle: true,
       ),
-    );
-  }
-
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String hintText,
-    bool obscureText = false,
-    TextInputType? keyboardType,
-    Widget? suffixIcon,
-    bool hasError = false,
-  }) {
-    return TextField(
-      controller: controller,
-      obscureText: obscureText,
-      keyboardType: keyboardType,
-      style: const TextStyle(color: Colors.white),
-      decoration: InputDecoration(
-        hintText: hintText,
-        hintStyle: const TextStyle(color: Colors.white38),
-        filled: true,
-        fillColor: Colors.white.withValues(alpha: 0.05),
-        suffixIcon: suffixIcon,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: hasError ? Colors.red : Colors.white24),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: hasError ? Colors.red : Colors.white24),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: hasError ? Colors.red : Colors.blue),
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20),
+          children: [
+            Text(
+              t.tr(en: "Create Account", ar: "إنشاء حساب جديد"),
+              style: const TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF011931),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              t.tr(en: "Fill the details to start your journey", ar: "املاً البيانات لتبدأ رحلتك معنا"),
+              style: const TextStyle(fontSize: 16, color: Colors.black54),
+            ),
+            const SizedBox(height: 32),
+            
+            AppTextField(
+              label: t.emailAddress,
+              controller: _emailController,
+              hint: t.tr(en: "Enter your email", ar: "اكتب بريدك الإلكتروني"),
+              keyboardType: TextInputType.emailAddress,
+              prefixIcon: Icons.mail_outline,
+              validatorText: _emailError,
+            ),
+            const SizedBox(height: 16),
+            
+            AppTextField(
+              label: t.password,
+              controller: _passwordController,
+              hint: t.tr(en: "Enter your password", ar: "اكتب كلمة المرور"),
+              obscureText: _obscurePassword,
+              prefixIcon: Icons.lock_outline,
+              validatorText: _passError,
+              suffix: IconButton(
+                onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility),
+              ),
+            ),
+            const SizedBox(height: 16),
+            
+            AppTextField(
+              label: t.confirmPassword,
+              controller: _confirmPasswordController,
+              hint: t.tr(en: "Confirm your password", ar: "أعد كتابة كلمة المرور"),
+              obscureText: _obscureConfirm,
+              prefixIcon: Icons.lock_reset_outlined,
+              validatorText: _confirmError,
+              suffix: IconButton(
+                onPressed: () => setState(() => _obscureConfirm = !_obscureConfirm),
+                icon: Icon(_obscureConfirm ? Icons.visibility_off : Icons.visibility),
+              ),
+            ),
+            
+            const SizedBox(height: 32),
+            AppButton(
+              label: t.signUpBtn,
+              onPressed: _submit,
+            ),
+            
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                const Expanded(child: Divider()),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Text(t.tr(en: "OR", ar: "أو"), style: const TextStyle(color: Colors.grey)),
+                ),
+                const Expanded(child: Divider()),
+              ],
+            ),
+            const SizedBox(height: 24),
+            
+            OutlinedButton.icon(
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                side: BorderSide(color: Colors.grey.withOpacity(0.3)),
+              ),
+              onPressed: () {
+                // Google Sign Up logic
+              },
+              icon: const FaIcon(FontAwesomeIcons.google, color: Colors.red, size: 20),
+              label: Text(
+                t.tr(en: "Continue with Google", ar: "المتابعة باستخدام جوجل"),
+                style: const TextStyle(color: Colors.black87, fontWeight: FontWeight.bold),
+              ),
+            ),
+            
+            const SizedBox(height: 40),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(t.alreadyRegistered, style: const TextStyle(color: Colors.black54)),
+                GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: Text(
+                    t.signInBtn,
+                    style: TextStyle(color: Theme.of(context).primaryColor, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+          ],
         ),
       ),
     );
   }
 }
-

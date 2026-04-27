@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../shared/l10n/app_localizations.dart';
 import '../../../constants/app_images.dart';
 import 'edit_profile_screen.dart';
+import 'profile_media_edit_screen.dart';
 import '../notifications/notifications_screen.dart';
 import '../settings/setting_screen.dart';
 import 'user_data.dart';
@@ -64,18 +65,33 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
+                      image: UserProfileData.coverImage != null
+                          ? DecorationImage(
+                              image: NetworkImage(UserProfileData.coverImage!),
+                              fit: BoxFit.cover,
+                            )
+                          : null,
                     ),
                     child: Align(
                       alignment: Alignment.topRight,
                       child: Padding(
                         padding: const EdgeInsets.all(10),
-                        child: Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            color: Colors.black26,
-                            borderRadius: BorderRadius.circular(4),
+                        child: GestureDetector(
+                          onTap: () async {
+                            await Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const ProfileMediaEditScreen()),
+                            );
+                            setState(() {});
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              color: Colors.black26,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: const Icon(Icons.edit_note, color: Colors.white, size: 20),
                           ),
-                          child: const Icon(Icons.edit_note, color: Colors.white, size: 20),
                         ),
                       ),
                     ),
@@ -98,9 +114,11 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
                           )
                         ],
                       ),
-                      child: const CircleAvatar(
+                      child: CircleAvatar(
                         radius: 45,
-                        backgroundImage: AssetImage(AppImages.companyProfile1),
+                        backgroundImage: UserProfileData.profileImage != null
+                            ? NetworkImage(UserProfileData.profileImage!)
+                            : const AssetImage(AppImages.companyProfile1) as ImageProvider,
                       ),
                     ),
                   ),
@@ -149,7 +167,16 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 4),
+                    Text(
+                      t.tr(en: "Job Seeker", ar: "باحث عن عمل"),
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.primary,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
                     Text(
                       UserProfileData.jobTitle.isEmpty ? t.notYet : UserProfileData.jobTitle,
                       style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 14),
@@ -194,7 +221,25 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
 
               const SizedBox(height: 30),
 
-              // About Me
+              // 1. Additional Details
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(t.additionalDetails, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 20),
+                    _buildDetailItem(Icons.email_outlined, t.email, UserProfileData.email),
+                    _buildDetailItem(Icons.phone_android_outlined, t.phone, UserProfileData.phone),
+                    _buildDetailItem(Icons.calendar_today_outlined, t.dob, UserProfileData.dob),
+                    _buildDetailItem(Icons.location_on_outlined, t.address, UserProfileData.location),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // 2. About Me Section
               _buildSectionTitle(t.aboutMeSection),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -206,7 +251,7 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
 
               const SizedBox(height: 30),
 
-              // Work Experience Section
+              // 3. Work Experience Section
               _buildSectionTitle(t.workExperience),
               if (UserProfileData.experiences.isEmpty)
                 Padding(
@@ -217,15 +262,36 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
                   ),
                 )
               else
-                  ...UserProfileData.experiences.map((exp) => _buildExperienceItem(
-                  exp['title']!, 
-                  exp['company']!, 
-                  exp['duration']!
+                ...UserProfileData.experiences.map((exp) => _buildEntryItem(
+                  Icons.work_outline,
+                  exp['title'] ?? "", 
+                  exp['company'] ?? "", 
+                  exp['duration'] ?? ""
                 )),
 
               const SizedBox(height: 30),
 
-              // Skills
+              // 4. Education Section
+              _buildSectionTitle(t.education),
+              if (UserProfileData.education.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Text(
+                    t.tr(en: "No education added yet", ar: "لم يتم إضافة تعليم بعد"),
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 12),
+                  ),
+                )
+              else
+                ...UserProfileData.education.map((edu) => _buildEntryItem(
+                  Icons.school_outlined,
+                  edu['institution'] ?? "", 
+                  edu['degree'] ?? "", 
+                  edu['duration'] ?? ""
+                )),
+
+              const SizedBox(height: 30),
+
+              // 5. Skills Section
               _buildSectionTitle(t.skills),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -240,46 +306,46 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
 
               const SizedBox(height: 30),
 
-              // Portfolio
-              _buildSectionTitle(t.portfolioUrl),
+              // 6. Social Media Section
+              _buildSectionTitle(t.socialMedia),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Text(
-                  UserProfileData.portfolioUrl.isEmpty ? t.notYet : UserProfileData.portfolioUrl,
-                  style: TextStyle(
-                    color: UserProfileData.portfolioUrl.isEmpty 
-                        ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)
-                        : Colors.blueAccent, 
-                    fontSize: 16
-                  ),
-                ),
+                child: UserProfileData.socialLinks.isEmpty
+                    ? Text(t.tr(en: "No social links added", ar: "لم يتم إضافة روابط تواصل"), style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 12))
+                    : Column(
+                        children: UserProfileData.socialLinks.map((link) => 
+                          _buildDetailItem(Icons.link, link["platform"]!, link["url"]!)
+                        ).toList(),
+                      ),
               ),
 
               const SizedBox(height: 30),
 
-              // Details Sections
+              // 7. Gallery Section (Portfolio Images)
+              _buildSectionTitle(t.tr(en: "Gallery", ar: "المعرض")),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(t.additionalDetails, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 20),
-                    _buildDetailItem(Icons.email_outlined, t.email, UserProfileData.email),
-                    _buildDetailItem(Icons.phone_android_outlined, t.phone, UserProfileData.phone),
-                    _buildDetailItem(Icons.calendar_today_outlined, t.dob, UserProfileData.dob),
-                    
-                    const SizedBox(height: 30),
-                    Text(t.socialMedia, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 20),
-                    if (UserProfileData.socialLinks.isEmpty)
-                      Text(t.tr(en: "No social links added", ar: "لم يتم إضافة روابط تواصل"), style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 12))
-                    else
-                      ...UserProfileData.socialLinks.map((link) => 
-                        _buildDetailItem(Icons.link, link["platform"]!, link["url"]!)
+                child: UserProfileData.portfolioImages.isEmpty
+                    ? Text(t.tr(en: "No items in gallery", ar: "لا توجد عناصر في المعرض"), style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 12))
+                    : GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 10,
+                        ),
+                        itemCount: UserProfileData.portfolioImages.length,
+                        itemBuilder: (context, index) {
+                          return ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.network(
+                              UserProfileData.portfolioImages[index],
+                              fit: BoxFit.cover,
+                            ),
+                          );
+                        },
                       ),
-                  ],
-                ),
               ),
 
               const SizedBox(height: 120),
@@ -318,13 +384,13 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
     );
   }
 
-  Widget _buildExperienceItem(String title, String company, String duration) {
+  Widget _buildEntryItem(IconData icon, String title, String subtitle, String duration) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.work_outline, color: Theme.of(context).colorScheme.primary, size: 24),
+          Icon(icon, color: Theme.of(context).colorScheme.primary, size: 24),
           const SizedBox(width: 15),
           Expanded(
             child: Column(
@@ -332,7 +398,7 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
               children: [
                 Text(title, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 4),
-                Text("$company • $duration", style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 13)),
+                Text("$subtitle • $duration", style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 13)),
               ],
             ),
           ),
@@ -390,4 +456,3 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
     );
   }
 }
-

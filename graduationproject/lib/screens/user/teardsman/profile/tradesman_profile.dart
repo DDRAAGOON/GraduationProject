@@ -2,8 +2,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import '../../../../../shared/l10n/app_localizations.dart';
 import '../../../../../shared/state/recruitment_sync_store.dart';
+import '../../auth/sign_up_screen/sign_up_seeker.dart';
 import '../setting/settings.dart';
 import 'teardsman_data.dart';
+import '../../profile/edit_profile_screen.dart';
 
 class TradesmanProfile extends StatefulWidget {
   const TradesmanProfile({super.key});
@@ -78,8 +80,13 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
             icon: const Icon(Icons.settings_outlined, color: Color(0xFF49769F)),
           ),
           IconButton(
-            onPressed: () => setState(() => _isEditing = !_isEditing),
-            icon: Icon(_isEditing ? Icons.close : Icons.edit_outlined, color: const Color(0xFF49769F)),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const EditProfileScreen()),
+              );
+            },
+            icon: const Icon(Icons.edit_outlined, color: Color(0xFF49769F)),
           ),
           const SizedBox(width: 8),
         ],
@@ -138,6 +145,37 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Switching Button (Job Seeker / Tradesman)
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const SignUpSeeker()),
+                          );
+                        },
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFF7A2A).withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(15),
+                            border: Border.all(color: const Color(0xFFFF7A2A).withOpacity(0.3)),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.swap_horiz, color: Color(0xFFFF7A2A)),
+                              const SizedBox(width: 10),
+                              Text(
+                                t.tr(en: "Switch to Job Seeker", ar: "التبديل إلى باحث عن عمل"),
+                                style: const TextStyle(color: Color(0xFFFF7A2A), fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+
                       Card(
                         color: Colors.white,
                         elevation: 0,
@@ -215,7 +253,7 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
                                 phone: _phoneController.text,
                                 location: _locationController.text,
                                 about: _aboutController.text,
-                                skills: _skillsController.text.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList(),
+                                skills: _skillsController.text.split(',').map((e) => e.trim()).toList(),
                               );
                               setState(() => _isEditing = false);
                               ScaffoldMessenger.of(context).showSnackBar(

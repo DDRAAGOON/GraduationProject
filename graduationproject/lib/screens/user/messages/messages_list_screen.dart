@@ -81,6 +81,14 @@ class _MessagesListScreenState extends State<MessagesListScreen> {
     final t = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: const Color(0xFFF9F5F1),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // New chat logic
+        },
+        backgroundColor: const Color(0xFFDDE6FF),
+        elevation: 4,
+        child: const Icon(Icons.add, color: Color(0xFF011931)),
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20.0),

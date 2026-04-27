@@ -132,7 +132,44 @@ class ServiceRequestPost {
 }
 
 class RecruitmentSyncStore extends ChangeNotifier {
-  RecruitmentSyncStore._();
+  RecruitmentSyncStore._() {
+    // Initial mock jobs for Discover tab
+    _jobs.addAll([
+      RecruitmentJob(
+        id: 'job_1',
+        title: 'Senior Flutter Developer',
+        companyName: 'TechCorp',
+        location: 'Cairo',
+        salaryRange: '25k - 35k',
+        type: 'Full-time',
+        category: 'Technical',
+        tags: ['Flutter', 'Dart', 'Firebase'],
+        publishedAt: DateTime.now(),
+      ),
+      RecruitmentJob(
+        id: 'job_2',
+        title: 'UI/UX Designer',
+        companyName: 'DesignStudio',
+        location: 'Remote',
+        salaryRange: '15k - 25k',
+        type: 'Contract',
+        category: 'Technical',
+        tags: ['Figma', 'Adobe XD'],
+        publishedAt: DateTime.now(),
+      ),
+      RecruitmentJob(
+        id: 'job_3',
+        title: 'Marketing Manager',
+        companyName: 'Growthify',
+        location: 'Alexandria',
+        salaryRange: '20k - 30k',
+        type: 'Full-time',
+        category: 'Non-technical',
+        tags: ['Marketing', 'SEO', 'Ads'],
+        publishedAt: DateTime.now(),
+      ),
+    ]);
+  }
 
   static final RecruitmentSyncStore instance = RecruitmentSyncStore._();
 
@@ -459,18 +496,24 @@ class RecruitmentSyncStore extends ChangeNotifier {
     required List<Map<String, dynamic>> applications,
     required List<Map<String, dynamic>> messages,
   }) {
-    _jobs.clear();
-    _jobs.addAll(jobs.map((item) => RecruitmentJob(
-      id: item['id']?.toString() ?? '',
-      title: item['title']?.toString() ?? 'Untitled',
-      companyName: item['companyName']?.toString() ?? 'Company',
-      location: item['location']?.toString() ?? 'Remote',
-      salaryRange: item['salaryRange']?.toString() ?? 'Negotiable',
-      type: item['type']?.toString() ?? 'Full-time',
-      category: item['category']?.toString() ?? 'Technical',
-      tags: item['tags'] is List ? (item['tags'] as List).map((e) => e.toString()).toList() : const [],
-      publishedAt: DateTime.tryParse(item['createdAt']?.toString() ?? '') ?? DateTime.now(),
-    )));
+    if (jobs.isNotEmpty) {
+      _jobs.clear();
+      _jobs.addAll(jobs.map((item) => RecruitmentJob(
+        id: item['id']?.toString() ?? '',
+        title: item['title']?.toString() ?? 'Untitled',
+        companyName: item['companyName']?.toString() ?? 'Company',
+        location: item['location']?.toString() ?? 'Remote',
+        salaryRange: item['salaryRange']?.toString() ?? 'Negotiable',
+        type: item['type']?.toString() ?? 'Full-time',
+        category: item['category']?.toString() ?? 'Technical',
+        tags: item['tags'] is List ? (item['tags'] as List).map((e) => e.toString()).toList() : const [],
+        publishedAt: DateTime.tryParse(item['createdAt']?.toString() ?? '') ?? DateTime.now(),
+      )));
+    }
+    if (applications.isNotEmpty) {
+       _applications.clear();
+       // ... logic to parse applications if needed
+    }
     notifyListeners();
   }
 }

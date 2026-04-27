@@ -23,6 +23,50 @@ class RecruitmentSyncService {
   }
 
   Future<void> startPolling() async {
+    // For demo purposes, we insert some mock jobs if empty
+    final store = RecruitmentSyncStore.instance;
+    if (store.jobs.isEmpty) {
+      store.replaceFromRemote(
+        jobs: [
+          {
+            'id': 'job_1',
+            'title': 'Senior Flutter Developer',
+            'companyName': 'TechCorp',
+            'location': 'Cairo',
+            'salaryRange': '25k - 35k',
+            'type': 'Full-time',
+            'category': 'Technical',
+            'tags': ['Flutter', 'Dart', 'Firebase'],
+            'createdAt': DateTime.now().toIso8601String(),
+          },
+          {
+            'id': 'job_2',
+            'title': 'UI/UX Designer',
+            'companyName': 'DesignStudio',
+            'location': 'Remote',
+            'salaryRange': '15k - 25k',
+            'type': 'Contract',
+            'category': 'Technical',
+            'tags': ['Figma', 'Adobe XD'],
+            'createdAt': DateTime.now().toIso8601String(),
+          },
+          {
+            'id': 'job_3',
+            'title': 'Marketing Manager',
+            'companyName': 'Growthify',
+            'location': 'Alexandria',
+            'salaryRange': '20k - 30k',
+            'type': 'Full-time',
+            'category': 'Non-technical',
+            'tags': ['Marketing', 'SEO', 'Ads'],
+            'createdAt': DateTime.now().toIso8601String(),
+          },
+        ],
+        applications: [],
+        messages: [],
+      );
+    }
+
     await _pullServerState();
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 12), (_) async {
