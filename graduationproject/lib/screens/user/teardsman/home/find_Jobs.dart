@@ -4,6 +4,8 @@ import '../../../../../shared/state/recruitment_sync_store.dart';
 import '../post/post_job.dart';
 import '../setting/settings.dart';
 import 'tradesman_apply_job_screen.dart';
+import 'dart:io';
+import '../../profile/user_data.dart';
 import 'tradesman_job_details_screen.dart';
 
 class FindJobs extends StatefulWidget {
@@ -72,13 +74,33 @@ class _FindJobsState extends State<FindJobs> {
     return Scaffold(
       backgroundColor: const Color(0xFFF9F5F1),
       appBar: AppBar(
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 16, top: 8, bottom: 8),
+          child: GestureDetector(
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const Settings()),
+            ),
+            child: CircleAvatar(
+              radius: 18,
+              backgroundColor: Colors.white,
+              backgroundImage: UserProfileData.profileImage != null
+                  ? (UserProfileData.profileImage!.startsWith('http') 
+                      ? NetworkImage(UserProfileData.profileImage!) 
+                      : FileImage(File(UserProfileData.profileImage!)) as ImageProvider)
+                  : null,
+              child: UserProfileData.profileImage == null 
+                  ? const Icon(Icons.person, size: 20) 
+                  : null,
+            ),
+          ),
+        ),
         backgroundColor: const Color(0xFFF9F5F1),
         elevation: 0,
         surfaceTintColor: Colors.transparent,
-        title: Image.asset(
-          'assets/company/logo/logo.png',
-          height: 150,
-          fit: BoxFit.contain,
+        title: Text(
+          t.tr(en: "Find Jobs", ar: "البحث عن وظائف"),
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         centerTitle: false,
         actions: [

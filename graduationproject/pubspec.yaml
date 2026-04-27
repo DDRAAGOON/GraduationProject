@@ -23,8 +23,8 @@ dependencies:
     sdk: flutter
   intl_phone_field: ^3.2.0
   flutter_svg: ^2.0.10+1
-  fl_chart: ^0.70.2
-  file_picker: ^11.0.2
+  fl_chart: ^1.2.0
+  file_picker: ^8.1.5
   image_picker: ^1.2.1
   shared_preferences: ^2.5.5
   url_launcher: ^6.3.2

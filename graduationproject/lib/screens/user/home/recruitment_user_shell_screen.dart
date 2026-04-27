@@ -1,3 +1,4 @@
+import 'package:url_launcher/url_launcher.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 
@@ -8,7 +9,8 @@ import '../../../shared/state/recruitment_sync_store.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../teardsman/setting/settings.dart';
 import '../messages/messages_list_screen.dart';
-import '../auth/sign_up_screen/sign_up_tradesman.dart';
+import '../teardsman/nav_Botton_bar/nav_bottom_bar.dart';
+import '../profile/user_data.dart';
 
 class RecruitmentUserShellScreen extends StatefulWidget {
   const RecruitmentUserShellScreen({super.key});
@@ -49,6 +51,26 @@ class _RecruitmentUserShellScreenState extends State<RecruitmentUserShellScreen>
     return Scaffold(
       backgroundColor: const Color(0xFFF9F5F1),
       appBar: AppBar(
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 16, top: 8, bottom: 8),
+          child: GestureDetector(
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => const Settings()),
+            ),
+            child: CircleAvatar(
+              radius: 18,
+              backgroundColor: Colors.white,
+              backgroundImage: UserProfileData.profileImage != null
+                  ? (UserProfileData.profileImage!.startsWith('http') 
+                      ? NetworkImage(UserProfileData.profileImage!) 
+                      : FileImage(File(UserProfileData.profileImage!)) as ImageProvider)
+                  : null,
+              child: UserProfileData.profileImage == null 
+                  ? const Icon(Icons.person, size: 20) 
+                  : null,
+            ),
+          ),
+        ),
         title: Text(
           _tab == 0 ? (_isAr ? 'اكتشف الوظائف' : 'Discover Jobs') : 
           _tab == 1 ? (_isAr ? 'تقديماتي' : 'My Apps') :
@@ -563,223 +585,203 @@ class _ProfileTab extends StatefulWidget {
 }
 
 class _ProfileTabState extends State<_ProfileTab> {
-  final _emailController = TextEditingController();
-  final _phoneController = TextEditingController();
-  final _locationController = TextEditingController();
-  final _aboutController = TextEditingController();
-  final _skillsController = TextEditingController();
-  final _portfolioController = TextEditingController();
-  final _cvController = TextEditingController();
-  final _experienceController = TextEditingController();
-  
-  bool _isEditing = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadData();
-  }
-
-  void _loadData() {
-    final store = RecruitmentSyncStore.instance;
-    _emailController.text = store.currentUserEmail;
-    _phoneController.text = store.currentUserPhone;
-    _locationController.text = store.currentUserLocation;
-    _aboutController.text = store.currentUserAbout;
-    _skillsController.text = store.currentUserSkills.join(', ');
-    _portfolioController.text = store.currentUserPortfolio;
-    _cvController.text = store.currentUserCvName ?? '';
-    _experienceController.text = store.currentUserExperience.map((e) => "${e['title']} (${e['duration']})").join('\n');
-  }
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _phoneController.dispose();
-    _locationController.dispose();
-    _aboutController.dispose();
-    _skillsController.dispose();
-    _portfolioController.dispose();
-    _cvController.dispose();
-    _experienceController.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
-    final store = RecruitmentSyncStore.instance;
     final t = AppLocalizations.of(context);
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
-    return AnimatedBuilder(
-      animation: store,
-      builder: (context, _) {
-        if (!_isEditing) _loadData();
-        return Padding(
-          padding: const EdgeInsets.all(16),
-          child: ListView(
+    
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: ListView(
+        children: [
+          Row(
             children: [
-              Row(
-                children: [
-                  CircleAvatar(
-                    radius: 35,
-                    backgroundColor: Colors.white,
-                    backgroundImage: store.profileImage != null && store.profileImage!.startsWith('http')
-                        ? NetworkImage(store.profileImage!)
-                        : null,
-                    child: store.profileImage == null 
-                        ? const Icon(Icons.person, size: 40, color: Color(0xFF49769F)) 
-                        : null,
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          store.currentUserName,
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          store.currentUserTitle,
-                          style: const TextStyle(color: Colors.black54),
-                        ),
-                      ],
+              CircleAvatar(
+                radius: 35,
+                backgroundColor: Colors.white,
+                backgroundImage: UserProfileData.profileImage != null
+                    ? (UserProfileData.profileImage!.startsWith('http') 
+                        ? NetworkImage(UserProfileData.profileImage!) 
+                        : FileImage(File(UserProfileData.profileImage!)) as ImageProvider)
+                    : null,
+                child: UserProfileData.profileImage == null 
+                    ? const Icon(Icons.person, size: 40, color: Color(0xFF49769F)) 
+                    : null,
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      UserProfileData.fullName.isEmpty ? "Not yet" : UserProfileData.fullName,
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                     ),
-                  ),
-                  IconButton(
-                    onPressed: () => setState(() => _isEditing = !_isEditing),
-                    icon: Icon(_isEditing ? Icons.close : Icons.edit_outlined, color: const Color(0xFF49769F)),
+                    Text(
+                      UserProfileData.jobTitle.isEmpty ? "Not yet" : UserProfileData.jobTitle,
+                      style: const TextStyle(color: Colors.black54),
+                    ),
+                  ],
+                ),
+              ),
+              // Edit pen removed as requested
+            ],
+          ),
+          const SizedBox(height: 24),
+          
+          // Switch to Tradesman Button
+          GestureDetector(
+            onTap: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(t.tr(en: "Switching to Tradesman Mode...", ar: "التبديل إلى وضع الصنايعي...")),
+                  backgroundColor: const Color(0xFFFF7A2A),
+                  duration: const Duration(seconds: 1),
+                ),
+              );
+              // Navigate to Tradesman Shell
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const Navbotton()),
+              );
+            },
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFF7A2A).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(15),
+                border: Border.all(color: const Color(0xFFFF7A2A).withOpacity(0.3)),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.swap_horiz, color: Color(0xFFFF7A2A)),
+                  const SizedBox(width: 10),
+                  Text(
+                    t.tr(en: "Switch to Tradesman", ar: "التبديل إلى وضع الصنايعي"),
+                    style: const TextStyle(color: Color(0xFFFF7A2A), fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
-              
-              // Switch to Tradesman Button (Updated to Orange)
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const SignUpTradesman()),
-                  );
-                },
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFF7A2A).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(15),
-                    border: Border.all(color: const Color(0xFFFF7A2A).withOpacity(0.3)),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.swap_horiz, color: Color(0xFFFF7A2A)),
-                      const SizedBox(width: 10),
-                      Text(
-                        t.tr(en: "Switch to Tradesman", ar: "التبديل إلى حرفي"),
-                        style: const TextStyle(color: Color(0xFFFF7A2A), fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              Card(
-                color: Colors.white,
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  side: BorderSide(color: Colors.grey.withOpacity(0.1)),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(14),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildProfileItem(isAr ? 'البريد الإلكتروني' : 'Email', _emailController, enabled: _isEditing),
-                      _buildProfileItem(isAr ? 'رقم الهاتف' : 'Phone', _phoneController, enabled: _isEditing),
-                      _buildProfileItem(isAr ? 'الموقع' : 'Location', _locationController, enabled: _isEditing),
-                      _buildProfileItem(isAr ? 'نبذة عني' : 'About Me', _aboutController, maxLines: 3, enabled: _isEditing),
-                      _buildProfileItem(isAr ? 'المهارات' : 'Skills', _skillsController, enabled: _isEditing),
-                      _buildProfileItem(isAr ? 'خبرة العمل' : 'Work Experience', _experienceController, maxLines: 3, enabled: _isEditing),
-                      _buildProfileItem(isAr ? 'رابط ملف الأعمال' : 'Portfolio', _portfolioController, enabled: _isEditing),
-                      _buildProfileItem(isAr ? 'رابط السيرة الذاتية' : 'CV Link', _cvController, enabled: _isEditing),
-                      
-                      if (store.socialLinks.isNotEmpty) ...[
-                        const SizedBox(height: 20),
-                        Text(
-                          isAr ? 'الروابط الاجتماعية' : 'Social Links',
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                        ),
-                        const SizedBox(height: 8),
-                        ...store.socialLinks.map((link) => Padding(
-                          padding: const EdgeInsets.only(bottom: 4),
-                          child: Row(
-                            children: [
-                              const Icon(Icons.link, size: 18, color: Colors.blue),
-                              const SizedBox(width: 8),
-                              Text('${link['platform']}: '),
-                              Expanded(
-                                child: Text(
-                                  link['url'] ?? '',
-                                  style: const TextStyle(color: Colors.blue, decoration: TextDecoration.underline),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ],
-                          ),
-                        )),
-                      ],
-
-                      if (_isEditing) ...[
-                        const SizedBox(height: 20),
-                        AppButton(
-                          label: isAr ? 'حفظ التغييرات' : 'Save Changes',
-                          onPressed: () {
-                            store.updateUserProfile(
-                              fullName: store.currentUserName,
-                              title: store.currentUserTitle,
-                              email: _emailController.text,
-                              phone: _phoneController.text,
-                              location: _locationController.text,
-                              about: _aboutController.text,
-                              skills: _skillsController.text.split(',').map((e) => e.trim()).toList(),
-                              portfolio: _portfolioController.text,
-                              cvName: _cvController.text,
-                            );
-                            setState(() => _isEditing = false);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(isAr ? 'تم تحديث الملف الشخصي' : 'Profile updated')),
-                            );
-                          },
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
-        );
-      },
+          const SizedBox(height: 20),
+
+          Card(
+            color: Colors.white,
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+              side: BorderSide(color: Colors.grey.withOpacity(0.1)),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildProfileItem(isAr ? 'البريد الإلكتروني' : 'Email', UserProfileData.email),
+                  _buildProfileItem(isAr ? 'رقم الهاتف' : 'Phone', UserProfileData.phone),
+                  _buildProfileItem(isAr ? 'الموقع' : 'Location', UserProfileData.location),
+                  _buildProfileItem(isAr ? 'نبذة عني' : 'About Me', UserProfileData.aboutMe),
+                  _buildProfileItem(isAr ? 'المهارات' : 'Skills', UserProfileData.skills.join(', ')),
+                  _buildProfileItem(isAr ? 'خبرة العمل' : 'Work Experience', UserProfileData.experiences.map((e) => "${e['title']} (${e['duration']})").join('\n')),
+                  _buildProfileItem(isAr ? 'رابط ملف الأعمال' : 'Portfolio', UserProfileData.portfolioUrl),
+                  _buildProfileItem(isAr ? 'السيرة الذاتية' : 'CV', UserProfileData.cvName ?? ""),
+                  
+                  // Gallery Section
+                  if (UserProfileData.portfolioImages.isNotEmpty) ...[
+                    const SizedBox(height: 20),
+                    Text(
+                      isAr ? 'المعرض' : 'Gallery',
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    ),
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      height: 100,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: UserProfileData.portfolioImages.length,
+                        itemBuilder: (context, index) {
+                          final path = UserProfileData.portfolioImages[index];
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 10),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: path.startsWith('http')
+                                  ? Image.network(path, width: 100, height: 100, fit: BoxFit.cover, errorBuilder: (_,__,___) => const Icon(Icons.broken_image))
+                                  : Image.file(File(path), width: 100, height: 100, fit: BoxFit.cover, errorBuilder: (_,__,___) => const Icon(Icons.broken_image)),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+
+                  if (UserProfileData.socialLinks.isNotEmpty) ...[
+                    const SizedBox(height: 20),
+                    Text(
+                      isAr ? 'الروابط الاجتماعية' : 'Social Links',
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    ),
+                    const SizedBox(height: 8),
+                    ...UserProfileData.socialLinks.map((link) => Padding(
+                      padding: const EdgeInsets.only(bottom: 4),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.link, size: 18, color: Colors.blue),
+                          const SizedBox(width: 8),
+                          Text('${link['platform']}: '),
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () async {
+                                String url = link['url'] ?? '';
+                                if (url.isNotEmpty) {
+                                  if (!url.startsWith('http')) {
+                                    url = 'https://$url';
+                                  }
+                                  final uri = Uri.parse(url);
+                                  if (await canLaunchUrl(uri)) {
+                                    await launchUrl(uri, mode: LaunchMode.externalApplication);
+                                  }
+                                }
+                              },
+                              child: Text(
+                                link['url'] ?? '',
+                                style: const TextStyle(color: Colors.blue, decoration: TextDecoration.underline),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _buildProfileItem(String label, TextEditingController controller, {int maxLines = 1, bool enabled = false}) {
+  Widget _buildProfileItem(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: TextField(
-        controller: controller,
-        maxLines: maxLines,
-        enabled: enabled,
-        decoration: InputDecoration(
-          labelText: label,
-          labelStyle: const TextStyle(fontSize: 14),
-          border: enabled ? const OutlineInputBorder() : const UnderlineInputBorder(borderSide: BorderSide.none),
-          filled: enabled,
-          fillColor: Colors.grey.withOpacity(0.05),
-        ),
+      padding: const EdgeInsets.only(bottom: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(color: Colors.black38, fontSize: 12, fontWeight: FontWeight.w500),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            value.isEmpty ? "Not yet" : value,
+            style: const TextStyle(color: Colors.black87, fontSize: 15, fontWeight: FontWeight.w500),
+          ),
+        ],
       ),
     );
   }

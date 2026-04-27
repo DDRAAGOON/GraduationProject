@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import '../../../constants/app_images.dart';
 import '../../../shared/l10n/app_localizations.dart';
 import 'chat_thread_screen.dart';
+import 'dart:io';
+import '../profile/user_data.dart';
+import '../teardsman/setting/settings.dart';
 
 class MessagesListScreen extends StatefulWidget {
   const MessagesListScreen({super.key});
@@ -81,6 +84,35 @@ class _MessagesListScreenState extends State<MessagesListScreen> {
     final t = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: const Color(0xFFF9F5F1),
+      appBar: AppBar(
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 16, top: 8, bottom: 8),
+          child: GestureDetector(
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => const Settings()),
+            ),
+            child: CircleAvatar(
+              radius: 18,
+              backgroundColor: Colors.white,
+              backgroundImage: UserProfileData.profileImage != null
+                  ? (UserProfileData.profileImage!.startsWith('http') 
+                      ? NetworkImage(UserProfileData.profileImage!) 
+                      : FileImage(File(UserProfileData.profileImage!)) as ImageProvider)
+                  : null,
+              child: UserProfileData.profileImage == null 
+                  ? const Icon(Icons.person, size: 20) 
+                  : null,
+            ),
+          ),
+        ),
+        title: Text(
+          t.messages,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: const Color(0xFFF9F5F1),
+        surfaceTintColor: Colors.transparent,
+        centerTitle: false,
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           // New chat logic
@@ -93,17 +125,7 @@ class _MessagesListScreenState extends State<MessagesListScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
-              child: Text(
-                t.messages,
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface,
-                  fontSize: 28,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-            ),
+            const SizedBox(height: 10),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               child: _buildSearchBar(context, t),

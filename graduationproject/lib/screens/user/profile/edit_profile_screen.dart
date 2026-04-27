@@ -1,9 +1,11 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
-import '../../../constants/app_images.dart';
 import '../../../shared/l10n/app_localizations.dart';
 import 'profile_login_details_screen.dart';
 import 'setting_profile/notifications.dart';
 import 'setting_profile/preferences.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:image_picker/image_picker.dart';
 import 'user_data.dart';
 
 class EditProfileScreen extends StatefulWidget {
@@ -64,6 +66,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   void _saveData() {
+    final t = AppLocalizations.of(context);
     setState(() {
       UserProfileData.fullName = _fullNameController.text;
       UserProfileData.phone = _phoneController.text;
@@ -80,6 +83,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       UserProfileData.socialLinks = List.from(_socialLinks);
       UserProfileData.portfolioImages = List.from(_portfolioImages);
     });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(t.tr(en: "Saved successfully", ar: "تم الحفظ بنجاح")),
+        backgroundColor: Colors.green,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
     Navigator.pop(context);
   }
 
@@ -121,6 +132,30 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> _pickCV() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['pdf', 'doc', 'docx'],
+    );
+    
+    if (result != null) {
+      setState(() {
+        UserProfileData.cvName = result.files.single.name;
+      });
+    }
+  }
+
+  Future<void> _pickImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    
+    if (image != null) {
+      setState(() {
+        UserProfileData.profileImage = image.path;
+      });
+    }
   }
 
   @override
@@ -184,32 +219,41 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             const SizedBox(height: 8),
             Text(t.tr(en: "This image will be shown publicly as your profile picture.", ar: "ستظهر هذه الصورة علنًا كصورة ملفك الشخصي."), style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 12)),
             const SizedBox(height: 20),
-            Row(
-              children: [
-                CircleAvatar(
-                  radius: 35,
-                  backgroundImage: UserProfileData.profileImage != null
-                      ? NetworkImage(UserProfileData.profileImage!)
-                      : const AssetImage(AppImages.companyProfile1) as ImageProvider,
-                ),
-                const SizedBox(width: 20),
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), style: BorderStyle.solid),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Column(
-                      children: [
-                        Icon(Icons.image_outlined, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), size: 30),
-                        const SizedBox(height: 8),
-                        Text(t.tr(en: "Click to replace or drag and drop", ar: "انقر للاستبدال أو السحب والإفلات"), style: const TextStyle(color: Colors.blueAccent, fontSize: 12)),
-                      ],
+            GestureDetector(
+              onTap: _pickImage,
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 35,
+                    backgroundColor: Colors.grey.withOpacity(0.1),
+                    backgroundImage: UserProfileData.profileImage != null
+                        ? (UserProfileData.profileImage!.startsWith('http') 
+                            ? NetworkImage(UserProfileData.profileImage!) 
+                            : FileImage(File(UserProfileData.profileImage!)) as ImageProvider)
+                        : null,
+                    child: UserProfileData.profileImage == null 
+                        ? Icon(Icons.camera_alt, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)) 
+                        : null,
+                  ),
+                  const SizedBox(width: 20),
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), style: BorderStyle.solid),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Column(
+                        children: [
+                          Icon(Icons.image_outlined, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), size: 30),
+                          const SizedBox(height: 8),
+                          Text(t.tr(en: "Click to replace or drag and drop", ar: "انقر للاستبدال أو السحب والإفلات"), style: const TextStyle(color: Colors.blueAccent, fontSize: 12)),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
             Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 40),
 
@@ -318,17 +362,54 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             )),
             Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 40),
 
-            // 5. Gallery
-            _buildSectionHeader(t.tr(en: "Gallery", ar: "المعرض"), () {
-               _showAddItemDialog(
-                title: t.tr(en: "Add Image URL", ar: "إضافة رابط صورة"),
-                fieldLabels: ["URL"],
-                onSave: (data) => setState(() {
-                  if (data['url'] != null && data['url']!.isNotEmpty) {
-                    _portfolioImages.add(data['url']!);
-                  }
-                }),
-              );
+            // 5. CV Upload
+            Text(t.tr(en: "Curriculum Vitae (CV)", ar: "السيرة الذاتية (CV)"), style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 12),
+            GestureDetector(
+              onTap: _pickCV,
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(15),
+                  border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.12)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.description_outlined, color: Color(0xFF49769F), size: 30),
+                    const SizedBox(width: 15),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            UserProfileData.cvName ?? t.tr(en: "Upload your CV", ar: "ارفع سيرتك الذاتية"),
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            t.tr(en: "PDF, DOC, DOCX (Max 5MB)", ar: "PDF, DOC, DOCX (بحد أقصى 5 ميجابايت)"),
+                            style: const TextStyle(color: Colors.black38, fontSize: 12),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Icon(Icons.cloud_upload_outlined, color: Colors.blueAccent),
+                  ],
+                ),
+              ),
+            ),
+            Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 40),
+
+            // 6. Gallery
+            _buildSectionHeader(t.tr(en: "Gallery", ar: "المعرض"), () async {
+               final ImagePicker picker = ImagePicker();
+               final List<XFile> images = await picker.pickMultiImage();
+               if (images.isNotEmpty) {
+                 setState(() {
+                   _portfolioImages.addAll(images.map((i) => i.path));
+                 });
+               }
             }),
             GridView.builder(
               shrinkWrap: true,
@@ -337,21 +418,29 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 crossAxisCount: 3, crossAxisSpacing: 10, mainAxisSpacing: 10,
               ),
               itemCount: _portfolioImages.length,
-              itemBuilder: (context, index) => Stack(
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: Image.network(_portfolioImages[index], fit: BoxFit.cover, width: double.infinity, height: double.infinity, errorBuilder: (_,__,___) => const Icon(Icons.broken_image)),
-                  ),
-                  Positioned(
-                    top: 2, right: 2,
-                    child: GestureDetector(
-                      onTap: () => setState(() => _portfolioImages.removeAt(index)),
-                      child: Container(decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle), child: const Icon(Icons.close, size: 16, color: Colors.white)),
+              itemBuilder: (context, index) {
+                final path = _portfolioImages[index];
+                return Stack(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: path.startsWith('http')
+                          ? Image.network(path, fit: BoxFit.cover, width: double.infinity, height: double.infinity, errorBuilder: (_,__,___) => const Icon(Icons.broken_image))
+                          : Image.asset(path, fit: BoxFit.cover, width: double.infinity, height: double.infinity, errorBuilder: (ctx, _, __) {
+                              // If asset fails, try File
+                              return Image.file(File(path), fit: BoxFit.cover, width: double.infinity, height: double.infinity, errorBuilder: (_,__,___) => const Icon(Icons.broken_image));
+                            }),
                     ),
-                  )
-                ],
-              ),
+                    Positioned(
+                      top: 2, right: 2,
+                      child: GestureDetector(
+                        onTap: () => setState(() => _portfolioImages.removeAt(index)),
+                        child: Container(decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle), child: const Icon(Icons.close, size: 16, color: Colors.white)),
+                      ),
+                    )
+                  ],
+                );
+              },
             ),
 
             const SizedBox(height: 40),

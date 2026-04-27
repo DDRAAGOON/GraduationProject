@@ -37,7 +37,7 @@ class LogoPage extends StatelessWidget {
             children: [
               SizedBox(height: size.height * 0.02),
               Text(
-                'JOBITO',
+                t.isAr ? 'مرحباً بك' : 'WELCOME',
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.w900,
                   color: cs.primary,
@@ -60,14 +60,10 @@ class LogoPage extends StatelessWidget {
                     maxWidth: size.width * 0.84,
                     maxHeight: size.height * 0.38,
                   ),
-                  child: Image.asset(
-                    AppImages.jobito,
-                    fit: BoxFit.contain,
-                    errorBuilder: (_, _, _) => Icon(
-                      Icons.work_outline_rounded,
-                      size: size.width * 0.22,
-                      color: const Color(0xFF1B2D4F),
-                    ),
+                  child: Icon(
+                    Icons.work_outline_rounded,
+                    size: size.width * 0.35,
+                    color: const Color(0xFF1B2D4F),
                   ),
                 ),
               ),

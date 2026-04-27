@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:file_picker/file_picker.dart';
 import '../../../shared/services/recruitment_sync_service.dart';
 import '../../../shared/state/recruitment_sync_store.dart';
 import '../../../shared/widgets/app_button.dart';
@@ -17,24 +18,36 @@ class RecruitmentJobApplicationScreen extends StatefulWidget {
 class _RecruitmentJobApplicationScreenState
     extends State<RecruitmentJobApplicationScreen> {
   final _portfolio = TextEditingController();
-  final _cvLink = TextEditingController();
   final _cover = TextEditingController();
   final _linkedIn = TextEditingController();
   bool _loading = false;
+  String? _selectedCVName;
 
   @override
   void dispose() {
     _portfolio.dispose();
-    _cvLink.dispose();
     _cover.dispose();
     _linkedIn.dispose();
     super.dispose();
   }
 
+  Future<void> _pickCV() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['pdf', 'doc', 'docx'],
+    );
+    
+    if (result != null) {
+      setState(() {
+        _selectedCVName = result.files.single.name;
+      });
+    }
+  }
+
   Future<void> _submit() async {
-    if (_cover.text.trim().isEmpty || _cvLink.text.trim().isEmpty) {
+    if (_cover.text.trim().isEmpty || _selectedCVName == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please complete required fields (CV Link and Cover Letter).')),
+        const SnackBar(content: Text('Please upload your CV and write a Cover Letter.')),
       );
       return;
     }
@@ -58,10 +71,9 @@ class _RecruitmentJobApplicationScreenState
       appBar: AppBar(
         elevation: 0,
         surfaceTintColor: Colors.transparent,
-        title: Image.asset(
-          'assets/company/logo/logo.png',
-          height: 150,
-          fit: BoxFit.contain,
+        title: Text(
+          'Apply to Job',
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
       ),
@@ -97,10 +109,36 @@ class _RecruitmentJobApplicationScreenState
           
           _buildInputField('Portfolio URL', _portfolio),
           _buildInputField('LinkedIn URL', _linkedIn),
-          _buildInputField('CV Link (Google Drive/Dropbox) *', _cvLink, keyboardType: TextInputType.url),
           
           const SizedBox(height: 8),
+          const Text('Curriculum Vitae (CV) *', style: TextStyle(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
+          GestureDetector(
+            onTap: _pickCV,
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey.shade300),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.description_outlined, color: Colors.blue),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      _selectedCVName ?? 'Upload your CV (PDF, DOC)',
+                      style: TextStyle(color: _selectedCVName == null ? Colors.black38 : Colors.black87),
+                    ),
+                  ),
+                  const Icon(Icons.cloud_upload_outlined, color: Colors.blue),
+                ],
+              ),
+            ),
+          ),
           
+          const SizedBox(height: 20),
           _buildInputField('Cover letter *', _cover, maxLines: 5),
           
           const SizedBox(height: 24),

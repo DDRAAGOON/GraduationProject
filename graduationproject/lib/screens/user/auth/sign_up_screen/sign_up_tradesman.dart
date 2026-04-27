@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../../../app/router/app_router.dart';
+import '../../profile/user_data.dart';
 import '../../teardsman/nav_Botton_bar/nav_bottom_bar.dart';
 import '../../teardsman/profile/teardsman_data.dart';
 import '../../../../../shared/l10n/app_localizations.dart';
 import '../../../../../shared/state/recruitment_sync_store.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 class SignUpTradesman extends StatefulWidget {
   const SignUpTradesman({super.key});
@@ -58,7 +61,31 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
   final List<String> _skillsList = [];
   
   // Criminal Record and Work Images state
-  bool _criminalRecordUploaded = false;
+  String? _criminalRecordPath;
+  List<String> _workImagesPaths = [];
+
+  Future<void> _pickCriminalRecord() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['pdf', 'jpg', 'png', 'jpeg'],
+    );
+    if (result != null) {
+      setState(() {
+        _criminalRecordPath = result.files.single.path;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Criminal Record selected successfully")));
+    }
+  }
+
+  Future<void> _pickWorkImages() async {
+    final ImagePicker picker = ImagePicker();
+    final List<XFile> images = await picker.pickMultiImage();
+    if (images.isNotEmpty) {
+      setState(() {
+        _workImagesPaths.addAll(images.map((i) => i.path));
+      });
+    }
+  }
 
   @override
   void initState() {
@@ -121,7 +148,7 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Please select gender")));
         return;
       }
-      if (!_criminalRecordUploaded) {
+      if (_criminalRecordPath == null) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Criminal Record is required")));
         return;
       }
@@ -158,8 +185,13 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
         "instagram": _instagramController.text,
         "facebook": _facebookController.text,
       };
-      TradesmanProfileData.criminalRecordUploaded = _criminalRecordUploaded;
+      TradesmanProfileData.criminalRecordUploaded = _criminalRecordPath != null;
       TradesmanProfileData.profileImage = _profileImageController.text.isEmpty ? null : _profileImageController.text;
+      
+      // Update UserProfileData too
+      UserProfileData.portfolioImages = List.from(_workImagesPaths);
+      UserProfileData.cvName = _criminalRecordPath != null ? "Criminal_Record" : null; // Mapping criminal record to CV for now as requested or add CV specifically
+
 
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Tradesman Profile saved successfully!")));
       
@@ -180,10 +212,9 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
         backgroundColor: const Color(0xFFF9F5F1),
         elevation: 0,
         surfaceTintColor: Colors.transparent,
-        title: Image.asset(
-          'assets/company/logo/logo.png',
-          height: 150,
-          fit: BoxFit.contain,
+        title: Text(
+          t.isAr ? "إنشاء حساب" : "Sign Up",
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
       ),
@@ -211,12 +242,8 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
                       ),
                       TextSpan(
                         text: t.isAr
-                            ? "كحرفي أو باحث عن عمل مع "
-                            : "Tradesman or a job seeker with ",
-                      ),
-                      const TextSpan(
-                        text: "Jobito",
-                        style: TextStyle(color: Colors.orange),
+                            ? "كحرفي أو باحث عن عمل"
+                            : "Tradesman or a job seeker",
                       ),
                     ],
                   ),
@@ -296,17 +323,47 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
                 const SizedBox(height: 30),
 
                 // Criminal Record Check (Required)
-                _buildSectionHeader("${t.criminalRecord} *", t.criminalRecordHint),
+                _buildUploadBox(
+                  _criminalRecordPath != null ? "Criminal Record: ${_criminalRecordPath!.split(Platform.pathSeparator).last} ✓" : t.uploadHint, 
+                  _pickCriminalRecord
+                ),
+                const SizedBox(height: 30),
+
+                // Gallery / Work Images
+                _buildSectionHeader(t.tr(en: "Work Images (Gallery)", ar: "صور العمل (المعرض)"), t.tr(en: "Upload photos of your previous work", ar: "ارفع صور لأعمالك السابقة")),
                 const SizedBox(height: 15),
                 _buildUploadBox(
-                  _criminalRecordUploaded ? "${t.criminalRecord} ${t.saved} ✓" : t.uploadHint, 
-                  () {
-                    setState(() {
-                      _criminalRecordUploaded = true;
-                    });
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Criminal Record Uploaded Successfully")));
-                  }
+                  _workImagesPaths.isNotEmpty ? "${_workImagesPaths.length} Images Selected ✓" : t.uploadHint,
+                  _pickWorkImages
                 ),
+                if (_workImagesPaths.isNotEmpty) ...[
+                  const SizedBox(height: 10),
+                  SizedBox(
+                    height: 80,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: _workImagesPaths.length,
+                      itemBuilder: (context, index) => Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: Stack(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: Image.file(File(_workImagesPaths[index]), width: 80, height: 80, fit: BoxFit.cover),
+                            ),
+                            Positioned(
+                              top: 2, right: 2,
+                              child: GestureDetector(
+                                onTap: () => setState(() => _workImagesPaths.removeAt(index)),
+                                child: Container(decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle), child: const Icon(Icons.close, size: 16, color: Colors.white)),
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 30),
 
                 // About Me

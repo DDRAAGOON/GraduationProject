@@ -5,6 +5,9 @@ import '../../../../app/router/app_router.dart';
 import '../../profile/user_data.dart';
 import '../../../../../shared/l10n/app_localizations.dart';
 import '../../../../../shared/state/recruitment_sync_store.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 class SignUpSeeker extends StatefulWidget {
   const SignUpSeeker({super.key});
@@ -52,9 +55,35 @@ class _SignUpSeeker extends State<SignUpSeeker> {
   final List<Map<String, String>> _experiencesList = [];
   final List<Map<String, String>> _educationList = [];
 
+  String? _cvPath;
+  String? _profileImagePath;
   String? _selectedGender;
   final List<String> _platforms = ["LinkedIn", "GitHub", "Twitter", "Instagram", "Facebook", "Other"];
   String _selectedPlatform = "LinkedIn";
+
+  Future<void> _pickCV() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['pdf', 'doc', 'docx'],
+    );
+    if (result != null) {
+      setState(() {
+        _cvPath = result.files.single.path;
+        _cvController.text = result.files.single.name;
+      });
+    }
+  }
+
+  Future<void> _pickProfileImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      setState(() {
+        _profileImagePath = image.path;
+        _profileImageController.text = image.path;
+      });
+    }
+  }
 
   @override
   void initState() {
@@ -191,10 +220,9 @@ class _SignUpSeeker extends State<SignUpSeeker> {
         backgroundColor: const Color(0xFFF9F5F1),
         elevation: 0,
         surfaceTintColor: Colors.transparent,
-        title: Image.asset(
-          'assets/company/logo/logo.png',
-          height: 150,
-          fit: BoxFit.contain,
+        title: Text(
+          t.isAr ? "إنشاء حساب" : "Sign Up",
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
       ),
@@ -222,12 +250,8 @@ class _SignUpSeeker extends State<SignUpSeeker> {
                       ),
                       TextSpan(
                         text: t.isAr
-                            ? "كحرفي أو باحث عن عمل مع "
-                            : "Tradesman or a job seeker with ",
-                      ),
-                      const TextSpan(
-                        text: "Jobito",
-                        style: TextStyle(color: Colors.orange),
+                            ? "كحرفي أو باحث عن عمل"
+                            : "Tradesman or a job seeker",
                       ),
                     ],
                   ),
@@ -249,15 +273,18 @@ class _SignUpSeeker extends State<SignUpSeeker> {
                 const SizedBox(height: 35),
 
                 // Profile Image Avatar Preview (Moved to the left)
-                CircleAvatar(
-                  radius: 50,
-                  backgroundColor: Colors.white,
-                  backgroundImage: _profileImageController.text.isNotEmpty 
-                      ? NetworkImage(_profileImageController.text) as ImageProvider
-                      : null,
-                  child: _profileImageController.text.isEmpty
-                      ? const Icon(Icons.person, size: 50, color: Color(0xFF49769F))
-                      : null,
+                GestureDetector(
+                  onTap: _pickProfileImage,
+                  child: CircleAvatar(
+                    radius: 50,
+                    backgroundColor: Colors.white,
+                    backgroundImage: _profileImagePath != null 
+                        ? FileImage(File(_profileImagePath!))
+                        : null,
+                    child: _profileImagePath == null
+                        ? const Icon(Icons.person, size: 50, color: Color(0xFF49769F))
+                        : null,
+                  ),
                 ),
                 const SizedBox(height: 20),
 
@@ -265,7 +292,7 @@ class _SignUpSeeker extends State<SignUpSeeker> {
                 const SizedBox(height: 20),
                 _buildTextField(_fullNameController, t.fullName, Icons.person_outline, isRequired: true),
                 const SizedBox(height: 20),
-                _buildTextField(_profileImageController, t.tr(en: "Profile Image URL", ar: "رابط الصورة الشخصية"), Icons.image_outlined, hint: t.tr(en: "Paste image link here", ar: "الصق رابط الصورة هنا")),
+                _buildTextField(_profileImageController, t.tr(en: "Profile Image", ar: "الصورة الشخصية"), Icons.image_outlined, hint: t.tr(en: "Tap avatar to upload", ar: "اضغط على الصورة للرفع"), readOnly: true),
                 const SizedBox(height: 20),
                 _buildTextField(_emailController, t.emailAddress, Icons.email_outlined, isRequired: true, validator: (v) => (v == null || !v.endsWith("@gmail.com")) ? t.enterValidEmail : null),
                 const SizedBox(height: 20),
@@ -383,9 +410,10 @@ class _SignUpSeeker extends State<SignUpSeeker> {
                 _buildTextField(_portfolioController, t.tr(en: "Portfolio Link (URL)", ar: "رابط ملف الأعمال"), Icons.link_outlined),
 
                 const SizedBox(height: 25),
-                Text(t.tr(en: "CV Link ", ar: "رابط السيرة الذاتية "), style: const TextStyle(color: Colors.black87, fontSize: 16, fontWeight: FontWeight.w600)),
-                const SizedBox(height: 10),
-                _buildTextField(_cvController, t.tr(en: "CV Info", ar: "معلومات السيرة الذاتية"), Icons.description_outlined, hint: t.tr(en: "Paste link or type info", ar: "الصق الرابط أو اكتب المعلومات")),
+                GestureDetector(
+                  onTap: _pickCV,
+                  child: _buildTextField(_cvController, t.tr(en: "CV File", ar: "ملف السيرة الذاتية"), Icons.description_outlined, hint: t.tr(en: "Tap to upload CV", ar: "اضغط لرفع السيرة الذاتية"), readOnly: true),
+                ),
 
                 const SizedBox(height: 25),
                 Text(t.socialLinks, style: const TextStyle(color: Colors.black54, fontSize: 14)),
@@ -450,9 +478,10 @@ class _SignUpSeeker extends State<SignUpSeeker> {
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String label, IconData icon, {String? hint, String? prefixText, int maxLines = 1, TextInputType keyboardType = TextInputType.text, bool isRequired = false, VoidCallback? onIconTap, IconData? suffixIcon, VoidCallback? onSuffixTap, List<TextInputFormatter>? inputFormatters, String? Function(String?)? validator}) {
+  Widget _buildTextField(TextEditingController controller, String label, IconData icon, {String? hint, String? prefixText, int maxLines = 1, TextInputType keyboardType = TextInputType.text, bool isRequired = false, VoidCallback? onIconTap, IconData? suffixIcon, VoidCallback? onSuffixTap, List<TextInputFormatter>? inputFormatters, String? Function(String?)? validator, bool readOnly = false}) {
     return TextFormField(
       controller: controller, maxLines: maxLines, keyboardType: keyboardType, inputFormatters: inputFormatters, 
+      readOnly: readOnly,
       style: const TextStyle(color: Colors.black87),
       validator: isRequired ? (validator ?? (value) => (value == null || value.isEmpty) ? "$label is required" : null) : null,
       decoration: InputDecoration(
