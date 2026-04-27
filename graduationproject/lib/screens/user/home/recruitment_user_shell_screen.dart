@@ -347,7 +347,7 @@ class _ApplicationsTab extends StatelessWidget {
 
     // Stats
     final totalApps = apps.length;
-    final hiredApps = apps.where((a) => a.status.toLowerCase() == 'hired').length;
+    final hiredApps = apps.where((a) => a.status.toLowerCase() == 'hired' || a.status == 'تم التوظيف').length;
 
     return AnimatedBuilder(
       animation: store,
@@ -361,6 +361,7 @@ class _ApplicationsTab extends StatelessWidget {
               isAr ? '${store.currentUserName} صباح الخير' : 'Good Morning, ${store.currentUserName}',
               style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF011931)),
             ),
+            const SizedBox(height: 4),
             Text(
               isAr ? 'هذا ما قمت به بطلباتك حتى الآن' : 'Here is what\'s happening with your applications',
               style: const TextStyle(color: Colors.black54, fontSize: 14),
@@ -383,7 +384,7 @@ class _ApplicationsTab extends StatelessWidget {
                       ),
                       const SizedBox(height: 12),
                       _buildStatCard(
-                        isAr ? 'لقد تم تعيينك في' : 'You were hired in',
+                        isAr ? 'تم اختيارك في' : 'You were hired in',
                         hiredApps.toString(),
                         Icons.check_circle_outline,
                       ),
@@ -411,20 +412,20 @@ class _ApplicationsTab extends StatelessWidget {
                             child: Stack(
                               alignment: Alignment.center,
                               children: [
-                                const SizedBox(
+                                SizedBox(
                                   width: 100,
                                   height: 100,
                                   child: CircularProgressIndicator(
-                                    value: 0.7,
+                                    value: totalApps == 0 ? 0 : hiredApps / totalApps,
                                     strokeWidth: 10,
-                                    backgroundColor: Color(0xFFEEEEEE),
-                                    valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+                                    backgroundColor: const Color(0xFFEEEEEE),
+                                    valueColor: const AlwaysStoppedAnimation<Color>(Colors.green),
                                   ),
                                 ),
                                 Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Text(totalApps > 0 ? '70%' : '0%', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                                    Text('${totalApps > 0 ? (hiredApps / totalApps * 100).toInt() : 0}%', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
                                   ],
                                 )
                               ],
@@ -539,44 +540,16 @@ class _ApplicationsTab extends StatelessWidget {
             ],
           ),
           const SizedBox(width: 8),
-          const Icon(Icons.more_horiz, color: Colors.grey, size: 20),
+          IconButton(
+            onPressed: () {
+              Navigator.of(context).pushNamed(
+                AppRoutes.userApplicationTimeline,
+                arguments: app,
+              );
+            },
+            icon: const Icon(Icons.more_horiz, color: Colors.grey, size: 20),
+          ),
         ],
-      ),
-    );
-  }
-}
-
-class _MessagesTab extends StatelessWidget {
-  const _MessagesTab();
-
-  @override
-  Widget build(BuildContext context) {
-    final RecruitmentSyncStore store = RecruitmentSyncStore.instance;
-    return AnimatedBuilder(
-      animation: store,
-      builder: (BuildContext context, _) => ListView.builder(
-        reverse: true,
-        padding: const EdgeInsets.all(16),
-        itemCount: store.messages.length,
-        itemBuilder: (BuildContext context, int index) {
-          final RecruitmentMessage message = store.messages[index];
-          return Align(
-            alignment: message.fromCompany
-                ? Alignment.centerLeft
-                : Alignment.centerRight,
-            child: Container(
-              margin: const EdgeInsets.only(bottom: 10),
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: message.fromCompany
-                    ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.15)
-                    : Theme.of(context).colorScheme.secondary.withValues(alpha: 0.16),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(message.text),
-            ),
-          );
-        },
       ),
     );
   }
