@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../shared/l10n/app_localizations.dart';
+import '../../../../shared/state/recruitment_sync_store.dart';
 import '../../messages/new_chat_screen.dart';
 import '../post/post_Job.dart';
 import '../setting/settings.dart';
@@ -17,37 +18,27 @@ class MessagesList extends StatefulWidget {
 
 class _MessagesListState extends State<MessagesList> {
   final TextEditingController _searchController = TextEditingController();
-
-  final List<Map<String, String>> _allMessages = [];
-
-  late List<Map<String, String>> _filteredMessages;
+  String _searchQuery = "";
 
   @override
   void initState() {
     super.initState();
-    _filteredMessages = _allMessages;
-    _searchController.addListener(_filterMessages);
+    _searchController.addListener(() {
+      setState(() => _searchQuery = _searchController.text.toLowerCase());
+    });
   }
 
   @override
   void dispose() {
-    _searchController.removeListener(_filterMessages);
     _searchController.dispose();
     super.dispose();
-  }
-
-  void _filterMessages() {
-    final query = _searchController.text.toLowerCase();
-    setState(() {
-      _filteredMessages = _allMessages
-          .where((msg) => msg['name']!.toLowerCase().contains(query))
-          .toList();
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
+    final store = RecruitmentSyncStore.instance;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF9F5F1),
       floatingActionButton: FloatingActionButton(
@@ -110,46 +101,50 @@ class _MessagesListState extends State<MessagesList> {
             ),
             const SizedBox(height: 10),
             Expanded(
-              child: _filteredMessages.isEmpty
-                  ? Center(
+              child: AnimatedBuilder(
+                animation: store,
+                builder: (context, _) {
+                  final threads = store.tradesmanChatThreads.where((thread) => 
+                    thread.name.toLowerCase().contains(_searchQuery)
+                  ).toList();
+
+                  if (threads.isEmpty) {
+                    return Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.search_off, size: 60, color: Colors.grey.withOpacity(0.5)),
+                          Icon(Icons.chat_bubble_outline, size: 60, color: Colors.grey.withOpacity(0.5)),
                           const SizedBox(height: 16),
                           Text(
-                            t.tr(en: "No messages found", ar: "لم يتم العثور على رسائل"),
+                            t.tr(en: "No messages yet", ar: "لا توجد رسائل بعد"),
                             style: const TextStyle(color: Colors.black54, fontSize: 16),
                           ),
                         ],
                       ),
-                    )
-                  : ListView.builder(
-                      physics: const BouncingScrollPhysics(),
-                      padding: const EdgeInsets.fromLTRB(10, 0, 10, 100), // Padding bottom for FAB
-                      itemCount: _filteredMessages.length,
-                      itemBuilder: (context, index) {
-                        final msg = _filteredMessages[index];
-                        return Column(
-                          children: [
-                            _buildMessageItem(
-                              context,
-                              name: msg['name']!,
-                              message: msg['message']!,
-                              time: msg['time']!,
-                              image: msg['image']!,
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
-                              child: Divider(
-                                color: Colors.grey.withOpacity(0.15),
-                                height: 1,
-                              ),
-                            ),
-                          ],
-                        );
-                      },
+                    );
+                  }
+
+                  return ListView.separated(
+                    physics: const BouncingScrollPhysics(),
+                    padding: const EdgeInsets.fromLTRB(10, 0, 10, 100),
+                    itemCount: threads.length,
+                    separatorBuilder: (context, index) => Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Divider(color: Colors.grey.withOpacity(0.15), height: 1),
                     ),
+                    itemBuilder: (context, index) {
+                      final thread = threads[index];
+                      return _buildMessageItem(
+                        context,
+                        name: thread.name,
+                        message: thread.lastMessage,
+                        time: thread.time,
+                        image: thread.image,
+                      );
+                    },
+                  );
+                },
+              ),
             ),
           ],
         ),
@@ -208,8 +203,6 @@ class _MessagesListState extends State<MessagesList> {
         required String message,
         required String time,
         required String image,
-        bool isOnline = false,
-        bool isHighlighted = false,
       }) {
     return InkWell(
       onTap: () {
@@ -228,28 +221,12 @@ class _MessagesListState extends State<MessagesList> {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
         child: Row(
           children: [
-            Stack(
-              children: [
-                CircleAvatar(
-                  radius: 30,
-                  backgroundImage: AssetImage(image),
-                  backgroundColor: Colors.grey.shade200,
-                ),
-                if (isOnline)
-                  Positioned(
-                    right: 0,
-                    bottom: 2,
-                    child: Container(
-                      width: 14,
-                      height: 14,
-                      decoration: BoxDecoration(
-                        color: Colors.green,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 2),
-                      ),
-                    ),
-                  ),
-              ],
+            CircleAvatar(
+              radius: 30, 
+              backgroundColor: Colors.grey.shade200,
+              backgroundImage: image.startsWith('http') 
+                ? NetworkImage(image) 
+                : AssetImage(image) as ImageProvider,
             ),
             const SizedBox(width: 15),
             Expanded(

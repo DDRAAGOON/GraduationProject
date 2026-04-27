@@ -1,5 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import '../../../../shared/l10n/app_localizations.dart';
+import '../../../../shared/state/recruitment_sync_store.dart';
 
 class ChatTradesman extends StatefulWidget {
   final String name;
@@ -26,15 +27,23 @@ class _ChatTradesmanState extends State<ChatTradesman> {
   }
 
   void _sendMessage() {
-    if (_messageController.text.trim().isNotEmpty) {
+    final text = _messageController.text.trim();
+    if (text.isNotEmpty) {
       setState(() {
         _messages.add({
           "isMe": true,
-          "text": _messageController.text.trim(),
+          "text": text,
           "time": _getCurrentTime(),
         });
         _messageController.clear();
       });
+      
+      // Update global store so it appears in Messages List
+      RecruitmentSyncStore.instance.updateTradesmanChat(
+        widget.name, 
+        widget.image, 
+        text
+      );
     }
   }
 
@@ -58,7 +67,13 @@ class _ChatTradesmanState extends State<ChatTradesman> {
         ),
         title: Row(
           children: [
-            CircleAvatar(radius: 18, backgroundImage: AssetImage(widget.image)),
+            CircleAvatar(
+              radius: 18, 
+              backgroundColor: Colors.grey.shade200,
+              backgroundImage: widget.image.startsWith('http') 
+                ? NetworkImage(widget.image) 
+                : AssetImage(widget.image) as ImageProvider
+            ),
             const SizedBox(width: 10),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -77,7 +92,7 @@ class _ChatTradesmanState extends State<ChatTradesman> {
       ),
       body: Column(
         children: [
-          Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 1),
+          Divider(color: Theme.of(context).dividerColor.withOpacity(0.12), height: 1),
           Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
@@ -106,7 +121,13 @@ class _ChatTradesmanState extends State<ChatTradesman> {
         isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
         children: [
           if (!isMe)
-            CircleAvatar(radius: 18, backgroundImage: AssetImage(widget.image)),
+            CircleAvatar(
+              radius: 18, 
+              backgroundColor: Colors.grey.shade200,
+              backgroundImage: widget.image.startsWith('http') 
+                ? NetworkImage(widget.image) 
+                : AssetImage(widget.image) as ImageProvider
+            ),
           const SizedBox(width: 12),
           Flexible(
             child: Column(
@@ -119,7 +140,7 @@ class _ChatTradesmanState extends State<ChatTradesman> {
                   decoration: BoxDecoration(
                     color: isMe
                         ? Theme.of(context).colorScheme.primary
-                        : (Theme.of(context).brightness == Brightness.dark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.05)),
+                        : (Theme.of(context).brightness == Brightness.dark ? Colors.white.withOpacity(0.1) : Colors.black.withOpacity(0.05)),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(msg["text"],
@@ -131,7 +152,7 @@ class _ChatTradesmanState extends State<ChatTradesman> {
                 const SizedBox(height: 4),
                 Text(msg["time"],
                     style:
-                    TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 10)),
+                    TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.38), fontSize: 10)),
               ],
             ),
           ),
@@ -148,13 +169,13 @@ class _ChatTradesmanState extends State<ChatTradesman> {
         height: 60,
         decoration: BoxDecoration(
             color: Theme.of(context).brightness == Brightness.dark
-                ? Colors.white.withValues(alpha: 0.05)
-                : Colors.black.withValues(alpha: 0.05),
+                ? Colors.white.withOpacity(0.05)
+                : Colors.black.withOpacity(0.05),
             borderRadius: BorderRadius.circular(30)),
         child: Row(
           children: [
             IconButton(
-                icon: Icon(Icons.attach_file, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
+                icon: Icon(Icons.attach_file, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54)),
                 onPressed: () {}),
             Expanded(
               child: TextField(
@@ -163,14 +184,14 @@ class _ChatTradesmanState extends State<ChatTradesman> {
                 style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                 decoration: InputDecoration(
                     hintText: t.tr(en: "Type a message", ar: "اكتب رسالة"),
-                    hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)),
+                    hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.38)),
                     border: InputBorder.none),
               ),
             ),
             IconButton(
                 icon: Icon(Icons.send,
                     color: _messageController.text.isEmpty
-                        ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.24)
+                        ? Theme.of(context).colorScheme.onSurface.withOpacity(0.24)
                         : Theme.of(context).colorScheme.primary),
                 onPressed: _messageController.text.isEmpty ? null : _sendMessage),
           ],
@@ -183,7 +204,13 @@ class _ChatTradesmanState extends State<ChatTradesman> {
     return Center(
       child: Column(
         children: [
-          CircleAvatar(radius: 40, backgroundImage: AssetImage(widget.image)),
+          CircleAvatar(
+            radius: 40, 
+            backgroundColor: Colors.grey.shade200,
+            backgroundImage: widget.image.startsWith('http') 
+                ? NetworkImage(widget.image) 
+                : AssetImage(widget.image) as ImageProvider
+          ),
           const SizedBox(height: 10),
           Text(widget.name,
               style: TextStyle(

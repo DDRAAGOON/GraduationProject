@@ -932,175 +932,250 @@ class _ProfileTabState extends State<_ProfileTab> {
     final t = AppLocalizations.of(context);
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
 
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: ListView(
+    return SingleChildScrollView(
+      child: Column(
         children: [
-          Row(
+          // Top Cover Area
+          Stack(
+            clipBehavior: Clip.none,
             children: [
-              CircleAvatar(
-                radius: 35,
-                backgroundColor: Colors.white,
-                backgroundImage: UserProfileData.profileImage != null
-                    ? (UserProfileData.profileImage!.startsWith('http')
-                        ? NetworkImage(UserProfileData.profileImage!)
-                        : FileImage(File(UserProfileData.profileImage!)) as ImageProvider)
-                    : null,
-                child: UserProfileData.profileImage == null
-                    ? const Icon(Icons.person, size: 40, color: Color(0xFF49769F))
-                    : null,
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      UserProfileData.fullName.isEmpty ? "Not yet" : UserProfileData.fullName,
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      UserProfileData.jobTitle.isEmpty ? "Not yet" : UserProfileData.jobTitle,
-                      style: const TextStyle(color: Colors.black54),
-                    ),
-                  ],
+              Container(
+                height: 180,
+                width: double.infinity,
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Color(0xFF011931), Color(0xFF49769F)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
                 ),
               ),
-              // Edit pen removed as requested
+              // Profile Avatar positioned partially over cover
+              Positioned(
+                bottom: -50,
+                left: isAr ? null : 24,
+                right: isAr ? 24 : null,
+                child: Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 4),
+                    boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10)],
+                  ),
+                  child: CircleAvatar(
+                    radius: 50,
+                    backgroundColor: Colors.white,
+                    backgroundImage: UserProfileData.profileImage != null
+                        ? (UserProfileData.profileImage!.startsWith('http')
+                            ? NetworkImage(UserProfileData.profileImage!)
+                            : FileImage(File(UserProfileData.profileImage!)) as ImageProvider)
+                        : null,
+                    child: UserProfileData.profileImage == null
+                        ? const Icon(Icons.person, size: 55, color: Color(0xFF49769F))
+                        : null,
+                  ),
+                ),
+              ),
             ],
           ),
-          const SizedBox(height: 24),
 
-          // Switch to Tradesman Button
-          GestureDetector(
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(t.tr(en: "Switching to Tradesman Mode...", ar: "التبديل إلى وضع الصنايعي...")),
-                  backgroundColor: const Color(0xFFFF7A2A),
-                  duration: const Duration(seconds: 1),
+          const SizedBox(height: 60),
+
+          // User Info Section
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  UserProfileData.fullName.isEmpty ? "Not yet" : UserProfileData.fullName,
+                  style: const TextStyle(color: Color(0xFF011931), fontSize: 26, fontWeight: FontWeight.w900),
                 ),
-              );
-              // Navigate to Tradesman Shell
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => const Navbotton()),
-              );
-            },
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 14),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFF7A2A).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(15),
-                border: Border.all(color: const Color(0xFFFF7A2A).withOpacity(0.3)),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.swap_horiz, color: Color(0xFFFF7A2A)),
-                  const SizedBox(width: 10),
-                  Text(
-                    t.tr(en: "Switch to Tradesman", ar: "التبديل إلى وضع الصنايعي"),
-                    style: const TextStyle(color: Color(0xFFFF7A2A), fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 20),
+                const SizedBox(height: 4),
+                Text(
+                  UserProfileData.jobTitle.isEmpty ? "Not yet" : UserProfileData.jobTitle,
+                  style: const TextStyle(color: Color(0xFF49769F), fontSize: 16, fontWeight: FontWeight.w700),
+                ),
+                const SizedBox(height: 30),
 
-          Card(
-            color: Colors.white,
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-              side: BorderSide(color: Colors.grey.withOpacity(0.1)),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(14),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildProfileItem(isAr ? 'البريد الإلكتروني' : 'Email', UserProfileData.email),
-                  _buildProfileItem(isAr ? 'رقم الهاتف' : 'Phone', UserProfileData.phone),
-                  _buildProfileItem(isAr ? 'الموقع' : 'Location', UserProfileData.location),
-                  _buildProfileItem(isAr ? 'نبذة عني' : 'About Me', UserProfileData.aboutMe),
-                  _buildProfileItem(isAr ? 'المهارات' : 'Skills', UserProfileData.skills.join(', ')),
-                  _buildProfileItem(isAr ? 'خبرة العمل' : 'Work Experience', UserProfileData.experiences.map((e) => "${e['title']} (${e['duration']})").join('\n')),
-                  _buildProfileItem(isAr ? 'رابط ملف الأعمال' : 'Portfolio', UserProfileData.portfolioUrl),
-                  _buildProfileItem(isAr ? 'السيرة الذاتية' : 'CV', UserProfileData.cvName ?? ""),
-
-                  // Gallery Section
-                  if (UserProfileData.portfolioImages.isNotEmpty) ...[
-                    const SizedBox(height: 20),
-                    Text(
-                      isAr ? 'المعرض' : 'Gallery',
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                    ),
-                    const SizedBox(height: 10),
-                    SizedBox(
-                      height: 100,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: UserProfileData.portfolioImages.length,
-                        itemBuilder: (context, index) {
-                          final path = UserProfileData.portfolioImages[index];
-                          return Padding(
-                            padding: const EdgeInsets.only(right: 10),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: path.startsWith('http')
-                                  ? Image.network(path, width: 100, height: 100, fit: BoxFit.cover, errorBuilder: (_,__,___) => const Icon(Icons.broken_image))
-                                  : Image.file(File(path), width: 100, height: 100, fit: BoxFit.cover, errorBuilder: (_,__,___) => const Icon(Icons.broken_image)),
-                            ),
-                          );
-                        },
+                // Switching Button
+                GestureDetector(
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(t.tr(en: "Switching to Tradesman Mode...", ar: "التبديل إلى وضع الصنايعي...")),
+                        backgroundColor: const Color(0xFFFF7A2A),
+                        duration: const Duration(seconds: 1),
                       ),
+                    );
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => const Navbotton()),
+                    );
+                  },
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFF7A2A),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [BoxShadow(color: const Color(0xFFFF7A2A).withOpacity(0.3), blurRadius: 10, offset: const Offset(0, 4))],
                     ),
-                  ],
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.swap_horiz, color: Colors.white),
+                        const SizedBox(width: 10),
+                        Text(
+                          t.tr(en: "Switch to Tradesman", ar: "التبديل إلى وضع الصنايعي"),
+                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 30),
 
-                  if (UserProfileData.socialLinks.isNotEmpty) ...[
-                    const SizedBox(height: 20),
-                    Text(
-                      isAr ? 'الروابط الاجتماعية' : 'Social Links',
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                // Info Cards
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(color: Colors.grey.withOpacity(0.05)),
+                    boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 4))],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildProfileItem(t.aboutMe, UserProfileData.aboutMe, Icons.info_outline),
+                      _buildProfileItem(isAr ? 'البريد الإلكتروني' : 'Email', UserProfileData.email, Icons.email_outlined),
+                      _buildProfileItem(isAr ? 'رقم الهاتف' : 'Phone', UserProfileData.phone, Icons.phone_android_outlined),
+                      _buildProfileItem(isAr ? 'الموقع' : 'Location', UserProfileData.location, Icons.location_on_outlined),
+                      _buildProfileItem(isAr ? 'المهارات' : 'Skills', UserProfileData.skills.join(', '), Icons.psychology_outlined),
+                      _buildProfileItem(isAr ? 'السيرة الذاتية' : 'CV', UserProfileData.cvName ?? "", Icons.description_outlined),
+
+                      // Gallery Section
+                      if (UserProfileData.portfolioImages.isNotEmpty) ...[
+                        const SizedBox(height: 10),
+                        Text(
+                          isAr ? 'المعرض' : 'Gallery',
+                          style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: Color(0xFF011931)),
+                        ),
+                        const SizedBox(height: 16),
+                        SizedBox(
+                          height: 100,
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: UserProfileData.portfolioImages.length,
+                            itemBuilder: (context, index) {
+                              final path = UserProfileData.portfolioImages[index];
+                              return Container(
+                                margin: const EdgeInsets.only(right: 12),
+                                width: 100,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(color: Colors.grey.shade100),
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(14),
+                                  child: path.startsWith('http')
+                                      ? Image.network(path, fit: BoxFit.cover)
+                                      : Image.file(File(path), fit: BoxFit.cover),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                // Social Links Section
+                if (UserProfileData.socialLinks.isNotEmpty) ...[
+                  Text(
+                    t.socialLinks,
+                    style: const TextStyle(color: Color(0xFF011931), fontSize: 20, fontWeight: FontWeight.w800),
+                  ),
+                  const SizedBox(height: 16),
+                  ...UserProfileData.socialLinks.map((link) => Container(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.grey.withOpacity(0.05)),
                     ),
-                    const SizedBox(height: 8),
-                    ...UserProfileData.socialLinks.map((link) => Padding(
-                      padding: const EdgeInsets.only(bottom: 4),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.link, size: 18, color: Colors.blue),
-                          const SizedBox(width: 8),
-                          Text('${link['platform']}: '),
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: () async {
-                                String url = link['url'] ?? '';
-                                if (url.isNotEmpty) {
-                                  if (!url.startsWith('http')) {
-                                    url = 'https://$url';
-                                  }
-                                  final uri = Uri.parse(url);
-                                  if (await canLaunchUrl(uri)) {
-                                    await launchUrl(uri, mode: LaunchMode.externalApplication);
-                                  }
-                                }
-                              },
-                              child: Text(
-                                link['url'] ?? '',
-                                style: const TextStyle(color: Colors.blue, decoration: TextDecoration.underline),
-                                overflow: TextOverflow.ellipsis,
-                              ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.link_rounded, color: Color(0xFF49769F), size: 22),
+                        const SizedBox(width: 12),
+                        Text(
+                          "${link['platform']}: ",
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.black87),
+                        ),
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () async {
+                              String url = link['url'] ?? '';
+                              if (url.isNotEmpty) {
+                                if (!url.startsWith('http')) url = 'https://$url';
+                                final uri = Uri.parse(url);
+                                if (await canLaunchUrl(uri)) await launchUrl(uri, mode: LaunchMode.externalApplication);
+                              }
+                            },
+                            child: Text(
+                              link['url'] ?? "",
+                              style: const TextStyle(color: Color(0xFF49769F), fontSize: 14, fontWeight: FontWeight.w600, decoration: TextDecoration.underline),
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                        ],
-                      ),
-                    )),
-                  ],
+                        ),
+                      ],
+                    ),
+                  )),
+                  const SizedBox(height: 12),
                 ],
-              ),
+
+                // Education Section
+                if (UserProfileData.education.isNotEmpty) ...[
+                  Text(t.education, style: const TextStyle(color: Color(0xFF011931), fontSize: 20, fontWeight: FontWeight.w800)),
+                  const SizedBox(height: 16),
+                  ...UserProfileData.education.map((edu) => Container(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.grey.withOpacity(0.05)),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(color: const Color(0xFFF0F3FF), borderRadius: BorderRadius.circular(14)),
+                          child: const Icon(Icons.school_rounded, color: Color(0xFF49769F)),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(edu['institution'] ?? "", style: const TextStyle(color: Color(0xFF011931), fontWeight: FontWeight.bold, fontSize: 16)),
+                              const SizedBox(height: 4),
+                              Text("${edu['degree']} • ${edu['duration']}", style: const TextStyle(color: Colors.black54, fontSize: 13, fontWeight: FontWeight.w500)),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  )),
+                ],
+                const SizedBox(height: 100),
+              ],
             ),
           ),
         ],
@@ -1108,20 +1183,36 @@ class _ProfileTabState extends State<_ProfileTab> {
     );
   }
 
-  Widget _buildProfileItem(String label, String value) {
+  Widget _buildProfileItem(String label, String value, IconData icon) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 20),
-      child: Column(
+      padding: const EdgeInsets.only(bottom: 24),
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            label,
-            style: const TextStyle(color: Colors.black38, fontSize: 12, fontWeight: FontWeight.w500),
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF0F3FF),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: const Color(0xFF49769F), size: 20),
           ),
-          const SizedBox(height: 4),
-          Text(
-            value.isEmpty ? "Not yet" : value,
-            style: const TextStyle(color: Colors.black87, fontSize: 15, fontWeight: FontWeight.w500),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: const TextStyle(color: Colors.black38, fontSize: 12, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  value.isEmpty ? "Not yet" : value,
+                  style: const TextStyle(color: Color(0xFF011931), fontSize: 15, fontWeight: FontWeight.w600),
+                ),
+              ],
+            ),
           ),
         ],
       ),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../../../shared/state/recruitment_sync_store.dart';
 import '../../../shared/widgets/app_button.dart';
 
@@ -21,88 +20,61 @@ class _RecruitmentJobFiltersScreenState
   void initState() {
     super.initState();
     final store = RecruitmentSyncStore.instance;
-    _selectedType = store.filterType;
-    _selectedCategory = store.filterCategory;
-    _selectedSalary = store.filterSalaryRange;
+    
+    // Safely initialize values
+    _selectedType = _ensureValueExists(store.filterType, ['All', 'Full-time', 'Part-time', 'Remote', 'Contract']);
+    _selectedCategory = _ensureValueExists(store.filterCategory, RecruitmentSyncStore.categories);
+    _selectedSalary = _ensureValueExists(store.filterSalaryRange, RecruitmentSyncStore.salaryRanges);
+  }
+
+  String _ensureValueExists(String value, List<String> items) {
+    if (items.contains(value)) return value;
+    return items.isNotEmpty ? items.first : 'All';
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF9F5F1),
       appBar: AppBar(
-        title: const Text('Advanced Filters'),
+        title: const Text('Advanced Filters', style: TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: const Color(0xFFF9F5F1),
+        elevation: 0,
         surfaceTintColor: Colors.transparent,
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Employment Type',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-              ),
-              const SizedBox(height: 8),
-              DropdownButtonFormField<String>(
+              _buildFilterLabel('Employment Type'),
+              const SizedBox(height: 10),
+              _buildDropdown(
                 value: _selectedType,
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Colors.white,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-                items: const ['All', 'Full-time', 'Part-time','Remote']
-                    .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                    .toList(),
+                items: ['All', 'Full-time', 'Part-time', 'Remote', 'Contract'],
                 onChanged: (value) => setState(() => _selectedType = value ?? 'All'),
               ),
-              const SizedBox(height: 20),
-              const Text(
-                'Salary Range',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-              ),
-              const SizedBox(height: 8),
-              DropdownButtonFormField<String>(
+              const SizedBox(height: 24),
+              
+              _buildFilterLabel('Salary Range'),
+              const SizedBox(height: 10),
+              _buildDropdown(
                 value: _selectedSalary,
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Colors.white,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-                items: RecruitmentSyncStore.salaryRanges
-                    .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                    .toList(),
+                items: RecruitmentSyncStore.salaryRanges,
                 onChanged: (value) => setState(() => _selectedSalary = value ?? 'All'),
               ),
-              const SizedBox(height: 20),
-              const Text(
-                'Categories',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-              ),
-              const SizedBox(height: 8),
-              DropdownButtonFormField<String>(
+              const SizedBox(height: 24),
+              
+              _buildFilterLabel('Categories'),
+              const SizedBox(height: 10),
+              _buildDropdown(
                 value: _selectedCategory,
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Colors.white,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-                items: RecruitmentSyncStore.categories
-                    .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                    .toList(),
-                onChanged: (value) =>
-                    setState(() => _selectedCategory = value ?? 'All'),
+                items: RecruitmentSyncStore.categories,
+                onChanged: (value) => setState(() => _selectedCategory = value ?? 'All'),
               ),
-              const SizedBox(height: 40),
+              
+              const SizedBox(height: 48),
               AppButton(
                 label: 'Apply Filters',
                 onPressed: () {
@@ -114,7 +86,7 @@ class _RecruitmentJobFiltersScreenState
                   Navigator.of(context).pop();
                 },
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 12),
               SizedBox(
                 width: double.infinity,
                 child: TextButton(
@@ -125,12 +97,43 @@ class _RecruitmentJobFiltersScreenState
                       _selectedSalary = 'All';
                     });
                   },
-                  child: const Text('Reset All'),
+                  child: const Text('Reset All', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w600)),
                 ),
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildFilterLabel(String label) {
+    return Text(
+      label,
+      style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: Color(0xFF011931)),
+    );
+  }
+
+  Widget _buildDropdown({
+    required String value,
+    required List<String> items,
+    required ValueChanged<String?> onChanged,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 4))],
+      ),
+      child: DropdownButtonFormField<String>(
+        value: items.contains(value) ? value : items.first,
+        decoration: InputDecoration(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+        ),
+        icon: const Icon(Icons.keyboard_arrow_down, color: Colors.grey),
+        items: items.map((e) => DropdownMenuItem(value: e, child: Text(e, style: const TextStyle(fontSize: 14)))).toList(),
+        onChanged: onChanged,
       ),
     );
   }

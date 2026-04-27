@@ -23,9 +23,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   late TextEditingController _dobController;
   late TextEditingController _locationController;
   late TextEditingController _skillController;
+  
+  // Use fixed keys for logic: 'Male' or 'Female'
   String _selectedGender = "Male";
 
-  // Local state to hold changes before saving
   late List<Map<String, String>> _experiences;
   late List<Map<String, String>> _education;
   late List<String> _skills;
@@ -43,9 +44,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _dobController = TextEditingController(text: UserProfileData.dob);
     _locationController = TextEditingController(text: UserProfileData.location);
     _skillController = TextEditingController();
-    _selectedGender = UserProfileData.gender.isEmpty ? "Male" : UserProfileData.gender;
+    
+    // Normalize gender value
+    if (UserProfileData.gender == "ذكر" || UserProfileData.gender == "Male") {
+      _selectedGender = "Male";
+    } else if (UserProfileData.gender == "أنثى" || UserProfileData.gender == "Female") {
+      _selectedGender = "Female";
+    } else {
+      _selectedGender = "Male";
+    }
 
-    // Initialize local lists with copies of current data
     _experiences = List.from(UserProfileData.experiences);
     _education = List.from(UserProfileData.education);
     _skills = List.from(UserProfileData.skills);
@@ -73,10 +81,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       UserProfileData.email = _emailController.text;
       UserProfileData.dob = _dobController.text;
       UserProfileData.location = _locationController.text;
-      UserProfileData.gender = _selectedGender;
+      // Save translated value or key as needed
+      UserProfileData.gender = _selectedGender == "Male" ? t.male : t.female;
       UserProfileData.aboutMe = _aboutMeController.text;
 
-      // Commit local lists to global store
       UserProfileData.experiences = List.from(_experiences);
       UserProfileData.education = List.from(_education);
       UserProfileData.skills = List.from(_skills);
@@ -92,70 +100,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       ),
     );
     Navigator.pop(context);
-  }
-
-  void _showAddItemDialog({
-    required String title,
-    required List<String> fieldLabels,
-    required Function(Map<String, String>) onSave,
-  }) {
-    final controllers = fieldLabels.map((_) => TextEditingController()).toList();
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(title),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: List.generate(fieldLabels.length, (index) {
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: TextField(
-                controller: controllers[index],
-                decoration: InputDecoration(labelText: fieldLabels[index], border: const OutlineInputBorder()),
-              ),
-            );
-          }),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
-          ElevatedButton(
-            onPressed: () {
-              final data = <String, String>{};
-              for (int i = 0; i < fieldLabels.length; i++) {
-                data[fieldLabels[i].toLowerCase()] = controllers[i].text;
-              }
-              onSave(data);
-              Navigator.pop(context);
-            },
-            child: const Text("Add"),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _pickCV() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['pdf', 'doc', 'docx'],
-    );
-    
-    if (result != null) {
-      setState(() {
-        UserProfileData.cvName = result.files.single.name;
-      });
-    }
-  }
-
-  Future<void> _pickImage() async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-    
-    if (image != null) {
-      setState(() {
-        UserProfileData.profileImage = image.path;
-      });
-    }
   }
 
   @override
@@ -183,7 +127,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           crossAxisAlignment: t.isAr ? CrossAxisAlignment.end : CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 20),
-            // Tabs
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
@@ -211,13 +154,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             // Basic Information
             Text(t.tr(en: "Basic Information", ar: "معلومات أساسية"), style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
-            Text(t.tr(en: "This is your personal information that you can update anytime.", ar: "هذه هي معلوماتك الشخصية التي يمكنك تحديثها في أي وقت."), style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 13)),
-            Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 40),
+            Text(t.tr(en: "This is your personal information that you can update anytime.", ar: "هذه هي معلوماتك الشخصية التي يمكنك تحديثها في أي وقت."), style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54), fontSize: 13)),
+            Divider(color: Theme.of(context).dividerColor.withOpacity(0.12), height: 40),
 
             // Profile Photo
             Text(t.tr(en: "Profile Photo", ar: "صورة الملف الشخصي"), style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            Text(t.tr(en: "This image will be shown publicly as your profile picture.", ar: "ستظهر هذه الصورة علنًا كصورة ملفك الشخصي."), style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 12)),
             const SizedBox(height: 20),
             GestureDetector(
               onTap: _pickImage,
@@ -240,12 +181,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     child: Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), style: BorderStyle.solid),
+                        border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.12)),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Column(
                         children: [
-                          Icon(Icons.image_outlined, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), size: 30),
+                          Icon(Icons.image_outlined, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.38), size: 30),
                           const SizedBox(height: 8),
                           Text(t.tr(en: "Click to replace or drag and drop", ar: "انقر للاستبدال أو السحب والإفلات"), style: const TextStyle(color: Colors.blueAccent, fontSize: 12)),
                         ],
@@ -255,7 +196,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ],
               ),
             ),
-            Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 40),
+            Divider(color: Theme.of(context).dividerColor.withOpacity(0.12), height: 40),
 
             // Personal Details
             Text(t.tr(en: "Personal Details", ar: "تفاصيل شخصية"), style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16, fontWeight: FontWeight.bold)),
@@ -278,168 +219,130 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             const SizedBox(height: 20),
             _buildTextFieldWithLabel(_locationController, t.address, t.tr(en: "Enter Address", ar: "أدخل العنوان"), suffixIcon: Icons.location_on_outlined),
             const SizedBox(height: 20),
-            _buildDropdownField(t.gender, [t.male, t.female]),
-            Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 40),
+            
+            // Gender Dropdown
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                RichText(
+                  text: TextSpan(
+                    text: t.gender,
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14),
+                    children: const [TextSpan(text: " *", style: TextStyle(color: Colors.red))],
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  width: 150,
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).brightness == Brightness.dark 
+                        ? Colors.white.withOpacity(0.05) 
+                        : Colors.black.withOpacity(0.05),
+                    border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.12)),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: _selectedGender,
+                      items: [
+                        DropdownMenuItem(value: "Male", child: Text(t.male)),
+                        DropdownMenuItem(value: "Female", child: Text(t.female)),
+                      ],
+                      onChanged: (val) {
+                        if (val != null) setState(() => _selectedGender = val);
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            
+            Divider(color: Theme.of(context).dividerColor.withOpacity(0.12), height: 40),
 
             // About Me
             Text(t.aboutMe, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16, fontWeight: FontWeight.bold)),
             const SizedBox(height: 12),
             _buildTextField(_aboutMeController, t.tr(en: "Enter About Me", ar: "أدخل معلومات عنك"), maxLines: 3),
-            Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 40),
+            Divider(color: Theme.of(context).dividerColor.withOpacity(0.12), height: 40),
 
-            // 1. Experiences
+            // Sections (Experiences, Education, Skills, etc.)
             _buildSectionHeader(t.workExperience, () {
-              _showAddItemDialog(
-                title: t.tr(en: "Add Experience", ar: "إضافة خبرة"),
-                fieldLabels: ["Title", "Company", "Duration"],
-                onSave: (data) => setState(() => _experiences.add(data)),
-              );
+               _showAddItemDialog(title: t.tr(en: "Add Experience", ar: "إضافة خبرة"), fieldLabels: ["Title", "Company", "Duration"], onSave: (data) => setState(() => _experiences.add(data)));
             }),
-            ..._experiences.map((exp) => _buildRemovableItem(
-              exp['title'] ?? "", 
-              exp['company'] ?? "", 
-              () => setState(() => _experiences.remove(exp)),
-            )),
-            Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 40),
+            ..._experiences.map((exp) => _buildRemovableItem(exp['title'] ?? "", exp['company'] ?? "", () => setState(() => _experiences.remove(exp)))),
+            Divider(color: Theme.of(context).dividerColor.withOpacity(0.12), height: 40),
 
-            // 2. Education
             _buildSectionHeader(t.education, () {
-              _showAddItemDialog(
-                title: t.tr(en: "Add Education", ar: "إضافة تعليم"),
-                fieldLabels: ["Institution", "Degree", "Duration"],
-                onSave: (data) => setState(() => _education.add(data)),
-              );
+               _showAddItemDialog(title: t.tr(en: "Add Education", ar: "إضافة تعليم"), fieldLabels: ["Institution", "Degree", "Duration"], onSave: (data) => setState(() => _education.add(data)));
             }),
-            ..._education.map((edu) => _buildRemovableItem(
-              edu['institution'] ?? "", 
-              edu['degree'] ?? "", 
-              () => setState(() => _education.remove(edu)),
-            )),
-            Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 40),
+            ..._education.map((edu) => _buildRemovableItem(edu['institution'] ?? "", edu['degree'] ?? "", () => setState(() => _education.remove(edu)))),
+            Divider(color: Theme.of(context).dividerColor.withOpacity(0.12), height: 40),
 
-            // 3. Skills
+            // Skills
             Text(t.skills, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16, fontWeight: FontWeight.bold)),
             const SizedBox(height: 12),
             Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: _skills.map((skill) => Chip(
-                label: Text(skill, style: const TextStyle(fontSize: 12)),
-                onDeleted: () => setState(() => _skills.remove(skill)),
-              )).toList(),
+              spacing: 8, runSpacing: 8,
+              children: _skills.map((skill) => Chip(label: Text(skill, style: const TextStyle(fontSize: 12)), onDeleted: () => setState(() => _skills.remove(skill)))).toList(),
             ),
             const SizedBox(height: 12),
             Row(
               children: [
                 Expanded(child: _buildTextField(_skillController, t.tr(en: "Add Skill", ar: "إضافة مهارة"))),
-                IconButton(
-                  icon: const Icon(Icons.add_circle, color: Colors.blueAccent),
-                  onPressed: () {
-                    if (_skillController.text.isNotEmpty) {
-                      setState(() {
-                        _skills.add(_skillController.text);
-                        _skillController.clear();
-                      });
-                    }
-                  },
-                )
+                IconButton(icon: const Icon(Icons.add_circle, color: Colors.blueAccent), onPressed: () {
+                  if (_skillController.text.isNotEmpty) { setState(() { _skills.add(_skillController.text); _skillController.clear(); }); }
+                }),
               ],
             ),
-            Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 40),
+            Divider(color: Theme.of(context).dividerColor.withOpacity(0.12), height: 40),
 
-            // 4. Social Media
+            // Social Media
             _buildSectionHeader(t.socialMedia, () {
-              _showAddItemDialog(
-                title: t.tr(en: "Add Social Link", ar: "إضافة رابط تواصل"),
-                fieldLabels: ["Platform", "URL"],
-                onSave: (data) => setState(() => _socialLinks.add(data)),
-              );
+               _showAddItemDialog(title: t.tr(en: "Add Social Link", ar: "إضافة رابط تواصل"), fieldLabels: ["Platform", "URL"], onSave: (data) => setState(() => _socialLinks.add(data)));
             }),
-            ..._socialLinks.map((link) => _buildRemovableItem(
-              link['platform'] ?? "", 
-              link['url'] ?? "", 
-              () => setState(() => _socialLinks.remove(link)),
-            )),
-            Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 40),
+            ..._socialLinks.map((link) => _buildRemovableItem(link['platform'] ?? "", link['url'] ?? "", () => setState(() => _socialLinks.remove(link)))),
+            Divider(color: Theme.of(context).dividerColor.withOpacity(0.12), height: 40),
 
-            // 5. CV Upload
+            // CV
             Text(t.tr(en: "Curriculum Vitae (CV)", ar: "السيرة الذاتية (CV)"), style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16, fontWeight: FontWeight.bold)),
             const SizedBox(height: 12),
             GestureDetector(
               onTap: _pickCV,
               child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(15),
-                  border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.12)),
-                ),
+                width: double.infinity, padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(15), border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.12))),
                 child: Row(
                   children: [
                     const Icon(Icons.description_outlined, color: Color(0xFF49769F), size: 30),
                     const SizedBox(width: 15),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            UserProfileData.cvName ?? t.tr(en: "Upload your CV", ar: "ارفع سيرتك الذاتية"),
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          Text(
-                            t.tr(en: "PDF, DOC, DOCX (Max 5MB)", ar: "PDF, DOC, DOCX (بحد أقصى 5 ميجابايت)"),
-                            style: const TextStyle(color: Colors.black38, fontSize: 12),
-                          ),
-                        ],
-                      ),
-                    ),
+                    Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Text(UserProfileData.cvName ?? t.tr(en: "Upload your CV", ar: "ارفع سيرتك الذاتية"), style: const TextStyle(fontWeight: FontWeight.bold)),
+                      Text(t.tr(en: "PDF, DOC, DOCX (Max 5MB)", ar: "PDF, DOC, DOCX (بحد أقصى 5 ميجابايت)"), style: const TextStyle(color: Colors.black38, fontSize: 12)),
+                    ])),
                     const Icon(Icons.cloud_upload_outlined, color: Colors.blueAccent),
                   ],
                 ),
               ),
             ),
-            Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 40),
+            Divider(color: Theme.of(context).dividerColor.withOpacity(0.12), height: 40),
 
-            // 6. Gallery
+            // Gallery
             _buildSectionHeader(t.tr(en: "Gallery", ar: "المعرض"), () async {
                final ImagePicker picker = ImagePicker();
                final List<XFile> images = await picker.pickMultiImage();
-               if (images.isNotEmpty) {
-                 setState(() {
-                   _portfolioImages.addAll(images.map((i) => i.path));
-                 });
-               }
+               if (images.isNotEmpty) setState(() { _portfolioImages.addAll(images.map((i) => i.path)); });
             }),
             GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3, crossAxisSpacing: 10, mainAxisSpacing: 10,
-              ),
+              shrinkWrap: true, physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3, crossAxisSpacing: 10, mainAxisSpacing: 10),
               itemCount: _portfolioImages.length,
               itemBuilder: (context, index) {
                 final path = _portfolioImages[index];
-                return Stack(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: path.startsWith('http')
-                          ? Image.network(path, fit: BoxFit.cover, width: double.infinity, height: double.infinity, errorBuilder: (_,__,___) => const Icon(Icons.broken_image))
-                          : Image.asset(path, fit: BoxFit.cover, width: double.infinity, height: double.infinity, errorBuilder: (ctx, _, __) {
-                              // If asset fails, try File
-                              return Image.file(File(path), fit: BoxFit.cover, width: double.infinity, height: double.infinity, errorBuilder: (_,__,___) => const Icon(Icons.broken_image));
-                            }),
-                    ),
-                    Positioned(
-                      top: 2, right: 2,
-                      child: GestureDetector(
-                        onTap: () => setState(() => _portfolioImages.removeAt(index)),
-                        child: Container(decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle), child: const Icon(Icons.close, size: 16, color: Colors.white)),
-                      ),
-                    )
-                  ],
-                );
+                return Stack(children: [
+                  ClipRRect(borderRadius: BorderRadius.circular(8), child: path.startsWith('http') ? Image.network(path, fit: BoxFit.cover, width: double.infinity, height: double.infinity) : Image.file(File(path), fit: BoxFit.cover, width: double.infinity, height: double.infinity)),
+                  Positioned(top: 2, right: 2, child: GestureDetector(onTap: () => setState(() => _portfolioImages.removeAt(index)), child: Container(decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle), child: const Icon(Icons.close, size: 16, color: Colors.white)))),
+                ]);
               },
             ),
 
@@ -448,11 +351,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               alignment: Alignment.centerRight,
               child: ElevatedButton(
                 onPressed: _saveData,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                ),
+                style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.primary, padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30))),
                 child: Text(t.tr(en: "Save Profile", ar: "حفظ الملف الشخصي"), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
               ),
             ),
@@ -463,139 +362,56 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
-  Widget _buildSectionHeader(String title, VoidCallback onAdd) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(title, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16, fontWeight: FontWeight.bold)),
-        IconButton(icon: const Icon(Icons.add_circle_outline, color: Colors.blueAccent), onPressed: onAdd),
-      ],
-    );
+  void _showAddItemDialog({required String title, required List<String> fieldLabels, required Function(Map<String, String>) onSave}) {
+    final controllers = fieldLabels.map((_) => TextEditingController()).toList();
+    showDialog(context: context, builder: (context) => AlertDialog(
+        title: Text(title),
+        content: Column(mainAxisSize: MainAxisSize.min, children: List.generate(fieldLabels.length, (index) => Padding(padding: const EdgeInsets.only(bottom: 10), child: TextField(controller: controllers[index], decoration: InputDecoration(labelText: fieldLabels[index], border: const OutlineInputBorder()))))),
+        actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")), ElevatedButton(onPressed: () {
+          final data = <String, String>{};
+          for (int i = 0; i < fieldLabels.length; i++) { data[fieldLabels[i].toLowerCase()] = controllers[i].text; }
+          onSave(data); Navigator.pop(context);
+        }, child: const Text("Add"))],
+    ));
   }
 
-  Widget _buildRemovableItem(String title, String subtitle, VoidCallback onDelete) {
-    return ListTile(
-      contentPadding: EdgeInsets.zero,
-      title: Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-      subtitle: Text(subtitle, style: const TextStyle(fontSize: 12)),
-      trailing: IconButton(icon: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 20), onPressed: onDelete),
-    );
+  Future<void> _pickCV() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: ['pdf', 'doc', 'docx']);
+    if (result != null) setState(() { UserProfileData.cvName = result.files.single.name; });
   }
 
-  Widget _buildTabItem(String title, bool isActive, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        children: [
-          Text(
-            title,
-            style: TextStyle(
-              color: isActive ? const Color(0xFF49769F) : Colors.black38, 
-              fontWeight: isActive ? FontWeight.bold : FontWeight.normal, 
-              fontSize: 14,
-            ),
-          ),
-          if (isActive)
-            Container(
-              margin: const EdgeInsets.only(top: 8),
-              height: 2,
-              width: 60,
-              color: const Color(0xFF49769F),
-            ),
-        ],
-      ),
-    );
+  Future<void> _pickImage() async {
+    final XFile? image = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (image != null) setState(() { UserProfileData.profileImage = image.path; });
   }
 
-  Widget _buildTextField(TextEditingController controller, String hint, {int maxLines = 1, TextInputType? keyboardType}) {
-    return TextField(
-      controller: controller,
-      maxLines: maxLines,
-      keyboardType: keyboardType,
-      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
-      decoration: InputDecoration(
-        hintText: hint,
-        hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)),
-        filled: true,
-        fillColor: Theme.of(context).brightness == Brightness.dark 
-            ? Colors.white.withValues(alpha: 0.05) 
-            : Colors.black.withValues(alpha: 0.05),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.12))),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.12))),
-      ),
-    );
-  }
+  Widget _buildSectionHeader(String title, VoidCallback onAdd) => Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(title, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16, fontWeight: FontWeight.bold)), IconButton(icon: const Icon(Icons.add_circle_outline, color: Colors.blueAccent), onPressed: onAdd)]);
 
-  Widget _buildTextFieldWithLabel(TextEditingController controller, String label, String hint, {IconData? suffixIcon}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        RichText(
-          text: TextSpan(
-            text: label,
-            style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14),
-            children: const [TextSpan(text: " *", style: TextStyle(color: Colors.red))],
-          ),
-        ),
-        const SizedBox(height: 8),
-        TextField(
-          controller: controller,
-          style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
-          decoration: InputDecoration(
-            hintText: hint,
-            hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 12),
-            suffixIcon: suffixIcon != null ? Icon(suffixIcon, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), size: 18) : null,
-            filled: true,
-            fillColor: Theme.of(context).brightness == Brightness.dark 
-                ? Colors.white.withValues(alpha: 0.05) 
-                : Colors.black.withValues(alpha: 0.05),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(4), borderSide: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.12))),
-            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(4), borderSide: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.12))),
-          ),
-        ),
-      ],
-    );
-  }
+  Widget _buildRemovableItem(String title, String subtitle, VoidCallback onDelete) => ListTile(contentPadding: EdgeInsets.zero, title: Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)), subtitle: Text(subtitle, style: const TextStyle(fontSize: 12)), trailing: IconButton(icon: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 20), onPressed: onDelete));
 
-  Widget _buildDropdownField(String label, List<String> items) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        RichText(
-          text: TextSpan(
-            text: label,
-            style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14),
-            children: const [TextSpan(text: " *", style: TextStyle(color: Colors.red))],
-          ),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          width: 120,
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          decoration: BoxDecoration(
-            color: Theme.of(context).brightness == Brightness.dark 
-                ? Colors.white.withValues(alpha: 0.05) 
-                : Colors.black.withValues(alpha: 0.05),
-            border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.12)),
-            borderRadius: BorderRadius.circular(4),
-          ),
-          child: DropdownButton<String>(
-            value: _selectedGender,
-            dropdownColor: Theme.of(context).scaffoldBackgroundColor,
-            underline: Container(),
-            isExpanded: true,
-            icon: Icon(Icons.keyboard_arrow_down, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)),
-            items: items.map((String value) => DropdownMenuItem<String>(value: value, child: Text(value, style: TextStyle(color: Theme.of(context).colorScheme.onSurface)))).toList(),
-            onChanged: (String? newValue) {
-              if (newValue != null) {
-                setState(() {
-                  _selectedGender = newValue;
-                });
-              }
-            },
-          ),
-        ),
-      ],
-    );
-  }
+  Widget _buildTabItem(String title, bool isActive, VoidCallback onTap) => GestureDetector(onTap: onTap, child: Column(children: [Text(title, style: TextStyle(color: isActive ? const Color(0xFF49769F) : Colors.black38, fontWeight: isActive ? FontWeight.bold : FontWeight.normal, fontSize: 14)), if (isActive) Container(margin: const EdgeInsets.only(top: 8), height: 2, width: 60, color: const Color(0xFF49769F))]));
+
+  Widget _buildTextField(TextEditingController controller, String hint, {int maxLines = 1}) => TextField(controller: controller, maxLines: maxLines, style: TextStyle(color: Theme.of(context).colorScheme.onSurface), decoration: InputDecoration(hintText: hint, hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.38)), filled: true, fillColor: Theme.of(context).brightness == Brightness.dark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.05), border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide(color: Theme.of(context).dividerColor.withOpacity(0.12))), enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide(color: Theme.of(context).dividerColor.withOpacity(0.12)))));
+
+  Widget _buildTextFieldWithLabel(TextEditingController controller,
+      String label, String hint,
+      {IconData? suffixIcon}) => Column(crossAxisAlignment: CrossAxisAlignment.start,
+      children: [RichText(
+      text: TextSpan(text: label, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14),
+      children:
+      const [TextSpan(text: " *", style: TextStyle(color: Colors.red))])),
+  const SizedBox(height: 8),
+  TextField(controller: controller, style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+  decoration: InputDecoration(hintText: hint, hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.38), fontSize: 12),
+  suffixIcon: suffixIcon != null ? Icon(suffixIcon, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54), size: 18) : null,
+  filled: true, fillColor: Theme.of(context).brightness == Brightness.dark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.05),
+  border: OutlineInputBorder(borderRadius: BorderRadius.circular(4),
+  borderSide: BorderSide(color: Theme.of(context).dividerColor.withOpacity(0.12))),
+  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(4),
+  borderSide: BorderSide(color: Theme.of(context).dividerColor.withOpacity(0.12))
+  )
+  )
+  )
+      ]
+  );
 }

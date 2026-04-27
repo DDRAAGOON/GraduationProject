@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:graduationproject/shared/l10n/app_localizations.dart';
+import 'package:graduationproject/shared/state/recruitment_sync_store.dart';
+import 'job_applicants_screen.dart';
 
 class PostJob extends StatefulWidget {
   const PostJob({super.key});
@@ -45,10 +47,43 @@ class _PostJobState extends State<PostJob> {
 
   void _validateAndPost(AppLocalizations t) {
     if (_formKey.currentState!.validate()) {
-      // Logic for posting can go here
-      // تم إزالة الـ SnackBar الخاص بالنجاح بناءً على طلبك
-    } else {
-      // تم إزالة الـ SnackBar الخاص بالخطأ بناءً على طلبك
+      // Post to global store
+      final store = RecruitmentSyncStore.instance;
+      final jobId = 'job_${DateTime.now().millisecondsSinceEpoch}';
+      store.companyPostJob(
+        RecruitmentJob(
+          id: jobId,
+          title: _titleController.text,
+          companyName: store.currentUserName, 
+          location: store.currentUserLocation,
+          salaryRange: _priceController.text,
+          type: 'one-time',
+          category: 'Service',
+          tags: _selectedDays.toList(),
+          publishedAt: DateTime.now(),
+        ),
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(t.tr(en: "Job posted successfully!", ar: "تم نشر الوظيفة بنجاح!")),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      // Navigate to applicants screen
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => JobApplicantsScreen(
+            jobId: jobId,
+            jobTitle: _titleController.text,
+            initialDesc: _descriptionController.text,
+            initialBudget: _priceController.text,
+            initialDays: _selectedDays.toList(),
+          ),
+        ),
+      );
     }
   }
 
@@ -75,6 +110,38 @@ class _PostJobState extends State<PostJob> {
           ),
         ),
         centerTitle: true,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10.0),
+            child: TextButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => JobApplicantsScreen(
+                      jobId: "", // Generic view
+                      jobTitle: _titleController.text.isEmpty ? (t.isAr ? "بدون عنوان" : "Untitled") : _titleController.text,
+                    ),
+                  ),
+                );
+              },
+              style: TextButton.styleFrom(
+                backgroundColor: const Color(0xFF49769F).withOpacity(0.1),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+              child: Text(
+                t.tr(en: "Applicants", ar: "المتقدمين"),
+                style: const TextStyle(
+                  color: Color(0xFF49769F),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),

@@ -113,6 +113,21 @@ class RecruitmentMessage {
   final DateTime createdAt;
 }
 
+// New class for Chat Threads
+class ChatThread {
+  final String name;
+  final String image;
+  String lastMessage;
+  String time;
+
+  ChatThread({
+    required this.name,
+    required this.image,
+    required this.lastMessage,
+    required this.time,
+  });
+}
+
 class ServiceRequestPost {
   const ServiceRequestPost({
     required this.id,
@@ -133,7 +148,6 @@ class ServiceRequestPost {
 
 class RecruitmentSyncStore extends ChangeNotifier {
   RecruitmentSyncStore._() {
-    // Initial mock jobs for Discover tab
     _jobs.addAll([
       RecruitmentJob(
         id: 'job_1',
@@ -173,6 +187,14 @@ class RecruitmentSyncStore extends ChangeNotifier {
 
   static final RecruitmentSyncStore instance = RecruitmentSyncStore._();
 
+  static const List<String> categories = [
+    'All', 'Technical', 'Non-technical', 'Service', 'Tradesman',
+  ];
+
+  static const List<String> salaryRanges = [
+    'All', '10k - 20k', '20k - 30k', '30k - 45k', 'Negotiable',
+  ];
+
   static const Map<String, String> locationTranslations = {
     'All': 'الكل',
     'Cairo': 'القاهرة',
@@ -206,57 +228,13 @@ class RecruitmentSyncStore extends ChangeNotifier {
   };
 
   static const List<String> egyptGovernorates = [
-    'All',
-    'Cairo',
-    'Giza',
-    'Alexandria',
-    'Dakahlia',
-    'Red Sea',
-    'Beheira',
-    'Fayoum',
-    'Gharbia',
-    'Ismailia',
-    'Monufia',
-    'Minya',
-    'Qalyubia',
-    'New Valley',
-    'Sharqia',
-    'Suez',
-    'Aswan',
-    'Assiut',
-    'Beni Suef',
-    'Port Said',
-    'Damietta',
-    'South Sinai',
-    'Kafr El Sheikh',
-    'Matrouh',
-    'Luxor',
-    'Qena',
-    'Sohag',
-    'North Sinai',
-    'Remote',
-  ];
-
-  static const List<String> categories = [
-    'All',
-    'Technical',
-    'Non-technical',
-    'Service',
-    'Tradesman',
-  ];
-
-  static const List<String> salaryRanges = [
-    'All',
-    '10k - 20k',
-    '20k - 30k',
-    '30k - 45k',
-    'Negotiable',
+    'All', 'Cairo', 'Giza', 'Alexandria', 'Dakahlia', 'Red Sea', 'Beheira', 'Fayoum', 'Gharbia', 'Ismailia', 'Monufia', 'Minya', 'Qalyubia', 'New Valley', 'Sharqia', 'Suez', 'Aswan', 'Assiut', 'Beni Suef', 'Port Said', 'Damietta', 'South Sinai', 'Kafr El Sheikh', 'Matrouh', 'Luxor', 'Qena', 'Sohag', 'North Sinai', 'Remote',
   ];
 
   final List<RecruitmentJob> _jobs = <RecruitmentJob>[];
-
   final List<RecruitmentApplication> _applications = <RecruitmentApplication>[];
   final List<RecruitmentMessage> _messages = <RecruitmentMessage>[];
+  final List<ChatThread> _tradesmanChatThreads = <ChatThread>[];
   final Set<String> _savedJobIds = <String>{};
   
   String _currentUserName = 'Ahmed User';
@@ -283,6 +261,7 @@ class RecruitmentSyncStore extends ChangeNotifier {
   List<RecruitmentJob> get jobs => List<RecruitmentJob>.unmodifiable(_jobs);
   List<RecruitmentApplication> get applications => List<RecruitmentApplication>.unmodifiable(_applications);
   List<RecruitmentMessage> get messages => List<RecruitmentMessage>.unmodifiable(_messages);
+  List<ChatThread> get tradesmanChatThreads => List<ChatThread>.unmodifiable(_tradesmanChatThreads);
   Set<String> get savedJobIds => Set<String>.unmodifiable(_savedJobIds);
   
   String get currentUserName => _currentUserName;
@@ -326,8 +305,6 @@ class RecruitmentSyncStore extends ChangeNotifier {
       });
 
       final matchesType = _filterType == 'All' || job.type == _filterType;
-      
-      // Smart location match supporting both EN and AR
       bool matchesLocation = _filterLocation == 'All' || _filterLocation == 'الكل';
       if (!matchesLocation) {
         final currentFilterAr = locationTranslations[_filterLocation] ?? _filterLocation;
@@ -342,14 +319,31 @@ class RecruitmentSyncStore extends ChangeNotifier {
     }).toList();
   }
 
-  void companyPostJob(RecruitmentJob job) {
-    _jobs.insert(0, job);
-    // generateMockApplicants(job.id, job.title, job.companyName);
+  void updateTradesmanChat(String name, String image, String text) {
+    final existingIndex = _tradesmanChatThreads.indexWhere((t) => t.name == name);
+    final now = DateTime.now();
+    final timeStr = "${now.hour}:${now.minute.toString().padLeft(2, '0')}";
+    
+    if (existingIndex != -1) {
+      _tradesmanChatThreads[existingIndex].lastMessage = text;
+      _tradesmanChatThreads[existingIndex].time = timeStr;
+      // Move to top
+      final thread = _tradesmanChatThreads.removeAt(existingIndex);
+      _tradesmanChatThreads.insert(0, thread);
+    } else {
+      _tradesmanChatThreads.insert(0, ChatThread(
+        name: name,
+        image: image,
+        lastMessage: text,
+        time: timeStr,
+      ));
+    }
     notifyListeners();
   }
 
-  void generateMockApplicants(String jobId, String jobTitle, String companyName) {
-    // Disabled for backend integration
+  void companyPostJob(RecruitmentJob job) {
+    _jobs.insert(0, job);
+    notifyListeners();
   }
 
   void toggleSaveJob(String jobId) {
@@ -425,21 +419,11 @@ class RecruitmentSyncStore extends ChangeNotifier {
     String? category,
     String? salaryRange,
   }) {
-    if (searchQuery != null) {
-      _searchQuery = searchQuery;
-    }
-    if (type != null) {
-      _filterType = type;
-    }
-    if (location != null) {
-      _filterLocation = location;
-    }
-    if (category != null) {
-      _filterCategory = category;
-    }
-    if (salaryRange != null) {
-      _filterSalaryRange = salaryRange;
-    }
+    if (searchQuery != null) _searchQuery = searchQuery;
+    if (type != null) _filterType = type;
+    if (location != null) _filterLocation = location;
+    if (category != null) _filterCategory = category;
+    if (salaryRange != null) _filterSalaryRange = salaryRange;
     notifyListeners();
   }
 
@@ -509,10 +493,6 @@ class RecruitmentSyncStore extends ChangeNotifier {
         tags: item['tags'] is List ? (item['tags'] as List).map((e) => e.toString()).toList() : const [],
         publishedAt: DateTime.tryParse(item['createdAt']?.toString() ?? '') ?? DateTime.now(),
       )));
-    }
-    if (applications.isNotEmpty) {
-       _applications.clear();
-       // ... logic to parse applications if needed
     }
     notifyListeners();
   }
