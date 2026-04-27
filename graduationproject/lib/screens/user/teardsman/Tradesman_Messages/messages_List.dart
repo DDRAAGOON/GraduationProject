@@ -1,7 +1,6 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import '../../../../constants/app_images.dart';
-import '../../../user/messages/new_chat_screen.dart';
-import '../notifications/teardsman_notifications.dart';
+import '../../../../shared/l10n/app_localizations.dart';
 import '../post/post_Job.dart';
 import '../setting/settings.dart';
 import 'chat_tradesman.dart';
@@ -83,18 +82,22 @@ class _MessagesListState extends State<MessagesList> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: const Color(0xFFF9F5F1),
+      backgroundColor: Theme.of(context).colorScheme.surface,
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-           Navigator.push(context, MaterialPageRoute(builder: (context) => const NewChatScreen()));
+          // Placeholder for NewChatScreen
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(t.tr(en: "New chat coming soon", ar: "دردشة جديدة قريباً")))
+          );
         },
         backgroundColor: const Color(0xFFDDE6FF),
         elevation: 4,
         child: const Icon(Icons.add, color: Color(0xFF011931)),
       ),
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF9F5F1),
+        backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         title: Image.asset(
@@ -121,22 +124,22 @@ class _MessagesListState extends State<MessagesList> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 25),
-              const Text(
-                "Messages",
+              Text(
+                t.tr(en: "Messages", ar: "الرسائل"),
                 style: TextStyle(
-                  color: Colors.black87,
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 15),
               // Search Bar
-              _buildSearchBar(),
+              _buildSearchBar(t),
               const SizedBox(height: 20),
               // Messages List
               Expanded(
                 child: _filteredMessages.isEmpty
-                    ? const Center(child: Text("No messages found", style: TextStyle(color: Colors.black54)))
+                    ? Center(child: Text(t.tr(en: "No messages found", ar: "لم يتم العثور على رسائل"), style: const TextStyle(color: Colors.black54)))
                     : ListView.builder(
                         physics: const BouncingScrollPhysics(),
                         itemCount: _filteredMessages.length,
@@ -151,7 +154,7 @@ class _MessagesListState extends State<MessagesList> {
                                 time: msg['time']!,
                                 image: msg['image']!,
                               ),
-                              const Divider(color: Colors.black12, height: 1),
+                              Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 1),
                             ],
                           );
                         },
@@ -171,30 +174,30 @@ class _MessagesListState extends State<MessagesList> {
         width: 40,
         height: 40,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.surface,
           shape: BoxShape.circle,
-          border: Border.all(color: Colors.grey.withOpacity(0.2)),
+          border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.12)),
         ),
-        child: Icon(icon, color: Colors.black87, size: 20),
+        child: Icon(icon, color: Theme.of(context).colorScheme.onSurface, size: 20),
       ),
     );
   }
 
-  Widget _buildSearchBar() {
+  Widget _buildSearchBar(AppLocalizations t) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(30),
-        border: Border.all(color: Colors.grey.withOpacity(0.2)),
+        border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.12)),
       ),
       child: TextField(
         controller: _searchController,
-        style: const TextStyle(color: Colors.black87),
-        decoration: const InputDecoration(
-          icon: Icon(Icons.search, color: Colors.black38),
-          hintText: "Search messages",
-          hintStyle: TextStyle(color: Colors.black38),
+        style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+        decoration: InputDecoration(
+          icon: Icon(Icons.search, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)),
+          hintText: t.tr(en: "Search messages", ar: "البحث في الرسائل"),
+          hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)),
           border: InputBorder.none,
         ),
       ),
@@ -226,7 +229,7 @@ class _MessagesListState extends State<MessagesList> {
         margin: const EdgeInsets.symmetric(vertical: 4),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: isHighlighted ? Colors.white : Colors.transparent,
+          color: isHighlighted ? Theme.of(context).colorScheme.primaryContainer : Colors.transparent,
           borderRadius: isHighlighted
               ? const BorderRadius.only(
             topLeft: Radius.circular(50),
@@ -241,7 +244,7 @@ class _MessagesListState extends State<MessagesList> {
             CircleAvatar(
               radius: 28,
               backgroundImage: AssetImage(image),
-              backgroundColor: Colors.grey.withOpacity(0.1),
+              backgroundColor: Theme.of(context).dividerColor.withValues(alpha: 0.1),
             ),
             const SizedBox(width: 15),
             Expanded(
@@ -253,7 +256,7 @@ class _MessagesListState extends State<MessagesList> {
                       Text(
                         name,
                         style: TextStyle(
-                          color: isHighlighted ? Colors.black : Colors.black87,
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
@@ -266,7 +269,7 @@ class _MessagesListState extends State<MessagesList> {
                       Text(
                         time,
                         style: TextStyle(
-                          color: isHighlighted ? Colors.black45 : Colors.black38,
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38),
                           fontSize: 12,
                         ),
                       ),
@@ -278,7 +281,7 @@ class _MessagesListState extends State<MessagesList> {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      color: isHighlighted ? Colors.black54 : Colors.black54,
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
                       fontSize: 14,
                     ),
                   ),
@@ -291,3 +294,4 @@ class _MessagesListState extends State<MessagesList> {
     );
   }
 }
+
