@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../Tradesman_Messages/messages_list.dart';
 import '../home/find_jobs.dart';
 import '../home/tradesman_my_apps_screen.dart';
-import '../home/tradesman_saved_jobs.dart';
+import '../home/tradesman_browse_companies_screen.dart';
 import '../profile/tradesman_profile.dart';
 
 class Navbotton extends StatefulWidget {
@@ -19,9 +19,9 @@ class _NavbottonState extends State<Navbotton> {
 
   final List<Widget> _pages = [
     const FindJobs(), 
-    const TradesmanMyAppsScreen(), // Linked to My Apps
+    const TradesmanMyAppsScreen(),
+    const TradesmanBrowseCompaniesScreen(),
     const MessagesList(), 
-    const TradesmanSavedJobs(),
     const TradesmanProfile(), 
   ];
 
@@ -49,12 +49,12 @@ class _NavbottonState extends State<Navbotton> {
             label: _isAr ? 'تقديماتي' : 'My Apps',
           ),
           NavigationDestination(
-            icon: const Icon(Icons.chat_bubble),
-            label: _isAr ? 'الرسائل' : 'Messages',
+            icon: const Icon(Icons.business),
+            label: _isAr ? 'الشركات' : 'Companies',
           ),
           NavigationDestination(
-            icon: const Icon(Icons.bookmark),
-            label: _isAr ? 'المحفوظة' : 'Saved',
+            icon: const Icon(Icons.chat_bubble),
+            label: _isAr ? 'الرسائل' : 'Messages',
           ),
           NavigationDestination(
             icon: const Icon(Icons.person),

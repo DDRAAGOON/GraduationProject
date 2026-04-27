@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../../constants/app_images.dart';
 import '../../../../shared/l10n/app_localizations.dart';
+import '../../messages/new_chat_screen.dart';
 import '../post/post_Job.dart';
 import '../setting/settings.dart';
 import 'dart:io';
@@ -18,44 +18,7 @@ class MessagesList extends StatefulWidget {
 class _MessagesListState extends State<MessagesList> {
   final TextEditingController _searchController = TextEditingController();
 
-  final List<Map<String, String>> _allMessages = [
-    {
-      "name": "Joe Bartmann",
-      "message": "Hey thanks for your interview...",
-      "time": "3:40 PM",
-      "image": AppImages.companyProfile2,
-    },
-    {
-      "name": "Ally Wales",
-      "message": "Hey thanks for your interview...",
-      "time": "3:40 PM",
-      "image": AppImages.companyProfile3,
-    },
-    {
-      "name": "James Gardner",
-      "message": "Hey thanks for your interview...",
-      "time": "3:40 PM",
-      "image": AppImages.companyProfile4,
-    },
-    {
-      "name": "Allison Geidt",
-      "message": "Hey thanks for your interview...",
-      "time": "3:40 PM",
-      "image": AppImages.companyProfile5,
-    },
-    {
-      "name": "Ruben Culhane",
-      "message": "Hey thanks for your interview...",
-      "time": "3:40 PM",
-      "image": AppImages.companyProfile6,
-    },
-    {
-      "name": "Lydia Diaz",
-      "message": "Hey thanks for your interview...",
-      "time": "3:40 PM",
-      "image": AppImages.companyProfile7,
-    },
-  ];
+  final List<Map<String, String>> _allMessages = [];
 
   late List<Map<String, String>> _filteredMessages;
 
@@ -86,17 +49,14 @@ class _MessagesListState extends State<MessagesList> {
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      backgroundColor: const Color(0xFFF9F5F1),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Placeholder for NewChatScreen
-          ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(t.tr(en: "New chat coming soon", ar: "دردشة جديدة قريباً")))
-          );
+           Navigator.push(context, MaterialPageRoute(builder: (context) => const NewChatScreen()));
         },
         backgroundColor: const Color(0xFFDDE6FF),
-        elevation: 4,
-        child: const Icon(Icons.add, color: Color(0xFF011931)),
+        elevation: 6,
+        child: const Icon(Icons.add, color: Color(0xFF011931), size: 28),
       ),
       appBar: AppBar(
         leading: Padding(
@@ -120,7 +80,7 @@ class _MessagesListState extends State<MessagesList> {
             ),
           ),
         ),
-        backgroundColor: Theme.of(context).colorScheme.surface,
+        backgroundColor: const Color(0xFFF9F5F1),
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         title: Text(
@@ -140,50 +100,58 @@ class _MessagesListState extends State<MessagesList> {
         ],
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 25),
-              Text(
-                t.tr(en: "Messages", ar: "الرسائل"),
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface,
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 15),
-              // Search Bar
-              _buildSearchBar(t),
-              const SizedBox(height: 20),
-              // Messages List
-              Expanded(
-                child: _filteredMessages.isEmpty
-                    ? Center(child: Text(t.tr(en: "No messages found", ar: "لم يتم العثور على رسائل"), style: const TextStyle(color: Colors.black54)))
-                    : ListView.builder(
-                  physics: const BouncingScrollPhysics(),
-                  itemCount: _filteredMessages.length,
-                  itemBuilder: (context, index) {
-                    final msg = _filteredMessages[index];
-                    return Column(
-                      children: [
-                        _buildMessageItem(
-                          context,
-                          name: msg['name']!,
-                          message: msg['message']!,
-                          time: msg['time']!,
-                          image: msg['image']!,
-                        ),
-                        Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 1),
-                      ],
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 10),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              child: _buildSearchBar(context, t),
+            ),
+            const SizedBox(height: 10),
+            Expanded(
+              child: _filteredMessages.isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.search_off, size: 60, color: Colors.grey.withOpacity(0.5)),
+                          const SizedBox(height: 16),
+                          Text(
+                            t.tr(en: "No messages found", ar: "لم يتم العثور على رسائل"),
+                            style: const TextStyle(color: Colors.black54, fontSize: 16),
+                          ),
+                        ],
+                      ),
+                    )
+                  : ListView.builder(
+                      physics: const BouncingScrollPhysics(),
+                      padding: const EdgeInsets.fromLTRB(10, 0, 10, 100), // Padding bottom for FAB
+                      itemCount: _filteredMessages.length,
+                      itemBuilder: (context, index) {
+                        final msg = _filteredMessages[index];
+                        return Column(
+                          children: [
+                            _buildMessageItem(
+                              context,
+                              name: msg['name']!,
+                              message: msg['message']!,
+                              time: msg['time']!,
+                              image: msg['image']!,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              child: Divider(
+                                color: Colors.grey.withOpacity(0.15),
+                                height: 1,
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+            ),
+          ],
         ),
       ),
     );
@@ -196,31 +164,39 @@ class _MessagesListState extends State<MessagesList> {
         width: 40,
         height: 40,
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
+          color: Colors.white,
           shape: BoxShape.circle,
-          border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.12)),
+          border: Border.all(color: Colors.grey.withOpacity(0.2)),
         ),
-        child: Icon(icon, color: Theme.of(context).colorScheme.onSurface, size: 20),
+        child: Icon(icon, color: Colors.black87, size: 20),
       ),
     );
   }
 
-  Widget _buildSearchBar(AppLocalizations t) {
+  Widget _buildSearchBar(BuildContext context, AppLocalizations t) {
+    bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      height: 55,
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(30),
-        border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.12)),
+        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: TextField(
         controller: _searchController,
         style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
         decoration: InputDecoration(
-          icon: Icon(Icons.search, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)),
+          prefixIcon: Icon(Icons.search, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5)),
           hintText: t.tr(en: "Search messages", ar: "البحث في الرسائل"),
-          hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)),
+          hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.35), fontSize: 15),
           border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(vertical: 15),
         ),
       ),
     );
@@ -235,7 +211,7 @@ class _MessagesListState extends State<MessagesList> {
         bool isOnline = false,
         bool isHighlighted = false,
       }) {
-    return GestureDetector(
+    return InkWell(
       onTap: () {
         Navigator.push(
           context,
@@ -247,26 +223,33 @@ class _MessagesListState extends State<MessagesList> {
           ),
         );
       },
+      borderRadius: BorderRadius.circular(12),
       child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 4),
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: isHighlighted ? Theme.of(context).colorScheme.primaryContainer : Colors.transparent,
-          borderRadius: isHighlighted
-              ? const BorderRadius.only(
-            topLeft: Radius.circular(50),
-            bottomLeft: Radius.circular(50),
-            topRight: Radius.circular(50),
-            bottomRight: Radius.circular(20),
-          )
-              : BorderRadius.zero,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
         child: Row(
           children: [
-            CircleAvatar(
-              radius: 28,
-              backgroundImage: AssetImage(image),
-              backgroundColor: Theme.of(context).dividerColor.withValues(alpha: 0.1),
+            Stack(
+              children: [
+                CircleAvatar(
+                  radius: 30,
+                  backgroundImage: AssetImage(image),
+                  backgroundColor: Colors.grey.shade200,
+                ),
+                if (isOnline)
+                  Positioned(
+                    right: 0,
+                    bottom: 2,
+                    child: Container(
+                      width: 14,
+                      height: 14,
+                      decoration: BoxDecoration(
+                        color: Colors.green,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 2),
+                      ),
+                    ),
+                  ),
+              ],
             ),
             const SizedBox(width: 15),
             Expanded(
@@ -274,36 +257,36 @@ class _MessagesListState extends State<MessagesList> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        name,
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                      Expanded(
+                        child: Text(
+                          name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontSize: 17,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ),
-                      if (isOnline) ...[
-                        const SizedBox(width: 5),
-                        const Icon(Icons.circle, color: Colors.blue, size: 8),
-                      ],
-                      const Spacer(),
                       Text(
                         time,
                         style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38),
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                           fontSize: 12,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 5),
+                  const SizedBox(height: 6),
                   Text(
                     message,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                       fontSize: 14,
                     ),
                   ),
