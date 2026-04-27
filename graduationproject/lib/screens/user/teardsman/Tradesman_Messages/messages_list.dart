@@ -15,7 +15,7 @@ class MessagesList extends StatefulWidget {
 
 class _MessagesListState extends State<MessagesList> {
   final TextEditingController _searchController = TextEditingController();
-  
+
   final List<Map<String, String>> _allMessages = [
     {
       "name": "Joe Bartmann",
@@ -89,7 +89,7 @@ class _MessagesListState extends State<MessagesList> {
         onPressed: () {
           // Placeholder for NewChatScreen
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(t.tr(en: "New chat coming soon", ar: "دردشة جديدة قريباً")))
+              SnackBar(content: Text(t.tr(en: "New chat coming soon", ar: "دردشة جديدة قريباً")))
           );
         },
         backgroundColor: const Color(0xFFDDE6FF),
@@ -141,24 +141,24 @@ class _MessagesListState extends State<MessagesList> {
                 child: _filteredMessages.isEmpty
                     ? Center(child: Text(t.tr(en: "No messages found", ar: "لم يتم العثور على رسائل"), style: const TextStyle(color: Colors.black54)))
                     : ListView.builder(
-                        physics: const BouncingScrollPhysics(),
-                        itemCount: _filteredMessages.length,
-                        itemBuilder: (context, index) {
-                          final msg = _filteredMessages[index];
-                          return Column(
-                            children: [
-                              _buildMessageItem(
-                                context,
-                                name: msg['name']!,
-                                message: msg['message']!,
-                                time: msg['time']!,
-                                image: msg['image']!,
-                              ),
-                              Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 1),
-                            ],
-                          );
-                        },
-                      ),
+                  physics: const BouncingScrollPhysics(),
+                  itemCount: _filteredMessages.length,
+                  itemBuilder: (context, index) {
+                    final msg = _filteredMessages[index];
+                    return Column(
+                      children: [
+                        _buildMessageItem(
+                          context,
+                          name: msg['name']!,
+                          message: msg['message']!,
+                          time: msg['time']!,
+                          image: msg['image']!,
+                        ),
+                        Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 1),
+                      ],
+                    );
+                  },
+                ),
               ),
             ],
           ),
@@ -294,4 +294,3 @@ class _MessagesListState extends State<MessagesList> {
     );
   }
 }
-
