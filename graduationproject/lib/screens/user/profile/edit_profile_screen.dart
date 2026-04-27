@@ -3,6 +3,7 @@ import '../../../constants/app_images.dart';
 import '../../../shared/l10n/app_localizations.dart';
 import 'profile_login_details_screen.dart';
 import 'setting_profile/notifications.dart';
+import 'setting_profile/preferences.dart';
 import 'user_data.dart';
 
 class EditProfileScreen extends StatefulWidget {
@@ -126,49 +127,50 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: const Color(0xFFF9F5F1),
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: const Color(0xFFF9F5F1),
         elevation: 0,
+        surfaceTintColor: Colors.transparent,
+        title: Text(
+          t.tr(en: "Edit Profile", ar: "تعديل الملف الشخصي"),
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        centerTitle: false,
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.notifications_none, color: Theme.of(context).colorScheme.onSurface),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: Icon(Icons.settings_outlined, color: Theme.of(context).colorScheme.onSurface),
-            onPressed: () {},
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 24),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: t.isAr ? CrossAxisAlignment.end : CrossAxisAlignment.start,
           children: [
+            const SizedBox(height: 20),
             // Tabs
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _buildTabItem(t.tr(en: "My Profile", ar: "ملفي الشخصي"), true, () {}),
-                _buildTabItem(t.tr(en: "Login Details", ar: "تفاصيل الدخول"), false, () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const ProfileLoginDetailsScreen()),
-                  );
-                }),
-                _buildTabItem(t.notifications, false, () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const Notifications()),
-                  );
-                }),
-              ],
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  _buildTabItem(t.tr(en: "Profile Setting", ar: "إعدادات الملف"), true, () {}),
+                  const SizedBox(width: 20),
+                  _buildTabItem(t.tr(en: "Account Security", ar: "أمان الحساب"), false, () {
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const ProfileLoginDetailsScreen()));
+                  }),
+                  const SizedBox(width: 20),
+                  _buildTabItem(t.tr(en: "Notification", ar: "الإشعارات"), false, () {
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Notifications()));
+                  }),
+                  const SizedBox(width: 20),
+                  _buildTabItem(t.tr(en: "Preferences", ar: "التفضيلات"), false, () {
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Preferences()));
+                  }),
+                ],
+              ),
             ),
+            const SizedBox(height: 10),
+            const Divider(color: Colors.black12, height: 1),
             const SizedBox(height: 30),
 
             // Basic Information
@@ -399,7 +401,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           Text(
             title,
             style: TextStyle(
-              color: isActive ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), 
+              color: isActive ? const Color(0xFF49769F) : Colors.black38, 
               fontWeight: isActive ? FontWeight.bold : FontWeight.normal, 
               fontSize: 14,
             ),
@@ -409,7 +411,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               margin: const EdgeInsets.only(top: 8),
               height: 2,
               width: 60,
-              color: Theme.of(context).colorScheme.primary,
+              color: const Color(0xFF49769F),
             ),
         ],
       ),
