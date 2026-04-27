@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../app/router/app_router.dart';
 import '../../../shared/l10n/app_localizations.dart';
 import '../../../shared/state/locale_controller.dart';
 import '../../../shared/state/theme_controller.dart';
@@ -15,6 +16,49 @@ class SettingScreen extends StatefulWidget {
 }
 
 class _SettingScreenState extends State<SettingScreen> {
+  void _showLogoutDialog() {
+    final t = AppLocalizations.of(context);
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text(
+          t.tr(en: "Logout", ar: "تسجيل الخروج"),
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        content: Text(
+          t.tr(
+            en: "Are you sure you want to log out?",
+            ar: "هل أنت متأكد أنك تريد تسجيل الخروج؟",
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(t.cancel, style: const TextStyle(color: Colors.grey)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context); // Close dialog
+              Navigator.of(context).pushNamedAndRemoveUntil(
+                AppRoutes.roleSelection, // Assuming roleSelection is the initial/sign-in entry
+                (route) => false,
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.redAccent,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+            child: Text(
+              t.tr(en: "Logout", ar: "خروج"),
+              style: const TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
@@ -74,9 +118,7 @@ class _SettingScreenState extends State<SettingScreen> {
               title: t.tr(en: "Logout", ar: "تسجيل الخروج"),
               titleColor: Colors.redAccent,
               showArrow: false,
-              onTap: () {
-                // Logout logic
-              },
+              onTap: _showLogoutDialog,
             ),
           ],
         ),

@@ -4,12 +4,10 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="89a40d2e-dee6-4edc-af06-e2e78f633ab0" name="Changes" comment="v2.5&#10;kkk&#10;kkkkk">
+    <list default="true" id="89a40d2e-dee6-4edc-af06-e2e78f633ab0" name="Changes" comment="v2.5&#10;kkk&#10;kkkkk&#10;vvvvvv">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/home/recruitment_user_shell_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/home/recruitment_user_shell_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/jobs/recruitment_application_timeline_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/jobs/recruitment_application_timeline_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/messages/messages_list_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/messages/messages_list_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/Tradesman_Messages/messages_List.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/Tradesman_Messages/messages_list.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/settings/setting_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/settings/setting_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/setting/settings.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/setting/settings.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -204,7 +202,15 @@
       <option name="project" value="LOCAL؜" />
       <updated>1777249598857</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL؜-٠٠٠١٥" summary="v2.5&#10;kkk&#10;kkkkk&#10;vvvvvv">
+      <option name="closed" value="true" />
+      <created>1777253347832</created>
+      <option name="number" value="٠٠٠١٥" />
+      <option name="presentableId" value="LOCAL؜-٠٠٠١٥" />
+      <option name="project" value="LOCAL؜" />
+      <updated>1777253347832</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -216,6 +222,7 @@
     <MESSAGE value="v2" />
     <MESSAGE value="v2.5" />
     <MESSAGE value="v2.5&#10;kkk&#10;kkkkk" />
-    <option name="LAST_COMMIT_MESSAGE" value="v2.5&#10;kkk&#10;kkkkk" />
+    <MESSAGE value="v2.5&#10;kkk&#10;kkkkk&#10;vvvvvv" />
+    <option name="LAST_COMMIT_MESSAGE" value="v2.5&#10;kkk&#10;kkkkk&#10;vvvvvv" />
   </component>
 </project>
