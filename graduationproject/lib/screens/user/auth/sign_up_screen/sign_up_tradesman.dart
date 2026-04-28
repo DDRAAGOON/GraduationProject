@@ -28,7 +28,6 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
   final TextEditingController _aboutMeController = TextEditingController();
   final TextEditingController _serviceController = TextEditingController();
   final TextEditingController _skillsController = TextEditingController();
-  final TextEditingController _profileImageController = TextEditingController();
   
   // Education Controllers
   final TextEditingController _eduInstitutionController = TextEditingController();
@@ -63,6 +62,17 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
   // Criminal Record and Work Images state
   String? _criminalRecordPath;
   List<String> _workImagesPaths = [];
+  String? _profileImagePath;
+
+  Future<void> _pickProfileImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      setState(() {
+        _profileImagePath = image.path;
+      });
+    }
+  }
 
   Future<void> _pickCriminalRecord() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -90,9 +100,6 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
   @override
   void initState() {
     super.initState();
-    _profileImageController.addListener(() {
-      setState(() {});
-    });
   }
 
   @override
@@ -104,7 +111,6 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
     _aboutMeController.dispose();
     _serviceController.dispose();
     _skillsController.dispose();
-    _profileImageController.dispose();
     _eduInstitutionController.dispose();
     _eduDegreeController.dispose();
     _eduDurationController.dispose();
@@ -186,7 +192,7 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
         "facebook": _facebookController.text,
       };
       TradesmanProfileData.criminalRecordUploaded = _criminalRecordPath != null;
-      TradesmanProfileData.profileImage = _profileImageController.text.isEmpty ? null : _profileImageController.text;
+      TradesmanProfileData.profileImage = _profileImagePath;
       
       // Update UserProfileData too
       UserProfileData.portfolioImages = List.from(_workImagesPaths);
@@ -265,15 +271,23 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
                 const SizedBox(height: 35),
 
                 // Profile Image Avatar Preview (Left aligned)
-                CircleAvatar(
-                  radius: 50,
-                  backgroundColor: Colors.white,
-                  backgroundImage: _profileImageController.text.isNotEmpty 
-                      ? NetworkImage(_profileImageController.text) as ImageProvider
-                      : null,
-                  child: _profileImageController.text.isEmpty
-                      ? const Icon(Icons.person, size: 50, color: Color(0xFF49769F))
-                      : null,
+                GestureDetector(
+                  onTap: _pickProfileImage,
+                  child: Stack(
+                    alignment: Alignment.bottomRight,
+                    children: [
+                      CircleAvatar(
+                        radius: 50,
+                        backgroundColor: Colors.white,
+                        backgroundImage: _profileImagePath != null 
+                            ? FileImage(File(_profileImagePath!)) as ImageProvider
+                            : null,
+                        child: _profileImagePath == null
+                            ? const Icon(Icons.person, size: 50, color: Color(0xFF49769F))
+                            : null,
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 20),
 
@@ -281,8 +295,6 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
                 Text(t.personalInfo, style: const TextStyle(color: Colors.black87, fontSize: 16, fontWeight: FontWeight.w600)),
                 const SizedBox(height: 20),
                 _buildTextField(_fullNameController, t.fullName, Icons.person_outline, isRequired: true),
-                const SizedBox(height: 20),
-                _buildTextField(_profileImageController, "Profile Image URL", Icons.image_outlined, hint: "Paste image link here"),
                 const SizedBox(height: 20),
                 _buildTextField(_emailController, t.emailAddress, Icons.email_outlined, isRequired: true),
                 const SizedBox(height: 20),

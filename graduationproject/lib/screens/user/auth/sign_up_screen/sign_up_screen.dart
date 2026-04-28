@@ -1,4 +1,4 @@
-﻿import 'dart:io';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:file_picker/file_picker.dart';
@@ -31,7 +31,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _portfolioController = TextEditingController();
   final TextEditingController _socialController = TextEditingController();
   final TextEditingController _cvController = TextEditingController();
-  final TextEditingController _profileImageController = TextEditingController();
 
   // DOB Dropdowns
   String? _selectedDay;
@@ -80,7 +79,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
     if (image != null) {
       setState(() {
         _profileImagePath = image.path;
-        _profileImageController.text = image.path;
       });
     }
   }
@@ -88,9 +86,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   void initState() {
     super.initState();
-    _profileImageController.addListener(() {
-      setState(() {});
-    });
   }
 
   @override
@@ -104,7 +99,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
     _portfolioController.dispose();
     _socialController.dispose();
     _cvController.dispose();
-    _profileImageController.dispose();
     _eduInstitutionController.dispose();
     _eduDegreeController.dispose();
     _eduDurationController.dispose();
@@ -201,7 +195,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       UserProfileData.socialLinks = List.from(_socialLinksList);
       UserProfileData.experiences = List.from(_experiencesList);
       UserProfileData.cvName = _cvController.text.isEmpty ? null : _cvController.text;
-      UserProfileData.profileImage = _profileImageController.text.isEmpty ? null : _profileImageController.text;
+      UserProfileData.profileImage = _profileImagePath;
 
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Profile saved successfully!")));
       Navigator.of(context).pushNamedAndRemoveUntil(
@@ -291,8 +285,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 Text(t.personalInfo, style: const TextStyle(color: Colors.black87, fontSize: 16, fontWeight: FontWeight.w600)),
                 const SizedBox(height: 20),
                 _buildTextField(_fullNameController, t.fullName, Icons.person_outline, isRequired: true),
-                const SizedBox(height: 20),
-                _buildTextField(_profileImageController, t.tr(en: "Profile Image", ar: "الصورة الشخصية"), Icons.image_outlined, hint: t.tr(en: "Tap avatar to upload", ar: "اضغط على الصورة للرفع"), readOnly: true),
                 const SizedBox(height: 20),
                 _buildTextField(_emailController, t.emailAddress, Icons.email_outlined, isRequired: true, validator: (v) => (v == null || !v.endsWith("@gmail.com")) ? t.enterValidEmail : null),
                 const SizedBox(height: 20),

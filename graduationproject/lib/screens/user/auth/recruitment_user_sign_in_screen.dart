@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:icons_plus/icons_plus.dart';
 
 import '../../../app/router/app_router.dart';
 import '../../../shared/services/session_manager.dart';
@@ -132,7 +132,7 @@ class _RecruitmentUserSignInScreenState extends State<RecruitmentUserSignInScree
             onPressed: () {
               // Logic for Google Sign-In
             },
-            icon: const FaIcon(FontAwesomeIcons.google, color: Colors.red, size: 20),
+            icon: Brand(Brands.google, size: 24),
             label: Text(
               t.tr(en: "Continue with Google", ar: "المتابعة باستخدام جوجل"),
               style: const TextStyle(color: Colors.black87, fontWeight: FontWeight.bold),
