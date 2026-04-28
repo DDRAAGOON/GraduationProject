@@ -27,7 +27,6 @@ class _CompanyNewChatScreenState extends State<CompanyNewChatScreen> {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
-    final isAr = t.isAr;
     
     return ListenableBuilder(
       listenable: RecruitmentSyncStore.instance,

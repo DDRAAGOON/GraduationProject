@@ -207,8 +207,7 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
     Job job,
     int acceptedCount,
   ) {
-    final capacity = job.capacity ?? 10;
-    final remaining = (capacity - acceptedCount).clamp(0, capacity);
+    final requiredCount = job.requiredCount > 0 ? job.requiredCount : 1;
 
     return Column(
       children: [
@@ -252,7 +251,7 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
                             style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                           ),
                           Text(
-                            '$acceptedCount/$capacity',
+                            '$acceptedCount/$requiredCount',
                             style: TextStyle(
                               fontSize: 12, 
                               fontWeight: FontWeight.bold,
@@ -263,13 +262,13 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
                       LinearProgressIndicator(
-                        value: acceptedCount / capacity,
+                        value: acceptedCount / requiredCount,
                         borderRadius: BorderRadius.circular(4),
                         minHeight: 6,
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        t.hiredProgressMsg(acceptedCount, capacity),
+                        t.hiredProgressMsg(acceptedCount, requiredCount),
                         style: const TextStyle(fontSize: 10, color: Colors.grey),
                       ),
                     ],

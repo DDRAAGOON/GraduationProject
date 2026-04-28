@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import '../../data/api/company_api_client.dart';
+import '../state/company_store.dart';
 import '../state/recruitment_sync_store.dart';
 
 class RecruitmentSyncService {
@@ -10,63 +11,154 @@ class RecruitmentSyncService {
 
   final CompanyApiClient _client = CompanyApiClient();
   Timer? _timer;
+  bool get isAuthenticated => _client.hasToken;
 
-  Future<void> loginForDemo({required bool companyRole}) async {
+  Future<Map<String, dynamic>> login({required String email, required String password, required String expectedRole}) async {
     final auth = await _client.login(
-      email: companyRole ? 'company@jobito.com' : 'user@jobito.com',
-      password: '12345678',
+      email: email.trim(),
+      password: password,
     );
-    final token = auth['token']?.toString();
-    if (token != null && token.isNotEmpty) {
-      _client.setToken(token);
+
+    final user = auth['user'] as Map<String, dynamic>?;
+    final role = user?['role']?.toString().toLowerCase().trim();
+    final token = auth['token']?.toString().trim();
+    final expected = expectedRole.toLowerCase().trim();
+
+    if (token == null || token.isEmpty) {
+      throw Exception('Login response missing token');
+    }
+    if (role == null || role.isEmpty) {
+      throw Exception('Login response missing role');
+    }
+    if (expected == 'company') {
+      if (role != 'company') {
+        throw Exception('هذا الحساب ليس حساب شركة');
+      }
+    } else {
+      // For user login, block company accounts from signing in
+      if (role == 'company') {
+        throw Exception('هذا الحساب مخصص للشركات');
+      }
+    }
+
+    _client.setToken(token);
+
+    // Update store with user info
+    if (user != null) {
+      final String name = user['name']?.toString() ?? 'User';
+      RecruitmentSyncStore.instance.updateCurrentUser(
+        name: name,
+        email: user['email']?.toString(),
+        photoUrl: user['photoUrl']?.toString(),
+      );
+
+      if (role == 'company') {
+        CompanyStore.instance.setRegistrationData(
+          companyName: name,
+          email: user['email']?.toString(),
+        );
+      }
+    }
+
+    return user ?? {};
+  }
+
+  Future<Map<String, dynamic>> googleLogin(String idToken) async {
+    final auth = await _client.googleLogin(idToken: idToken);
+
+    final user = auth['user'] as Map<String, dynamic>?;
+    final token = auth['token']?.toString().trim();
+
+    if (token == null || token.isEmpty) {
+      throw Exception('Google login response missing token');
+    }
+
+    _client.setToken(token);
+
+    // Update store with user info
+    if (user != null) {
+      final String name = user['name']?.toString() ?? 'User';
+      RecruitmentSyncStore.instance.updateCurrentUser(
+        name: name,
+        email: user['email']?.toString(),
+        photoUrl: user['photoUrl']?.toString(),
+      );
+
+      // We don't have role in googleLogin response yet, but if the user
+      // is already known as a company in the store, we should sync.
+      if (RecruitmentSyncStore.instance.userRole == 'Company') {
+        CompanyStore.instance.setRegistrationData(
+          companyName: name,
+          email: user['email']?.toString(),
+        );
+      }
+    }
+
+    return user ?? {};
+  }
+
+  Future<Map<String, dynamic>> register({
+    required String email,
+    required String password,
+    required String name,
+    required String role,
+  }) async {
+    final auth = await _client.register(
+      email: email.trim(),
+      password: password,
+      name: name.trim(),
+      role: role.toLowerCase().trim(),
+    );
+
+    final user = auth['user'] as Map<String, dynamic>?;
+    final token = auth['token']?.toString().trim();
+
+    if (token == null || token.isEmpty) {
+      throw Exception('Registration response missing token');
+    }
+
+    _client.setToken(token);
+
+    // Update store with user info
+    if (user != null) {
+      final String name = user['name']?.toString() ?? 'User';
+      RecruitmentSyncStore.instance.updateCurrentUser(
+        name: name,
+        email: user['email']?.toString(),
+        photoUrl: user['photoUrl']?.toString(),
+      );
+
+      if (role.toLowerCase().trim() == 'company') {
+        CompanyStore.instance.setRegistrationData(
+          companyName: name,
+          email: user['email']?.toString(),
+        );
+      }
+    }
+
+    return user ?? {};
+  }
+
+  void logout() {
+    _client.clearToken();
+    stopPolling();
+  }
+
+  void _assertAuthenticated() {
+    if (!isAuthenticated) {
+      throw Exception('Not authenticated. Please login first.');
     }
   }
 
-  Future<void> startPolling() async {
-    // For demo purposes, we insert some mock jobs if empty
-    final store = RecruitmentSyncStore.instance;
-    if (store.jobs.isEmpty) {
-      store.replaceFromRemote(
-        jobs: [
-          {
-            'id': 'job_1',
-            'title': 'Senior Flutter Developer',
-            'companyName': 'TechCorp',
-            'location': 'Cairo',
-            'salaryRange': '25k - 35k',
-            'type': 'Full-time',
-            'category': 'Technical',
-            'tags': ['Flutter', 'Dart', 'Firebase'],
-            'createdAt': DateTime.now().toIso8601String(),
-          },
-          {
-            'id': 'job_2',
-            'title': 'UI/UX Designer',
-            'companyName': 'DesignStudio',
-            'location': 'Remote',
-            'salaryRange': '15k - 25k',
-            'type': 'Contract',
-            'category': 'Technical',
-            'tags': ['Figma', 'Adobe XD'],
-            'createdAt': DateTime.now().toIso8601String(),
-          },
-          {
-            'id': 'job_3',
-            'title': 'Marketing Manager',
-            'companyName': 'Growthify',
-            'location': 'Alexandria',
-            'salaryRange': '20k - 30k',
-            'type': 'Full-time',
-            'category': 'Non-technical',
-            'tags': ['Marketing', 'SEO', 'Ads'],
-            'createdAt': DateTime.now().toIso8601String(),
-          },
-        ],
-        applications: [],
-        messages: [],
-      );
-    }
+  Future<void> loginForDemo({required bool companyRole}) async {
+    await login(
+      email: companyRole ? 'company@jobito.com' : 'user@jobito.com',
+      password: '12345678',
+      expectedRole: companyRole ? 'company' : 'user',
+    );
+  }
 
+  Future<void> startPolling() async {
     await _pullServerState();
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 12), (_) async {
@@ -95,68 +187,51 @@ class RecruitmentSyncService {
     }
   }
 
-  Future<void> postJob({
+  Future<String> postJob({
     required String title,
     required String location,
     required String salaryRange,
+    required String description,
+    required List<String> responsibilities,
+    required List<String> qualifications,
+    required List<String> niceToHaves,
+    required List<String> benefits,
+    required String category,
     String companyName = 'Jobito Labs',
     String type = 'Full-time',
     List<String> tags = const <String>['General'],
-    List<String> niceToHaves = const <String>[],
+    int requiredCount = 1,
   }) async {
-    try {
-      final auth = await _client.login(
-        email: 'company@jobito.com',
-        password: '12345678',
-      );
-      _client.setToken(auth['token']?.toString() ?? '');
-      await _client.createJob(
-        title: title,
-        companyName: companyName,
-        location: location,
-        salaryRange: salaryRange,
-        type: type,
-        tags: tags,
-      );
-      await _pullServerState();
-    } catch (_) {
-      RecruitmentSyncStore.instance.companyPostJob(
-        RecruitmentJob(
-          id: 'job_${DateTime.now().millisecondsSinceEpoch}',
-          title: title,
-          companyName: companyName,
-          location: location,
-          salaryRange: salaryRange,
-          type: type,
-          tags: tags,
-          niceToHaves: niceToHaves,
-          publishedAt: DateTime.now(), category: '',
-        ),
-      );
-    }
+    _assertAuthenticated();
+    final response = await _client.createJob(
+      title: title,
+      companyName: companyName,
+      location: location,
+      salaryRange: salaryRange,
+      type: type,
+      tags: tags,
+      category: category,
+      requiredCount: requiredCount,
+    );
+    final String jobId = response['id']?.toString() ?? '';
+    await _pullServerState();
+    return jobId;
   }
 
   Future<void> applyToJob({
     required String jobId,
     required String userName,
   }) async {
-    try {
-      final auth = await _client.login(
-        email: 'user@jobito.com',
-        password: '12345678',
-      );
-      _client.setToken(auth['token']?.toString() ?? '');
-      await _client.createApplication(jobId: jobId, userName: userName);
-      await _pullServerState();
-    } catch (_) {
-      RecruitmentSyncStore.instance.userApplyToJob(jobId: jobId, userName: userName);
-    }
+    _assertAuthenticated();
+    await _client.createApplication(jobId: jobId, userName: userName);
+    await _pullServerState();
   }
 
   Future<void> updateStatus({
     required String applicationId,
     required String status,
   }) async {
+    _assertAuthenticated();
     try {
       await _client.updateApplicationStatus(
         applicationId: applicationId,
@@ -172,6 +247,7 @@ class RecruitmentSyncService {
   }
 
   Future<void> sendBroadcast(String text) async {
+    _assertAuthenticated();
     try {
       await _client.sendMessage(text);
       await _pullServerState();

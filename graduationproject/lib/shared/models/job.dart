@@ -28,8 +28,10 @@ final class Job {
     this.qualifications = const [],
     this.benefits = const [],
     this.department = '',
-    this.appliedCount,
-    this.capacity,
+    this.tags = const [],
+    this.appliedCount = 0,
+    this.requiredCount = 1,
+    this.acceptedCount = 0,
     this.status = 'Open',
     DateTime? createdAt,
   }) : createdAt = createdAt ?? DateTime.now();
@@ -47,8 +49,10 @@ final class Job {
   final List<String> niceToHaves;
   final List<String> qualifications;
   final List<JobBenefit> benefits;
-  final int? appliedCount;
-  final int? capacity;
+  final List<String> tags;
+  final int appliedCount;
+  final int requiredCount;
+  final int acceptedCount;
   final String status;
   final DateTime createdAt;
 
@@ -67,8 +71,10 @@ final class Job {
     List<String>? niceToHaves,
     List<String>? qualifications,
     List<JobBenefit>? benefits,
+    List<String>? tags,
     int? appliedCount,
-    int? capacity,
+    int? requiredCount,
+    int? acceptedCount,
     String? status,
     DateTime? createdAt,
   }) {
@@ -86,8 +92,10 @@ final class Job {
       niceToHaves: niceToHaves ?? this.niceToHaves,
       qualifications: qualifications ?? this.qualifications,
       benefits: benefits ?? this.benefits,
+      tags: tags ?? this.tags,
       appliedCount: appliedCount ?? this.appliedCount,
-      capacity: capacity ?? this.capacity,
+      requiredCount: requiredCount ?? this.requiredCount,
+      acceptedCount: acceptedCount ?? this.acceptedCount,
       status: status ?? this.status,
       createdAt: createdAt ?? this.createdAt,
     );
@@ -100,7 +108,7 @@ final class Job {
     companyName: 'Nomad',
     location: '',
     employmentType: 'Full-Time',
-    category: 'Marketing',
+    category: 'Technical',
     salaryRange: r'$15k-$85k USD',
     description:
         'Stripe is looking for Social Media Marketing expert to help manage our online networks.',
@@ -114,9 +122,35 @@ final class Job {
       'Copy editing skills',
       'Experience with online communities',
     ],
+    tags: ['Marketing', 'Social Media', 'Content'],
     appliedCount: 5,
-    capacity: 10,
+    requiredCount: 10,
+    acceptedCount: 2,
   );
 
   static List<Job> mockList() => [];
+
+  factory Job.fromMap(Map<String, dynamic> map) {
+    return Job(
+      id: map['id']?.toString() ?? '',
+      title: map['title']?.toString() ?? '',
+      companyName: map['companyName']?.toString() ?? '',
+      location: map['location']?.toString() ?? '',
+      employmentType: map['type']?.toString() ?? '',
+      category: map['category']?.toString() ?? '',
+      salaryRange: map['salaryRange']?.toString() ?? '',
+      description: map['description']?.toString() ?? '',
+      responsibilities: List<String>.from(map['responsibilities'] ?? []),
+      qualifications: List<String>.from(map['qualifications'] ?? []),
+      niceToHaves: List<String>.from(map['niceToHaves'] ?? []),
+      benefits: (map['benefits'] as List<dynamic>?)
+          ?.map((e) => JobBenefit.fromMap({'title': e.toString(), 'description': ''}))
+          .toList() ?? [],
+      tags: List<String>.from(map['tags'] ?? []),
+      status: map['status']?.toString() ?? 'Open',
+      requiredCount: int.tryParse(map['requiredCount']?.toString() ?? '1') ?? 1,
+      acceptedCount: int.tryParse(map['acceptedCount']?.toString() ?? '0') ?? 0,
+      createdAt: map['createdAt'] != null ? DateTime.parse(map['createdAt'].toString()) : null,
+    );
+  }
 }

@@ -2,11 +2,15 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:dio/dio.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../../app/router/app_router.dart';
+// ... rest of imports
 import '../../../shared/l10n/app_localizations.dart';
-import '../../../shared/state/company_store.dart';
+import '../../../shared/services/recruitment_sync_service.dart';
 import '../../../shared/services/session_manager.dart';
+import '../../../shared/state/company_store.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_scaffold.dart';
 import '../../../shared/widgets/app_text_field.dart';
@@ -26,6 +30,10 @@ class _CompanySignInScreenState extends State<CompanySignInScreen> {
   String? _emailError;
   String? _passwordError;
 
+  final GoogleSignIn _googleSignInInstance = GoogleSignIn(
+    scopes: ['email', 'profile'],
+  );
+
   @override
   void dispose() {
     _email.dispose();
@@ -39,34 +47,104 @@ class _CompanySignInScreenState extends State<CompanySignInScreen> {
     final pass = _password.text;
     setState(() {
       _emailError = email.contains('@') ? null : t.enterValidEmail;
-      _passwordError = pass.length >= 8 ? null : t.min8Chars;
+      _passwordError = pass.isNotEmpty ? null : t.min8Chars;
     });
     return _emailError == null && _passwordError == null;
   }
 
+  Future<void> _handleGoogleSignIn() async {
+    final t = AppLocalizations.of(context);
+    setState(() => _loading = true);
+    try {
+      final GoogleSignInAccount? googleUser = await _googleSignInInstance.signIn();
+      if (googleUser == null) {
+        setState(() => _loading = false);
+        return;
+      }
+
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final String? idToken = googleAuth.idToken;
+
+      if (idToken == null) {
+        throw Exception('Failed to get Google ID Token');
+      }
+
+      final userData = await RecruitmentSyncService.instance.googleLogin(idToken);
+      
+      await SessionManager.saveCompanySession(
+        email: googleUser.email,
+        name: googleUser.displayName ?? googleUser.email.split('@').first,
+      );
+
+      if (!mounted) return;
+
+      CompanyStore.instance.setRegistrationData(
+        companyName: googleUser.displayName ?? googleUser.email.split('@').first,
+        email: googleUser.email,
+      );
+
+      setState(() => _loading = false);
+      Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.companyDashboard, (route) => false);
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _loading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Google Sign-In failed: ${e.toString()}')),
+      );
+    }
+  }
+
   Future<void> _submit() async {
+    final t = AppLocalizations.of(context);
     if (!_validate()) return;
     setState(() => _loading = true);
-    await Future<void>.delayed(const Duration(milliseconds: 700));
-    if (!mounted) return;
-
-    // In a real app, you'd fetch the company name from a database. 
-    // Here we'll use a placeholder or just save the email as a name part for demo.
-    await SessionManager.saveCompanySession(
-      email: _email.text.trim(),
-      name: _email.text.split('@').first,
-    );
     
-    if (!mounted) return;
+    try {
+      await RecruitmentSyncService.instance.login(
+        email: _email.text.trim(),
+        password: _password.text,
+        expectedRole: 'company',
+      );
 
-    // Update store
-    CompanyStore.instance.setRegistrationData(
-      companyName: _email.text.split('@').first,
-      email: _email.text.trim(),
-    );
+      await SessionManager.saveCompanySession(
+        email: _email.text.trim(),
+        name: _email.text.split('@').first,
+      );
+      
+      if (!mounted) return;
 
-    setState(() => _loading = false);
-    Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.companyDashboard, (route) => false);
+      CompanyStore.instance.setRegistrationData(
+        companyName: _email.text.split('@').first,
+        email: _email.text.trim(),
+      );
+
+      await RecruitmentSyncService.instance.startPolling();
+
+      setState(() => _loading = false);
+      Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.companyDashboard, (route) => false);
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _loading = false);
+      String msg = t.isAr ? 'البريد الإلكتروني أو كلمة المرور غير صحيحة' : 'Invalid email or password.';
+      
+      if (e is DioException) {
+        if (e.type == DioExceptionType.connectionTimeout || e.type == DioExceptionType.receiveTimeout) {
+          msg = t.isAr ? 'فشل الاتصال بالخادم، تحقق من الإنترنت' : 'Connection timeout. Check your internet.';
+        } else if (e.response?.statusCode == 401 || e.response?.statusCode == 403) {
+          msg = t.isAr ? 'البريد الإلكتروني أو كلمة المرور غير صحيحة' : 'Invalid email or password.';
+        } else {
+          msg = t.isAr ? 'حدث خطأ في الاتصال بالخادم' : 'Server connection error.';
+        }
+      } else {
+        msg = e.toString().contains('حساب شركة') || e.toString().contains('company account')
+            ? e.toString().replaceAll('Exception: ', '')
+            : msg;
+      }
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(msg)),
+      );
+    }
   }
 
   @override
@@ -138,7 +216,7 @@ class _CompanySignInScreenState extends State<CompanySignInScreen> {
           ),
           const SizedBox(height: 14),
           OutlinedButton.icon(
-            onPressed: _loading ? null : _submit,
+            onPressed: _loading ? null : _handleGoogleSignIn,
             icon: SvgPicture.asset(
               'assets/company/icon/google_g.svg',
               width: 18,

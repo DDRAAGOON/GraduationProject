@@ -99,7 +99,7 @@ class _RecruitmentJobApplicationScreenState
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  '${widget.job.companyName} • ${widget.job.location}',
+                  widget.job.companyName,
                   style: const TextStyle(color: Colors.black54),
                 ),
               ],

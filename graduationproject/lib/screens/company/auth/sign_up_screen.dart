@@ -1,13 +1,14 @@
 // Company registration form and navigation to next steps.
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 
 import '../../../app/router/app_router.dart';
 import '../../../shared/l10n/app_localizations.dart';
 import '../../../shared/state/company_store.dart';
 import '../../../shared/services/session_manager.dart';
+import '../../../shared/services/recruitment_sync_service.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_scaffold.dart';
 import '../../../shared/widgets/app_text_field.dart';
@@ -79,29 +80,54 @@ class _CompanySignUpScreenState extends State<CompanySignUpScreen> {
   Future<void> _submit() async {
     if (!_validate()) return;
     setState(() => _loading = true);
-    await Future<void>.delayed(const Duration(milliseconds: 700));
-    if (!mounted) return;
     
-    // Save registration data to the store so it appears in the profile.
-    CompanyStore.instance.setRegistrationData(
-      companyName: _companyName.text.trim(),
-      customProfileImage: null,
-      commercialRegister: _commercialRegister.text.trim(),
-      nationalNumber: _nationalNumber.text.trim(),
-      email: _email.text.trim(),
-    );
+    try {
+      await RecruitmentSyncService.instance.register(
+        email: _email.text.trim(),
+        password: _password.text,
+        name: _companyName.text.trim(),
+        role: 'company',
+      );
 
-    // Save session for persistence
-    await SessionManager.saveCompanySession(
-      email: _email.text.trim(),
-      name: _companyName.text.trim(),
-      photoPath: null,
-    );
+      CompanyStore.instance.setRegistrationData(
+        companyName: _companyName.text.trim(),
+        customProfileImage: null,
+        commercialRegister: _commercialRegister.text.trim(),
+        nationalNumber: _nationalNumber.text.trim(),
+        email: _email.text.trim(),
+      );
 
-    if (!mounted) return;
+      await SessionManager.saveCompanySession(
+        email: _email.text.trim(),
+        name: _companyName.text.trim(),
+        photoPath: null,
+      );
 
-    setState(() => _loading = false);
-    Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.companyDashboard, (route) => false);
+      if (!mounted) return;
+
+      setState(() => _loading = false);
+      Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.companyWorkspace, (route) => false);
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _loading = false);
+      final t = AppLocalizations.of(context);
+      String msg;
+      if (e is DioException) {
+        final statusCode = e.response?.statusCode;
+        if (statusCode == 409 || statusCode == 400) {
+          msg = t.isAr ? 'البريد الإلكتروني مستخدم بالفعل، جرّب بريداً آخر.' : 'Email already registered. Try a different one.';
+        } else if (statusCode == null) {
+          msg = t.isAr ? 'تعذّر الاتصال بالخادم، تحقق من الإنترنت.' : 'Cannot reach server. Check your internet.';
+        } else {
+          msg = t.isAr ? 'فشل التسجيل، حاول مرة أخرى.' : 'Registration failed. Please try again.';
+        }
+      } else {
+        msg = t.isAr ? 'فشل التسجيل، حاول مرة أخرى.' : 'Registration failed. Please try again.';
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(msg)),
+      );
+    }
   }
 
   @override

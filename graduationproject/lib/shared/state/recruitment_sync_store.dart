@@ -1,5 +1,6 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import '../models/job.dart';
+import 'company_store.dart';
 
 class RecruitmentJob {
   const RecruitmentJob({
@@ -9,11 +10,18 @@ class RecruitmentJob {
     required this.location,
     required this.salaryRange,
     required this.type,
+    required this.status,
     required this.category,
     required this.tags,
     required this.publishedAt,
-    this.logoIcon,
+    this.description = '',
+    this.responsibilities = const [],
+    this.qualifications = const [],
     this.niceToHaves = const [],
+    required this.benefits,
+    this.logoIcon,
+    this.capacity = 1,
+    this.acceptedCount = 0,
   });
 
   final String id;
@@ -22,11 +30,18 @@ class RecruitmentJob {
   final String location;
   final String salaryRange;
   final String type;
+  final String status;
   final String category;
   final List<String> tags;
   final DateTime publishedAt;
-  final IconData? logoIcon;
+  final String description;
+  final List<String> responsibilities;
+  final List<String> qualifications;
   final List<String> niceToHaves;
+  final List<String> benefits;
+  final IconData? logoIcon;
+  final int capacity;
+  final int acceptedCount;
 }
 
 class RecruitmentApplication {
@@ -148,41 +163,7 @@ class ServiceRequestPost {
 
 class RecruitmentSyncStore extends ChangeNotifier {
   RecruitmentSyncStore._() {
-    _jobs.addAll([
-      RecruitmentJob(
-        id: 'job_1',
-        title: 'Senior Flutter Developer',
-        companyName: 'TechCorp',
-        location: 'Cairo',
-        salaryRange: '25k - 35k',
-        type: 'Full-time',
-        category: 'Technical',
-        tags: ['Flutter', 'Dart', 'Firebase'],
-        publishedAt: DateTime.now(),
-      ),
-      RecruitmentJob(
-        id: 'job_2',
-        title: 'UI/UX Designer',
-        companyName: 'DesignStudio',
-        location: 'Remote',
-        salaryRange: '15k - 25k',
-        type: 'Contract',
-        category: 'Technical',
-        tags: ['Figma', 'Adobe XD'],
-        publishedAt: DateTime.now(),
-      ),
-      RecruitmentJob(
-        id: 'job_3',
-        title: 'Marketing Manager',
-        companyName: 'Growthify',
-        location: 'Alexandria',
-        salaryRange: '20k - 30k',
-        type: 'Full-time',
-        category: 'Non-technical',
-        tags: ['Marketing', 'SEO', 'Ads'],
-        publishedAt: DateTime.now(),
-      ),
-    ]);
+    // Empty initial state
   }
 
   static final RecruitmentSyncStore instance = RecruitmentSyncStore._();
@@ -284,6 +265,21 @@ class RecruitmentSyncStore extends ChangeNotifier {
   List<Map<String, String>> get currentUserEducation => _currentUserEducation;
   List<Map<String, String>> get currentUserExperience => _currentUserExperience;
   List<ServiceRequestPost> get serviceRequests => List<ServiceRequestPost>.unmodifiable(_serviceRequests);
+
+  void updateCurrentUser({
+    String? name,
+    String? email,
+    String? phone,
+    String? location,
+    String? photoUrl,
+  }) {
+    if (name != null) _currentUserName = name;
+    if (email != null) _currentUserEmail = email;
+    if (phone != null) _currentUserPhone = phone;
+    if (location != null) _currentUserLocation = location;
+    if (photoUrl != null) _profileImage = photoUrl;
+    notifyListeners();
+  }
 
   List<RecruitmentJob> get savedJobs =>
       _jobs.where((item) => _savedJobIds.contains(item.id)).toList();
@@ -482,17 +478,41 @@ class RecruitmentSyncStore extends ChangeNotifier {
   }) {
     if (jobs.isNotEmpty) {
       _jobs.clear();
-      _jobs.addAll(jobs.map((item) => RecruitmentJob(
-        id: item['id']?.toString() ?? '',
-        title: item['title']?.toString() ?? 'Untitled',
-        companyName: item['companyName']?.toString() ?? 'Company',
-        location: item['location']?.toString() ?? 'Remote',
-        salaryRange: item['salaryRange']?.toString() ?? 'Negotiable',
-        type: item['type']?.toString() ?? 'Full-time',
-        category: item['category']?.toString() ?? 'Technical',
-        tags: item['tags'] is List ? (item['tags'] as List).map((e) => e.toString()).toList() : const [],
-        publishedAt: DateTime.tryParse(item['createdAt']?.toString() ?? '') ?? DateTime.now(),
-      )));
+      final List<Job> companyJobs = [];
+      final currentCompanyName = CompanyStore.instance.companyName;
+
+      for (final item in jobs) {
+        final rJob = RecruitmentJob(
+          id: item['id']?.toString() ?? '',
+          title: item['title']?.toString() ?? 'Untitled',
+          companyName: item['companyName']?.toString() ?? 'Company',
+          location: item['location']?.toString() ?? 'Remote',
+          salaryRange: item['salaryRange']?.toString() ?? 'Negotiable',
+          type: item['type']?.toString() ?? 'Full-time',
+          status: item['status']?.toString() ?? 'Open',
+          category: item['category']?.toString() ?? 'Technical',
+          tags: item['tags'] is List ? (item['tags'] as List).map((e) => e.toString()).toList() : const [],
+          publishedAt: DateTime.tryParse(item['createdAt']?.toString() ?? '') ?? DateTime.now(),
+          description: item['description']?.toString() ?? '',
+          responsibilities: item['responsibilities'] is List ? (item['responsibilities'] as List).map((e) => e.toString()).toList() : const [],
+          qualifications: item['qualifications'] is List ? (item['qualifications'] as List).map((e) => e.toString()).toList() : const [],
+          niceToHaves: item['niceToHaves'] is List ? (item['niceToHaves'] as List).map((e) => e.toString()).toList() : const [],
+          benefits: item['benefits'] is List ? (item['benefits'] as List).map((e) => e.toString()).toList() : const [],
+          capacity: int.tryParse(item['requiredCount']?.toString() ?? '1') ?? 1,
+          acceptedCount: int.tryParse(item['acceptedCount']?.toString() ?? '0') ?? 0,
+        );
+        _jobs.add(rJob);
+
+        // If this job belongs to the current company, add it to CompanyStore
+        if (rJob.companyName == currentCompanyName) {
+          companyJobs.add(Job.fromMap(item));
+        }
+      }
+
+      // Sync with CompanyStore
+      for (final job in companyJobs) {
+        CompanyStore.instance.saveJob(job);
+      }
     }
     notifyListeners();
   }

@@ -27,11 +27,8 @@ class _RecruitmentUserShellScreenState extends State<RecruitmentUserShellScreen>
   @override
   void initState() {
     super.initState();
-    // Start polling immediately to ensure mock jobs are loaded even if login fails
+    // Start polling immediately
     RecruitmentSyncService.instance.startPolling();
-    RecruitmentSyncService.instance.loginForDemo(companyRole: false).catchError((e) {
-      debugPrint('Login failed, continuing in demo mode: $e');
-    });
   }
 
   @override
@@ -49,40 +46,45 @@ class _RecruitmentUserShellScreenState extends State<RecruitmentUserShellScreen>
       const MessagesListScreen(),
       const _ProfileTab(),
     ];
-    return Scaffold(
-      backgroundColor: const Color(0xFFF9F5F1),
-      appBar: AppBar(
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 16, top: 8, bottom: 8),
-          child: GestureDetector(
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => const Settings()),
+    final store = RecruitmentSyncStore.instance;
+    return AnimatedBuilder(
+      animation: store,
+      builder: (context, _) {
+        return Scaffold(
+          backgroundColor: const Color(0xFFF9F5F1),
+          appBar: AppBar(
+            leading: Padding(
+              padding: const EdgeInsets.only(left: 16, top: 8, bottom: 8),
+              child: GestureDetector(
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => const Settings()),
+                ),
+                child: CircleAvatar(
+                  radius: 18,
+                  backgroundColor: Colors.white,
+                  backgroundImage: store.profileImage != null
+                      ? (store.profileImage!.startsWith('http')
+                          ? NetworkImage(store.profileImage!)
+                          : FileImage(File(store.profileImage!)) as ImageProvider)
+                      : null,
+                  child: store.profileImage == null
+                      ? const Icon(Icons.person, size: 20)
+                      : null,
+                ),
+              ),
             ),
-            child: CircleAvatar(
-              radius: 18,
-              backgroundColor: Colors.white,
-              backgroundImage: UserProfileData.profileImage != null
-                  ? (UserProfileData.profileImage!.startsWith('http')
-                      ? NetworkImage(UserProfileData.profileImage!)
-                      : FileImage(File(UserProfileData.profileImage!)) as ImageProvider)
-                  : null,
-              child: UserProfileData.profileImage == null
-                  ? const Icon(Icons.person, size: 20)
-                  : null,
+            title: Text(
+              _tab == 0 
+                ? (store.currentUserName.isNotEmpty ? store.currentUserName : (_isAr ? 'اكتشف الوظائف' : 'Discover Jobs'))
+                : _tab == 1 ? (_isAr ? 'تقديماتي' : 'My Apps') 
+                : _tab == 2 ? (_isAr ? 'الشركات' : 'Browse Companies') 
+                : _tab == 3 ? (_isAr ? 'الرسائل' : 'Messages') 
+                : (_isAr ? 'البروفايل' : 'Profile'),
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-          ),
-        ),
-        title: Text(
-          _tab == 0 ? (_isAr ? 'اكتشف الوظائف' : 'Discover Jobs') : 
-          _tab == 1 ? (_isAr ? 'تقديماتي' : 'My Apps') :
-          _tab == 2 ? (_isAr ? 'الشركات' : 'Browse Companies') :
-          _tab == 3 ? (_isAr ? 'الرسائل' : 'Messages') :
-          (_isAr ? 'البروفايل' : 'Profile'),
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: const Color(0xFFF9F5F1),
-        surfaceTintColor: Colors.transparent,
-        centerTitle: false,
+            backgroundColor: const Color(0xFFF9F5F1),
+            surfaceTintColor: Colors.transparent,
+            centerTitle: false,
         actions: [
           IconButton(
             onPressed: () => Navigator.of(context).push(
@@ -122,7 +124,9 @@ class _RecruitmentUserShellScreenState extends State<RecruitmentUserShellScreen>
         ],
       ),
     );
-  }
+  },
+);
+}
 }
 
 class _DiscoverTab extends StatelessWidget {
@@ -134,10 +138,29 @@ class _DiscoverTab extends StatelessWidget {
         return Colors.green;
       case 'part-time':
         return Colors.blue;
-      case 'contract':
-        return Colors.orange;
+      case 'remote':
+        return Colors.purple;
+      case 'freelance':
+        return Colors.teal;
+      case 'one-time':
+        return Colors.amber;
+      case 'internship':
+        return Colors.indigo;
       default:
         return Colors.grey;
+    }
+  }
+
+  Color _getCategoryColor(String category) {
+    switch (category.toLowerCase()) {
+      case 'technical':
+        return const Color(0xFF3B82F6);
+      case 'non-technical':
+        return const Color(0xFFEC4899);
+      case 'services':
+        return const Color(0xFF8B5CF6);
+      default:
+        return const Color(0xFF6B7280);
     }
   }
 
@@ -269,6 +292,19 @@ class _DiscoverTab extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
+                    Row(
+                      children: [
+                        const Icon(Icons.business, size: 16, color: Colors.grey),
+                        const SizedBox(width: 4),
+                        Expanded(
+                          child: Text(
+                            job.companyName,
+                            style: const TextStyle(color: Colors.black54, fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
                     Text(
                       job.title,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -276,22 +312,56 @@ class _DiscoverTab extends StatelessWidget {
                           ),
                     ),
                     const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        const Icon(Icons.business, size: 16, color: Colors.grey),
-                        const SizedBox(width: 4),
-                        Text(job.companyName, style: const TextStyle(fontWeight: FontWeight.w600)),
-                      ],
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: job.type.split(RegExp(r'[•,;]')).map((t) {
+                        final type = t.trim();
+                        if (type.isEmpty) return const SizedBox.shrink();
+                        final color = _getJobTypeColor(type);
+                        return Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: color,
+                            borderRadius: BorderRadius.circular(8),
+                            boxShadow: [
+                              BoxShadow(
+                                color: color.withOpacity(0.3),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Text(
+                            type,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                            ),
+                          ),
+                        );
+                      }).toList(),
                     ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        const Icon(Icons.location_on, size: 16, color: Colors.grey),
-                        const SizedBox(width: 4),
-                        Text(job.location, style: const TextStyle(color: Colors.black54)),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
+                    if (job.category.isNotEmpty && job.category != 'General' && job.category != 'All') ...[
+                      const SizedBox(height: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: _getCategoryColor(job.category),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          job.category,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 8),
                     Wrap(
                       spacing: 8,
                       runSpacing: 8,
@@ -304,23 +374,42 @@ class _DiscoverTab extends StatelessWidget {
                               ))
                           .toList(),
                     ),
-                    const SizedBox(height: 12),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: typeColor.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(6),
-                        border: Border.all(color: typeColor.withOpacity(0.5)),
+                    if (job.capacity > 0) ...[
+                      const SizedBox(height: 12),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            isAr
+                              ? 'تم القبول: ${job.acceptedCount} / المطلوب: ${job.capacity}'
+                              : 'Accepted: ${job.acceptedCount} / Required: ${job.capacity}',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: job.acceptedCount >= job.capacity ? Colors.green.shade700 : Colors.blue.shade700,
+                            ),
+                          ),
+                          Text(
+                            '${((job.acceptedCount / job.capacity) * 100).toInt()}%',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: job.acceptedCount >= job.capacity ? Colors.green : Colors.blue,
+                            ),
+                          ),
+                        ],
                       ),
-                      child: Text(
-                        job.type,
-                        style: TextStyle(
-                          color: typeColor,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 12,
+                      const SizedBox(height: 6),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: LinearProgressIndicator(
+                          value: (job.acceptedCount / job.capacity).clamp(0.0, 1.0),
+                          backgroundColor: Colors.grey.withOpacity(0.1),
+                          color: job.acceptedCount >= job.capacity ? Colors.green : const Color(0xFF00D2B4),
+                          minHeight: 6,
                         ),
                       ),
-                    ),
+                    ],
                     const SizedBox(height: 12),
                     Row(
                       children: <Widget>[

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../constants/app_images.dart';
 import '../../../shared/l10n/app_localizations.dart';
 
 class NotificationsScreen extends StatelessWidget {
@@ -61,63 +60,6 @@ class NotificationsScreen extends StatelessWidget {
                 ],
               ),
             ),
-    );
-  }
-
-  Widget _buildNotificationItem(
-    BuildContext context, {
-    required String name,
-    required String action,
-    required String time,
-    String? image,
-    String? initials,
-    bool isUnread = false,
-  }) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        if (isUnread)
-          Container(
-            width: 8,
-            height: 8,
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primary,
-              shape: BoxShape.circle,
-            ),
-          ),
-        const SizedBox(width: 12),
-        CircleAvatar(
-          radius: 28,
-          backgroundColor: Theme.of(context).dividerColor.withValues(alpha: 0.12),
-          backgroundImage: image != null ? AssetImage(image) : null,
-          child: initials != null
-            ? Text(initials, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold))
-            : null,
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              RichText(
-                text: TextSpan(
-                  style: TextStyle(fontSize: 15, color: Theme.of(context).colorScheme.onSurface),
-                  children: [
-                    TextSpan(text: name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                    const TextSpan(text: " "),
-                    TextSpan(text: action, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                time,
-                style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 13),
-              ),
-            ],
-          ),
-        ),
-      ],
     );
   }
 }

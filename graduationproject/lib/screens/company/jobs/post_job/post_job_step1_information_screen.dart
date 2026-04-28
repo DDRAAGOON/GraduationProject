@@ -27,7 +27,6 @@ class _CompanyPostJobStep1InformationScreenState
   final _positions = TextEditingController(text: '1');
   final _department = TextEditingController();
   DateTime? _deadline = DateTime.now().add(const Duration(days: 30));
-  String _salaryFrequency = 'Monthly';
   String _category = 'Technical'; // Technical, Non-Technical, Services
   final Set<String> _types = {'Full-Time'};
   final List<String> _skills = [];
@@ -46,7 +45,7 @@ class _CompanyPostJobStep1InformationScreenState
         _editingJob = args;
         _jobTitle.text = args.title;
         _jobDescription.text = args.description;
-        _positions.text = args.capacity?.toString() ?? '1';
+        _positions.text = args.requiredCount.toString();
         _department.text = args.department;
         _category = args.category;
         
@@ -56,10 +55,9 @@ class _CompanyPostJobStep1InformationScreenState
         // Simple salary parsing: "EGP 5000-22000 / monthly"
         final salary = args.salaryRange;
         if (salary.contains('-')) {
-          final rangePart = salary.split('/').first.trim(); // "EGP 5000-22000"
           _salaryController.text = args.salaryRange;
         }
-        _positions.text = args.capacity.toString();
+        _positions.text = args.requiredCount.toString();
         _types.clear();
         _types.addAll(args.employmentType.split(' • '));
         _skills.clear();

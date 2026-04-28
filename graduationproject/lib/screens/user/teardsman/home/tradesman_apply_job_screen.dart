@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:graduationproject/shared/l10n/app_localizations.dart';
 import '../../../../../shared/state/recruitment_sync_store.dart';
 import '../../../../../shared/widgets/app_button.dart';
+import '../../../../shared/services/recruitment_sync_service.dart';
 
 class TradesmanApplyJobScreen extends StatefulWidget {
   const TradesmanApplyJobScreen({super.key, required this.job});
@@ -24,6 +25,8 @@ class _TradesmanApplyJobScreenState extends State<TradesmanApplyJobScreen> {
     _timeController.dispose();
     super.dispose();
   }
+
+  bool _loading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -64,11 +67,6 @@ class _TradesmanApplyJobScreenState extends State<TradesmanApplyJobScreen> {
                         color: Colors.black87,
                       ),
                 ),
-                const SizedBox(height: 6),
-                Text(
-                  widget.job.location,
-                  style: const TextStyle(color: Colors.black54, fontSize: 14),
-                ),
               ],
             ),
           ),
@@ -98,7 +96,8 @@ class _TradesmanApplyJobScreenState extends State<TradesmanApplyJobScreen> {
           const SizedBox(height: 24),
           AppButton(
             label: t.tr(en: 'Submit Application', ar: 'إرسال الطلب'),
-            onPressed: () {
+            loading: _loading,
+            onPressed: () async {
               if (_coverLetterController.text.isEmpty || _priceController.text.isEmpty || _timeController.text.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text(t.tr(en: 'Please fill all fields', ar: 'يرجى ملء جميع الحقول'))),
@@ -106,16 +105,31 @@ class _TradesmanApplyJobScreenState extends State<TradesmanApplyJobScreen> {
                 return;
               }
 
-              // Add to store so it appears in "My Apps"
-              store.userApplyToJob(
-                jobId: widget.job.id,
-                userName: store.currentUserName,
-              );
+              setState(() => _loading = true);
+              try {
+                // Real API Call
+                await RecruitmentSyncService.instance.applyToJob(
+                  jobId: widget.job.id,
+                  userName: store.currentUserName,
+                );
 
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(t.tr(en: 'Application Sent!', ar: 'تم إرسال الطلب بنجاح!'))),
-              );
-              Navigator.pop(context);
+                if (!mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(t.tr(en: 'Application Sent!', ar: 'تم إرسال الطلب بنجاح!'))),
+                );
+                Navigator.pop(context);
+              } catch (e) {
+                if (!mounted) return;
+                setState(() => _loading = false);
+                
+                String errorMsg = e.toString().contains('already applied') 
+                    ? t.tr(en: 'You have already applied for this job', ar: 'لقد قمت بالتقديم لهذه الوظيفة بالفعل')
+                    : t.tr(en: 'Failed to send application', ar: 'فشل إرسال الطلب');
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(errorMsg)),
+                );
+              }
             },
           ),
         ],

@@ -2,7 +2,6 @@ import 'package:url_launcher/url_launcher.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import '../../../../../shared/l10n/app_localizations.dart';
-import '../../../../../shared/state/recruitment_sync_store.dart';
 import '../../profile/user_data.dart';
 import '../setting/settings.dart';
 import '../../home/recruitment_user_shell_screen.dart';
@@ -18,7 +17,6 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
-    final isAr = Localizations.localeOf(context).languageCode == 'ar';
     
     return Scaffold(
       backgroundColor: const Color(0xFFF9F5F1),

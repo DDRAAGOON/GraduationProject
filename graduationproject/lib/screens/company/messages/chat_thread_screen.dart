@@ -104,7 +104,6 @@ class _ChatBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final isAr = Localizations.localeOf(context).languageCode == 'ar';
     
     final bg = bubble.fromMe
         ? cs.primary

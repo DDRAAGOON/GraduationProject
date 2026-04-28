@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 
-
 import '../../screens/company/auth/forgot_password_screen.dart';
 import '../../screens/company/auth/otp_email_verification_screen.dart';
 import '../../screens/company/auth/password_changed_dialog_screen.dart';
@@ -78,7 +77,6 @@ final class AppRoutes {
   static const userSignInNew = '/user/auth/sign_in_new';
   static const userEditProfile = '/user/profile/edit';
 
-
   // --- Company Onboarding Routes ---
   static const companyOnboardingSmartSearch =
       '/company/onboarding/smart_search';
@@ -153,8 +151,11 @@ final class AppRouter {
             location: 'N/A',
             salaryRange: 'N/A',
             type: 'N/A',
+            status: 'Open',
             tags: const <String>[],
-            publishedAt: DateTime.now(), category: '',
+            publishedAt: DateTime.now(),
+            category: 'N/A',
+            benefits: const <String>[],
           );
 
     Widget page;
@@ -178,7 +179,8 @@ final class AppRouter {
       case AppRoutes.userAdvancedFilters:
         page = const RecruitmentJobFiltersScreen();
       case AppRoutes.userApplicationTimeline:
-        final fallbackApplication = RecruitmentSyncStore.instance.applications.isNotEmpty
+        final fallbackApplication =
+            RecruitmentSyncStore.instance.applications.isNotEmpty
             ? RecruitmentSyncStore.instance.applications.first
             : RecruitmentApplication(
                 id: 'fallback',
@@ -190,7 +192,9 @@ final class AppRouter {
                 updatedAt: DateTime.now(),
               );
         page = RecruitmentApplicationTimelineScreen(
-          application: args is RecruitmentApplication ? args : fallbackApplication,
+          application: args is RecruitmentApplication
+              ? args
+              : fallbackApplication,
         );
       case AppRoutes.userSettingsNew:
         page = const RecruitmentUserSettingsScreen();
@@ -236,7 +240,8 @@ final class AppRouter {
       case AppRoutes.companyProfileEditor:
         page = const RecruitmentCompanyProfileScreen();
       case AppRoutes.companyCandidateDetails:
-        final fallbackApplication = RecruitmentSyncStore.instance.applications.isNotEmpty
+        final fallbackApplication =
+            RecruitmentSyncStore.instance.applications.isNotEmpty
             ? RecruitmentSyncStore.instance.applications.first
             : RecruitmentApplication(
                 id: 'fallback',
@@ -248,7 +253,9 @@ final class AppRouter {
                 updatedAt: DateTime.now(),
               );
         page = RecruitmentCandidateDetailsScreen(
-          application: args is RecruitmentApplication ? args : fallbackApplication,
+          application: args is RecruitmentApplication
+              ? args
+              : fallbackApplication,
         );
       case AppRoutes.companyMessagesList:
         page = const CompanyMessagesListScreen();

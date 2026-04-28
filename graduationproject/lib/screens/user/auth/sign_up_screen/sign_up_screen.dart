@@ -6,6 +6,8 @@ import 'package:image_picker/image_picker.dart';
 import '../../../../app/router/app_router.dart';
 import '../../../../shared/l10n/app_localizations.dart';
 import '../../../../shared/state/recruitment_sync_store.dart';
+import '../../../../shared/services/recruitment_sync_service.dart';
+import '../../../../shared/services/session_manager.dart';
 import '../../profile/user_data.dart';
 import 'sign_up_tradesman.dart';
 
@@ -54,7 +56,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final List<Map<String, String>> _experiencesList = [];
   final List<Map<String, String>> _educationList = [];
 
-  String? _cvPath;
   String? _profileImagePath;
   String? _selectedGender;
   final List<String> _platforms = ["LinkedIn", "GitHub", "Twitter", "Instagram", "Facebook", "Other"];
@@ -67,7 +68,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
     if (result != null) {
       setState(() {
-        _cvPath = result.files.single.path;
         _cvController.text = result.files.single.name;
       });
     }
@@ -154,7 +154,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
   }
 
-  void _saveProfile() {
+  void _saveProfile() async {
     if (_formKey.currentState!.validate()) {
       if (_selectedDay == null || _selectedMonth == null || _selectedYear == null) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Please select your full Date of Birth")));
@@ -165,43 +165,60 @@ class _SignUpScreenState extends State<SignUpScreen> {
         return;
       }
 
-      // Sync EVERYTHING with RecruitmentSyncStore
-      RecruitmentSyncStore.instance.updateUserProfile(
-        fullName: _fullNameController.text,
-        title: _expJobTitleController.text.isNotEmpty ? _expJobTitleController.text : "User",
-        email: _emailController.text,
-        phone: "+20 ${_phoneController.text}",
-        location: _addressController.text,
-        about: _aboutMeController.text,
-        portfolio: _portfolioController.text,
-        skills: _skillsList,
-        education: _educationList,
-        experience: _experiencesList,
-        role: "Job Seeker",
-        socialLinks: _socialLinksList,
-        cvName: _cvController.text.isEmpty ? null : _cvController.text,
-      );
+      try {
+        final role = _selectedRole == "Tradesman" ? "tradesman" : "user";
+        await RecruitmentSyncService.instance.register(
+          email: _emailController.text.trim(),
+          password: "12345678",
+          name: _fullNameController.text.trim(),
+          role: role,
+        );
 
-      // Also Sync with static UserProfileData for consistency
-      UserProfileData.fullName = _fullNameController.text;
-      UserProfileData.email = _emailController.text;
-      UserProfileData.phone = "+20 ${_phoneController.text}";
-      UserProfileData.aboutMe = _aboutMeController.text;
-      UserProfileData.dob = "$_selectedYear-$_selectedMonth-$_selectedDay";
-      UserProfileData.location = _addressController.text;
-      UserProfileData.gender = _selectedGender!;
-      UserProfileData.portfolioUrl = _portfolioController.text;
-      UserProfileData.skills = List.from(_skillsList);
-      UserProfileData.socialLinks = List.from(_socialLinksList);
-      UserProfileData.experiences = List.from(_experiencesList);
-      UserProfileData.cvName = _cvController.text.isEmpty ? null : _cvController.text;
-      UserProfileData.profileImage = _profileImagePath;
+        await SessionManager.saveUserSession(
+          email: _emailController.text.trim(),
+          name: _fullNameController.text.trim(),
+        );
 
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Profile saved successfully!")));
-      Navigator.of(context).pushNamedAndRemoveUntil(
-        AppRoutes.userWorkspace,
-        (route) => false,
-      );
+        RecruitmentSyncStore.instance.updateUserProfile(
+          fullName: _fullNameController.text,
+          title: _expJobTitleController.text.isNotEmpty ? _expJobTitleController.text : "User",
+          email: _emailController.text,
+          phone: "+20 ${_phoneController.text}",
+          location: _addressController.text,
+          about: _aboutMeController.text,
+          portfolio: _portfolioController.text,
+          skills: _skillsList,
+          education: _educationList,
+          experience: _experiencesList,
+          role: _selectedRole,
+          socialLinks: _socialLinksList,
+          cvName: _cvController.text.isEmpty ? null : _cvController.text,
+        );
+
+        UserProfileData.fullName = _fullNameController.text;
+        UserProfileData.email = _emailController.text;
+        UserProfileData.phone = "+20 ${_phoneController.text}";
+        UserProfileData.aboutMe = _aboutMeController.text;
+        UserProfileData.dob = "$_selectedYear-$_selectedMonth-$_selectedDay";
+        UserProfileData.location = _addressController.text;
+        UserProfileData.gender = _selectedGender!;
+        UserProfileData.portfolioUrl = _portfolioController.text;
+        UserProfileData.skills = List.from(_skillsList);
+        UserProfileData.socialLinks = List.from(_socialLinksList);
+        UserProfileData.experiences = List.from(_experiencesList);
+        UserProfileData.cvName = _cvController.text.isEmpty ? null : _cvController.text;
+        UserProfileData.profileImage = _profileImagePath;
+
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Profile saved successfully!")));
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          AppRoutes.userWorkspace,
+          (route) => false,
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Registration failed: ${e.toString()}")),
+        );
+      }
     }
   }
 

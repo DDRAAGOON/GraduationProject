@@ -129,36 +129,6 @@ class _CompanyJobDetailsScreenState extends State<CompanyJobDetailsScreen> {
     );
   }
 
-  Future<void> _deleteJob(Job job) async {
-    final t = AppLocalizations.of(context);
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(t.deleteJobTitle),
-        content: Text(t.deleteJobContent(job.title)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text(t.cancel),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text(t.delete),
-          ),
-        ],
-      ),
-    );
-    if (confirmed != true) return;
-    final deleted = CompanyStore.instance.deleteJob(job.id);
-    if (!mounted) return;
-    if (deleted) {
-      Navigator.of(context).pop();
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(t.jobDeleted)));
-    }
-  }
-
   Future<void> _editJob(BuildContext context, Job job) async {
     Navigator.of(context).pushNamed(
       AppRoutes.companyPostJobStep1,

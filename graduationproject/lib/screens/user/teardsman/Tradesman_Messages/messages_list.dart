@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../shared/l10n/app_localizations.dart';
 import '../../../../shared/state/recruitment_sync_store.dart';
 import '../../messages/new_chat_screen.dart';
-import '../post/post_Job.dart';
+import '../post/post_job.dart';
 import '../setting/settings.dart';
 import 'dart:io';
 import '../../profile/user_data.dart';

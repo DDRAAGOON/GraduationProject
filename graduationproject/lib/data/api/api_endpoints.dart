@@ -6,11 +6,13 @@ final class ApiEndpoints {
   // Render deployment URL (can be overridden at build time).
   static const String baseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'http://localhost:4000',
+    defaultValue: 'https://jobito.runasp.net',
   );
 
   // Auth
   static const String login = '/api/auth/login';
+  static const String googleLogin = '/api/auth/google';
+  static const String register = '/api/auth/register';
 
   // Recruitment entities
   static const String jobs = '/api/jobs';

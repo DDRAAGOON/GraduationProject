@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';
+import '../../../shared/services/recruitment_sync_service.dart';
 import '../../../shared/services/session_manager.dart';
 import '../../../shared/state/company_store.dart';
 import '../../../shared/widgets/app_button.dart';
@@ -35,7 +36,7 @@ class _RecruitmentCompanySignInScreenState
     final pass = _password.text;
     setState(() {
       _emailError = mail.contains('@') ? null : 'Enter a valid email';
-      _passwordError = pass.length >= 8 ? null : 'Min 8 characters';
+      _passwordError = pass.isNotEmpty ? null : 'Enter your password';
     });
     return _emailError == null && _passwordError == null;
   }
@@ -43,24 +44,40 @@ class _RecruitmentCompanySignInScreenState
   Future<void> _submit() async {
     if (!_validate()) return;
     setState(() => _loading = true);
-    await Future<void>.delayed(const Duration(milliseconds: 600));
-    if (!mounted) return;
+    try {
+      final user = await RecruitmentSyncService.instance.login(
+        email: _email.text.trim(),
+        password: _password.text,
+        expectedRole: 'company',
+      );
 
-    await SessionManager.saveCompanySession(
-      email: _email.text.trim(),
-      name: 'Company User', 
-    );
-    
-    CompanyStore.instance.setRegistrationData(
-      companyName: 'Company User',
-      email: _email.text.trim(),
-    );
+      final name = user['name']?.toString() ?? 'Company User';
 
-    setState(() => _loading = false);
-    Navigator.of(context).pushNamedAndRemoveUntil(
-      AppRoutes.companyWorkspace,
-      (route) => false,
-    );
+      await SessionManager.saveCompanySession(
+        email: _email.text.trim(),
+        name: name,
+      );
+
+      CompanyStore.instance.setRegistrationData(
+        companyName: name,
+        email: _email.text.trim(),
+      );
+
+      if (!mounted) return;
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        AppRoutes.companyWorkspace,
+        (route) => false,
+      );
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Invalid company email or password.')),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _loading = false);
+      }
+    }
   }
 
   @override

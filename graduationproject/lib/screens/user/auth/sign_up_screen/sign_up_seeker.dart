@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:graduationproject/screens/user/auth/sign_up_screen/sign_up_tradesman.dart';
 import '../../../../app/router/app_router.dart';
+import '../../../../shared/services/recruitment_sync_service.dart';
+import '../../../../shared/services/session_manager.dart';
 import '../../profile/user_data.dart';
 import '../../../../../shared/l10n/app_localizations.dart';
 import '../../../../../shared/state/recruitment_sync_store.dart';
@@ -18,6 +20,7 @@ class SignUpSeeker extends StatefulWidget {
 
 class _SignUpSeeker extends State<SignUpSeeker> {
   final _formKey = GlobalKey<FormState>();
+  bool _loading = false;
   
   final String _selectedRole = "Job Seeker";
 
@@ -54,7 +57,6 @@ class _SignUpSeeker extends State<SignUpSeeker> {
   final List<Map<String, String>> _experiencesList = [];
   final List<Map<String, String>> _educationList = [];
 
-  String? _cvPath;
   String? _profileImagePath;
   String? _selectedGender;
   final List<String> _platforms = ["LinkedIn", "GitHub", "Twitter", "Instagram", "Facebook", "Other"];
@@ -67,7 +69,6 @@ class _SignUpSeeker extends State<SignUpSeeker> {
     );
     if (result != null) {
       setState(() {
-        _cvPath = result.files.single.path;
         _cvController.text = result.files.single.name;
       });
     }
@@ -154,7 +155,7 @@ class _SignUpSeeker extends State<SignUpSeeker> {
     }
   }
 
-  void _saveProfile() {
+  void _saveProfile() async {
     if (_formKey.currentState!.validate()) {
       if (_selectedDay == null || _selectedMonth == null || _selectedYear == null) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Please select your full Date of Birth")));
@@ -165,43 +166,69 @@ class _SignUpSeeker extends State<SignUpSeeker> {
         return;
       }
 
-      // Sync EVERYTHING with RecruitmentSyncStore
-      RecruitmentSyncStore.instance.updateUserProfile(
-        fullName: _fullNameController.text,
-        title: _expJobTitleController.text.isNotEmpty ? _expJobTitleController.text : "User",
-        email: _emailController.text,
-        phone: "+20 ${_phoneController.text}",
-        location: _addressController.text,
-        about: _aboutMeController.text,
-        portfolio: _portfolioController.text,
-        skills: _skillsList,
-        education: _educationList,
-        experience: _experiencesList,
-        role: "Job Seeker",
-        socialLinks: _socialLinksList,
-        cvName: _cvController.text.isEmpty ? null : _cvController.text,
-      );
+      setState(() => _loading = true);
 
-      // Also Sync with static UserProfileData for consistency
-      UserProfileData.fullName = _fullNameController.text;
-      UserProfileData.email = _emailController.text;
-      UserProfileData.phone = "+20 ${_phoneController.text}";
-      UserProfileData.aboutMe = _aboutMeController.text;
-      UserProfileData.dob = "$_selectedYear-$_selectedMonth-$_selectedDay";
-      UserProfileData.location = _addressController.text;
-      UserProfileData.gender = _selectedGender!;
-      UserProfileData.portfolioUrl = _portfolioController.text;
-      UserProfileData.skills = List.from(_skillsList);
-      UserProfileData.socialLinks = List.from(_socialLinksList);
-      UserProfileData.experiences = List.from(_experiencesList);
-      UserProfileData.cvName = _cvController.text.isEmpty ? null : _cvController.text;
-      UserProfileData.profileImage = _profileImagePath;
+      try {
+        // 1. Call Backend API
+        await RecruitmentSyncService.instance.register(
+          email: _emailController.text.trim(),
+          password: "12345678", // Default password for now as per other screens
+          name: _fullNameController.text.trim(),
+          role: "user",
+        );
 
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Profile saved successfully!")));
-      Navigator.of(context).pushNamedAndRemoveUntil(
-        AppRoutes.userWorkspace,
-        (route) => false,
-      );
+        // 2. Save Session
+        await SessionManager.saveUserSession(
+          email: _emailController.text.trim(),
+          name: _fullNameController.text.trim(),
+        );
+
+        // 3. Sync local state
+        RecruitmentSyncStore.instance.updateUserProfile(
+          fullName: _fullNameController.text,
+          title: _expJobTitleController.text.isNotEmpty ? _expJobTitleController.text : "User",
+          email: _emailController.text,
+          phone: "+20 ${_phoneController.text}",
+          location: _addressController.text,
+          about: _aboutMeController.text,
+          portfolio: _portfolioController.text,
+          skills: _skillsList,
+          education: _educationList,
+          experience: _experiencesList,
+          role: "Job Seeker",
+          socialLinks: _socialLinksList,
+          cvName: _cvController.text.isEmpty ? null : _cvController.text,
+        );
+
+        // Also Sync with static UserProfileData for consistency
+        UserProfileData.fullName = _fullNameController.text;
+        UserProfileData.email = _emailController.text;
+        UserProfileData.phone = "+20 ${_phoneController.text}";
+        UserProfileData.aboutMe = _aboutMeController.text;
+        UserProfileData.dob = "$_selectedYear-$_selectedMonth-$_selectedDay";
+        UserProfileData.location = _addressController.text;
+        UserProfileData.gender = _selectedGender!;
+        UserProfileData.portfolioUrl = _portfolioController.text;
+        UserProfileData.skills = List.from(_skillsList);
+        UserProfileData.socialLinks = List.from(_socialLinksList);
+        UserProfileData.experiences = List.from(_experiencesList);
+        UserProfileData.cvName = _cvController.text.isEmpty ? null : _cvController.text;
+        UserProfileData.profileImage = _profileImagePath;
+
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Profile saved successfully!")));
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          AppRoutes.userWorkspace,
+          (route) => false,
+        );
+      } catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Registration failed: ${e.toString()}")),
+        );
+      } finally {
+        if (mounted) setState(() => _loading = false);
+      }
     }
   }
 
@@ -420,7 +447,7 @@ class _SignUpSeeker extends State<SignUpSeeker> {
                 ..._socialLinksList.asMap().entries.map((entry) => Container(margin: const EdgeInsets.only(bottom: 8), padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.grey.shade300)), child: Row(children: [const Icon(Icons.link, color: Color(0xFF49769F), size: 18), const SizedBox(width: 12), Expanded(child: Text("${entry.value['platform']}: ${entry.value['url']}", style: const TextStyle(color: Colors.black87, fontSize: 11), maxLines: 1, overflow: TextOverflow.ellipsis)), IconButton(icon: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 20), onPressed: () => setState(() => _socialLinksList.removeAt(entry.key)))]))).toList(),
 
                 const SizedBox(height: 40),
-                SizedBox(width: double.infinity, height: 56, child: ElevatedButton(onPressed: _saveProfile, style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF49769F), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))), child: Text(t.saveProfile, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)))),
+                SizedBox(width: double.infinity, height: 56, child: ElevatedButton(onPressed: _loading ? null : _saveProfile, style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF49769F), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))), child: _loading ? const CircularProgressIndicator(color: Colors.white) : Text(t.saveProfile, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)))),
                 const SizedBox(height: 40),
               ],
             ),

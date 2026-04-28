@@ -62,53 +62,153 @@ class _CompanyJobsHubScreenState extends State<CompanyJobsHubScreen> {
                                 .length;
                             final isOpen = j.status == 'Open';
                             
-                            final monthsEn = const ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                            final monthsAr = const ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
-                            
-                            final m = isAr ? monthsAr[j.createdAt.month - 1] : monthsEn[j.createdAt.month - 1];
-                            final d = j.createdAt.day;
-                            final y = j.createdAt.year;
-                            final dateStr = isAr ? '$d $m $y'.replaceAll('0', '٠').replaceAll('1', '١').replaceAll('2', '٢').replaceAll('3', '٣').replaceAll('4', '٤').replaceAll('5', '٥').replaceAll('6', '٦').replaceAll('7', '٧').replaceAll('8', '٨').replaceAll('9', '٩') : '$m $d, $y';
-                            
                             return Card(
-                              margin: const EdgeInsets.only(bottom: 16),
-                              elevation: 2,
-                              shadowColor: Colors.black.withOpacity(0.05),
+                              color: Colors.white,
+                              elevation: 0,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(16),
-                                side: BorderSide(color: Colors.grey.withOpacity(0.15)),
+                                side: BorderSide(color: Colors.grey.withOpacity(0.1)),
                               ),
+                              margin: const EdgeInsets.only(bottom: 12),
                               child: InkWell(
                                 borderRadius: BorderRadius.circular(16),
                                 onTap: () => Navigator.of(context).pushNamed(AppRoutes.companyJobDetails, arguments: j),
                                 child: Padding(
-                                  padding: const EdgeInsets.all(16),
+                                  padding: const EdgeInsets.all(14),
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
+                                      // Company name row
                                       Row(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
+                                          const Icon(Icons.business, size: 16, color: Colors.grey),
+                                          const SizedBox(width: 4),
                                           Expanded(
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  j.title,
-                                                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 6),
-                                                Text(
-                                                  isAr ? 'تم النشر في $dateStr' : 'Posted on $dateStr',
-                                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                                    color: Colors.grey.shade600,
-                                                  ),
+                                            child: Text(
+                                              j.companyName,
+                                              style: const TextStyle(color: Colors.black54, fontWeight: FontWeight.w600),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 8),
+                                      // Title
+                                      Text(
+                                        j.title,
+                                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      // Employment type tags
+                                      Wrap(
+                                        spacing: 8,
+                                        runSpacing: 8,
+                                        children: j.employmentType.split(RegExp(r'[•,;]')).map((t) {
+                                          final type = t.trim();
+                                          if (type.isEmpty) return const SizedBox.shrink();
+                                          final color = _getJobTypeColor(type);
+                                          return Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                            decoration: BoxDecoration(
+                                              color: color,
+                                              borderRadius: BorderRadius.circular(8),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: color.withOpacity(0.3),
+                                                  blurRadius: 4,
+                                                  offset: const Offset(0, 2),
                                                 ),
                                               ],
                                             ),
+                                            child: Text(
+                                              type,
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                          );
+                                        }).toList(),
+                                      ),
+                                      // Category tag (if present)
+                                      if (j.category.isNotEmpty && j.category != 'General') ...[
+                                        const SizedBox(height: 8),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                          decoration: BoxDecoration(
+                                            color: _getCategoryColor(j.category),
+                                            borderRadius: BorderRadius.circular(8),
                                           ),
+                                          child: Text(
+                                            j.category,
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                      const SizedBox(height: 12),
+                                      // Tags
+                                      Wrap(
+                                        spacing: 8,
+                                        runSpacing: 8,
+                                        children: (j.tags ?? []).map((String tag) => Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFFF9F5F1),
+                                            borderRadius: BorderRadius.circular(8),
+                                            border: Border.all(color: Colors.black.withOpacity(0.05)),
+                                          ),
+                                          child: Text(
+                                            tag,
+                                            style: const TextStyle(color: Colors.black54, fontSize: 12),
+                                          ),
+                                        )).toList(),
+                                      ),
+                                      const SizedBox(height: 12),
+                                      // Hiring stats row
+                                      Row(
+                                        children: [
+                                          Icon(Icons.people_outline, size: 16, color: Theme.of(context).colorScheme.primary),
+                                          const SizedBox(width: 6),
+                                          Text(
+                                            '${count} ${isAr ? 'متقدمين' : 'applicants'}',
+                                            style: TextStyle(
+                                              color: Theme.of(context).colorScheme.primary,
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 13,
+                                            ),
+                                          ),
+                                          const Spacer(),
+                                          if (j.requiredCount > 0)
+                                            Text(
+                                              isAr
+                                                ? 'تم القبول: ${j.acceptedCount} / المطلوب: ${j.requiredCount}'
+                                                : 'Accepted: ${j.acceptedCount} / Required: ${j.requiredCount}',
+                                              style: TextStyle(
+                                                color: j.acceptedCount >= j.requiredCount ? Colors.green.shade700 : Colors.blue.shade700,
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 12),
+                                      Row(
+                                        children: [
+                                          if (j.location.isNotEmpty) ...[
+                                            Icon(Icons.location_on_outlined, size: 16, color: Colors.grey.shade600),
+                                            const SizedBox(width: 4),
+                                            Text(
+                                              j.location,
+                                              style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+                                            ),
+                                          ],
+                                          const Spacer(),
                                           Container(
                                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                             decoration: BoxDecoration(
@@ -124,83 +224,6 @@ class _CompanyJobsHubScreenState extends State<CompanyJobsHubScreen> {
                                               ),
                                             ),
                                           ),
-                                          const SizedBox(width: 8),
-                                          PopupMenuButton<String>(
-                                            padding: EdgeInsets.zero,
-                                            icon: const Icon(Icons.more_vert, size: 20, color: Colors.grey),
-                                            onSelected: (value) async {
-                                              if (value == 'edit') {
-                                                Navigator.of(context).pushNamed(
-                                                  AppRoutes.companyPostJobStep1,
-                                                  arguments: j,
-                                                );
-                                                return;
-                                              }
-                                              if (value == 'toggle_status') {
-                                                store.saveJob(j.copyWith(
-                                                  status: j.status == 'Open' ? 'Closed' : 'Open',
-                                                ));
-                                                return;
-                                              }
-                                              final confirmed = await showDialog<bool>(
-                                                context: context,
-                                                builder: (ctx) => AlertDialog(
-                                                  title: Text(t.deleteJobTitle),
-                                                  content: Text(t.deleteJobContent(j.title)),
-                                                  actions: [
-                                                    TextButton(
-                                                      onPressed: () => Navigator.of(ctx).pop(false),
-                                                      child: Text(t.cancel),
-                                                    ),
-                                                    FilledButton(
-                                                      onPressed: () => Navigator.of(ctx).pop(true),
-                                                      child: Text(t.delete),
-                                                    ),
-                                                  ],
-                                                ),
-                                              );
-                                              if (confirmed != true) return;
-                                              store.deleteJob(j.id);
-                                            },
-                                            itemBuilder: (ctx) => [
-                                              PopupMenuItem<String>(
-                                                value: 'edit',
-                                                child: Text(t.edit),
-                                              ),
-                                              PopupMenuItem<String>(
-                                                value: 'toggle_status',
-                                                child: Text(j.status == 'Open' ? (isAr ? 'إغلاق الوظيفة' : 'Close Job') : (isAr ? 'فتح الوظيفة' : 'Open Job')),
-                                              ),
-                                              PopupMenuItem<String>(
-                                                value: 'delete',
-                                                child: Text(t.delete),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 16),
-                                      Row(
-                                        children: [
-                                          Icon(Icons.people_outline, size: 16, color: Theme.of(context).colorScheme.primary),
-                                          const SizedBox(width: 6),
-                                          Text(
-                                            '$count ${isAr ? 'متقدمين' : 'applicants'}',
-                                            style: TextStyle(
-                                              color: Theme.of(context).colorScheme.primary,
-                                              fontWeight: FontWeight.w600,
-                                              fontSize: 13,
-                                            ),
-                                          ),
-                                          const Spacer(),
-                                          if (j.location.isNotEmpty) ...[
-                                            Icon(Icons.location_on_outlined, size: 16, color: Colors.grey.shade600),
-                                            const SizedBox(width: 4),
-                                            Text(
-                                              j.location,
-                                              style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
-                                            ),
-                                          ],
                                         ],
                                       ),
                                     ],
@@ -362,5 +385,48 @@ class _FilterChip extends StatelessWidget {
         ],
       ),
     ));
+  }
+}
+
+extension _JobHelpers on _CompanyJobsHubScreenState {
+  Color _getJobTypeColor(String type) {
+    switch (type.toLowerCase()) {
+      case 'full-time':
+      case 'دوام كامل':
+        return const Color(0xFF00D2B4);
+      case 'part-time':
+      case 'دوام جزئي':
+        return const Color(0xFF49769F);
+      case 'freelance':
+      case 'عمل حر':
+        return const Color(0xFFFF7A2A);
+      case 'internship':
+      case 'تدريب':
+        return const Color(0xFF8B5CF6);
+      case 'remote':
+      case 'عن بعد':
+        return const Color(0xFF10B981);
+      case 'one-time':
+      case 'عمل لمرة واحدة':
+        return const Color(0xFFF59E0B);
+      default:
+        return const Color(0xFF6B7280);
+    }
+  }
+
+  Color _getCategoryColor(String category) {
+    switch (category.toLowerCase()) {
+      case 'technical':
+      case 'تقني':
+        return const Color(0xFF3B82F6);
+      case 'non-technical':
+      case 'غير تقني':
+        return const Color(0xFFEC4899);
+      case 'services':
+      case 'خدمات':
+        return const Color(0xFF8B5CF6);
+      default:
+        return const Color(0xFF6B7280);
+    }
   }
 }

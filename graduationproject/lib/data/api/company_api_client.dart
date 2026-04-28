@@ -1,5 +1,6 @@
 import 'api_endpoints.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 
 final class CompanyApiClient {
   CompanyApiClient({
@@ -11,14 +12,25 @@ final class CompanyApiClient {
             receiveTimeout: const Duration(seconds: 12),
             headers: const {'Content-Type': 'application/json'},
           ),
-        );
+        ) {
+    _dio.interceptors.add(LogInterceptor(
+      requestBody: true,
+      responseBody: true,
+      logPrint: (o) => debugPrint(o.toString()),
+    ));
+  }
 
   final String baseUrl;
   final Dio _dio;
   String? _accessToken;
+  bool get hasToken => _accessToken != null && _accessToken!.isNotEmpty;
 
   void setToken(String token) {
     _accessToken = token;
+  }
+
+  void clearToken() {
+    _accessToken = null;
   }
 
   Options get _authOptions => Options(
@@ -34,6 +46,34 @@ final class CompanyApiClient {
     final Response<dynamic> response = await _dio.post<dynamic>(
       ApiEndpoints.login,
       data: <String, dynamic>{'email': email, 'password': password},
+    );
+    return Map<String, dynamic>.from(response.data as Map);
+  }
+
+  Future<Map<String, dynamic>> googleLogin({
+    required String idToken,
+  }) async {
+    final Response<dynamic> response = await _dio.post<dynamic>(
+      ApiEndpoints.googleLogin,
+      data: <String, dynamic>{'idToken': idToken},
+    );
+    return Map<String, dynamic>.from(response.data as Map);
+  }
+
+  Future<Map<String, dynamic>> register({
+    required String email,
+    required String password,
+    required String name,
+    required String role,
+  }) async {
+    final Response<dynamic> response = await _dio.post<dynamic>(
+      ApiEndpoints.register,
+      data: <String, dynamic>{
+        'email': email,
+        'password': password,
+        'name': name,
+        'role': role,
+      },
     );
     return Map<String, dynamic>.from(response.data as Map);
   }
@@ -58,13 +98,15 @@ final class CompanyApiClient {
         .toList();
   }
 
-  Future<Map<String, dynamic>> createJob({
+Future<Map<String, dynamic>> createJob({
     required String title,
     required String companyName,
     required String location,
     required String salaryRange,
     required String type,
     required List<String> tags,
+    required String category,
+    int requiredCount = 1,
   }) async {
     final Response<dynamic> response = await _dio.post<dynamic>(
       ApiEndpoints.jobs,
@@ -75,6 +117,8 @@ final class CompanyApiClient {
         'salaryRange': salaryRange,
         'type': type,
         'tags': tags,
+        'category': category,
+        'requiredCount': requiredCount,
       },
       options: _authOptions,
     );

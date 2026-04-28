@@ -5,6 +5,9 @@ import '../../teardsman/nav_Botton_bar/nav_bottom_bar.dart';
 import '../../teardsman/profile/teardsman_data.dart';
 import '../../../../../shared/l10n/app_localizations.dart';
 import '../../../../../shared/state/recruitment_sync_store.dart';
+import '../../../../../shared/services/recruitment_sync_service.dart';
+import '../../../../../shared/services/session_manager.dart';
+import '../../../../../app/router/app_router.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -144,7 +147,7 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
     }
   }
 
-  void _saveTradesmanProfile() {
+  void _saveTradesmanProfile() async {
     if (_formKey.currentState!.validate()) {
       if (_selectedDay == null || _selectedMonth == null || _selectedYear == null) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Please select your full Date of Birth")));
@@ -159,53 +162,66 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
         return;
       }
 
-      // Sync with Store
-      RecruitmentSyncStore.instance.updateUserProfile(
-        fullName: _fullNameController.text,
-        title: _serviceController.text.isNotEmpty ? _serviceController.text : "Tradesman",
-        email: _emailController.text,
-        phone: "+20 ${_phoneController.text}",
-        location: _addressController.text,
-        about: _aboutMeController.text,
-        skills: _skillsList,
-        education: _educationList,
-        role: "Tradesman",
-        socialLinks: [
-          if (_instagramController.text.isNotEmpty) {"platform": "Instagram", "url": _instagramController.text},
-          if (_facebookController.text.isNotEmpty) {"platform": "Facebook", "url": _facebookController.text},
-        ],
-      );
+      try {
+        await RecruitmentSyncService.instance.register(
+          email: _emailController.text.trim(),
+          password: "12345678",
+          name: _fullNameController.text.trim(),
+          role: "tradesman",
+        );
 
-      // Saving data to TradesmanProfileData (Legacy)
-      TradesmanProfileData.fullName = _fullNameController.text;
-      TradesmanProfileData.email = _emailController.text;
-      TradesmanProfileData.phone = "+20 ${_phoneController.text}";
-      TradesmanProfileData.gender = _selectedGender!;
-      TradesmanProfileData.dob = "$_selectedYear-$_selectedMonth-$_selectedDay";
-      TradesmanProfileData.address = _addressController.text;
-      TradesmanProfileData.aboutMe = _aboutMeController.text;
-      TradesmanProfileData.service = _serviceController.text;
-      TradesmanProfileData.skills = List.from(_skillsList);
-      TradesmanProfileData.education = List.from(_educationList);
-      TradesmanProfileData.socialLinks = {
-        "instagram": _instagramController.text,
-        "facebook": _facebookController.text,
-      };
-      TradesmanProfileData.criminalRecordUploaded = _criminalRecordPath != null;
-      TradesmanProfileData.profileImage = _profileImagePath;
-      
-      // Update UserProfileData too
-      UserProfileData.portfolioImages = List.from(_workImagesPaths);
-      UserProfileData.cvName = _criminalRecordPath != null ? "Criminal_Record" : null; // Mapping criminal record to CV for now as requested or add CV specifically
+        await SessionManager.saveUserSession(
+          email: _emailController.text.trim(),
+          name: _fullNameController.text.trim(),
+        );
 
+        RecruitmentSyncStore.instance.updateUserProfile(
+          fullName: _fullNameController.text,
+          title: _serviceController.text.isNotEmpty ? _serviceController.text : "Tradesman",
+          email: _emailController.text,
+          phone: "+20 ${_phoneController.text}",
+          location: _addressController.text,
+          about: _aboutMeController.text,
+          skills: _skillsList,
+          education: _educationList,
+          role: "Tradesman",
+          socialLinks: [
+            if (_instagramController.text.isNotEmpty) {"platform": "Instagram", "url": _instagramController.text},
+            if (_facebookController.text.isNotEmpty) {"platform": "Facebook", "url": _facebookController.text},
+          ],
+        );
 
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Tradesman Profile saved successfully!")));
-      
-      // Navigate to Tradesman Workspace (Find Jobs)
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => const Navbotton()),
-        (route) => false,
-      );
+        TradesmanProfileData.fullName = _fullNameController.text;
+        TradesmanProfileData.email = _emailController.text;
+        TradesmanProfileData.phone = "+20 ${_phoneController.text}";
+        TradesmanProfileData.gender = _selectedGender!;
+        TradesmanProfileData.dob = "$_selectedYear-$_selectedMonth-$_selectedDay";
+        TradesmanProfileData.address = _addressController.text;
+        TradesmanProfileData.aboutMe = _aboutMeController.text;
+        TradesmanProfileData.service = _serviceController.text;
+        TradesmanProfileData.skills = List.from(_skillsList);
+        TradesmanProfileData.education = List.from(_educationList);
+        TradesmanProfileData.socialLinks = {
+          "instagram": _instagramController.text,
+          "facebook": _facebookController.text,
+        };
+        TradesmanProfileData.criminalRecordUploaded = _criminalRecordPath != null;
+        TradesmanProfileData.profileImage = _profileImagePath;
+        
+        UserProfileData.portfolioImages = List.from(_workImagesPaths);
+        UserProfileData.cvName = _criminalRecordPath != null ? "Criminal_Record" : null;
+
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Tradesman Profile saved successfully!")));
+        
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const Navbotton()),
+          (route) => false,
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Registration failed: ${e.toString()}")),
+        );
+      }
     }
   }
 

@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import '../../../../app/router/app_router.dart';
 import '../../../../shared/l10n/app_localizations.dart';
 import '../../../../shared/models/job.dart';
+import '../../../../shared/services/recruitment_sync_service.dart';
 import '../../../../shared/state/company_store.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_scaffold.dart';
-import '../../../../shared/widgets/app_text_field.dart';
 import '../../../../shared/widgets/section_title.dart';
 
 class CompanyPostJobStep3BenefitsScreen extends StatefulWidget {
@@ -102,23 +102,19 @@ class _CompanyPostJobStep3BenefitsScreenState
 
   Future<void> _publish() async {
     setState(() => _loading = true);
-    await Future<void>.delayed(const Duration(milliseconds: 600));
-    if (!mounted) return;
-    setState(() => _loading = false);
-
+    
     final args = ModalRoute.of(context)?.settings.arguments;
     final data = args is Map<String, dynamic> ? args : const <String, dynamic>{};
-    final now = DateTime.now().millisecondsSinceEpoch;
     
-    final title = (data['title'] as String?)?.trim();
-    final employmentType = (data['employmentType'] as String?)?.trim();
-    final salaryRange = (data['salaryRange'] as String?)?.trim();
+    final title = (data['title'] as String?)?.trim() ?? 'Untitled Job';
+    final employmentType = (data['employmentType'] as String?)?.trim() ?? 'Full-Time';
+    final salaryRange = (data['salaryRange'] as String?)?.trim() ?? 'Competitive';
     final step1Description = (data['description'] as String?) ?? '';
     final descriptionPoints = (data['descriptionPoints'] as List<String>?) ?? [];
     final category = (data['category'] as String?) ?? 'General';
     final department = (data['department'] as String?) ?? '';
+    // ignore: unused_local_variable
     final positions = (data['positions'] as int?) ?? 1;
-    final skills = (data['skills'] as List<String>?) ?? [];
     final responsibilities = (data['responsibilities'] as List<String>?) ?? [];
     final niceToHaves = (data['niceToHaves'] as List<String>?) ?? [];
     final qualifications = (data['qualifications'] as List<String>?) ?? [];
@@ -130,27 +126,33 @@ class _CompanyPostJobStep3BenefitsScreenState
 
     final companyLocations = CompanyStore.instance.locations;
     final location = companyLocations.isNotEmpty ? companyLocations.first : 'Remote';
-    
-    final job = Job(
-        id: _jobId ?? now.toString(),
-        title: title ?? 'Untitled Job',
-        companyName: CompanyStore.instance.companyName,
+
+    try {
+      await RecruitmentSyncService.instance.postJob(
+        title: title,
         location: location,
-        employmentType: (employmentType == null || employmentType.isEmpty) ? 'Full-Time' : employmentType,
-        category: category ?? 'General',
-        department: department ?? '',
-        salaryRange: salaryRange ?? 'EGP 0-0',
+        salaryRange: salaryRange,
         description: fullDescription,
         responsibilities: responsibilities,
-        niceToHaves: niceToHaves,
         qualifications: qualifications,
-        benefits: _benefits,
-        capacity: positions,
-    );
+        niceToHaves: niceToHaves,
+        benefits: _benefits.map((b) => b.title).toList(),
+        category: category,
+        companyName: CompanyStore.instance.companyName,
+        type: employmentType,
+        tags: [category, department].where((s) => s.isNotEmpty).toList(),
+      );
 
-    CompanyStore.instance.saveJob(job);
-
-    Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.companyDashboard, (r) => false);
+      if (!mounted) return;
+      setState(() => _loading = false);
+      Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.companyDashboard, (r) => false);
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _loading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to post job: ${e.toString()}')),
+      );
+    }
   }
 
   @override

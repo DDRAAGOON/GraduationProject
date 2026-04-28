@@ -14,9 +14,6 @@ class Preferences extends StatefulWidget {
 }
 
 class _PreferencesState extends State<Preferences> {
-  String _selectedWorkType = "دوام كامل";
-  final TextEditingController _salaryController = TextEditingController(text: "5000 - 10000");
-
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
@@ -144,55 +141,6 @@ class _PreferencesState extends State<Preferences> {
             ),
         ],
       ),
-    );
-  }
-
-  Widget _buildDropdownField(String label, List<String> items, String value, ValueChanged<String?> onChanged) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: const TextStyle(color: Colors.black87, fontSize: 14, fontWeight: FontWeight.bold)),
-        const SizedBox(height: 8),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border.all(color: Colors.black12),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: DropdownButton<String>(
-            value: value,
-            underline: Container(),
-            isExpanded: true,
-            icon: const Icon(Icons.keyboard_arrow_down, color: Colors.black38),
-            items: items.map((String val) => DropdownMenuItem<String>(value: val, child: Text(val))).toList(),
-            onChanged: onChanged,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTextFieldWithLabel(TextEditingController controller, String label, String hint) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: const TextStyle(color: Colors.black87, fontSize: 14, fontWeight: FontWeight.bold)),
-        const SizedBox(height: 8),
-        TextField(
-          controller: controller,
-          decoration: InputDecoration(
-            hintText: hint,
-            hintStyle: const TextStyle(color: Colors.black26, fontSize: 13),
-            filled: true,
-            fillColor: Colors.white,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Colors.black12)),
-            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Colors.black12)),
-          ),
-        ),
-      ],
     );
   }
 

@@ -248,10 +248,21 @@ class _JobUpdateCard extends StatelessWidget {
 
   final Job job;
 
+  Color _getJobTypeColor(String type) {
+    switch (type.toLowerCase().trim()) {
+      case 'full-time': return Colors.green;
+      case 'part-time': return Colors.blue;
+      case 'remote': return Colors.purple;
+      case 'freelance': return Colors.teal;
+      case 'one-time': return Colors.amber;
+      case 'internship': return Colors.indigo;
+      default: return Colors.grey;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
-    final isAr = Localizations.localeOf(context).languageCode == 'ar';
     final syncStore = RecruitmentSyncStore.instance;
 
     return Padding(
@@ -262,9 +273,10 @@ class _JobUpdateCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(18),
         child: Card(
           elevation: 0,
+          color: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(18),
-            side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant.withOpacity(0.5)),
+            side: BorderSide(color: Colors.grey.withOpacity(0.1)),
           ),
           child: Padding(
             padding: const EdgeInsets.all(20),
@@ -273,23 +285,76 @@ class _JobUpdateCard extends StatelessWidget {
               children: [
                 Text(
                   job.title,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  '${job.companyName} • ${job.employmentType}',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-                  ),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    const Icon(Icons.business, size: 16, color: Colors.grey),
+                    const SizedBox(width: 6),
+                    Text(
+                      job.companyName,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Colors.black54,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
                 Wrap(
                   spacing: 8,
                   runSpacing: 8,
                   children: [
-                    _Chip(job.category),
-                    _Chip(job.employmentType),
+                    // Job Type Badges
+                    ...job.employmentType.split(RegExp(r'[•,;]')).map((type) {
+                      final tTrim = type.trim();
+                      if (tTrim.isEmpty) return const SizedBox.shrink();
+                      final color = _getJobTypeColor(tTrim);
+                      return Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: color,
+                          borderRadius: BorderRadius.circular(8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: color.withOpacity(0.3),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Text(
+                          tTrim,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 11,
+                          ),
+                        ),
+                      );
+                    }),
+                    // Category Badge
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF9F5F1),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.black.withOpacity(0.05)),
+                      ),
+                      child: Text(
+                        job.category,
+                        style: const TextStyle(
+                          color: Colors.black54,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 11,
+                        ),
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 20),
@@ -299,39 +364,40 @@ class _JobUpdateCard extends StatelessWidget {
                     final hiredCount = syncStore.applications
                         .where((a) => a.jobId == job.id && a.status.toLowerCase().contains('hire'))
                         .length;
-                    final capacity = job.capacity ?? 10;
-                    final progress = (hiredCount / capacity).clamp(0.0, 1.0);
-
-                    // Auto-close logic (Reactive)
-                    if (hiredCount >= capacity && job.status == 'Open') {
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        CompanyStore.instance.saveJob(job.copyWith(status: 'Closed'));
-                      });
-                    }
+                    final requiredCount = job.requiredCount > 0 ? job.requiredCount : 1;
+                    final progress = (hiredCount / requiredCount).clamp(0.0, 1.0);
 
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              t.hiredProgressMsg(hiredCount, requiredCount),
+                              style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black87,
+                              ),
+                            ),
+                            Text(
+                              '${(progress * 100).toInt()}%',
+                              style: TextStyle(
+                                color: progress >= 1.0 ? Colors.green : Colors.blue,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
                         ClipRRect(
-                          borderRadius: BorderRadius.circular(4),
+                          borderRadius: BorderRadius.circular(10),
                           child: LinearProgressIndicator(
                             value: progress,
-                            backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                            color: const Color(0xFF00D2B4), // Keeping the green progress bar as requested
-                            minHeight: 6,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        RichText(
-                          text: TextSpan(
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-                            ),
-                            children: [
-                              TextSpan(
-                                text: t.hiredProgressMsg(hiredCount, capacity),
-                              ),
-                            ],
+                            backgroundColor: Colors.grey.withOpacity(0.1),
+                            color: progress >= 1.0 ? Colors.green : const Color(0xFF00D2B4),
+                            minHeight: 8,
                           ),
                         ),
                       ],
@@ -348,28 +414,22 @@ class _JobUpdateCard extends StatelessWidget {
 }
 
 class _Chip extends StatelessWidget {
-  const _Chip(this.text, {this.isDark = false});
+  const _Chip(this.text);
 
   final String text;
-  final bool isDark;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: isDark 
-            ? Colors.white.withOpacity(0.08)
-            : Theme.of(context).colorScheme.primary.withOpacity(0.15),
+        color: Theme.of(context).colorScheme.primary.withOpacity(0.15),
         borderRadius: BorderRadius.circular(14),
-        border: isDark 
-            ? Border.all(color: Colors.white.withOpacity(0.1))
-            : null,
       ),
       child: Text(
         text,
         style: Theme.of(context).textTheme.labelSmall?.copyWith(
-          color: isDark ? Colors.white : null,
+          color: null,
         ),
         overflow: TextOverflow.ellipsis,
       ),

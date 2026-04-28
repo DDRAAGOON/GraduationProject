@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../shared/services/recruitment_sync_service.dart';
+import '../../../shared/state/company_store.dart';
 
 class RecruitmentPostJobScreen extends StatefulWidget {
   const RecruitmentPostJobScreen({super.key});
@@ -75,6 +76,24 @@ class _RecruitmentPostJobScreenState extends State<RecruitmentPostJobScreen> {
             salaryRange: _salaryController.text.trim().isEmpty
                 ? 'Negotiable'
                 : _salaryController.text.trim(),
+            description: _descriptionController.text.trim(),
+            responsibilities: _requirementsController.text
+                .split(',')
+                .map((e) => e.trim())
+                .where((e) => e.isNotEmpty)
+                .toList(),
+            qualifications: const [],
+            benefits: _benefitsController.text
+                .split(',')
+                .map((e) => e.trim())
+                .where((e) => e.isNotEmpty)
+                .toList(),
+            category: _departmentController.text.trim().isEmpty 
+                ? 'Engineering' 
+                : _departmentController.text.trim(),
+            companyName: CompanyStore.instance.companyName.isEmpty 
+                ? 'Jobito Recruiter' 
+                : CompanyStore.instance.companyName,
             type: _typeController.text.trim().isEmpty
                 ? 'Full-time'
                 : _typeController.text.trim(),

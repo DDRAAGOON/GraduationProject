@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:graduationproject/shared/l10n/app_localizations.dart';
 
 import '../../../shared/state/recruitment_sync_store.dart';
 
@@ -33,7 +32,6 @@ class _RecruitmentApplicationTimelineScreenState extends State<RecruitmentApplic
 
   @override
   Widget build(BuildContext context) {
-    final t = AppLocalizations.of(context);
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
     final store = RecruitmentSyncStore.instance;
     

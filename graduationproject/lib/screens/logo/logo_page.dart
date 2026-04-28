@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../app/router/app_router.dart';
-import '../../constants/app_images.dart';
 import '../../shared/l10n/app_localizations.dart';
 import '../../shared/state/locale_controller.dart';
-import '../../shared/state/company_store.dart';
-import '../../shared/services/session_manager.dart';
 
 /// First launch: choose Job seeker (User) or Recruiter (Company), then each flow’s onboarding.
 class LogoPage extends StatelessWidget {
@@ -87,7 +84,7 @@ class LogoPage extends StatelessWidget {
                 ),
                 color: cs.secondary,
                 onTap: () =>
-                    Navigator.of(context).pushNamed(AppRoutes.companySignInNew),
+                    Navigator.of(context).pushNamed(AppRoutes.companyOnboardingNew),
               ),
               SizedBox(height: size.height * 0.012),
 

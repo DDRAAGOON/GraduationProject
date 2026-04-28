@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../app/router/app_router.dart';
 import '../../../../../shared/l10n/app_localizations.dart';
-import '../../../../../shared/state/locale_controller.dart';
-import '../../../../../shared/state/theme_controller.dart';
 import '../../profile/edit_profile_screen.dart';
 import '../../profile/profile_login_details_screen.dart';
 import '../../profile/setting_profile/notifications.dart';

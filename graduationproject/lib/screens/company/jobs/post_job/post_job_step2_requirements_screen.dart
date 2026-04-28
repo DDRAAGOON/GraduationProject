@@ -2,8 +2,6 @@
 import 'package:flutter/material.dart';
 import '../../../../app/router/app_router.dart';
 import '../../../../shared/l10n/app_localizations.dart';
-import '../../../../shared/models/job.dart';
-import '../../../../shared/state/company_store.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_scaffold.dart';
 import '../../../../shared/widgets/section_title.dart';

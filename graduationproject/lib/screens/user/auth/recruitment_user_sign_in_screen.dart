@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
+import 'package:dio/dio.dart';
 
 import '../../../app/router/app_router.dart';
 import '../../../shared/services/session_manager.dart';
+import '../../../shared/services/recruitment_sync_service.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_text_field.dart';
 import 'sign_up_screen/sign_up_screen.dart';
@@ -34,21 +36,52 @@ class _RecruitmentUserSignInScreenState extends State<RecruitmentUserSignInScree
     final t = AppLocalizations.of(context);
     setState(() {
       _emailError = _email.text.contains('@') ? null : t.enterValidEmail;
-      _passError = _password.text.length >= 8 ? null : t.min8Chars;
+      _passError = _password.text.isNotEmpty ? null : t.min8Chars;
     });
     
     if (_emailError != null || _passError != null) return;
 
-    await SessionManager.saveUserSession(
-      email: _email.text.trim(),
-      name: 'User',
-    );
+    try {
+      final user = await RecruitmentSyncService.instance.login(
+        email: _email.text.trim(),
+        password: _password.text,
+        expectedRole: 'user',
+      );
 
-    if (!mounted) return;
-    Navigator.of(context).pushNamedAndRemoveUntil(
-      AppRoutes.userWorkspace,
-      (route) => false,
-    );
+      final name = user['name']?.toString() ?? 'User';
+
+      await SessionManager.saveUserSession(
+        email: _email.text.trim(),
+        name: name,
+      );
+
+      if (!mounted) return;
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        AppRoutes.userWorkspace,
+        (route) => false,
+      );
+    } catch (e) {
+      if (!mounted) return;
+      String msg = t.isAr ? 'البريد الإلكتروني أو كلمة المرور غير صحيحة' : 'Invalid email or password.';
+      
+      if (e is DioException) {
+        if (e.type == DioExceptionType.connectionTimeout || e.type == DioExceptionType.receiveTimeout) {
+          msg = t.isAr ? 'فشل الاتصال بالخادم، تحقق من الإنترنت' : 'Connection timeout. Check your internet.';
+        } else if (e.response?.statusCode == 401 || e.response?.statusCode == 403) {
+          msg = t.isAr ? 'البريد الإلكتروني أو كلمة المرور غير صحيحة' : 'Invalid email or password.';
+        } else {
+          msg = t.isAr ? 'حدث خطأ في الاتصال بالخادم' : 'Server connection error.';
+        }
+      } else {
+        msg = e.toString().contains('حساب مخصص') || e.toString().contains('company accounts')
+            ? e.toString().replaceAll('Exception: ', '')
+            : msg;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(msg)),
+      );
+    }
   }
 
   @override

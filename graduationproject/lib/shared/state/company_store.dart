@@ -1,9 +1,7 @@
 // [ChangeNotifier] holding company profile, jobs, and contacts.
 
 import 'package:flutter/foundation.dart';
-import 'package:graduationproject/shared/state/recruitment_sync_store.dart';
 
-import '../../constants/app_images.dart';
 import '../models/contact_entry.dart';
 import '../models/job.dart';
 
@@ -143,7 +141,7 @@ class CompanyStore extends ChangeNotifier {
   // --- Associated Entities: Jobs & Contacts ---
   
   /// Holds the list of dynamically managed jobs for the company.
-  final List<Job> _jobs = [...Job.mockList()];
+  final List<Job> _jobs = [];
   
   /// Holds contact details like social links and emails.
   final List<ContactEntry> _contacts = [];
