@@ -72,9 +72,8 @@ if (-not (Test-Path $logsDir)) {
   New-Item -ItemType Directory -Path $logsDir -Force | Out-Null
 }
 
-# ─── Overwrite web.config for self-contained win-x64 deployment ───
-# Self-contained: EXE bundles its own .NET 8 runtime.
-# No dependency on server-installed .NET – most compatible with shared hosting.
+# ─── Overwrite web.config for MonsterASP.net (Framework Dependent Mode) ───
+# Most compatible mode: using the dotnet runtime provided by the server.
 $webConfigContent = @'
 <?xml version="1.0" encoding="utf-8"?>
 <configuration>
@@ -83,8 +82,8 @@ $webConfigContent = @'
       <handlers>
         <add name="aspNetCore" path="*" verb="*" modules="AspNetCoreModuleV2" resourceType="Unspecified" />
       </handlers>
-      <aspNetCore processPath=".\Jobito.Api.exe"
-                  arguments=""
+      <aspNetCore processPath="dotnet"
+                  arguments=".\Jobito.Api.dll"
                   stdoutLogEnabled="true"
                   stdoutLogFile=".\logs\stdout"
                   captureStartupErrors="true"
@@ -100,7 +99,7 @@ $webConfigContent = @'
 
 $webConfigPath = Join-Path $outputDir "web.config"
 Set-Content -Path $webConfigPath -Value $webConfigContent -Encoding UTF8
-Write-Host "web.config written (self-contained EXE / outofprocess)."
+Write-Host "web.config written (Framework Dependent / dotnet mode)."
 
 Write-Host "Published to $outputDir"
 Write-Host ""
