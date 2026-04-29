@@ -198,5 +198,87 @@ GO
 
 
 -- =====================================================================
---  Done. All tables and columns are up-to-date.
+--  UPDATE 2026-04-29  –  Schema fixes discovered during deployment
+--  Safe to re-run (all checks are idempotent).
 -- =====================================================================
+
+-- ─── [Users] Widen PhotoUrl from 512 → 1024 ────────────────────────
+-- Google profile picture URLs can be very long (512 was too short).
+IF EXISTS (
+    SELECT 1 FROM sys.columns
+    WHERE object_id = OBJECT_ID(N'[Users]')
+      AND name = N'PhotoUrl'
+      AND max_length < 2048   -- NVARCHAR(1024) uses max_length = 2048 bytes
+)
+BEGIN
+    ALTER TABLE [Users] ALTER COLUMN [PhotoUrl] NVARCHAR(1024) NULL;
+    PRINT '  ~ [Users].[PhotoUrl] widened to NVARCHAR(1024).';
+END
+ELSE
+BEGIN
+    PRINT '  [Users].[PhotoUrl] already 1024+ chars – no change.';
+END
+GO
+
+-- ─── [Users] Make Password nullable for Google-login users ──────────
+IF EXISTS (
+    SELECT 1 FROM sys.columns
+    WHERE object_id = OBJECT_ID(N'[Users]')
+      AND name = N'Password'
+      AND is_nullable = 0
+)
+BEGIN
+    ALTER TABLE [Users] ALTER COLUMN [Password] NVARCHAR(128) NULL;
+    PRINT '  ~ [Users].[Password] changed to NULL (Google-login support).';
+END
+ELSE
+BEGIN
+    PRINT '  [Users].[Password] already nullable – no change.';
+END
+GO
+
+-- ─── [Jobs] Add DEFAULT 0 on CompanyId if missing ───────────────────
+IF NOT EXISTS (
+    SELECT 1 FROM sys.default_constraints
+    WHERE parent_object_id = OBJECT_ID(N'[Jobs]')
+      AND COL_NAME(parent_object_id, parent_column_id) = 'CompanyId'
+)
+BEGIN
+    ALTER TABLE [Jobs] ADD CONSTRAINT [DF_Jobs_CompanyId] DEFAULT 0 FOR [CompanyId];
+    PRINT '  + DEFAULT(0) added to [Jobs].[CompanyId].';
+END
+ELSE
+BEGIN
+    PRINT '  [Jobs].[CompanyId] default already exists – no change.';
+END
+GO
+
+-- ─── [Applications] Add DEFAULT 0 on UserId if missing ──────────────
+IF NOT EXISTS (
+    SELECT 1 FROM sys.default_constraints
+    WHERE parent_object_id = OBJECT_ID(N'[Applications]')
+      AND COL_NAME(parent_object_id, parent_column_id) = 'UserId'
+)
+BEGIN
+    ALTER TABLE [Applications] ADD CONSTRAINT [DF_Applications_UserId] DEFAULT 0 FOR [UserId];
+    PRINT '  + DEFAULT(0) added to [Applications].[UserId].';
+END
+ELSE
+BEGIN
+    PRINT '  [Applications].[UserId] default already exists – no change.';
+END
+GO
+
+
+-- =====================================================================
+--  Done. Final validation – lists all tables and column counts.
+-- =====================================================================
+SELECT
+    t.name             AS TableName,
+    COUNT(c.column_id) AS ColumnCount
+FROM sys.tables  t
+JOIN sys.columns c ON c.object_id = t.object_id
+WHERE t.name IN ('Users','Jobs','Applications','Messages','Notifications')
+GROUP BY t.name
+ORDER BY t.name;
+GO

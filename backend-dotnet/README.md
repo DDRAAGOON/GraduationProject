@@ -50,6 +50,30 @@ From repo root:
 powershell -ExecutionPolicy Bypass -File backend-dotnet/publish.ps1
 ```
 
+On most IIS hosts, the app pool is 64-bit. The default publish runtime has been changed to x64.
+
+Use the single helper file to publish the backend:
+
+```bash
+backend-dotnet\update.bat
+```
+
+If your host app pool is 32-bit, run:
+
+```bash
+backend-dotnet\update.bat -Runtime win-x86
+```
+
+If you need framework-dependent deployment instead of self-contained, run:
+
+```bash
+backend-dotnet\update.bat -Runtime win-x64 -SelfContained false
+```
+
+This script cleans the old publish output and recreates the `logs` folder so IIS can write ASP.NET Core stdout logs.
+
+Important: upload the contents of `backend-dotnet/publish` to the site root, not a subfolder. The `web.config` file must be at the root of the deployed app.
+
 Then upload contents of `backend-dotnet/publish` to your hosting target (`jobito.runasp.net`).
 
 ## If you get HTTP 500.30

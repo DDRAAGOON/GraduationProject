@@ -17,6 +17,7 @@ class RecruitmentSyncService {
     final auth = await _client.login(
       email: email.trim(),
       password: password,
+      role: expectedRole,
     );
 
     final user = auth['user'] as Map<String, dynamic>?;
@@ -54,6 +55,7 @@ class RecruitmentSyncService {
 
       if (role == 'company') {
         CompanyStore.instance.setRegistrationData(
+          companyId: user['id']?.toString(),
           companyName: name,
           email: user['email']?.toString(),
         );
@@ -84,10 +86,10 @@ class RecruitmentSyncService {
         photoUrl: user['photoUrl']?.toString(),
       );
 
-      // We don't have role in googleLogin response yet, but if the user
-      // is already known as a company in the store, we should sync.
-      if (RecruitmentSyncStore.instance.userRole == 'Company') {
+      final role = user['role']?.toString().toLowerCase().trim();
+      if (role == 'company') {
         CompanyStore.instance.setRegistrationData(
+          companyId: user['id']?.toString(),
           companyName: name,
           email: user['email']?.toString(),
         );
@@ -130,6 +132,7 @@ class RecruitmentSyncService {
 
       if (role.toLowerCase().trim() == 'company') {
         CompanyStore.instance.setRegistrationData(
+          companyId: user['id']?.toString(),
           companyName: name,
           email: user['email']?.toString(),
         );
@@ -137,6 +140,29 @@ class RecruitmentSyncService {
     }
 
     return user ?? {};
+  }
+
+  Future<Map<String, dynamic>> updateProfile({
+    String? name,
+    String? photoUrl,
+  }) async {
+    _assertAuthenticated();
+    final user = await _client.updateProfile(name: name, photoUrl: photoUrl);
+    
+    final String currentName = user['name']?.toString() ?? 'User';
+    RecruitmentSyncStore.instance.updateCurrentUser(
+      name: currentName,
+      photoUrl: user['photoUrl']?.toString(),
+    );
+
+    if (RecruitmentSyncStore.instance.userRole.toLowerCase() == 'company') {
+      CompanyStore.instance.setRegistrationData(
+        companyName: currentName,
+        customProfileImage: user['photoUrl']?.toString(),
+      );
+    }
+
+    return user;
   }
 
   void logout() {

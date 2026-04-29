@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:dio/dio.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../../app/router/app_router.dart';
 import '../../../shared/services/session_manager.dart';
@@ -22,8 +23,13 @@ class _RecruitmentUserSignInScreenState extends State<RecruitmentUserSignInScree
   final _email = TextEditingController();
   final _password = TextEditingController();
   bool _obscure = true;
+  bool _loading = false;
   String? _emailError;
   String? _passError;
+
+  final GoogleSignIn _googleSignInInstance = GoogleSignIn(
+    scopes: ['email', 'profile'],
+  );
 
   @override
   void dispose() {
@@ -40,6 +46,7 @@ class _RecruitmentUserSignInScreenState extends State<RecruitmentUserSignInScree
     });
     
     if (_emailError != null || _passError != null) return;
+    setState(() => _loading = true);
 
     try {
       final user = await RecruitmentSyncService.instance.login(
@@ -56,12 +63,14 @@ class _RecruitmentUserSignInScreenState extends State<RecruitmentUserSignInScree
       );
 
       if (!mounted) return;
+      setState(() => _loading = false);
       Navigator.of(context).pushNamedAndRemoveUntil(
         AppRoutes.userWorkspace,
         (route) => false,
       );
     } catch (e) {
       if (!mounted) return;
+      setState(() => _loading = false);
       String msg = t.isAr ? 'البريد الإلكتروني أو كلمة المرور غير صحيحة' : 'Invalid email or password.';
       
       if (e is DioException) {
@@ -84,13 +93,53 @@ class _RecruitmentUserSignInScreenState extends State<RecruitmentUserSignInScree
     }
   }
 
+  Future<void> _handleGoogleSignIn() async {
+    final t = AppLocalizations.of(context);
+    setState(() => _loading = true);
+    try {
+      final GoogleSignInAccount? googleUser = await _googleSignInInstance.signIn();
+      if (googleUser == null) {
+        setState(() => _loading = false);
+        return;
+      }
+
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final String? idToken = googleAuth.idToken;
+
+      if (idToken == null) {
+        throw Exception('Failed to get Google ID Token');
+      }
+
+      await RecruitmentSyncService.instance.googleLogin(idToken);
+      
+      final name = googleUser.displayName ?? googleUser.email.split('@').first;
+
+      await SessionManager.saveUserSession(
+        email: googleUser.email,
+        name: name,
+      );
+
+      if (!mounted) return;
+      
+      setState(() => _loading = false);
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        AppRoutes.userWorkspace,
+        (route) => false,
+      );
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _loading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Google Sign-In failed: ${e.toString()}')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: const Color(0xFFF9F5F1),
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF9F5F1),
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         title: Text(t.signInBtn),
@@ -102,7 +151,7 @@ class _RecruitmentUserSignInScreenState extends State<RecruitmentUserSignInScree
             t.tr(en: 'Welcome back', ar: 'أهلاً بك مجدداً'),
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.w800,
-                  color: const Color(0xFF011931),
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
           ),
           const SizedBox(height: 24),
@@ -141,6 +190,7 @@ class _RecruitmentUserSignInScreenState extends State<RecruitmentUserSignInScree
           const SizedBox(height: 8),
           AppButton(
             label: t.signInBtn,
+            loading: _loading,
             onPressed: _submit,
           ),
           
@@ -162,13 +212,11 @@ class _RecruitmentUserSignInScreenState extends State<RecruitmentUserSignInScree
               padding: const EdgeInsets.symmetric(vertical: 14),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
-            onPressed: () {
-              // Logic for Google Sign-In
-            },
-            icon: Brand(Brands.google, size: 24),
+            onPressed: _loading ? null : _handleGoogleSignIn,
+            icon: _loading ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2)) : Brand(Brands.google, size: 24),
             label: Text(
               t.tr(en: "Continue with Google", ar: "المتابعة باستخدام جوجل"),
-              style: const TextStyle(color: Colors.black87, fontWeight: FontWeight.bold),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold),
             ),
           ),
           

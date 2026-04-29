@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import '../../../../shared/utils/image_helper.dart';
 import '../../../../shared/l10n/app_localizations.dart';
 import '../../../../shared/state/recruitment_sync_store.dart';
 import '../../messages/new_chat_screen.dart';
 import '../post/post_job.dart';
 import '../setting/settings.dart';
-import 'dart:io';
 import '../../profile/user_data.dart';
 import 'chat_tradesman.dart';
 
@@ -60,11 +60,7 @@ class _MessagesListState extends State<MessagesList> {
             child: CircleAvatar(
               radius: 18,
               backgroundColor: Colors.white,
-              backgroundImage: UserProfileData.profileImage != null
-                  ? (UserProfileData.profileImage!.startsWith('http') 
-                      ? NetworkImage(UserProfileData.profileImage!) 
-                      : FileImage(File(UserProfileData.profileImage!)) as ImageProvider)
-                  : null,
+              backgroundImage: getAppImageProvider(UserProfileData.profileImage),
               child: UserProfileData.profileImage == null 
                   ? const Icon(Icons.person, size: 20) 
                   : null,

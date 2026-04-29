@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import '../../../../shared/utils/image_helper.dart';
 import 'package:graduationproject/shared/l10n/app_localizations.dart';
 import '../../../../../shared/state/recruitment_sync_store.dart';
 import '../post/post_job.dart';
 import '../setting/settings.dart';
 import 'tradesman_apply_job_screen.dart';
-import 'dart:io';
 import 'tradesman_job_details_screen.dart';
 
 class FindJobs extends StatefulWidget {
@@ -86,11 +86,7 @@ class _FindJobsState extends State<FindJobs> {
                 child: CircleAvatar(
                   radius: 18,
                   backgroundColor: Colors.white,
-                  backgroundImage: store.profileImage != null
-                      ? (store.profileImage!.startsWith('http') 
-                          ? NetworkImage(store.profileImage!) 
-                          : FileImage(File(store.profileImage!)) as ImageProvider)
-                      : null,
+                  backgroundImage: getAppImageProvider(store.profileImage),
                   child: store.profileImage == null 
                       ? const Icon(Icons.person, size: 20) 
                       : null,

@@ -6,6 +6,9 @@ import 'setting_profile/notifications.dart';
 import 'setting_profile/preferences.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:image_picker/image_picker.dart';
+import 'dart:convert';
+import '../../../shared/utils/image_helper.dart';
+import '../../../shared/services/recruitment_sync_service.dart';
 import 'user_data.dart';
 
 class EditProfileScreen extends StatefulWidget {
@@ -92,6 +95,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       UserProfileData.portfolioImages = List.from(_portfolioImages);
     });
 
+    // Sync with backend
+    RecruitmentSyncService.instance.updateProfile(
+      name: _fullNameController.text,
+    );
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(t.tr(en: "Saved successfully", ar: "تم الحفظ بنجاح")),
@@ -167,11 +175,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   CircleAvatar(
                     radius: 35,
                     backgroundColor: Colors.grey.withOpacity(0.1),
-                    backgroundImage: UserProfileData.profileImage != null
-                        ? (UserProfileData.profileImage!.startsWith('http') 
-                            ? NetworkImage(UserProfileData.profileImage!) 
-                            : FileImage(File(UserProfileData.profileImage!)) as ImageProvider)
-                        : null,
+                    backgroundImage: getAppImageProvider(UserProfileData.profileImage),
                     child: UserProfileData.profileImage == null 
                         ? Icon(Icons.camera_alt, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)) 
                         : null,
@@ -381,8 +385,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   Future<void> _pickImage() async {
-    final XFile? image = await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (image != null) setState(() { UserProfileData.profileImage = image.path; });
+    final XFile? image = await ImagePicker().pickImage(source: ImageSource.gallery, imageQuality: 50, maxWidth: 500, maxHeight: 500);
+    if (image != null) {
+      try {
+        final bytes = await image.readAsBytes();
+        final base64Image = 'data:image/jpeg;base64,${base64Encode(bytes)}';
+        
+        setState(() { UserProfileData.profileImage = base64Image; });
+        await RecruitmentSyncService.instance.updateProfile(photoUrl: base64Image);
+      } catch (_) {}
+    }
   }
 
   Widget _buildSectionHeader(String title, VoidCallback onAdd) => Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(title, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16, fontWeight: FontWeight.bold)), IconButton(icon: const Icon(Icons.add_circle_outline, color: Colors.blueAccent), onPressed: onAdd)]);

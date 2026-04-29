@@ -38,8 +38,10 @@ class CompanyStore extends ChangeNotifier {
   String _commercialRegister = '';
   String _nationalNumber = '';
   String? _customProfileImage;
+  String _companyId = '';
 
   // Public getters to access state securely
+  String get companyId => _companyId;
   String get companyName => _companyName;
   String get website => _website;
   String get employee => _employee;
@@ -80,12 +82,14 @@ class CompanyStore extends ChangeNotifier {
   }
 
   void setRegistrationData({
+    String? companyId,
     String? companyName,
     String? customProfileImage,
     String? commercialRegister,
     String? nationalNumber,
     String? email,
   }) {
+    if (companyId != null) _companyId = companyId;
     if (companyName != null && companyName.isNotEmpty) _companyName = companyName;
     if (customProfileImage != null) _customProfileImage = customProfileImage;
     if (commercialRegister != null) _commercialRegister = commercialRegister;
@@ -171,6 +175,12 @@ class CompanyStore extends ChangeNotifier {
       );
       */
     }
+    notifyListeners();
+  }
+
+  /// Clears all jobs from the store.
+  void clearJobs() {
+    _jobs.clear();
     notifyListeners();
   }
 

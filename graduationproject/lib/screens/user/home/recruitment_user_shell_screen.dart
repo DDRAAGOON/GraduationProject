@@ -1,5 +1,5 @@
 import 'package:url_launcher/url_launcher.dart';
-import 'dart:io';
+import '../../../shared/utils/image_helper.dart';
 import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';
@@ -62,11 +62,7 @@ class _RecruitmentUserShellScreenState extends State<RecruitmentUserShellScreen>
                 child: CircleAvatar(
                   radius: 18,
                   backgroundColor: Colors.white,
-                  backgroundImage: store.profileImage != null
-                      ? (store.profileImage!.startsWith('http')
-                          ? NetworkImage(store.profileImage!)
-                          : FileImage(File(store.profileImage!)) as ImageProvider)
-                      : null,
+                  backgroundImage: getAppImageProvider(store.profileImage),
                   child: store.profileImage == null
                       ? const Icon(Icons.person, size: 20)
                       : null,
@@ -1053,11 +1049,7 @@ class _ProfileTabState extends State<_ProfileTab> {
                   child: CircleAvatar(
                     radius: 50,
                     backgroundColor: Colors.white,
-                    backgroundImage: UserProfileData.profileImage != null
-                        ? (UserProfileData.profileImage!.startsWith('http')
-                            ? NetworkImage(UserProfileData.profileImage!)
-                            : FileImage(File(UserProfileData.profileImage!)) as ImageProvider)
-                        : null,
+                    backgroundImage: getAppImageProvider(UserProfileData.profileImage),
                     child: UserProfileData.profileImage == null
                         ? const Icon(Icons.person, size: 55, color: Color(0xFF49769F))
                         : null,
@@ -1168,9 +1160,10 @@ class _ProfileTabState extends State<_ProfileTab> {
                                 ),
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(14),
-                                  child: path.startsWith('http')
-                                      ? Image.network(path, fit: BoxFit.cover)
-                                      : Image.file(File(path), fit: BoxFit.cover),
+                                  child: Image(
+                                    image: getAppImageProvider(path) ?? const AssetImage('assets/placeholder.png'),
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
                               );
                             },

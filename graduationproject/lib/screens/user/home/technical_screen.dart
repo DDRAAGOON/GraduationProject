@@ -431,10 +431,12 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
           Container(
             width: 44, height: 44,
             decoration: BoxDecoration(
-              color: Theme.of(context).brightness == Brightness.dark ? Colors.white12 : Colors.black.withValues(alpha: 0.05), 
-              borderRadius: BorderRadius.circular(10)
+              borderRadius: BorderRadius.circular(10),
+              image: const DecorationImage(
+                image: AssetImage(AppImages.companyProfile1),
+                fit: BoxFit.cover,
+              ),
             ),
-            child: Icon(Icons.business, color: Theme.of(context).colorScheme.onSurface, size: 24),
           ),
           const SizedBox(width: 12),
           Expanded(

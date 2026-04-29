@@ -42,10 +42,15 @@ final class CompanyApiClient {
   Future<Map<String, dynamic>> login({
     required String email,
     required String password,
+    String? role,
   }) async {
+    final payload = <String, dynamic>{'email': email, 'password': password};
+    if (role != null && role.trim().isNotEmpty) {
+      payload['role'] = role.trim().toLowerCase();
+    }
     final Response<dynamic> response = await _dio.post<dynamic>(
       ApiEndpoints.login,
-      data: <String, dynamic>{'email': email, 'password': password},
+      data: payload,
     );
     return Map<String, dynamic>.from(response.data as Map);
   }
@@ -74,6 +79,21 @@ final class CompanyApiClient {
         'name': name,
         'role': role,
       },
+    );
+    return Map<String, dynamic>.from(response.data as Map);
+  }
+
+  Future<Map<String, dynamic>> updateProfile({
+    String? name,
+    String? photoUrl,
+  }) async {
+    final Response<dynamic> response = await _dio.put<dynamic>(
+      '/api/auth/profile',
+      data: <String, dynamic>{
+        if (name != null) 'name': name,
+        if (photoUrl != null) 'photoUrl': photoUrl,
+      },
+      options: _authOptions,
     );
     return Map<String, dynamic>.from(response.data as Map);
   }

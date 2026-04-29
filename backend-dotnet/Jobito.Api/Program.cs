@@ -74,6 +74,7 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
+app.UseDeveloperExceptionPage(); // إظهار الخطأ التفصيلي
 app.UseSwagger();
 app.UseSwaggerUI(options =>
 {

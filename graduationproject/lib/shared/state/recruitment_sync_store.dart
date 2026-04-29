@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../screens/user/profile/user_data.dart';
 import '../models/job.dart';
 import 'company_store.dart';
 
@@ -277,7 +278,10 @@ class RecruitmentSyncStore extends ChangeNotifier {
     if (email != null) _currentUserEmail = email;
     if (phone != null) _currentUserPhone = phone;
     if (location != null) _currentUserLocation = location;
-    if (photoUrl != null) _profileImage = photoUrl;
+    if (photoUrl != null) {
+      _profileImage = photoUrl;
+      UserProfileData.profileImage = photoUrl;
+    }
     notifyListeners();
   }
 
@@ -476,44 +480,86 @@ class RecruitmentSyncStore extends ChangeNotifier {
     required List<Map<String, dynamic>> applications,
     required List<Map<String, dynamic>> messages,
   }) {
-    if (jobs.isNotEmpty) {
-      _jobs.clear();
-      final List<Job> companyJobs = [];
-      final currentCompanyName = CompanyStore.instance.companyName;
+    // 1. Update Jobs
+    _jobs.clear();
+    final List<Job> companyJobs = [];
+    final currentCompanyName = CompanyStore.instance.companyName.trim().toLowerCase();
+    final currentCompanyId = CompanyStore.instance.companyId;
 
-      for (final item in jobs) {
-        final rJob = RecruitmentJob(
-          id: item['id']?.toString() ?? '',
-          title: item['title']?.toString() ?? 'Untitled',
-          companyName: item['companyName']?.toString() ?? 'Company',
-          location: item['location']?.toString() ?? 'Remote',
-          salaryRange: item['salaryRange']?.toString() ?? 'Negotiable',
-          type: item['type']?.toString() ?? 'Full-time',
-          status: item['status']?.toString() ?? 'Open',
-          category: item['category']?.toString() ?? 'Technical',
-          tags: item['tags'] is List ? (item['tags'] as List).map((e) => e.toString()).toList() : const [],
-          publishedAt: DateTime.tryParse(item['createdAt']?.toString() ?? '') ?? DateTime.now(),
-          description: item['description']?.toString() ?? '',
-          responsibilities: item['responsibilities'] is List ? (item['responsibilities'] as List).map((e) => e.toString()).toList() : const [],
-          qualifications: item['qualifications'] is List ? (item['qualifications'] as List).map((e) => e.toString()).toList() : const [],
-          niceToHaves: item['niceToHaves'] is List ? (item['niceToHaves'] as List).map((e) => e.toString()).toList() : const [],
-          benefits: item['benefits'] is List ? (item['benefits'] as List).map((e) => e.toString()).toList() : const [],
-          capacity: int.tryParse(item['requiredCount']?.toString() ?? '1') ?? 1,
-          acceptedCount: int.tryParse(item['acceptedCount']?.toString() ?? '0') ?? 0,
-        );
-        _jobs.add(rJob);
+    for (final item in jobs) {
+      final rJob = RecruitmentJob(
+        id: item['id']?.toString() ?? '',
+        title: item['title']?.toString() ?? 'Untitled',
+        companyName: item['companyName']?.toString() ?? 'Company',
+        location: item['location']?.toString() ?? 'Remote',
+        salaryRange: item['salaryRange']?.toString() ?? 'Negotiable',
+        type: item['type']?.toString() ?? 'Full-time',
+        status: item['status']?.toString() ?? 'Open',
+        category: item['category']?.toString() ?? 'Technical',
+        tags: item['tags'] is List ? (item['tags'] as List).map((e) => e.toString()).toList() : const [],
+        publishedAt: DateTime.tryParse(item['createdAt']?.toString() ?? '') ?? DateTime.now(),
+        description: item['description']?.toString() ?? '',
+        responsibilities: item['responsibilities'] is List ? (item['responsibilities'] as List).map((e) => e.toString()).toList() : const [],
+        qualifications: item['qualifications'] is List ? (item['qualifications'] as List).map((e) => e.toString()).toList() : const [],
+        niceToHaves: item['niceToHaves'] is List ? (item['niceToHaves'] as List).map((e) => e.toString()).toList() : const [],
+        benefits: item['benefits'] is List ? (item['benefits'] as List).map((e) => e.toString()).toList() : const [],
+        capacity: int.tryParse(item['requiredCount']?.toString() ?? '1') ?? 1,
+        acceptedCount: int.tryParse(item['acceptedCount']?.toString() ?? '0') ?? 0,
+      );
+      _jobs.add(rJob);
 
-        // If this job belongs to the current company, add it to CompanyStore
-        if (rJob.companyName == currentCompanyName) {
-          companyJobs.add(Job.fromMap(item));
-        }
+      // Check if job belongs to current company
+      final itemCompanyId = item['companyId']?.toString() ?? '';
+      final itemCompanyName = rJob.companyName.trim().toLowerCase();
+
+      bool belongsToCompany = false;
+      if (currentCompanyId.isNotEmpty && itemCompanyId.isNotEmpty) {
+        belongsToCompany = itemCompanyId == currentCompanyId;
+      } else if (currentCompanyName.isNotEmpty) {
+        belongsToCompany = itemCompanyName == currentCompanyName;
       }
 
-      // Sync with CompanyStore
-      for (final job in companyJobs) {
-        CompanyStore.instance.saveJob(job);
+      if (belongsToCompany) {
+        companyJobs.add(Job.fromMap(item));
       }
     }
+
+    // Sync with CompanyStore
+    CompanyStore.instance.clearJobs();
+    for (final job in companyJobs) {
+      CompanyStore.instance.saveJob(job);
+    }
+
+    // 2. Update Applications
+    _applications.clear();
+    for (final item in applications) {
+      _applications.add(RecruitmentApplication(
+        id: item['id']?.toString() ?? '',
+        jobId: item['jobId']?.toString() ?? '',
+        jobTitle: item['jobTitle']?.toString() ?? '',
+        companyName: item['companyName']?.toString() ?? '',
+        userName: item['userName']?.toString() ?? '',
+        status: item['status']?.toString() ?? 'Pending',
+        updatedAt: DateTime.tryParse(item['updatedAt']?.toString() ?? '') ?? DateTime.now(),
+        email: item['email']?.toString(),
+        phone: item['phone']?.toString(),
+        location: item['location']?.toString(),
+        about: item['about']?.toString(),
+        skills: item['skills'] is List ? (item['skills'] as List).map((e) => e.toString()).toList() : const [],
+      ));
+    }
+
+    // 3. Update Messages
+    _messages.clear();
+    for (final item in messages) {
+      _messages.add(RecruitmentMessage(
+        id: item['id']?.toString() ?? '',
+        fromCompany: item['fromCompany'] == true,
+        text: item['text']?.toString() ?? '',
+        createdAt: DateTime.tryParse(item['createdAt']?.toString() ?? '') ?? DateTime.now(),
+      ));
+    }
+
     notifyListeners();
   }
 }

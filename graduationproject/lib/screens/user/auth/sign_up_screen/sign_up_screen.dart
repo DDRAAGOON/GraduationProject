@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:file_picker/file_picker.dart';
@@ -179,6 +180,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
           name: _fullNameController.text.trim(),
         );
 
+        if (_profileImagePath != null) {
+          try {
+            final bytes = await File(_profileImagePath!).readAsBytes();
+            final base64Image = 'data:image/jpeg;base64,${base64Encode(bytes)}';
+            await RecruitmentSyncService.instance.updateProfile(photoUrl: base64Image);
+            _profileImagePath = base64Image;
+          } catch (_) {}
+        }
+
         RecruitmentSyncStore.instance.updateUserProfile(
           fullName: _fullNameController.text,
           title: _expJobTitleController.text.isNotEmpty ? _expJobTitleController.text : "User",
@@ -226,9 +236,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: const Color(0xFFF9F5F1),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF9F5F1),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         title: Text(

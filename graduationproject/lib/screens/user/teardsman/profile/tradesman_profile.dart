@@ -1,5 +1,5 @@
 import 'package:url_launcher/url_launcher.dart';
-import 'dart:io';
+import '../../../../shared/utils/image_helper.dart';
 import 'package:flutter/material.dart';
 import '../../../../../shared/l10n/app_localizations.dart';
 import '../../profile/user_data.dart';
@@ -76,11 +76,7 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
                       child: CircleAvatar(
                         radius: 60,
                         backgroundColor: Colors.white,
-                        backgroundImage: UserProfileData.profileImage != null
-                            ? (UserProfileData.profileImage!.startsWith('http') 
-                                ? NetworkImage(UserProfileData.profileImage!) 
-                                : FileImage(File(UserProfileData.profileImage!)) as ImageProvider)
-                            : null,
+                        backgroundImage: getAppImageProvider(UserProfileData.profileImage),
                         child: UserProfileData.profileImage == null 
                             ? const Icon(Icons.person, size: 70, color: Color(0xFF49769F)) 
                             : null,
@@ -199,9 +195,10 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
                                   ),
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(15),
-                                    child: path.startsWith('http')
-                                        ? Image.network(path, fit: BoxFit.cover)
-                                        : Image.file(File(path), fit: BoxFit.cover),
+                                    child: Image(
+                                      image: getAppImageProvider(path) ?? const AssetImage('assets/placeholder.png'),
+                                      fit: BoxFit.cover,
+                                    ),
                                   ),
                                 );
                               },

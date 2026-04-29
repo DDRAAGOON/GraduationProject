@@ -1,9 +1,11 @@
 // Profile settings hub for the company account.
 
-import 'dart:io';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+
+import '../../../shared/utils/image_helper.dart';
 
 import '../../../app/router/app_router.dart';
 import '../../../shared/l10n/app_localizations.dart';
@@ -13,6 +15,7 @@ import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_scaffold.dart';
 import '../../../shared/widgets/app_text_field.dart';
 import '../../../shared/services/session_manager.dart';
+import '../../../shared/services/recruitment_sync_service.dart';
 
 class CompanyProfileSettingsOverviewScreen extends StatefulWidget {
   const CompanyProfileSettingsOverviewScreen({super.key});
@@ -100,6 +103,12 @@ class _CompanyProfileSettingsOverviewScreenState
       email: data['email'] ?? '',
       name: _companyName.text,
       photoPath: store.companyProfileImage,
+    );
+
+    // Sync with backend
+    await RecruitmentSyncService.instance.updateProfile(
+      name: _companyName.text,
+      // Backend only supports name and photoUrl for now
     );
 
     if (!mounted) return;
@@ -230,8 +239,10 @@ class _CompanyProfileSettingsOverviewScreenState
                     animation: CompanyStore.instance,
                     builder: (context, _) {
                       final profileImage = CompanyStore.instance.companyProfileImage;
+                      final imageProvider = getAppImageProvider(profileImage);
+                      
                       return ClipOval(
-                        child: profileImage == null
+                        child: imageProvider == null
                             ? Container(
                                 width: 44,
                                 height: 44,
@@ -242,19 +253,12 @@ class _CompanyProfileSettingsOverviewScreenState
                                   size: 24,
                                 ),
                               )
-                            : profileImage.startsWith('assets/')
-                                ? Image.asset(
-                                    profileImage,
-                                    width: 44,
-                                    height: 44,
-                                    fit: BoxFit.cover,
-                                  )
-                                : Image.file(
-                                    File(profileImage),
-                                    width: 44,
-                                    height: 44,
-                                    fit: BoxFit.cover,
-                                  ),
+                            : Image(
+                                image: imageProvider,
+                                width: 44,
+                                height: 44,
+                                fit: BoxFit.cover,
+                              ),
                       );
                     },
                   ),
@@ -268,17 +272,27 @@ class _CompanyProfileSettingsOverviewScreenState
                   OutlinedButton(
                     onPressed: () async {
                       final picker = ImagePicker();
-                      final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+                      final pickedFile = await picker.pickImage(
+                        source: ImageSource.gallery,
+                        imageQuality: 50,
+                        maxWidth: 500,
+                        maxHeight: 500,
+                      );
                       if (pickedFile != null) {
-                        CompanyStore.instance.setRegistrationData(customProfileImage: pickedFile.path);
-                        
-                        // Persist photo change
-                        final data = await SessionManager.getCompanyData();
-                        await SessionManager.saveCompanySession(
-                          email: data['email'] ?? '',
-                          name: data['name'] ?? '',
-                          photoPath: pickedFile.path,
-                        );
+                        try {
+                          final bytes = await pickedFile.readAsBytes();
+                          final base64Image = 'data:image/jpeg;base64,${base64Encode(bytes)}';
+                          
+                          // Save locally for immediate feedback
+                          CompanyStore.instance.setRegistrationData(customProfileImage: base64Image);
+                          
+                          // Sync with backend and update session automatically
+                          await RecruitmentSyncService.instance.updateProfile(photoUrl: base64Image);
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(t.tr(en: 'Failed to upload image', ar: 'فشل رفع الصورة'))),
+                          );
+                        }
                       }
                     }, 
                     child: Text(t.upload),

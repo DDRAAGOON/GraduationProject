@@ -9,6 +9,7 @@ class SessionManager {
   static const String _keyIsLoggedInUser = 'is_logged_in_user';
   static const String _keyUserEmail = 'user_email';
   static const String _keyUserName = 'user_name';
+  static const String _keyUserPhoto = 'user_photo';
 
   static Future<void> saveCompanySession({
     required String email,
@@ -49,11 +50,15 @@ class SessionManager {
   static Future<void> saveUserSession({
     required String email,
     required String name,
+    String? photoPath,
   }) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_keyIsLoggedInUser, true);
     await prefs.setString(_keyUserEmail, email);
     await prefs.setString(_keyUserName, name);
+    if (photoPath != null) {
+      await prefs.setString(_keyUserPhoto, photoPath);
+    }
   }
 
   static Future<bool> isUserLoggedIn() async {
@@ -66,6 +71,7 @@ class SessionManager {
     return {
       'email': prefs.getString(_keyUserEmail),
       'name': prefs.getString(_keyUserName),
+      'photo': prefs.getString(_keyUserPhoto),
     };
   }
 
@@ -74,5 +80,6 @@ class SessionManager {
     await prefs.remove(_keyIsLoggedInUser);
     await prefs.remove(_keyUserEmail);
     await prefs.remove(_keyUserName);
+    await prefs.remove(_keyUserPhoto);
   }
 }
