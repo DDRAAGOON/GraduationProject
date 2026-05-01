@@ -24,14 +24,15 @@ class _CompanyPostJobStep1InformationScreenState
   final _jobTitle = TextEditingController();
   final _jobDescription = TextEditingController();
   final _salaryController = TextEditingController();
-  final _positions = TextEditingController(text: '1');
+  final _positions = TextEditingController();
   final _department = TextEditingController();
   DateTime? _deadline = DateTime.now().add(const Duration(days: 30));
-  String _category = 'Technical'; // Technical, Non-Technical, Services
+  String _category = 'Technical'; // Technical, Non-Technical, Service
   final Set<String> _types = {'Full-Time'};
   final List<String> _skills = [];
   bool _loading = false;
   String? _titleError;
+  String? _positionsError;
 
   bool _initialized = false;
   Job? _editingJob;
@@ -52,11 +53,16 @@ class _CompanyPostJobStep1InformationScreenState
         _types.clear();
         _types.add(args.employmentType);
 
-        // Simple salary parsing: "EGP 5000-22000 / monthly"
+        // Simple salary parsing to keep value on edit
         final salary = args.salaryRange;
-        if (salary.contains('-')) {
-          _salaryController.text = args.salaryRange;
+        final digitsOnly = salary.replaceAll(RegExp(r'[^\d]'), '');
+        if (digitsOnly.isNotEmpty) {
+          _salaryController.text = digitsOnly.replaceAllMapped(
+              RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
+        } else {
+          _salaryController.text = salary == 'Competitive' ? '' : salary;
         }
+        
         _positions.text = args.requiredCount.toString();
         _types.clear();
         _types.addAll(args.employmentType.split(' • '));
@@ -80,12 +86,18 @@ class _CompanyPostJobStep1InformationScreenState
 
   bool _validate() {
     final t = AppLocalizations.of(context);
-    setState(
-      () => _titleError = _jobTitle.text.trim().length >= 3
-          ? null
-          : t.at3Chars,
-    );
-    return _titleError == null;
+    setState(() {
+      _titleError = _jobTitle.text.trim().length >= 3 ? null : t.at3Chars;
+      
+      final posText = _positions.text.trim();
+      final posInt = int.tryParse(posText);
+      if (posText.isEmpty || posInt == null || posInt < 1) {
+        _positionsError = t.isAr ? 'يرجى إدخال رقم صحيح وموجب' : 'Please enter a valid positive number';
+      } else {
+        _positionsError = null;
+      }
+    });
+    return _titleError == null && _positionsError == null;
   }
 
   Future<void> _next() async {
@@ -106,6 +118,7 @@ class _CompanyPostJobStep1InformationScreenState
         'category': _category,
         'department': _department.text.trim(),
         'skills': _skills,
+        'deadline': _deadline,
         // Pass existing lists if editing
         'responsibilities': _editingJob?.responsibilities,
         'qualifications': _editingJob?.qualifications,
@@ -241,8 +254,11 @@ class _CompanyPostJobStep1InformationScreenState
             label: t.salary,
             controller: _salaryController,
             keyboardType: TextInputType.number,
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            hint: t.tr(en: "e.g. 5000 - 7000", ar: "مثال: 5000 - 7000"),
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly,
+              _CommaTextInputFormatter(),
+            ],
+            hint: t.tr(en: "e.g. 5000", ar: "مثال: 5000"),
           ),
           const Divider(height: 48),
           Text(
@@ -285,6 +301,8 @@ class _CompanyPostJobStep1InformationScreenState
                 controller: _positions,
                 hint: t.tr(en: "e.g. 1", ar: "حدد عدد المقاعد المتاحة لهذا المنصب"),
                 keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                validatorText: _positionsError,
               ),
             ],
           ),
@@ -307,7 +325,7 @@ class _CompanyPostJobStep1InformationScreenState
                     const SizedBox(width: 8),
                     _buildRadioChip(t.tr(en: "Non-Technical", ar: "غير تقني"), "Non-Technical"),
                     const SizedBox(width: 8),
-                    _buildRadioChip(t.tr(en: "Services", ar: "خدمات"), "Services"),
+                    _buildRadioChip(t.tr(en: "Service", ar: "خدمات"), "Service"),
                   ],
                 ),
               ),
@@ -449,6 +467,29 @@ class _TypeChip extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _CommaTextInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    if (newValue.text.isEmpty) {
+      return newValue;
+    }
+    
+    // Only allow digits for formatting
+    final newText = newValue.text.replaceAll(RegExp(r'[^\d]'), '');
+    if (newText.isEmpty) return newValue.copyWith(text: '');
+
+    // Format with commas
+    final formatted = newText.replaceAllMapped(
+        RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
+
+    return TextEditingValue(
+      text: formatted,
+      selection: TextSelection.collapsed(offset: formatted.length),
     );
   }
 }

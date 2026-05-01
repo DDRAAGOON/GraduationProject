@@ -22,7 +22,7 @@ class _RecruitmentJobFiltersScreenState
     final store = RecruitmentSyncStore.instance;
     
     // Safely initialize values
-    _selectedType = _ensureValueExists(store.filterType, ['All', 'Full-time', 'Part-time', 'Remote', 'Contract']);
+    _selectedType = _ensureValueExists(store.filterType, ['All', 'Full-time', 'Part-time', 'Remote']);
     _selectedCategory = _ensureValueExists(store.filterCategory, RecruitmentSyncStore.categories);
     _selectedSalary = _ensureValueExists(store.filterSalaryRange, RecruitmentSyncStore.salaryRanges);
   }
@@ -35,10 +35,10 @@ class _RecruitmentJobFiltersScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF9F5F1),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('Advanced Filters', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: const Color(0xFFF9F5F1),
+        title: Text('Advanced Filters', style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
       ),
@@ -52,7 +52,7 @@ class _RecruitmentJobFiltersScreenState
               const SizedBox(height: 10),
               _buildDropdown(
                 value: _selectedType,
-                items: ['All', 'Full-time', 'Part-time', 'Remote', 'Contract'],
+                items: ['All', 'Full-time', 'Part-time', 'Remote'],
                 onChanged: (value) => setState(() => _selectedType = value ?? 'All'),
               ),
               const SizedBox(height: 24),
@@ -97,7 +97,7 @@ class _RecruitmentJobFiltersScreenState
                       _selectedSalary = 'All';
                     });
                   },
-                  child: const Text('Reset All', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w600)),
+                  child: Text('Reset All', style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.w600)),
                 ),
               ),
             ],
@@ -110,7 +110,7 @@ class _RecruitmentJobFiltersScreenState
   Widget _buildFilterLabel(String label) {
     return Text(
       label,
-      style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: Color(0xFF011931)),
+      style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: Theme.of(context).colorScheme.onSurface),
     );
   }
 
@@ -121,18 +121,22 @@ class _RecruitmentJobFiltersScreenState
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 4))],
+        boxShadow: [BoxShadow(color: Theme.of(context).dividerColor.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 4))],
       ),
       child: DropdownButtonFormField<String>(
         value: items.contains(value) ? value : items.first,
         decoration: InputDecoration(
           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+          filled: true,
+          fillColor: Theme.of(context).colorScheme.surface,
         ),
-        icon: const Icon(Icons.keyboard_arrow_down, color: Colors.grey),
-        items: items.map((e) => DropdownMenuItem(value: e, child: Text(e, style: const TextStyle(fontSize: 14)))).toList(),
+        style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14),
+        icon: Icon(Icons.keyboard_arrow_down, color: Theme.of(context).colorScheme.outline),
+        dropdownColor: Theme.of(context).colorScheme.surface,
+        items: items.map((e) => DropdownMenuItem(value: e, child: Text(e, style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurface)))).toList(),
         onChanged: onChanged,
       ),
     );

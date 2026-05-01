@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 
 import '../models/contact_entry.dart';
 import '../models/job.dart';
+import '../services/session_manager.dart';
 
 /// The [CompanyStore] acts as the central state management layer for the application.
 /// It uses the [ChangeNotifier] mixin to broadcast updates to the UI whenever
@@ -130,15 +131,41 @@ class CompanyStore extends ChangeNotifier {
     _industry = industry;
     _aboutEn = aboutEn;
     _aboutAr = aboutAr;
-    _locations = List.from(locations);
-    _techStack = List.from(techStack);
+    _locations = List.from(locations.toSet());
+    _techStack = List.from(techStack.toSet());
     _foundedDay = foundedDay;
     _foundedMonth = foundedMonth;
     _foundedYear = foundedYear;
     _category = category;
-    _benefits = List.from(benefits);
+    _benefits = List.from(benefits.toSet());
     _commercialRegister = commercialRegister;
     _nationalNumber = nationalNumber;
+    notifyListeners();
+  }
+
+  Future<void> initFromSession() async {
+    final data = await SessionManager.getCompanyData();
+    if (data['name'] != null) _companyName = data['name']!;
+    if (data['photo'] != null) _customProfileImage = data['photo']!;
+    
+    final full = await SessionManager.getCompanyFullProfile();
+    await loadFromSession(full);
+  }
+
+  Future<void> loadFromSession(Map<String, dynamic> data) async {
+    _employee = data['employee'] as String? ?? '';
+    _industry = data['industry'] as String? ?? '';
+    _aboutEn = data['aboutEn'] as String? ?? '';
+    _aboutAr = data['aboutAr'] as String? ?? '';
+    _locations = List<String>.from(data['locations'] as List? ?? []);
+    _techStack = List<String>.from(data['techStack'] as List? ?? []);
+    _foundedDay = data['foundedDay'] as int? ?? 0;
+    _foundedMonth = data['foundedMonth'] as int? ?? 0;
+    _foundedYear = data['foundedYear'] as int? ?? 0;
+    _category = data['category'] as String? ?? '';
+    _benefits = List<String>.from(data['benefits'] as List? ?? []);
+    _commercialRegister = data['commercialRegister'] as String? ?? '';
+    _nationalNumber = data['nationalNumber'] as String? ?? '';
     notifyListeners();
   }
 

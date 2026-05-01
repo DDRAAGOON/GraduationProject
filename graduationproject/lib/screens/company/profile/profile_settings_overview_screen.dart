@@ -7,7 +7,6 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../../shared/utils/image_helper.dart';
 
-import '../../../app/router/app_router.dart';
 import '../../../shared/l10n/app_localizations.dart';
 import '../../../shared/state/company_store.dart';
 import '../../../shared/state/locale_controller.dart';
@@ -16,6 +15,8 @@ import '../../../shared/widgets/app_scaffold.dart';
 import '../../../shared/widgets/app_text_field.dart';
 import '../../../shared/services/session_manager.dart';
 import '../../../shared/services/recruitment_sync_service.dart';
+
+import '../../../app/router/app_router.dart';
 
 class CompanyProfileSettingsOverviewScreen extends StatefulWidget {
   const CompanyProfileSettingsOverviewScreen({super.key});
@@ -26,7 +27,9 @@ class CompanyProfileSettingsOverviewScreen extends StatefulWidget {
 }
 
 class _CompanyProfileSettingsOverviewScreenState
-    extends State<CompanyProfileSettingsOverviewScreen> {
+    extends State<CompanyProfileSettingsOverviewScreen>
+    with SingleTickerProviderStateMixin {
+  late final TabController _tabController;
   late final TextEditingController _companyName;
   late final TextEditingController _employee;
   late final TextEditingController _about;
@@ -40,10 +43,13 @@ class _CompanyProfileSettingsOverviewScreenState
   late int _selectedMonth;
   late int _selectedYear;
   bool _loading = false;
+  bool _saveSuccess = false;
+  bool _saveError = false;
 
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 3, vsync: this);
     final store = CompanyStore.instance;
     final isAr = LocaleController.instance.locale.value.languageCode == 'ar';
     _companyName = TextEditingController(text: store.companyName);
@@ -64,6 +70,7 @@ class _CompanyProfileSettingsOverviewScreenState
 
   @override
   void dispose() {
+    _tabController.dispose();
     _companyName.dispose();
     _employee.dispose();
     _about.dispose();
@@ -72,78 +79,331 @@ class _CompanyProfileSettingsOverviewScreenState
 
   Future<void> _save() async {
     final t = AppLocalizations.of(context);
-    setState(() => _loading = true);
-    await Future<void>.delayed(const Duration(milliseconds: 600));
-    if (!mounted) return;
+    final messenger = ScaffoldMessenger.of(context);
     
-    final store = CompanyStore.instance;
-    final isAr = LocaleController.instance.locale.value.languageCode == 'ar';
+    // Validate
+    if (_companyName.text.trim().isEmpty) {
+      messenger.showSnackBar(
+        SnackBar(content: Text(t.tr(en: 'Company name is required', ar: 'اسم الشركة مطلوب')))
+      );
+      return;
+    }
+
+    setState(() {
+      _loading = true;
+      _saveSuccess = false;
+      _saveError = false;
+    });
+
+    try {
+      final store = CompanyStore.instance;
+      final isAr = LocaleController.instance.locale.value.languageCode == 'ar';
+      
+      // Sync with backend first to ensure persistence
+      await RecruitmentSyncService.instance.updateProfile(
+        name: _companyName.text.trim(),
+      );
+
+      // Local persistence
+      CompanyStore.instance.updateProfile(
+        name: _companyName.text.trim(),
+        website: store.website,
+        employee: _employee.text.trim(),
+        industry: store.industry,
+        aboutEn: isAr ? store.companyAboutEn : _about.text.trim(),
+        aboutAr: isAr ? _about.text.trim() : store.companyAboutAr,
+        locations: _locations,
+        techStack: _techStack,
+        foundedDay: _selectedDay,
+        foundedMonth: _selectedMonth,
+        foundedYear: _selectedYear,
+        benefits: _benefits,
+        category: _selectedCategory,
+        commercialRegister: store.commercialRegister,
+        nationalNumber: store.nationalNumber,
+      );
+
+      await SessionManager.saveCompanyFullProfile(
+        employee: _employee.text.trim(),
+        industry: store.industry,
+        aboutEn: isAr ? store.companyAboutEn : _about.text.trim(),
+        aboutAr: isAr ? _about.text.trim() : store.companyAboutAr,
+        locations: _locations,
+        techStack: _techStack,
+        foundedDay: _selectedDay,
+        foundedMonth: _selectedMonth,
+        foundedYear: _selectedYear,
+        category: _selectedCategory,
+        benefits: _benefits,
+        commercialRegister: store.commercialRegister,
+        nationalNumber: store.nationalNumber,
+      );
+
+      if (!mounted) return;
+      setState(() => _saveSuccess = true);
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(t.saved),
+          backgroundColor: Colors.green,
+          behavior: SnackBarBehavior.floating,
+        )
+      );
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _saveError = true);
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(t.tr(en: 'Save failed. Please try again.', ar: 'فشل الحفظ. يرجى المحاولة مرة أخرى.')),
+          backgroundColor: Theme.of(context).colorScheme.error,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _loading = false);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     
-    CompanyStore.instance.updateProfile(
-      name: _companyName.text,
-      website: store.website,
-      employee: _employee.text,
-      industry: store.industry,
-      aboutEn: isAr ? store.companyAboutEn : _about.text,
-      aboutAr: isAr ? _about.text : store.companyAboutAr,
-      locations: _locations,
-      techStack: _techStack,
-      foundedDay: _selectedDay,
-      foundedMonth: _selectedMonth,
-      foundedYear: _selectedYear,
-      commercialRegister: store.commercialRegister,
-      nationalNumber: store.nationalNumber,
-      benefits: _benefits,
-      category: _selectedCategory,
+    return AppScaffold(
+      title: t.profileSettings,
+      showBack: true,
+      body: Column(
+        children: [
+          TabBar(
+            controller: _tabController,
+            onTap: (index) {
+              if (index == 1) {
+                _tabController.index = 0; // Reset to profile tab for next time
+                Navigator.of(context).pushNamed(AppRoutes.companyAccountSecurity);
+              } else if (index == 2) {
+                _tabController.index = 0; // Reset to profile tab for next time
+                Navigator.of(context).pushNamed(AppRoutes.companyAppearanceLight);
+              }
+            },
+            labelColor: Theme.of(context).colorScheme.primary,
+            unselectedLabelColor: Colors.grey,
+            indicatorColor: Theme.of(context).colorScheme.primary,
+            indicatorWeight: 3,
+            labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+            tabs: [
+              Tab(text: t.profileSettings),
+              Tab(text: t.accountSecurity),
+              Tab(text: t.tr(en: "Appearance", ar: "المظهر")),
+            ],
+          ),
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              physics: const NeverScrollableScrollPhysics(),
+              children: [
+                _buildProfileTab(),
+                const Center(child: CircularProgressIndicator()),
+                const Center(child: CircularProgressIndicator()),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
+  }
 
-    // Persist company name change
-    final data = await SessionManager.getCompanyData();
-    await SessionManager.saveCompanySession(
-      email: data['email'] ?? '',
-      name: _companyName.text,
-      photoPath: store.companyProfileImage,
+  Widget _buildProfileTab() {
+    final t = AppLocalizations.of(context);
+    final months = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    ];
+
+    return ListView(
+      padding: const EdgeInsets.all(24),
+      children: [
+        _buildProfileHeader(),
+        const SizedBox(height: 30),
+        
+        Text(t.tr(en: "Basic Information", ar: "معلومات أساسية"), 
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 8),
+        Text(t.tr(en: "Update your company identity and contact details.", ar: "قم بتحديث هوية شركتك وتفاصيل الاتصال."), 
+          style: TextStyle(color: Colors.grey.shade600, fontSize: 13)),
+        const Divider(height: 40),
+
+        AppTextField(
+          label: t.companyName, 
+          controller: _companyName,
+          validatorText: _saveError && _companyName.text.isEmpty ? 'Required' : null,
+        ),
+        const SizedBox(height: 20),
+        AppTextField(label: t.employee, controller: _employee),
+        const SizedBox(height: 20),
+        
+        Text(t.categoryLabel, style: Theme.of(context).textTheme.labelLarge),
+        const SizedBox(height: 8),
+        _buildDropdown<String>(
+          value: _selectedCategory,
+          items: const ['technical', 'nontechnical'],
+          labelBuilder: (v) => v == 'technical' ? t.technical : t.nonTechnical,
+          onChanged: (v) => setState(() => _selectedCategory = v!),
+        ),
+        const SizedBox(height: 20),
+        
+        _buildChipField(t.locationInfo, _locations, () => _addTagDialog(t.locationInfo, _locations)),
+        const SizedBox(height: 20),
+
+        Text(t.dateFounded, style: Theme.of(context).textTheme.labelLarge),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            Expanded(child: _buildDropdown<int>(
+              value: _selectedDay,
+              items: List.generate(32, (i) => i),
+              labelBuilder: (v) => v == 0 ? (t.isAr ? 'اليوم' : 'Day') : v.toString(),
+              onChanged: (v) => setState(() => _selectedDay = v!),
+            )),
+            const SizedBox(width: 12),
+            Expanded(child: _buildDropdown<int>(
+              value: _selectedMonth,
+              items: List.generate(13, (i) => i),
+              labelBuilder: (v) => v == 0 ? (t.isAr ? 'الشهر' : 'Month') : (t.isAr ? ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'][v-1] : months[v-1]),
+              onChanged: (v) => setState(() => _selectedMonth = v!),
+            )),
+            const SizedBox(width: 12),
+            Expanded(child: _buildDropdown<int>(
+              value: _selectedYear,
+              items: [0, ...List.generate(50, (i) => 2024 - i)],
+              labelBuilder: (v) => v == 0 ? (t.isAr ? 'السنة' : 'Year') : v.toString(),
+              onChanged: (v) => setState(() => _selectedYear = v!),
+            )),
+          ],
+        ),
+        const SizedBox(height: 20),
+        
+        AppTextField(label: t.aboutCompany, controller: _about, maxLines: 4),
+        const SizedBox(height: 20),
+        _buildChipField(t.benefits, _benefits, () => _addTagDialog(t.benefits, _benefits)),
+        
+        const SizedBox(height: 40),
+        AppButton(
+          label: t.saveChange, 
+          loading: _loading, 
+          onPressed: _save,
+          icon: _saveSuccess ? Icons.check_circle : null,
+        ),
+        const SizedBox(height: 100),
+      ],
     );
+  }
 
-    // Sync with backend
-    await RecruitmentSyncService.instance.updateProfile(
-      name: _companyName.text,
-      // Backend only supports name and photoUrl for now
+  Widget _buildProfileHeader() {
+    return Center(
+      child: Stack(
+        children: [
+          AnimatedBuilder(
+            animation: CompanyStore.instance,
+            builder: (context, _) {
+              final profileImage = CompanyStore.instance.companyProfileImage;
+              final imageProvider = getAppImageProvider(profileImage);
+              return Container(
+                width: 100,
+                height: 100,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: _saveError ? Colors.red : (_saveSuccess ? Colors.green : Colors.blue.withValues(alpha: 0.2)),
+                    width: 3
+                  ),
+                  image: imageProvider != null ? DecorationImage(image: imageProvider, fit: BoxFit.cover) : null,
+                  color: Colors.grey.shade100,
+                ),
+                child: imageProvider == null ? const Icon(Icons.business, size: 40, color: Colors.grey) : null,
+              );
+            },
+          ),
+          Positioned(
+            bottom: 0,
+            right: 0,
+            child: GestureDetector(
+              onTap: _pickImage,
+              child: CircleAvatar(
+                radius: 18,
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                child: const Icon(Icons.camera_alt, size: 18, color: Colors.white),
+              ),
+            ),
+          ),
+          if (_saveError)
+            const Positioned.fill(
+              child: Center(child: Icon(Icons.error, color: Colors.red, size: 40)),
+            ),
+        ],
+      ),
     );
+  }
 
-    if (!mounted) return;
-
-    setState(() => _loading = false);
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(t.saved)));
+  Future<void> _pickImage() async {
+    final t = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final picker = ImagePicker();
+    try {
+      final pickedFile = await picker.pickImage(source: ImageSource.gallery, imageQuality: 50);
+      if (pickedFile != null) {
+        setState(() {
+          _loading = true;
+          _saveError = false;
+        });
+        
+        final bytes = await pickedFile.readAsBytes();
+        final base64Image = 'data:image/jpeg;base64,${base64Encode(bytes)}';
+        
+        // Update local store first for immediate feedback
+        CompanyStore.instance.setRegistrationData(customProfileImage: base64Image);
+        await SessionManager.saveCompanyPhoto(base64Image);
+        
+        // Sync with backend
+        await RecruitmentSyncService.instance.updateProfile(photoUrl: base64Image);
+        
+        if (mounted) {
+          setState(() {
+            _saveSuccess = true;
+          });
+          messenger.showSnackBar(
+            SnackBar(content: Text(t.saved), backgroundColor: Colors.green, behavior: SnackBarBehavior.floating)
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _saveError = true;
+          _saveSuccess = false;
+        });
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text(t.tr(en: 'Image upload failed', ar: 'فشل تحميل الصورة')),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating
+          )
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
   }
 
   Future<void> _addTagDialog(String title, List<String> targetList) async {
-    final t = AppLocalizations.of(context);
     final controller = TextEditingController();
     final newTag = await showDialog<String>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(title),
-        content: TextField(
-          controller: controller,
-          decoration: InputDecoration(
-            hintText: t.tr(en: 'Enter value', ar: 'أدخل القيمة'),
-            border: const OutlineInputBorder(),
-          ),
-          autofocus: true,
-          onSubmitted: (val) => Navigator.of(ctx).pop(val),
-        ),
+        content: TextField(controller: controller, autofocus: true),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(t.cancel),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(ctx).pop(controller.text),
-            child: Text(t.save),
-          ),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          FilledButton(onPressed: () => Navigator.pop(ctx, controller.text), child: const Text('Add')),
         ],
       ),
     );
@@ -153,240 +413,29 @@ class _CompanyProfileSettingsOverviewScreenState
   }
 
   Widget _buildChipField(String label, List<String> items, VoidCallback onAdd) {
-    final t = AppLocalizations.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label, style: Theme.of(context).textTheme.labelLarge),
         const SizedBox(height: 8),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          width: double.infinity,
-          constraints: const BoxConstraints(minHeight: 56),
+          padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            border: Border.all(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2)),
+            border: Border.all(color: Colors.grey.shade300),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Wrap(
             spacing: 8,
-            runSpacing: 8,
-            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              ...items.map(
-                (item) => Chip(
-                  label: Text(item, style: const TextStyle(fontSize: 12)),
-                  onDeleted: () {
-                    setState(() => items.remove(item));
-                  },
-                  visualDensity: VisualDensity.compact,
-                  deleteIcon: const Icon(Icons.close, size: 16),
-                ),
-              ),
-              ActionChip(
-                label: Text(t.tr(en: '+ Add', ar: '+ إضافة'), style: const TextStyle(fontSize: 12)),
-                onPressed: onAdd,
-                visualDensity: VisualDensity.compact,
-                backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                side: BorderSide.none,
-              ),
+              ...items.map((item) => Chip(
+                label: Text(item),
+                onDeleted: () => setState(() => items.remove(item)),
+              )),
+              ActionChip(label: const Text('+ Add'), onPressed: onAdd),
             ],
           ),
         ),
       ],
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final t = AppLocalizations.of(context);
-    
-    // Month abbreviations
-    final months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-    ];
-
-    return AppScaffold(
-      title: t.profileSettings,
-      showBack: false,
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(
-            context,
-          ).pushNamed(AppRoutes.companyProfileSocialLinks),
-          child: Text(t.socialLinks),
-        ),
-      ],
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          Text(
-            t.overviewSection,
-            style: Theme.of(
-              context,
-            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900),
-          ),
-          const SizedBox(height: 16),
-          Text(t.companyLogo, style: Theme.of(context).textTheme.titleSmall),
-          const SizedBox(height: 10),
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(14),
-              child: Row(
-                children: [
-                  AnimatedBuilder(
-                    animation: CompanyStore.instance,
-                    builder: (context, _) {
-                      final profileImage = CompanyStore.instance.companyProfileImage;
-                      final imageProvider = getAppImageProvider(profileImage);
-                      
-                      return ClipOval(
-                        child: imageProvider == null
-                            ? Container(
-                                width: 44,
-                                height: 44,
-                                color: Theme.of(context).colorScheme.surfaceBright,
-                                child: Icon(
-                                  Icons.business,
-                                  color: Theme.of(context).colorScheme.primary,
-                                  size: 24,
-                                ),
-                              )
-                            : Image(
-                                image: imageProvider,
-                                width: 44,
-                                height: 44,
-                                fit: BoxFit.cover,
-                              ),
-                      );
-                    },
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      t.logoHint,
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                  ),
-                  OutlinedButton(
-                    onPressed: () async {
-                      final picker = ImagePicker();
-                      final pickedFile = await picker.pickImage(
-                        source: ImageSource.gallery,
-                        imageQuality: 50,
-                        maxWidth: 500,
-                        maxHeight: 500,
-                      );
-                      if (pickedFile != null) {
-                        try {
-                          final bytes = await pickedFile.readAsBytes();
-                          final base64Image = 'data:image/jpeg;base64,${base64Encode(bytes)}';
-                          
-                          // Save locally for immediate feedback
-                          CompanyStore.instance.setRegistrationData(customProfileImage: base64Image);
-                          
-                          // Sync with backend and update session automatically
-                          await RecruitmentSyncService.instance.updateProfile(photoUrl: base64Image);
-                        } catch (e) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(t.tr(en: 'Failed to upload image', ar: 'فشل رفع الصورة'))),
-                          );
-                        }
-                      }
-                    }, 
-                    child: Text(t.upload),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          AppTextField(label: t.companyName, controller: _companyName),
-          const SizedBox(height: 16),
-          AppTextField(label: t.employee, controller: _employee),
-          const SizedBox(height: 16),
-          Text(t.categoryLabel, style: Theme.of(context).textTheme.labelLarge),
-          const SizedBox(height: 8),
-          _buildDropdown<String>(
-            value: _selectedCategory,
-            items: const ['technical', 'nontechnical'],
-            labelBuilder: (v) => v == 'technical' ? t.technical : t.nonTechnical,
-            onChanged: (v) => setState(() => _selectedCategory = v!),
-          ),
-          const SizedBox(height: 16),
-          _buildChipField(t.locationInfo, _locations, () => _addTagDialog(t.locationInfo, _locations)),
-          const SizedBox(height: 16),
-
-          Text(t.dateFounded, style: Theme.of(context).textTheme.labelLarge),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              Expanded(
-                flex: 1,
-                child: _buildDropdown<int>(
-                  value: _selectedDay,
-                  items: _selectedDay == 0 
-                      ? [0, ...List.generate(31, (i) => i + 1)] 
-                      : List.generate(31, (i) => i + 1),
-                  labelBuilder: (v) => v == 0 ? (t.isAr ? 'اليوم' : 'Day') : t.tr(
-                    en: v.toString(), 
-                    ar: v.toString().replaceAll('0', '٠').replaceAll('1', '١').replaceAll('2', '٢').replaceAll('3', '٣').replaceAll('4', '٤').replaceAll('5', '٥').replaceAll('6', '٦').replaceAll('7', '٧').replaceAll('8', '٨').replaceAll('9', '٩')
-                  ),
-                  onChanged: (v) => setState(() => _selectedDay = v!),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                flex: 1,
-                child: _buildDropdown<int>(
-                  value: _selectedMonth,
-                  items: _selectedMonth == 0 
-                      ? [0, ...List.generate(12, (i) => i + 1)] 
-                      : List.generate(12, (i) => i + 1),
-                  labelBuilder: (v) {
-                    if (v == 0) return t.isAr ? 'الشهر' : 'Month';
-                    return t.isAr ? [
-                      'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
-                      'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
-                    ][v - 1] : months[v - 1];
-                  },
-                  onChanged: (v) => setState(() => _selectedMonth = v!),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                flex: 1,
-                child: _buildDropdown<int>(
-                  value: _selectedYear,
-                  items: _selectedYear == 0 
-                      ? [0, ...List.generate(50, (i) => 2024 - i)] 
-                      : List.generate(50, (i) => 2024 - i),
-                  labelBuilder: (v) => v == 0 ? (t.isAr ? 'السنة' : 'Year') : t.tr(
-                    en: v.toString(), 
-                    ar: v.toString().replaceAll('0', '٠').replaceAll('1', '١').replaceAll('2', '٢').replaceAll('3', '٣').replaceAll('4', '٤').replaceAll('5', '٥').replaceAll('6', '٦').replaceAll('7', '٧').replaceAll('8', '٨').replaceAll('9', '٩')
-                  ),
-                  onChanged: (v) => setState(() => _selectedYear = v!),
-                ),
-              ),
-            ],
-          ),
-          
-          const SizedBox(height: 16),
-          AppTextField(label: t.aboutCompany, controller: _about, maxLines: 4),
-          const SizedBox(height: 16),
-          _buildChipField(t.benefits, _benefits, () => _addTagDialog(t.benefits, _benefits)),
-          const SizedBox(height: 18),
-          AppButton(label: t.saveChange, loading: _loading, onPressed: _save),
-          const SizedBox(height: 10),
-          TextButton(
-            onPressed: () => Navigator.of(
-              context,
-            ).pushNamed(AppRoutes.companyCompanyProfile),
-            child: Text(t.previewProfile),
-          ),
-        ],
-      ),
     );
   }
 
@@ -399,20 +448,14 @@ class _CompanyProfileSettingsOverviewScreenState
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
-        border: Border.all(
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2)),
+        border: Border.all(color: Colors.grey.shade300),
         borderRadius: BorderRadius.circular(12),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<T>(
           value: value,
           isExpanded: true,
-          items: items.map((e) {
-            return DropdownMenuItem<T>(
-              value: e,
-              child: Text(labelBuilder(e)),
-            );
-          }).toList(),
+          items: items.map((e) => DropdownMenuItem(value: e, child: Text(labelBuilder(e)))).toList(),
           onChanged: onChanged,
         ),
       ),

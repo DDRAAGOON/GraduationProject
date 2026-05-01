@@ -3,6 +3,7 @@ import 'dart:async';
 import '../../data/api/company_api_client.dart';
 import '../state/company_store.dart';
 import '../state/recruitment_sync_store.dart';
+import 'session_manager.dart';
 
 class RecruitmentSyncService {
   RecruitmentSyncService._();
@@ -13,7 +14,11 @@ class RecruitmentSyncService {
   Timer? _timer;
   bool get isAuthenticated => _client.hasToken;
 
-  Future<Map<String, dynamic>> login({required String email, required String password, required String expectedRole}) async {
+  Future<Map<String, dynamic>> login({
+    required String email,
+    required String password,
+    required String expectedRole,
+  }) async {
     final auth = await _client.login(
       email: email.trim(),
       password: password,
@@ -59,6 +64,8 @@ class RecruitmentSyncService {
           companyName: name,
           email: user['email']?.toString(),
         );
+        final fullProfile = await SessionManager.getCompanyFullProfile();
+        await CompanyStore.instance.loadFromSession(fullProfile);
       }
     }
 
@@ -93,6 +100,8 @@ class RecruitmentSyncService {
           companyName: name,
           email: user['email']?.toString(),
         );
+        final fullProfile = await SessionManager.getCompanyFullProfile();
+        await CompanyStore.instance.loadFromSession(fullProfile);
       }
     }
 
@@ -136,6 +145,8 @@ class RecruitmentSyncService {
           companyName: name,
           email: user['email']?.toString(),
         );
+        final fullProfile = await SessionManager.getCompanyFullProfile();
+        await CompanyStore.instance.loadFromSession(fullProfile);
       }
     }
 
@@ -148,7 +159,7 @@ class RecruitmentSyncService {
   }) async {
     _assertAuthenticated();
     final user = await _client.updateProfile(name: name, photoUrl: photoUrl);
-    
+
     final String currentName = user['name']?.toString() ?? 'User';
     RecruitmentSyncStore.instance.updateCurrentUser(
       name: currentName,
@@ -185,6 +196,9 @@ class RecruitmentSyncService {
   }
 
   Future<void> startPolling() async {
+    try {
+      await CompanyStore.instance.initFromSession();
+    } catch (_) {}
     await _pullServerState();
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 12), (_) async {
@@ -227,6 +241,7 @@ class RecruitmentSyncService {
     String type = 'Full-time',
     List<String> tags = const <String>['General'],
     int requiredCount = 1,
+    DateTime? deadline,
   }) async {
     _assertAuthenticated();
     final response = await _client.createJob(
@@ -235,13 +250,59 @@ class RecruitmentSyncService {
       location: location,
       salaryRange: salaryRange,
       type: type,
+      description: description,
+      responsibilities: responsibilities,
+      qualifications: qualifications,
+      niceToHaves: niceToHaves,
+      benefits: benefits,
       tags: tags,
       category: category,
       requiredCount: requiredCount,
+      deadline: deadline,
     );
     final String jobId = response['id']?.toString() ?? '';
     await _pullServerState();
     return jobId;
+  }
+
+  Future<void> updateJob({
+    required String jobId,
+    required String title,
+    required String location,
+    required String salaryRange,
+    required String description,
+    required List<String> responsibilities,
+    required List<String> qualifications,
+    required List<String> niceToHaves,
+    required List<String> benefits,
+    required String category,
+    String companyName = 'Jobito Labs',
+    String type = 'Full-time',
+    List<String> tags = const <String>['General'],
+    int requiredCount = 1,
+    DateTime? deadline,
+    String? status,
+  }) async {
+    _assertAuthenticated();
+    await _client.updateJob(
+      jobId: jobId,
+      title: title,
+      companyName: companyName,
+      location: location,
+      salaryRange: salaryRange,
+      type: type,
+      description: description,
+      responsibilities: responsibilities,
+      qualifications: qualifications,
+      niceToHaves: niceToHaves,
+      benefits: benefits,
+      tags: tags,
+      category: category,
+      requiredCount: requiredCount,
+      deadline: deadline,
+      status: status,
+    );
+    await _pullServerState();
   }
 
   Future<void> applyToJob({
@@ -280,5 +341,14 @@ class RecruitmentSyncService {
     } catch (_) {
       RecruitmentSyncStore.instance.companySendMessage(text);
     }
+  }
+
+  Future<void> deleteJob(String jobId) async {
+    _assertAuthenticated();
+    await _client.deleteJob(jobId);
+    // Optimistically remove from both local stores before server refresh
+    RecruitmentSyncStore.instance.removeJob(jobId);
+    CompanyStore.instance.deleteJob(jobId);
+    await _pullServerState();
   }
 }

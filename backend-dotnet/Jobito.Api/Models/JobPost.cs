@@ -20,4 +20,6 @@ public class JobPost
     public int ApplicationCount { get; set; } = 0;
     public int RequiredCount { get; set; } = 1;
     public int AcceptedCount { get; set; } = 0;
+    public DateTime? Deadline { get; set; }
+    public string Status { get; set; } = "Open";
 }

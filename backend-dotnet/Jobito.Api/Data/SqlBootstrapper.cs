@@ -17,7 +17,7 @@ BEGIN
         [Role]      NVARCHAR(32)      NOT NULL DEFAULT 'user',
         [Name]      NVARCHAR(128)     NOT NULL DEFAULT '',
         [GoogleId]  NVARCHAR(256)     NULL,
-        [PhotoUrl]  NVARCHAR(1024)    NULL
+        [PhotoUrl]  NVARCHAR(MAX)     NULL
     );
     CREATE UNIQUE INDEX [IX_Users_Email] ON [Users]([Email]);
 END;
@@ -42,7 +42,8 @@ BEGIN
         [CreatedAt]            DATETIME2       NOT NULL,
         [ApplicationCount]     INT             NOT NULL DEFAULT 0,
         [RequiredCount]        INT             NOT NULL DEFAULT 1,
-        [AcceptedCount]        INT             NOT NULL DEFAULT 0
+        [AcceptedCount]        INT             NOT NULL DEFAULT 0,
+        [Deadline]             DATETIME2       NULL
     );
 END;
 
@@ -88,7 +89,10 @@ IF COL_LENGTH('Users', 'GoogleId') IS NULL
     ALTER TABLE [Users] ADD [GoogleId] NVARCHAR(256) NULL;
 
 IF COL_LENGTH('Users', 'PhotoUrl') IS NULL
-    ALTER TABLE [Users] ADD [PhotoUrl] NVARCHAR(1024) NULL;
+    ALTER TABLE [Users] ADD [PhotoUrl] NVARCHAR(MAX) NULL;
+
+IF COL_LENGTH('Users', 'PhotoUrl') IS NOT NULL
+    ALTER TABLE [Users] ALTER COLUMN [PhotoUrl] NVARCHAR(MAX) NULL;
 
 -- Jobs: add missing columns
 IF COL_LENGTH('Jobs', 'ApplicationCount') IS NULL
@@ -117,6 +121,9 @@ IF COL_LENGTH('Jobs', 'BenefitsCsv') IS NULL
 
 IF COL_LENGTH('Jobs', 'Category') IS NULL
     ALTER TABLE [Jobs] ADD [Category] NVARCHAR(128) NOT NULL DEFAULT '';
+
+IF COL_LENGTH('Jobs', 'Deadline') IS NULL
+    ALTER TABLE [Jobs] ADD [Deadline] DATETIME2 NULL;
 """;
 
         await db.Database.ExecuteSqlRawAsync(alterSql);

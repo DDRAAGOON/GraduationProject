@@ -22,17 +22,17 @@ class _NewChatScreenState extends State<NewChatScreen> {
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           t.tr(en: "New Chat", ar: "محادثة جديدة"),
-          style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold),
         ),
       ),
       body: Padding(
@@ -43,12 +43,12 @@ class _NewChatScreenState extends State<NewChatScreen> {
             Container(
               height: 60,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Theme.of(context).cardColor,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFF49769F), width: 1.5),
+                border: Border.all(color: Theme.of(context).colorScheme.primary, width: 1.5),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF49769F).withOpacity(0.1),
+                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -67,13 +67,14 @@ class _NewChatScreenState extends State<NewChatScreen> {
                           _isSearching = value.length >= 2;
                         });
                       },
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                       decoration: InputDecoration(
                         hintText: t.tr(
                           en: "Search users by name or email...",
                           ar: "ابحث عن مستخدم بالاسم أو الإيميل...",
                         ),
                         border: InputBorder.none,
-                        hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
+                        hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 14),
                       ),
                     ),
                   ),

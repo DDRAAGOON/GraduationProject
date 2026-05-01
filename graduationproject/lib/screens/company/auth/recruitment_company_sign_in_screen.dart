@@ -63,6 +63,9 @@ class _RecruitmentCompanySignInScreenState
         email: _email.text.trim(),
       );
 
+      // Pull all jobs/data from server before navigating to workspace
+      await RecruitmentSyncService.instance.startPolling();
+
       if (!mounted) return;
       Navigator.of(context).pushNamedAndRemoveUntil(
         AppRoutes.companyWorkspace,

@@ -20,9 +20,9 @@ class _PreferencesState extends State<Preferences> {
     final isAr = t.isAr;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF9F5F1),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF9F5F1),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         title: Text(
@@ -63,7 +63,7 @@ class _PreferencesState extends State<Preferences> {
               ),
             ),
             const SizedBox(height: 10),
-            const Divider(color: Colors.black12, height: 1),
+            Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 1),
             const SizedBox(height: 30),
 
 
@@ -89,7 +89,7 @@ class _PreferencesState extends State<Preferences> {
             ),
 
             const SizedBox(height: 60),
-            const Divider(color: Colors.black12, height: 1),
+            Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 1),
             const SizedBox(height: 30),
 
             // Save Button
@@ -104,7 +104,7 @@ class _PreferencesState extends State<Preferences> {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF49769F),
+                    backgroundColor: Theme.of(context).colorScheme.primary,
                     padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                   ),
@@ -127,7 +127,7 @@ class _PreferencesState extends State<Preferences> {
           Text(
             title,
             style: TextStyle(
-              color: isActive ? const Color(0xFF49769F) : Colors.black38, 
+              color: isActive ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5), 
               fontWeight: isActive ? FontWeight.bold : FontWeight.normal, 
               fontSize: 14,
             ),
@@ -137,7 +137,7 @@ class _PreferencesState extends State<Preferences> {
               margin: const EdgeInsets.only(top: 8),
               height: 2,
               width: 60,
-              color: const Color(0xFF49769F),
+              color: Theme.of(context).colorScheme.primary,
             ),
         ],
       ),
@@ -147,20 +147,20 @@ class _PreferencesState extends State<Preferences> {
   Widget _buildAppSettingItem({required IconData icon, required String title, required String subtitle, required VoidCallback onTap}) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black.withValues(alpha: 0.05)),
+        border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.2)),
       ),
       child: ListTile(
         onTap: onTap,
         leading: Container(
           padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(color: const Color(0xFF49769F).withValues(alpha: 0.1), shape: BoxShape.circle),
-          child: Icon(icon, color: const Color(0xFF49769F), size: 20),
+          decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1), shape: BoxShape.circle),
+          child: Icon(icon, color: Theme.of(context).colorScheme.primary, size: 20),
         ),
-        title: Text(title, style: const TextStyle(color: Colors.black87, fontSize: 15, fontWeight: FontWeight.w600)),
-        subtitle: Text(subtitle, style: const TextStyle(color: Colors.black38, fontSize: 12)),
-        trailing: const Icon(Icons.keyboard_arrow_down, color: Colors.black26, size: 20),
+        title: Text(title, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 15, fontWeight: FontWeight.w600)),
+        subtitle: Text(subtitle, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), fontSize: 12)),
+        trailing: Icon(Icons.keyboard_arrow_down, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3), size: 20),
       ),
     );
   }
@@ -168,18 +168,18 @@ class _PreferencesState extends State<Preferences> {
   void _showLanguageDialog(BuildContext context, AppLocalizations t) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFFF9F5F1),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (context) => Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(t.language, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text(t.language, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
             const SizedBox(height: 20),
             ListTile(
               title: const Text("العربية"),
-              trailing: t.isAr ? const Icon(Icons.check, color: Color(0xFF49769F)) : null,
+              trailing: t.isAr ? Icon(Icons.check, color: Theme.of(context).colorScheme.primary) : null,
               onTap: () {
                 if (!t.isAr) LocaleController.instance.toggle();
                 Navigator.pop(context);
@@ -188,7 +188,7 @@ class _PreferencesState extends State<Preferences> {
             ),
             ListTile(
               title: const Text("English"),
-              trailing: !t.isAr ? const Icon(Icons.check, color: Color(0xFF49769F)) : null,
+              trailing: !t.isAr ? Icon(Icons.check, color: Theme.of(context).colorScheme.primary) : null,
               onTap: () {
                 if (t.isAr) LocaleController.instance.toggle();
                 Navigator.pop(context);
@@ -204,8 +204,8 @@ class _PreferencesState extends State<Preferences> {
   void _showThemeDialog(BuildContext context, AppLocalizations t) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFFF9F5F1),
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       builder: (context) => Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
@@ -214,8 +214,8 @@ class _PreferencesState extends State<Preferences> {
             Text(t.appearance, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 20),
             ListTile(
-              title: Text(t.light),
-              trailing: ThemeController.instance.themeMode.value == ThemeMode.light ? const Icon(Icons.check, color: Color(0xFF49769F)) : null,
+              title: Text(t.light, style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+              trailing: ThemeController.instance.themeMode.value == ThemeMode.light ? Icon(Icons.check, color: Theme.of(context).colorScheme.primary) : null,
               onTap: () {
                 ThemeController.instance.setLight();
                 Navigator.pop(context);
@@ -223,8 +223,8 @@ class _PreferencesState extends State<Preferences> {
               },
             ),
             ListTile(
-              title: Text(t.dark),
-              trailing: ThemeController.instance.themeMode.value == ThemeMode.dark ? const Icon(Icons.check, color: Color(0xFF49769F)) : null,
+              title: Text(t.dark, style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+              trailing: ThemeController.instance.themeMode.value == ThemeMode.dark ? Icon(Icons.check, color: Theme.of(context).colorScheme.primary) : null,
               onTap: () {
                 ThemeController.instance.setDark();
                 Navigator.pop(context);

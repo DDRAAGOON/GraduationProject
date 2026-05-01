@@ -2,14 +2,16 @@
 
 import 'package:flutter/material.dart';
 
-import '../../../app/router/app_router.dart';
-import '../../../shared/l10n/app_localizations.dart';
-import '../../../shared/models/applicant.dart';
-import '../../../shared/models/job.dart';
-import '../../../shared/state/company_store.dart';
-import '../../../shared/state/recruitment_sync_store.dart';
-import '../../../shared/widgets/app_scaffold.dart';
-import '../../../shared/models/message_thread.dart';
+import 'package:graduationproject/app/router/app_router.dart';
+import 'package:graduationproject/shared/l10n/app_localizations.dart';
+import 'package:graduationproject/shared/models/applicant.dart';
+import 'package:graduationproject/shared/models/job.dart';
+import 'package:graduationproject/shared/services/recruitment_sync_service.dart';
+import 'package:graduationproject/shared/state/company_store.dart';
+import 'package:graduationproject/shared/state/recruitment_sync_store.dart';
+import 'package:graduationproject/shared/widgets/app_scaffold.dart';
+import 'package:graduationproject/shared/models/message_thread.dart';
+
 import '../widgets/company_applicant_avatar.dart';
 
 class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
@@ -49,7 +51,10 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
         );
 
         final acceptedCount = syncStore.applications
-            .where((a) => a.jobId == job.id && a.status.toLowerCase().contains('hire'))
+            .where(
+              (a) =>
+                  a.jobId == job.id && a.status.toLowerCase().contains('hire'),
+            )
             .length;
 
         return AppScaffold(
@@ -73,7 +78,14 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
                       width: 320,
                       child: SingleChildScrollView(
                         padding: const EdgeInsets.all(24),
-                        child: _buildSidebar(context, t, isAr, application, job, acceptedCount),
+                        child: _buildSidebar(
+                          context,
+                          t,
+                          isAr,
+                          application,
+                          job,
+                          acceptedCount,
+                        ),
                       ),
                     ),
                   ],
@@ -83,7 +95,14 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
               return ListView(
                 padding: const EdgeInsets.all(16),
                 children: [
-                  _buildSidebar(context, t, isAr, application, job, acceptedCount),
+                  _buildSidebar(
+                    context,
+                    t,
+                    isAr,
+                    application,
+                    job,
+                    acceptedCount,
+                  ),
                   const SizedBox(height: 24),
                   _buildMainContent(context, t, isAr),
                 ],
@@ -95,7 +114,11 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMainContent(BuildContext context, AppLocalizations t, bool isAr) {
+  Widget _buildMainContent(
+    BuildContext context,
+    AppLocalizations t,
+    bool isAr,
+  ) {
     // ... (rest of main content stays same)
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -110,7 +133,10 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
           child: Row(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
                 decoration: const BoxDecoration(
                   border: Border(
                     bottom: BorderSide(color: Color(0xFF49769F), width: 2),
@@ -130,13 +156,29 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
         const SizedBox(height: 24),
 
         // Personal Info
-        _buildSectionTitle(isAr ? 'المعلومات الشخصية' : 'Personal Information'),
+        _buildSectionTitle(
+          context,
+          isAr ? 'المعلومات الشخصية' : 'Personal Information',
+        ),
         const SizedBox(height: 16),
         _buildGridInfo([
-          _Detail(label: isAr ? 'الاسم الكامل' : 'Full Name', value: applicant.fullName),
-          _Detail(label: isAr ? 'الجنس' : 'Gender', value: applicant.gender ?? (isAr ? 'لم يحدد' : 'Not specified')),
-          _Detail(label: isAr ? 'تاريخ الميلاد' : 'Birth Date', value: applicant.birthDate ?? (isAr ? 'غير متوفر' : 'Not available')),
-          _Detail(label: isAr ? 'اللغات' : 'Languages', value: applicant.languages.isEmpty ? (isAr ? 'العربية' : 'Arabic') : applicant.languages.join(', ')),
+          if (applicant.fullName.trim().isNotEmpty)
+            _Detail(
+              label: isAr ? 'الاسم الكامل' : 'Full Name',
+              value: applicant.fullName,
+            ),
+          if ((applicant.gender ?? '').trim().isNotEmpty)
+            _Detail(label: isAr ? 'الجنس' : 'Gender', value: applicant.gender!),
+          if ((applicant.birthDate ?? '').trim().isNotEmpty)
+            _Detail(
+              label: isAr ? 'تاريخ الميلاد' : 'Birth Date',
+              value: applicant.birthDate!,
+            ),
+          if (applicant.languages.isNotEmpty)
+            _Detail(
+              label: isAr ? 'اللغات' : 'Languages',
+              value: applicant.languages.join(', '),
+            ),
         ]),
 
         const SizedBox(height: 32),
@@ -144,65 +186,47 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
         const SizedBox(height: 32),
 
         // Professional Info
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            _buildSectionTitle(isAr ? 'المعلومات المهنية' : 'Professional Information'),
-            if (applicant.hasCv)
-              OutlinedButton.icon(
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (ctx) => AlertDialog(
-                      title: Text(isAr ? 'السيرة الذاتية' : 'Curriculum Vitae (CV)'),
-                      content: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(Icons.picture_as_pdf, size: 64, color: Colors.redAccent),
-                          const SizedBox(height: 16),
-                          Text(isAr ? 'جاري عرض ملف السيرة الذاتية للمتقدم...' : 'Opening applicant CV file...'),
-                        ],
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.of(ctx).pop(),
-                          child: Text(isAr ? 'إغلاق' : 'Close'),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-                icon: const Icon(Icons.picture_as_pdf_outlined, color: Colors.red),
-                label: Text(
-                  isAr ? 'عرض السيرة الذاتية' : 'View CV',
-                  style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
-                ),
-                style: OutlinedButton.styleFrom(
-                  side: BorderSide(color: Colors.red.shade200),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                ),
-              ),
-          ],
+        _buildSectionTitle(
+          context,
+          isAr ? 'المعلومات المهنية' : 'Professional Information',
         ),
         const SizedBox(height: 16),
-        _buildDetailRow(isAr ? 'نبذة عني' : 'About Me', applicant.about ?? (isAr ? 'لا يوجد نبذة تعريفية متاحة لهذا المتقدم.' : 'No about available.')),
+        if ((applicant.about ?? '').trim().isNotEmpty)
+          _buildDetailRow(
+            context,
+            isAr ? 'نبذة عني' : 'About Me',
+            applicant.about!,
+          ),
         const SizedBox(height: 24),
         _buildGridInfo([
-          _Detail(label: isAr ? 'الوظيفة الحالية' : 'Current Job', value: applicant.role),
-          _Detail(label: isAr ? 'سنوات الخبرة' : 'Years of Experience', value: '${applicant.experienceYears} ${isAr ? 'سنوات' : 'years'}'),
-          _Detail(label: isAr ? 'أعلى مؤهل علمي' : 'Highest Education', value: applicant.education ?? (isAr ? 'غير متوفر' : 'Not available')),
+          if (applicant.role.trim().isNotEmpty)
+            _Detail(
+              label: isAr ? 'الوظيفة الحالية' : 'Current Job',
+              value: applicant.role,
+            ),
+          if (applicant.experienceYears > 0)
+            _Detail(
+              label: isAr ? 'سنوات الخبرة' : 'Years of Experience',
+              value: '${applicant.experienceYears} ${isAr ? 'سنوات' : 'years'}',
+            ),
+          if ((applicant.education ?? '').trim().isNotEmpty)
+            _Detail(
+              label: isAr ? 'أعلى مؤهل علمي' : 'Highest Education',
+              value: applicant.education!,
+            ),
         ]),
-        const SizedBox(height: 16),
-        _buildSkills(isAr ? 'المهارات' : 'Skills', isAr),
+        if (applicant.skills.isNotEmpty) ...[
+          const SizedBox(height: 16),
+          _buildSkills(context, isAr ? 'المهارات' : 'Skills', isAr),
+        ],
       ],
     );
   }
 
   Widget _buildSidebar(
-    BuildContext context, 
-    AppLocalizations t, 
-    bool isAr, 
+    BuildContext context,
+    AppLocalizations t,
+    bool isAr,
     RecruitmentApplication application,
     Job job,
     int acceptedCount,
@@ -225,21 +249,29 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
                 const SizedBox(height: 16),
                 Text(
                   applicant.fullName,
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 Text(
                   applicant.role,
                   style: const TextStyle(color: Colors.grey),
                 ),
                 const SizedBox(height: 24),
-                
+
                 // Hiring Progress Section
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primary.withOpacity(0.05),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primary.withOpacity(0.05),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Theme.of(context).colorScheme.primary.withOpacity(0.1)),
+                    border: Border.all(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.primary.withOpacity(0.1),
+                    ),
                   ),
                   child: Column(
                     children: [
@@ -248,12 +280,15 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
                         children: [
                           Text(
                             isAr ? 'تقدم التوظيف' : 'Hiring Progress',
-                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                           Text(
                             '$acceptedCount/$requiredCount',
                             style: TextStyle(
-                              fontSize: 12, 
+                              fontSize: 12,
                               fontWeight: FontWeight.bold,
                               color: Theme.of(context).colorScheme.primary,
                             ),
@@ -269,7 +304,10 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
                       const SizedBox(height: 6),
                       Text(
                         t.hiredProgressMsg(acceptedCount, requiredCount),
-                        style: const TextStyle(fontSize: 10, color: Colors.grey),
+                        style: const TextStyle(
+                          fontSize: 10,
+                          color: Colors.grey,
+                        ),
                       ),
                     ],
                   ),
@@ -279,25 +317,39 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(isAr ? 'اليوم' : 'Today', style: const TextStyle(color: Colors.grey, fontSize: 12)),
-                    Text(isAr ? 'الحالة الحالية' : 'Current Status', style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                    Text(
+                      isAr ? 'اليوم' : 'Today',
+                      style: const TextStyle(color: Colors.grey, fontSize: 12),
+                    ),
+                    Text(
+                      isAr ? 'الحالة الحالية' : 'Current Status',
+                      style: const TextStyle(color: Colors.grey, fontSize: 12),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 4),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(isAr ? 'نموت سيف' : 'Namoot Saif', style: const TextStyle(fontWeight: FontWeight.bold)),
+                    Text(
+                      isAr ? 'نموت سيف' : 'Namoot Saif',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.primary.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
                         application.status,
                         style: TextStyle(
-                          fontSize: 11, 
+                          fontSize: 11,
                           color: Theme.of(context).colorScheme.primary,
                           fontWeight: FontWeight.bold,
                         ),
@@ -306,7 +358,7 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 24),
-                
+
                 // Action Buttons
                 Row(
                   children: [
@@ -314,7 +366,8 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
                       child: _ActionButton(
                         label: isAr ? 'قبول' : 'Accept',
                         color: const Color(0xFF4285F4),
-                        onPressed: () => _handleStatusChange(context, 'Hired', isAr),
+                        onPressed: () =>
+                            _handleStatusChange(context, 'Hired', isAr),
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -322,7 +375,8 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
                       child: _ActionButton(
                         label: isAr ? 'رفض' : 'Reject',
                         color: const Color(0xFFEA4335),
-                        onPressed: () => _handleStatusChange(context, 'Declined', isAr),
+                        onPressed: () =>
+                            _handleStatusChange(context, 'Declined', isAr),
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -330,7 +384,8 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
                       child: _ActionButton(
                         label: isAr ? 'انتظار' : 'Wait',
                         color: const Color(0xFFFBBC05),
-                        onPressed: () => _handleStatusChange(context, 'Waitlist', isAr),
+                        onPressed: () =>
+                            _handleStatusChange(context, 'Waitlist', isAr),
                       ),
                     ),
                   ],
@@ -363,18 +418,50 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
                       final thread = MessageThread(
                         id: 'thread_${applicant.id}',
                         title: applicant.fullName,
-                        subtitle: isAr ? 'بدء محادثة جديدة...' : 'Starting a new conversation...',
+                        subtitle: isAr
+                            ? 'بدء محادثة جديدة...'
+                            : 'Starting a new conversation...',
                         lastTimeLabelEn: 'Now',
                         lastTimeLabelAr: 'الآن',
                       );
-                      Navigator.of(context).pushNamed(AppRoutes.companyChatThread, arguments: thread);
+                      Navigator.of(context).pushNamed(
+                        AppRoutes.companyChatThread,
+                        arguments: thread,
+                      );
                     },
                     icon: const Icon(Icons.chat_bubble_outline, size: 18),
                     label: Text(isAr ? 'مراسلة المتقدم' : 'Message Applicant'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF5145CD),
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: () {
+                      Navigator.of(context).pushNamed(
+                        AppRoutes.companyApplicantDetailsResume,
+                        arguments: applicant,
+                      );
+                    },
+                    icon: const Icon(Icons.description_outlined, size: 18),
+                    label: Text(
+                      isAr ? 'عرض الفيش والتشبيه' : 'View Criminal Record',
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                      foregroundColor: Theme.of(context).colorScheme.primary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
                   ),
                 ),
@@ -387,7 +474,11 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
                         color: Colors.teal.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: const Icon(Icons.email_outlined, color: Colors.teal, size: 20),
+                      child: const Icon(
+                        Icons.email_outlined,
+                        color: Colors.teal,
+                        size: 20,
+                      ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -396,11 +487,17 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
                         children: [
                           Text(
                             isAr ? 'البريد الإلكتروني' : 'Email Address',
-                            style: const TextStyle(color: Colors.grey, fontSize: 10),
+                            style: const TextStyle(
+                              color: Colors.grey,
+                              fontSize: 10,
+                            ),
                           ),
                           Text(
                             applicant.email,
-                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ],
@@ -416,18 +513,28 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
     );
   }
 
-  void _handleStatusChange(BuildContext context, String newStatus, bool isAr) {
+  Future<void> _handleStatusChange(
+    BuildContext context,
+    String newStatus,
+    bool isAr,
+  ) async {
     final t = AppLocalizations.of(context);
-    RecruitmentSyncStore.instance.companyUpdateApplicationStatus(
+    await RecruitmentSyncService.instance.updateStatus(
       applicationId: applicant.id,
-      nextStatus: newStatus,
+      status: newStatus,
     );
+
+    if (!context.mounted) return;
 
     if (newStatus == 'Hired') {
       showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
-          icon: const Icon(Icons.check_circle, color: Color(0xFF4285F4), size: 48),
+          icon: const Icon(
+            Icons.check_circle,
+            color: Color(0xFF4285F4),
+            size: 48,
+          ),
           title: Text(t.applicantAcceptedTitle),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -440,18 +547,31 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.blue.withOpacity(0.05),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.primary.withOpacity(0.05),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.blue.withOpacity(0.1)),
+                  border: Border.all(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primary.withOpacity(0.1),
+                  ),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.notification_important, color: Colors.blue, size: 20),
+                    const Icon(
+                      Icons.notification_important,
+                      color: Colors.blue,
+                      size: 20,
+                    ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
                         t.evaluationReminder,
-                        style: const TextStyle(fontSize: 12, color: Colors.blue),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
                       ),
                     ),
                   ],
@@ -470,22 +590,20 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            '${t.hiredStatusUpdate} $newStatus',
-          ),
+          content: Text('${t.hiredStatusUpdate} $newStatus'),
           behavior: SnackBarBehavior.floating,
         ),
       );
     }
   }
 
-  Widget _buildSectionTitle(String title) {
+  Widget _buildSectionTitle(BuildContext context, String title) {
     return Text(
       title,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.bold,
-        color: Colors.black87,
+        color: Theme.of(context).colorScheme.onSurface,
       ),
     );
   }
@@ -494,32 +612,51 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
     return Wrap(
       spacing: 40,
       runSpacing: 20,
-      children: details.map((d) => SizedBox(
-        width: 120,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(d.label, style: const TextStyle(color: Colors.grey, fontSize: 12)),
-            const SizedBox(height: 4),
-            Text(d.value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-          ],
-        ),
-      )).toList(),
+      children: details
+          .map(
+            (d) => SizedBox(
+              width: 120,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    d.label,
+                    style: const TextStyle(color: Colors.grey, fontSize: 12),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    d.value,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          )
+          .toList(),
     );
   }
 
-  Widget _buildDetailRow(String label, String value) {
+  Widget _buildDetailRow(BuildContext context, String label, String value) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label, style: const TextStyle(color: Colors.grey, fontSize: 12)),
         const SizedBox(height: 8),
-        Text(value, style: const TextStyle(color: Colors.black87, fontSize: 14)),
+        Text(
+          value,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.9),
+            fontSize: 14,
+          ),
+        ),
       ],
     );
   }
 
-  Widget _buildSkills(String label, bool isAr) {
+  Widget _buildSkills(BuildContext context, String label, bool isAr) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -529,20 +666,27 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.blue.withOpacity(0.05),
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.05),
               borderRadius: BorderRadius.circular(4),
-              border: Border.all(color: Colors.blue.withOpacity(0.1)),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              ),
             ),
             child: Text(
               isAr ? 'لا توجد مهارات مسجلة' : 'No skills registered',
-              style: const TextStyle(color: Colors.blue, fontSize: 12),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
+                fontSize: 12,
+              ),
             ),
           )
         else
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: applicant.skills.map((s) => Chip(label: Text(s))).toList(),
+            children: applicant.skills
+                .map((s) => Chip(label: Text(s)))
+                .toList(),
           ),
       ],
     );

@@ -112,9 +112,9 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
     final realApplicants = store.applications.where((app) => app.jobId == widget.jobId).toList();
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         leading: Padding(

@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:graduationproject/screens/user/auth/sign_up_screen/sign_up_tradesman.dart';
 import '../../../../app/router/app_router.dart';
-import '../../../../shared/services/recruitment_sync_service.dart';
-import '../../../../shared/services/session_manager.dart';
-import '../../profile/user_data.dart';
-import '../../../../../shared/l10n/app_localizations.dart';
-import '../../../../../shared/state/recruitment_sync_store.dart';
-import 'package:file_picker/file_picker.dart';
+import 'package:graduationproject/shared/services/recruitment_sync_service.dart';
+import 'package:graduationproject/shared/services/session_manager.dart';
+import 'package:graduationproject/screens/user/profile/user_data.dart';
+import 'package:graduationproject/shared/l10n/app_localizations.dart';
+import 'package:graduationproject/shared/state/recruitment_sync_store.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
@@ -31,9 +30,7 @@ class _SignUpSeeker extends State<SignUpSeeker> {
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _aboutMeController = TextEditingController();
   final TextEditingController _skillsController = TextEditingController();
-  final TextEditingController _portfolioController = TextEditingController();
   final TextEditingController _socialController = TextEditingController();
-  final TextEditingController _cvController = TextEditingController();
 
   // DOB Dropdowns
   String? _selectedDay;
@@ -62,18 +59,6 @@ class _SignUpSeeker extends State<SignUpSeeker> {
   final List<String> _platforms = ["LinkedIn", "GitHub", "Twitter", "Instagram", "Facebook", "Other"];
   String _selectedPlatform = "LinkedIn";
 
-  Future<void> _pickCV() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['pdf', 'doc', 'docx'],
-    );
-    if (result != null) {
-      setState(() {
-        _cvController.text = result.files.single.name;
-      });
-    }
-  }
-
   Future<void> _pickProfileImage() async {
     final ImagePicker picker = ImagePicker();
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
@@ -97,9 +82,7 @@ class _SignUpSeeker extends State<SignUpSeeker> {
     _addressController.dispose();
     _aboutMeController.dispose();
     _skillsController.dispose();
-    _portfolioController.dispose();
     _socialController.dispose();
-    _cvController.dispose();
     _eduInstitutionController.dispose();
     _eduDegreeController.dispose();
     _eduDurationController.dispose();
@@ -191,13 +174,11 @@ class _SignUpSeeker extends State<SignUpSeeker> {
           phone: "+20 ${_phoneController.text}",
           location: _addressController.text,
           about: _aboutMeController.text,
-          portfolio: _portfolioController.text,
           skills: _skillsList,
           education: _educationList,
           experience: _experiencesList,
           role: "Job Seeker",
           socialLinks: _socialLinksList,
-          cvName: _cvController.text.isEmpty ? null : _cvController.text,
         );
 
         // Also Sync with static UserProfileData for consistency
@@ -208,11 +189,9 @@ class _SignUpSeeker extends State<SignUpSeeker> {
         UserProfileData.dob = "$_selectedYear-$_selectedMonth-$_selectedDay";
         UserProfileData.location = _addressController.text;
         UserProfileData.gender = _selectedGender!;
-        UserProfileData.portfolioUrl = _portfolioController.text;
         UserProfileData.skills = List.from(_skillsList);
         UserProfileData.socialLinks = List.from(_socialLinksList);
         UserProfileData.experiences = List.from(_experiencesList);
-        UserProfileData.cvName = _cvController.text.isEmpty ? null : _cvController.text;
         UserProfileData.profileImage = _profileImagePath;
 
         if (!mounted) return;
@@ -236,9 +215,9 @@ class _SignUpSeeker extends State<SignUpSeeker> {
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: const Color(0xFFF9F5F1),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF9F5F1),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         title: Text(
@@ -298,7 +277,7 @@ class _SignUpSeeker extends State<SignUpSeeker> {
                   onTap: _pickProfileImage,
                   child: CircleAvatar(
                     radius: 50,
-                    backgroundColor: Colors.white,
+                    backgroundColor: Theme.of(context).cardColor,
                     backgroundImage: _profileImagePath != null 
                         ? FileImage(File(_profileImagePath!))
                         : null,
@@ -424,15 +403,6 @@ class _SignUpSeeker extends State<SignUpSeeker> {
                 ),
                 const SizedBox(height: 10),
                 Wrap(spacing: 8, runSpacing: 8, children: _skillsList.map((s) => Chip(label: Text(s, style: const TextStyle(color: Colors.black87, fontSize: 11)), backgroundColor: const Color(0xFF49769F).withOpacity(0.1), onDeleted: () => setState(() => _skillsList.remove(s)), deleteIcon: const Icon(Icons.close, size: 14, color: Colors.black54), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))).toList()),
-
-                const SizedBox(height: 25),
-                _buildTextField(_portfolioController, t.tr(en: "Portfolio Link (URL)", ar: "رابط ملف الأعمال"), Icons.link_outlined),
-
-                const SizedBox(height: 25),
-                GestureDetector(
-                  onTap: _pickCV,
-                  child: _buildTextField(_cvController, t.tr(en: "CV File", ar: "ملف السيرة الذاتية"), Icons.description_outlined, hint: t.tr(en: "Tap to upload CV", ar: "اضغط لرفع السيرة الذاتية"), readOnly: true),
-                ),
 
                 const SizedBox(height: 25),
                 Text(t.socialLinks, style: const TextStyle(color: Colors.black54, fontSize: 14)),

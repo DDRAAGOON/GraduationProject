@@ -45,7 +45,7 @@ class CompanyPublicProfileScreen extends StatelessWidget {
     final about = isAr ? company.aboutAr : company.aboutEn;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF9F5F1),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: CustomScrollView(
         slivers: [
           // Hero App Bar
@@ -410,7 +410,7 @@ class CompanyPublicProfileScreen extends StatelessWidget {
             Wrap(
               spacing: 6,
               runSpacing: 6,
-              children: job.tags.take(3).map((tag) => Container(
+              children: job.tags.where((tag) => tag.trim().toLowerCase() != 'technical').take(3).map((tag) => Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: const Color(0xFFF0F3FF),

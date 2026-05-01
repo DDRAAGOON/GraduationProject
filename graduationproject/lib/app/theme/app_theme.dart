@@ -2,56 +2,45 @@
 
 import 'package:flutter/material.dart';
 
+import 'app_colors.dart';
+
 final class AppTheme {
-  static const _darkBg = Color(0xFF0B1020);
-  static const _darkSurface = Color(0xFF161D33);
-  static const _darkPrimary = Color(0xFF4A6ED1);
-  static const _darkAccent = Color(0xFFFF7A2A);
-  static const _darkText = Color(0xFFEAF0FF);
-  static const _darkMuted = Color(0xFFB59A90);
-
-  static const _lightBg = Color(0xFFF9F5F1);
-  static const _lightSurface = Color(0xFFFFFFFF);
-  static const _lightPrimary = Color(0xFF4A6ED1);
-  static const _lightAccent = Color(0xFFFF7A2A);
-  static const _lightText = Color(0xFF0B1020);
-  static const _lightMuted = Color(0xFFB59A90);
-
   static ThemeData light() {
     final base = ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
       colorScheme: ColorScheme.fromSeed(
-        seedColor: _lightPrimary,
+        seedColor: AppColors.lightPrimary,
         brightness: Brightness.light,
-        surface: _lightSurface,
-      ).copyWith(primary: _lightPrimary, secondary: _lightAccent),
+        surface: AppColors.lightSurface,
+      ).copyWith(primary: AppColors.lightPrimary, secondary: AppColors.lightAccent),
     );
 
     return base.copyWith(
-      scaffoldBackgroundColor: _lightBg,
+      scaffoldBackgroundColor: AppColors.lightBg,
+      cardColor: AppColors.lightSurface,
       appBarTheme: AppBarTheme(
-        backgroundColor: _lightBg.withValues(alpha: 0.98),
+        backgroundColor: AppColors.lightBg.withValues(alpha: 0.98),
         elevation: 0,
-        foregroundColor: _lightText,
+        foregroundColor: AppColors.lightText,
         centerTitle: false,
       ),
       textTheme: base.textTheme.apply(
-        bodyColor: _lightText,
-        displayColor: _lightText,
+        bodyColor: AppColors.lightText,
+        displayColor: AppColors.lightText,
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: Colors.black.withValues(alpha: 0.05),
-        hintStyle: const TextStyle(color: _lightMuted),
-        labelStyle: const TextStyle(color: _lightMuted),
+        hintStyle: const TextStyle(color: AppColors.lightMuted),
+        labelStyle: const TextStyle(color: AppColors.lightMuted),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
           borderSide: BorderSide(color: Colors.black.withValues(alpha: 0.1)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: _lightPrimary, width: 1.3),
+          borderSide: const BorderSide(color: AppColors.lightPrimary, width: 1.3),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
@@ -64,7 +53,7 @@ final class AppTheme {
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          backgroundColor: _lightPrimary,
+          backgroundColor: AppColors.lightPrimary,
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
@@ -75,23 +64,23 @@ final class AppTheme {
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           side: const BorderSide(color: Color(0xFFD7DDED)),
-          foregroundColor: _lightText,
+          foregroundColor: AppColors.lightText,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         ),
       ),
       cardTheme: CardThemeData(
-        color: _lightSurface,
+        color: AppColors.lightSurface,
         elevation: 0.2,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
       navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: _lightBg.withValues(alpha: 0.96),
+        backgroundColor: AppColors.lightBg.withValues(alpha: 0.96),
         labelTextStyle: WidgetStateProperty.resolveWith(
           (states) => TextStyle(
             color: states.contains(WidgetState.selected)
-                ? _lightPrimary
-                : _lightMuted,
+                ? AppColors.lightPrimary
+                : AppColors.lightMuted,
           ),
         ),
       ),
@@ -103,36 +92,37 @@ final class AppTheme {
       useMaterial3: true,
       brightness: Brightness.dark,
       colorScheme: ColorScheme.fromSeed(
-        seedColor: _darkPrimary,
+        seedColor: AppColors.darkPrimary,
         brightness: Brightness.dark,
-        surface: _darkSurface,
-      ).copyWith(primary: _darkPrimary, secondary: _darkAccent),
+        surface: AppColors.darkSurface,
+      ).copyWith(primary: AppColors.darkPrimary, secondary: AppColors.darkAccent),
     );
 
     return base.copyWith(
-      scaffoldBackgroundColor: _darkBg,
+      scaffoldBackgroundColor: AppColors.darkBg,
+      cardColor: AppColors.darkSurface,
       appBarTheme: const AppBarTheme(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        foregroundColor: _darkText,
+        foregroundColor: AppColors.darkText,
         centerTitle: false,
       ),
       textTheme: base.textTheme.apply(
-        bodyColor: _darkText,
-        displayColor: _darkText,
+        bodyColor: AppColors.darkText,
+        displayColor: AppColors.darkText,
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: _darkSurface,
-        hintStyle: const TextStyle(color: _darkMuted),
-        labelStyle: const TextStyle(color: _darkMuted),
+        fillColor: AppColors.darkSurface,
+        hintStyle: const TextStyle(color: AppColors.darkMuted),
+        labelStyle: const TextStyle(color: AppColors.darkMuted),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide.none,
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: _darkPrimary, width: 1.3),
+          borderSide: const BorderSide(color: AppColors.darkPrimary, width: 1.3),
         ),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 14,
@@ -141,7 +131,7 @@ final class AppTheme {
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          backgroundColor: _darkPrimary,
+          backgroundColor: AppColors.darkPrimary,
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
@@ -150,17 +140,17 @@ final class AppTheme {
         ),
       ),
       cardTheme: CardThemeData(
-        color: _darkSurface,
+        color: AppColors.darkSurface,
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
       navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: _darkSurface,
+        backgroundColor: AppColors.darkSurface,
         labelTextStyle: WidgetStateProperty.resolveWith(
           (states) => TextStyle(
             color: states.contains(WidgetState.selected)
-                ? _darkPrimary
-                : _darkMuted,
+                ? AppColors.darkPrimary
+                : AppColors.darkMuted,
           ),
         ),
       ),

@@ -120,6 +120,11 @@ public class ApplicationsController(AppDbContext db) : ControllerBase
                     return BadRequest(new { message = $"Cannot accept more candidates. Required count ({job.RequiredCount}) has been reached." });
                 }
             }
+            else if (previousStatus == "Accepted" && entity.Status != "Accepted")
+            {
+                // Decrement if moving away from Accepted
+                job.AcceptedCount = Math.Max(0, job.AcceptedCount - 1);
+            }
         }
 
         db.Messages.Add(new ChatMessage

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../../../shared/utils/image_helper.dart';
+import 'package:graduationproject/shared/utils/image_helper.dart';
 import 'package:graduationproject/shared/l10n/app_localizations.dart';
-import '../../../../../shared/state/recruitment_sync_store.dart';
+import 'package:graduationproject/shared/state/recruitment_sync_store.dart';
+import 'package:graduationproject/screens/user/teardsman/setting/settings.dart';
 import '../post/post_job.dart';
-import '../setting/settings.dart';
 import 'tradesman_apply_job_screen.dart';
 import 'tradesman_job_details_screen.dart';
 
@@ -28,7 +28,7 @@ class _FindJobsState extends State<FindJobs> {
   void _showLocationPicker(AppLocalizations t) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -39,7 +39,7 @@ class _FindJobsState extends State<FindJobs> {
             Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey.withOpacity(0.2), borderRadius: BorderRadius.circular(2))),
             Padding(
               padding: const EdgeInsets.all(20.0),
-              child: Text(t.tr(en: "Select Governorate", ar: "اختر المحافظة"), style: const TextStyle(color: Colors.black87, fontSize: 18, fontWeight: FontWeight.bold)),
+              child: Text(t.tr(en: "Select Governorate", ar: "اختر المحافظة"), style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 18, fontWeight: FontWeight.bold)),
             ),
             Expanded(
               child: ListView.builder(
@@ -47,7 +47,7 @@ class _FindJobsState extends State<FindJobs> {
                 itemBuilder: (context, index) {
                   final loc = index == 0 ? (t.isAr ? "الكل" : "All") : _egyptGovernorates[index - 1];
                   return ListTile(
-                    title: Text(loc, style: const TextStyle(color: Colors.black87)),
+                    title: Text(loc, style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
                     onTap: () {
                       setState(() {
                         _selectedLocation = loc;
@@ -74,7 +74,7 @@ class _FindJobsState extends State<FindJobs> {
       animation: store,
       builder: (context, _) {
         return Scaffold(
-          backgroundColor: const Color(0xFFF9F5F1),
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           appBar: AppBar(
             leading: Padding(
               padding: const EdgeInsets.only(left: 16, top: 8, bottom: 8),
@@ -85,7 +85,7 @@ class _FindJobsState extends State<FindJobs> {
                 ),
                 child: CircleAvatar(
                   radius: 18,
-                  backgroundColor: Colors.white,
+                  backgroundColor: Theme.of(context).cardColor,
                   backgroundImage: getAppImageProvider(store.profileImage),
                   child: store.profileImage == null 
                       ? const Icon(Icons.person, size: 20) 
@@ -93,7 +93,7 @@ class _FindJobsState extends State<FindJobs> {
                 ),
               ),
             ),
-            backgroundColor: const Color(0xFFF9F5F1),
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
             elevation: 0,
             surfaceTintColor: Colors.transparent,
             title: Text(
@@ -115,7 +115,7 @@ class _FindJobsState extends State<FindJobs> {
       body: SafeArea(
         child: Builder(
           builder: (context) {
-            final jobs = store.filteredJobs.where((j) => j.category == 'Tradesman').toList();
+            final jobs = store.filteredJobs.where((j) => j.category.toLowerCase() == 'tradesman' || j.category.toLowerCase() == 'service').toList();
             return SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 10),
               child: Column(
@@ -125,11 +125,11 @@ class _FindJobsState extends State<FindJobs> {
                   Container(
                     padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Theme.of(context).cardColor,
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
+                          color: Colors.black.withOpacity(0.15),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
@@ -142,24 +142,24 @@ class _FindJobsState extends State<FindJobs> {
                           child: TextField(
                             controller: _searchController,
                             onChanged: (val) => store.updateFilters(searchQuery: val),
-                            style: const TextStyle(color: Colors.black87, fontSize: 13),
+                            style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 13),
                             decoration: InputDecoration(
                               hintText: t.tr(en: "Search jobs", ar: "البحث عن وظائف"),
-                              hintStyle: const TextStyle(color: Colors.black38),
+                              hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)),
                               border: InputBorder.none,
                               contentPadding: const EdgeInsets.symmetric(horizontal: 10),
                             ),
                           ),
                         ),
-                        Container(height: 24, width: 1, color: Colors.grey.withOpacity(0.3)),
+                        Container(height: 24, width: 1, color: Theme.of(context).dividerColor.withValues(alpha: 0.12)),
                         const SizedBox(width: 12),
                         GestureDetector(
                           onTap: () => _showLocationPicker(t),
                           child: Row(
                             children: [
-                              const Icon(Icons.location_on_outlined, color: Colors.grey, size: 18),
+                              Icon(Icons.location_on_outlined, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), size: 18),
                               const SizedBox(width: 4),
-                              Text(_selectedLocation, style: const TextStyle(color: Colors.black87, fontSize: 13, fontWeight: FontWeight.w500)),
+                              Text(_selectedLocation, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 13, fontWeight: FontWeight.w500)),
                               const Icon(Icons.keyboard_arrow_down, color: Colors.grey, size: 18),
                             ],
                           ),
@@ -170,9 +170,9 @@ class _FindJobsState extends State<FindJobs> {
                   const SizedBox(height: 35),
                   RichText(
                     text: TextSpan(
-                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
                       children: [
-                        TextSpan(text: t.tr(en: "All ", ar: "جميع "), style: const TextStyle(color: Colors.black87)),
+                        TextSpan(text: t.tr(en: "All ", ar: "جميع ")),
                         TextSpan(text: t.job, style: TextStyle(color: Theme.of(context).colorScheme.primary)),
                       ],
                     ),
@@ -231,11 +231,11 @@ class _FindJobsState extends State<FindJobs> {
         width: 40,
         height: 40,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).cardColor,
           shape: BoxShape.circle,
-          border: Border.all(color: Colors.grey.withOpacity(0.2)),
+          border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.12)),
         ),
-        child: Icon(icon, color: Colors.black87, size: 20),
+        child: Icon(icon, color: Theme.of(context).colorScheme.onSurface, size: 20),
       ),
     );
   }
@@ -245,11 +245,11 @@ class _FindJobsState extends State<FindJobs> {
     final bool isSaved = store.savedJobIds.contains(job.id);
 
     return Card(
-      color: Colors.white,
+      color: Theme.of(context).cardColor,
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: Colors.grey.withOpacity(0.1)),
+        side: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
       ),
       margin: const EdgeInsets.only(bottom: 12),
       child: Padding(
@@ -263,10 +263,10 @@ class _FindJobsState extends State<FindJobs> {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: Colors.grey.withOpacity(0.1),
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(job.logoIcon ?? Icons.work_outline, color: Colors.black54, size: 20),
+                  child: Icon(job.logoIcon ?? Icons.work_outline, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), size: 20),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -284,7 +284,7 @@ class _FindJobsState extends State<FindJobs> {
               children: [
                 const Icon(Icons.business, size: 16, color: Colors.grey),
                 const SizedBox(width: 4),
-                Text(job.companyName, style: const TextStyle(color: Colors.black54, fontWeight: FontWeight.w600)),
+                Text(job.companyName, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), fontWeight: FontWeight.w600)),
               ],
             ),
             const SizedBox(height: 8),
@@ -324,16 +324,16 @@ class _FindJobsState extends State<FindJobs> {
               spacing: 8,
               runSpacing: 8,
               crossAxisAlignment: WrapCrossAlignment.center,
-              children: job.tags.map((String tag) => Container(
+              children: job.tags.where((tag) => tag.trim().toLowerCase() != 'technical').map((String tag) => Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF9F5F1),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.black.withOpacity(0.05)),
+                  border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
                 ),
                 child: Text(
                   tag,
-                  style: const TextStyle(color: Colors.black54, fontSize: 12),
+                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), fontSize: 12),
                 ),
               )).toList(),
             ),
@@ -347,10 +347,10 @@ class _FindJobsState extends State<FindJobs> {
                   children: [
                     Text(
                       t.tr(en: '${job.acceptedCount} of ${job.capacity} hired', ar: 'تم قبول ${job.acceptedCount} من أصل ${job.capacity}'),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black54,
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                       ),
                     ),
                     Text(
@@ -383,7 +383,7 @@ class _FindJobsState extends State<FindJobs> {
                     Expanded(
                       child: OutlinedButton(
                         style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: Color(0xFFFF7A2A)),
+                          side: BorderSide(color: Theme.of(context).colorScheme.secondary),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -399,7 +399,7 @@ class _FindJobsState extends State<FindJobs> {
                         },
                         child: Text(
                           t.tr(en: 'View Details', ar: 'عرض التفاصيل'),
-                          style: const TextStyle(color: Color(0xFFFF7A2A), fontWeight: FontWeight.bold, fontSize: 13),
+                          style: TextStyle(color: Theme.of(context).colorScheme.secondary, fontWeight: FontWeight.bold, fontSize: 13),
                         ),
                       ),
                     ),

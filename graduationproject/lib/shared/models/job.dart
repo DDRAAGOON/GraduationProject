@@ -33,6 +33,7 @@ final class Job {
     this.requiredCount = 1,
     this.acceptedCount = 0,
     this.status = 'Open',
+    this.deadline,
     DateTime? createdAt,
   }) : createdAt = createdAt ?? DateTime.now();
 
@@ -54,6 +55,7 @@ final class Job {
   final int requiredCount;
   final int acceptedCount;
   final String status;
+  final DateTime? deadline;
   final DateTime createdAt;
 
   /// Creates a copy of the current [Job] while allowing specific fields to be updated.
@@ -76,6 +78,7 @@ final class Job {
     int? requiredCount,
     int? acceptedCount,
     String? status,
+    DateTime? deadline,
     DateTime? createdAt,
   }) {
     return Job(
@@ -97,6 +100,7 @@ final class Job {
       requiredCount: requiredCount ?? this.requiredCount,
       acceptedCount: acceptedCount ?? this.acceptedCount,
       status: status ?? this.status,
+      deadline: deadline ?? this.deadline,
       createdAt: createdAt ?? this.createdAt,
     );
   }
@@ -150,6 +154,7 @@ final class Job {
       status: map['status']?.toString() ?? 'Open',
       requiredCount: int.tryParse(map['requiredCount']?.toString() ?? '1') ?? 1,
       acceptedCount: int.tryParse(map['acceptedCount']?.toString() ?? '0') ?? 0,
+      deadline: map['deadline'] != null ? DateTime.tryParse(map['deadline'].toString()) : null,
       createdAt: map['createdAt'] != null ? DateTime.parse(map['createdAt'].toString()) : null,
     );
   }

@@ -15,6 +15,15 @@ try
 
     builder.Services.AddScoped<JwtTokenService>();
     builder.Services.AddControllers();
+
+    // Increase request size limits for large base64 images
+    builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(options =>
+    {
+        options.ValueLengthLimit = int.MaxValue;
+        options.MultipartBodyLengthLimit = int.MaxValue;
+        options.MemoryBufferThreshold = int.MaxValue;
+    });
+
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddCors(options =>
     {

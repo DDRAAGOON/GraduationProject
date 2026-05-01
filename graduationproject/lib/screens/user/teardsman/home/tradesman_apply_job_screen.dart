@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:graduationproject/shared/l10n/app_localizations.dart';
-import '../../../../../shared/state/recruitment_sync_store.dart';
-import '../../../../../shared/widgets/app_button.dart';
-import '../../../../shared/services/recruitment_sync_service.dart';
+import 'package:graduationproject/shared/state/recruitment_sync_store.dart';
+import 'package:graduationproject/shared/widgets/app_button.dart';
+import 'package:graduationproject/shared/services/recruitment_sync_service.dart';
 
 class TradesmanApplyJobScreen extends StatefulWidget {
   const TradesmanApplyJobScreen({super.key, required this.job});
@@ -34,9 +34,9 @@ class _TradesmanApplyJobScreenState extends State<TradesmanApplyJobScreen> {
     final store = RecruitmentSyncStore.instance;
     
     return Scaffold(
-      backgroundColor: const Color(0xFFF9F5F1),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF9F5F1),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         title: Image.asset(

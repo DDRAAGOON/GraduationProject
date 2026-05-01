@@ -51,7 +51,7 @@ class _RecruitmentUserShellScreenState extends State<RecruitmentUserShellScreen>
       animation: store,
       builder: (context, _) {
         return Scaffold(
-          backgroundColor: const Color(0xFFF9F5F1),
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           appBar: AppBar(
             leading: Padding(
               padding: const EdgeInsets.only(left: 16, top: 8, bottom: 8),
@@ -61,7 +61,7 @@ class _RecruitmentUserShellScreenState extends State<RecruitmentUserShellScreen>
                 ),
                 child: CircleAvatar(
                   radius: 18,
-                  backgroundColor: Colors.white,
+                  backgroundColor: Theme.of(context).cardColor,
                   backgroundImage: getAppImageProvider(store.profileImage),
                   child: store.profileImage == null
                       ? const Icon(Icons.person, size: 20)
@@ -78,7 +78,7 @@ class _RecruitmentUserShellScreenState extends State<RecruitmentUserShellScreen>
                 : (_isAr ? 'البروفايل' : 'Profile'),
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            backgroundColor: const Color(0xFFF9F5F1),
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
             surfaceTintColor: Colors.transparent,
             centerTitle: false,
         actions: [
@@ -93,7 +93,7 @@ class _RecruitmentUserShellScreenState extends State<RecruitmentUserShellScreen>
       ),
       body: pages[_tab],
       bottomNavigationBar: NavigationBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).cardColor,
         selectedIndex: _tab,
         onDestinationSelected: (int value) => setState(() => _tab = value),
         destinations: <NavigationDestination>[
@@ -127,6 +127,18 @@ class _RecruitmentUserShellScreenState extends State<RecruitmentUserShellScreen>
 
 class _DiscoverTab extends StatelessWidget {
   const _DiscoverTab();
+
+  Widget _buildCompanyLogo(String? logoUrl) {
+    final provider = getAppImageProvider(logoUrl);
+    if (provider == null) {
+      return const CircleAvatar(
+        radius: 12,
+        backgroundColor: Color(0xFFF0F3FF),
+        child: Icon(Icons.business, size: 14, color: Color(0xFF49769F)),
+      );
+    }
+    return CircleAvatar(radius: 16, backgroundImage: provider);
+  }
 
   Color _getJobTypeColor(String type) {
     switch (type.toLowerCase()) {
@@ -168,10 +180,12 @@ class _DiscoverTab extends StatelessWidget {
       animation: store,
       builder: (BuildContext context, _) {
         final jobs = store.filteredJobs;
-        return ListView.builder(
-          padding: const EdgeInsets.all(16),
-          itemCount: jobs.length + 1,
-          itemBuilder: (BuildContext context, int index) {
+        return RefreshIndicator(
+          onRefresh: () => RecruitmentSyncService.instance.startPolling(),
+          child: ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: jobs.length + 1,
+            itemBuilder: (BuildContext context, int index) {
             if (index == 0) {
               return Padding(
                 padding: const EdgeInsets.only(bottom: 16),
@@ -180,11 +194,11 @@ class _DiscoverTab extends StatelessWidget {
                     Expanded(
                       child: Container(
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: Theme.of(context).cardColor,
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
+                              color: Colors.black.withValues(alpha: 0.05),
                               blurRadius: 10,
                               offset: const Offset(0, 4),
                             ),
@@ -212,7 +226,7 @@ class _DiscoverTab extends StatelessWidget {
                             Container(
                               height: 24,
                               width: 1,
-                              color: Colors.grey.withOpacity(0.3),
+                              color: Colors.grey.withValues(alpha: 0.3),
                             ),
                             const Padding(
                               padding: EdgeInsets.symmetric(horizontal: 8),
@@ -226,7 +240,7 @@ class _DiscoverTab extends StatelessWidget {
                                   isExpanded: true,
                                   icon: const Icon(Icons.keyboard_arrow_down, size: 18),
                                   style: TextStyle(
-                                    color: Colors.black.withOpacity(0.8),
+                                    color: Theme.of(context).colorScheme.onSurface,
                                     fontSize: 13,
                                     fontWeight: FontWeight.w500,
                                   ),
@@ -252,11 +266,11 @@ class _DiscoverTab extends StatelessWidget {
                     const SizedBox(width: 10),
                     Container(
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: Theme.of(context).cardColor,
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
+                            color: Colors.black.withValues(alpha: 0.05),
                             blurRadius: 10,
                             offset: const Offset(0, 4),
                           ),
@@ -265,7 +279,7 @@ class _DiscoverTab extends StatelessWidget {
                       child: IconButton(
                         onPressed: () => Navigator.of(context)
                             .pushNamed(AppRoutes.userAdvancedFilters),
-                        icon: const Icon(Icons.tune, color: Colors.black54),
+                        icon: Icon(Icons.tune, color: Theme.of(context).iconTheme.color),
                       ),
                     ),
                   ],
@@ -274,13 +288,12 @@ class _DiscoverTab extends StatelessWidget {
             }
             
             final RecruitmentJob job = jobs[index - 1];
-            final typeColor = _getJobTypeColor(job.type);
             return Card(
-              color: Colors.white,
+              color: Theme.of(context).cardColor,
               elevation: 0,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
-                side: BorderSide(color: Colors.grey.withOpacity(0.1)),
+                side: BorderSide(color: Colors.grey.withValues(alpha: 0.1)),
               ),
               margin: const EdgeInsets.only(bottom: 12),
               child: Padding(
@@ -290,12 +303,15 @@ class _DiscoverTab extends StatelessWidget {
                   children: <Widget>[
                     Row(
                       children: [
-                        const Icon(Icons.business, size: 16, color: Colors.grey),
+                        _buildCompanyLogo(job.companyLogoUrl),
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
                             job.companyName,
-                            style: const TextStyle(color: Colors.black54, fontWeight: FontWeight.w600),
+                            style: TextStyle(
+                              color: Theme.of(context).textTheme.bodySmall?.color,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
                       ],
@@ -322,7 +338,7 @@ class _DiscoverTab extends StatelessWidget {
                             borderRadius: BorderRadius.circular(8),
                             boxShadow: [
                               BoxShadow(
-                                color: color.withOpacity(0.3),
+                                color: color.withValues(alpha: 0.3),
                                 blurRadius: 4,
                                 offset: const Offset(0, 2),
                               ),
@@ -362,9 +378,10 @@ class _DiscoverTab extends StatelessWidget {
                       spacing: 8,
                       runSpacing: 8,
                       children: job.tags
+                          .where((tag) => tag.trim().toLowerCase() != 'technical')
                           .map((String tag) => Chip(
                                 label: Text(tag),
-                                backgroundColor: const Color(0xFFF9F5F1),
+                                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                                 side: BorderSide.none,
                                 padding: const EdgeInsets.symmetric(horizontal: 4),
                               ))
@@ -372,6 +389,15 @@ class _DiscoverTab extends StatelessWidget {
                     ),
                     if (job.capacity > 0) ...[
                       const SizedBox(height: 12),
+                      Text(
+                        isAr ? 'مطلوب ${job.capacity} أشخاص' : 'Hiring ${job.capacity} people',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF49769F),
+                        ),
+                      ),
+                      const SizedBox(height: 6),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -400,8 +426,8 @@ class _DiscoverTab extends StatelessWidget {
                         borderRadius: BorderRadius.circular(10),
                         child: LinearProgressIndicator(
                           value: (job.acceptedCount / job.capacity).clamp(0.0, 1.0),
-                          backgroundColor: Colors.grey.withOpacity(0.1),
-                          color: job.acceptedCount >= job.capacity ? Colors.green : const Color(0xFF00D2B4),
+                          backgroundColor: Colors.grey.withValues(alpha: 0.1),
+                          color: job.acceptedCount >= job.capacity ? Colors.green : Theme.of(context).colorScheme.primary,
                           minHeight: 6,
                         ),
                       ),
@@ -412,7 +438,7 @@ class _DiscoverTab extends StatelessWidget {
                         Expanded(
                           child: OutlinedButton(
                             style: OutlinedButton.styleFrom(
-                              side: const BorderSide(color: Color(0xFFFF7A2A)),
+                              side: BorderSide(color: Theme.of(context).colorScheme.secondary),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
@@ -424,7 +450,7 @@ class _DiscoverTab extends StatelessWidget {
                             ),
                             child: Text(
                               isAr ? 'عرض التفاصيل' : 'View Details',
-                              style: const TextStyle(color: Color(0xFFFF7A2A), fontWeight: FontWeight.bold),
+                              style: TextStyle(color: Theme.of(context).colorScheme.secondary, fontWeight: FontWeight.bold),
                             ),
                           ),
                         ),
@@ -443,10 +469,11 @@ class _DiscoverTab extends StatelessWidget {
               ),
             );
           },
-        );
-      },
-    );
-  }
+        ),
+      );
+    },
+  );
+}
 }
 
 class _ApplicationsTab extends StatelessWidget {
@@ -472,12 +499,12 @@ class _ApplicationsTab extends StatelessWidget {
             // Greeting
             Text(
               isAr ? '${store.currentUserName} صباح الخير' : 'Good Morning, ${store.currentUserName}',
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF011931)),
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.titleLarge?.color),
             ),
             const SizedBox(height: 4),
             Text(
               isAr ? 'هذا ما قمت به بطلباتك حتى الآن' : 'Here is what\'s happening with your applications',
-              style: const TextStyle(color: Colors.black54, fontSize: 14),
+              style: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color, fontSize: 14),
             ),
             const SizedBox(height: 24),
 
@@ -491,12 +518,14 @@ class _ApplicationsTab extends StatelessWidget {
                   child: Column(
                     children: [
                       _buildStatCard(
+                        context,
                         isAr ? 'إجمالي ما تم التقديم عليه' : 'Total Applied',
                         totalApps.toString(),
                         Icons.description_outlined,
                       ),
                       const SizedBox(height: 12),
                       _buildStatCard(
+                        context,
                         isAr ? 'تم اختيارك في' : 'You were hired in',
                         hiredApps.toString(),
                         Icons.check_circle_outline,
@@ -512,9 +541,9 @@ class _ApplicationsTab extends StatelessWidget {
                     height: 180,
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Theme.of(context).cardColor,
                       borderRadius: BorderRadius.circular(20),
-                      boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 4))],
+                      boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 10, offset: const Offset(0, 4))],
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -531,7 +560,7 @@ class _ApplicationsTab extends StatelessWidget {
                                   child: CircularProgressIndicator(
                                     value: totalApps == 0 ? 0 : hiredApps / totalApps,
                                     strokeWidth: 10,
-                                    backgroundColor: const Color(0xFFEEEEEE),
+                                    backgroundColor: Theme.of(context).dividerColor.withValues(alpha: 0.1),
                                     valueColor: const AlwaysStoppedAnimation<Color>(Colors.green),
                                   ),
                                 ),
@@ -556,7 +585,7 @@ class _ApplicationsTab extends StatelessWidget {
             // Recent Log Title
             Text(
               isAr ? 'السجل الأخير' : 'Recent Log',
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF011931)),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.titleMedium?.color),
             ),
             const SizedBox(height: 16),
 
@@ -576,13 +605,13 @@ class _ApplicationsTab extends StatelessWidget {
     );
   }
 
-  Widget _buildStatCard(String title, String value, IconData icon) {
+  Widget _buildStatCard(BuildContext context, String title, String value, IconData icon) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 4))],
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10, offset: const Offset(0, 4))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -590,12 +619,12 @@ class _ApplicationsTab extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(value, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF011931))),
-              Icon(icon, color: Colors.grey.shade400, size: 20),
+              Text(value, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.titleLarge?.color)),
+              Icon(icon, color: Theme.of(context).textTheme.bodySmall?.color, size: 20),
             ],
           ),
           const SizedBox(height: 8),
-          Text(title, style: const TextStyle(fontSize: 12, color: Colors.black54)),
+          Text(title, style: TextStyle(fontSize: 12, color: Theme.of(context).textTheme.bodySmall?.color)),
         ],
       ),
     );
@@ -606,9 +635,9 @@ class _ApplicationsTab extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.withOpacity(0.1)),
+        border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
       ),
       child: Row(
         children: [
@@ -616,7 +645,7 @@ class _ApplicationsTab extends StatelessWidget {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: const Color(0xFFF9F5F1),
+              color: Theme.of(context).scaffoldBackgroundColor,
               borderRadius: BorderRadius.circular(10),
             ),
             child: const Icon(Icons.business, color: Color(0xFF49769F)),
@@ -642,7 +671,7 @@ class _ApplicationsTab extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.1),
+                  color: Colors.green.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
@@ -704,34 +733,31 @@ class _CompaniesTabState extends State<_CompaniesTab> {
   @override
   Widget build(BuildContext context) {
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
+    final store = RecruitmentSyncStore.instance;
 
-    // Mock data for companies
-    final allCompanies = [
-      {
-        'name': 'dragon',
-        'industry': isAr ? 'خدمات عامة' : 'General Services',
-        'description': isAr ? 'شركة رائدة في مجالها' : 'A leading company in its field',
-        'logo': Icons.business,
-        'vacancies': 1,
-        'type': 'Technical'
-      },
-      {
-        'name': 'TechCorp',
-        'industry': isAr ? 'تكنولوجيا' : 'Technology',
-        'description': isAr ? 'حلول برمجية متطورة' : 'Advanced software solutions',
-        'logo': Icons.computer,
-        'vacancies': 3,
-        'type': 'Technical'
-      },
-      {
-        'name': 'DesignStudio',
-        'industry': isAr ? 'تصميم' : 'Design',
-        'description': isAr ? 'إبداع بلا حدود' : 'Creativity without limits',
-        'logo': Icons.brush,
-        'vacancies': 2,
-        'type': 'Non-Technical'
-      },
-    ];
+    final Map<String, Map<String, dynamic>> companiesMap = {};
+    for (final job in store.jobs) {
+      final key = job.companyName.trim();
+      if (key.isEmpty) continue;
+      final openVacancies = (job.capacity - job.acceptedCount).clamp(0, 9999);
+      if (!companiesMap.containsKey(key)) {
+        companiesMap[key] = {
+          'name': job.companyName,
+          'industry': job.category.isEmpty ? (isAr ? 'عام' : 'General') : job.category,
+          'description': isAr ? 'شركة توظف حالياً عبر Jobito' : 'Hiring now on Jobito',
+          'logoUrl': job.companyLogoUrl,
+          'vacancies': openVacancies,
+          'type': job.category.toLowerCase().contains('technical') ? 'Technical' : 'Non-Technical',
+        };
+      } else {
+        companiesMap[key]!['vacancies'] = (companiesMap[key]!['vacancies'] as int) + openVacancies;
+        if ((companiesMap[key]!['logoUrl'] == null || (companiesMap[key]!['logoUrl'] as String).isEmpty) &&
+            (job.companyLogoUrl != null && job.companyLogoUrl!.isNotEmpty)) {
+          companiesMap[key]!['logoUrl'] = job.companyLogoUrl;
+        }
+      }
+    }
+    final allCompanies = companiesMap.values.toList();
 
     final filteredCompanies = allCompanies.where((comp) {
       final matchesSearch = comp['name'].toString().toLowerCase().contains(_searchQuery) ||
@@ -757,10 +783,10 @@ class _CompaniesTabState extends State<_CompaniesTab> {
             children: [
               Text(
                 isAr ? 'ابحث عن الشركات التي تحلم بها' : 'Search for companies you dream of',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.w900,
-                  color: Color(0xFF011931),
+                  color: Theme.of(context).textTheme.titleLarge?.color,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -769,7 +795,7 @@ class _CompaniesTabState extends State<_CompaniesTab> {
                 isAr
                     ? 'اكتشف أفضل الشركات وبيئات العمل المثالية لمستقبلك المهني'
                     : 'Discover the best companies and ideal work environments for your professional future',
-                style: const TextStyle(fontSize: 13, color: Colors.black54),
+                style: TextStyle(fontSize: 13, color: Theme.of(context).textTheme.bodySmall?.color),
                 textAlign: TextAlign.center,
               ),
             ],
@@ -788,7 +814,7 @@ class _CompaniesTabState extends State<_CompaniesTab> {
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
@@ -810,7 +836,7 @@ class _CompaniesTabState extends State<_CompaniesTab> {
                     ),
                   ),
                 ),
-                Container(width: 1, height: 25, color: Colors.grey.withOpacity(0.2)),
+                Container(width: 1, height: 25, color: Colors.grey.withValues(alpha: 0.2)),
                 const SizedBox(width: 10),
                 const Icon(Icons.location_on_outlined, color: Color(0xFF49769F), size: 20),
                 Expanded(
@@ -852,7 +878,7 @@ class _CompaniesTabState extends State<_CompaniesTab> {
             children: [
               Text(
                 isAr ? 'التصنيف' : 'Classification',
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Theme.of(context).colorScheme.onSurface),
               ),
               const SizedBox(height: 12),
               Row(
@@ -863,8 +889,11 @@ class _CompaniesTabState extends State<_CompaniesTab> {
                 ],
               ),
               const SizedBox(height: 30),
+            ],
+          ),
+        ),
 
-              Text(
+        Text(
                 isAr ? 'جميع الشركات' : 'All Companies',
                 style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Color(0xFF011931)),
               ),
@@ -889,10 +918,7 @@ class _CompaniesTabState extends State<_CompaniesTab> {
                     itemBuilder: (context, index) => _buildCompanyCard(context, filteredCompanies[index], isAr),
                   ),
             ],
-          ),
-        ),
-        const SizedBox(height: 100),
-      ],
+        // const SizedBox(height: 100),
     );
   }
 
@@ -920,13 +946,14 @@ class _CompaniesTabState extends State<_CompaniesTab> {
   }
 
   Widget _buildCompanyCard(BuildContext context, Map<String, dynamic> comp, bool isAr) {
+    final logoProvider = getAppImageProvider(comp['logoUrl']?.toString());
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.withOpacity(0.1)),
+        border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 4)),
+          BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10, offset: const Offset(0, 4)),
         ],
       ),
       child: Material(
@@ -948,15 +975,17 @@ class _CompaniesTabState extends State<_CompaniesTab> {
                         color: const Color(0xFFF0F3FF),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Icon(comp['logo'] as IconData, color: const Color(0xFF49769F), size: 32),
+                      child: logoProvider != null
+                          ? CircleAvatar(radius: 16, backgroundImage: logoProvider)
+                          : Icon(Icons.business, color: Theme.of(context).colorScheme.primary, size: 32),
                     ),
                     const Spacer(),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF49769F).withOpacity(0.08),
+                        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.08),
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: const Color(0xFF49769F).withOpacity(0.2)),
+                        border: Border.all(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2)),
                       ),
                       child: Text(
                         isAr ? 'وظائف شاغرة ${comp['vacancies']}' : '${comp['vacancies']} Vacancies',
@@ -968,7 +997,7 @@ class _CompaniesTabState extends State<_CompaniesTab> {
                 const SizedBox(height: 16),
                 Text(
                   comp['name'] as String,
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Color(0xFF011931)),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Theme.of(context).colorScheme.onSurface),
                 ),
                 const SizedBox(height: 6),
                 Text(
@@ -992,7 +1021,7 @@ class _CompaniesTabState extends State<_CompaniesTab> {
                       ),
                     ),
                     const Spacer(),
-                    const Icon(Icons.arrow_forward_ios, size: 14, color: Color(0xFF49769F)),
+                    Icon(Icons.arrow_forward_ios, size: 14, color: Theme.of(context).colorScheme.primary),
                   ],
                 ),
               ],
@@ -1016,8 +1045,12 @@ class _ProfileTabState extends State<_ProfileTab> {
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
+    final store = RecruitmentSyncStore.instance;
 
-    return SingleChildScrollView(
+    return AnimatedBuilder(
+      animation: store,
+      builder: (context, _) {
+        return SingleChildScrollView(
       child: Column(
         children: [
           // Top Cover Area
@@ -1027,9 +1060,12 @@ class _ProfileTabState extends State<_ProfileTab> {
               Container(
                 height: 180,
                 width: double.infinity,
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [Color(0xFF011931), Color(0xFF49769F)],
+                    colors: [
+                      Theme.of(context).colorScheme.primary.withValues(alpha: 0.9),
+                      Theme.of(context).colorScheme.primary.withValues(alpha: 0.6)
+                    ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
@@ -1044,14 +1080,14 @@ class _ProfileTabState extends State<_ProfileTab> {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(color: Colors.white, width: 4),
-                    boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10)],
+                    boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 10)],
                   ),
                   child: CircleAvatar(
                     radius: 50,
-                    backgroundColor: Colors.white,
-                    backgroundImage: getAppImageProvider(UserProfileData.profileImage),
-                    child: UserProfileData.profileImage == null
-                        ? const Icon(Icons.person, size: 55, color: Color(0xFF49769F))
+                    backgroundColor: Theme.of(context).cardColor,
+                    backgroundImage: getAppImageProvider(store.profileImage),
+                    child: store.profileImage == null
+                        ? Icon(Icons.person, size: 55, color: Theme.of(context).colorScheme.primary)
                         : null,
                   ),
                 ),
@@ -1068,13 +1104,13 @@ class _ProfileTabState extends State<_ProfileTab> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  UserProfileData.fullName.isEmpty ? "Not yet" : UserProfileData.fullName,
-                  style: const TextStyle(color: Color(0xFF011931), fontSize: 26, fontWeight: FontWeight.w900),
+                  store.currentUserName.isEmpty ? "Not yet" : store.currentUserName,
+                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 26, fontWeight: FontWeight.w900),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  UserProfileData.jobTitle.isEmpty ? "Not yet" : UserProfileData.jobTitle,
-                  style: const TextStyle(color: Color(0xFF49769F), fontSize: 16, fontWeight: FontWeight.w700),
+                  store.currentUserTitle.isEmpty ? "Not yet" : store.currentUserTitle,
+                  style: TextStyle(color: Theme.of(context).colorScheme.primary, fontSize: 16, fontWeight: FontWeight.w700),
                 ),
                 const SizedBox(height: 30),
 
@@ -1084,7 +1120,7 @@ class _ProfileTabState extends State<_ProfileTab> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(t.tr(en: "Switching to Tradesman Mode...", ar: "التبديل إلى وضع الصنايعي...")),
-                        backgroundColor: const Color(0xFFFF7A2A),
+                        backgroundColor: Theme.of(context).colorScheme.secondary,
                         duration: const Duration(seconds: 1),
                       ),
                     );
@@ -1097,9 +1133,9 @@ class _ProfileTabState extends State<_ProfileTab> {
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFF7A2A),
+                      color: Theme.of(context).colorScheme.secondary,
                       borderRadius: BorderRadius.circular(16),
-                      boxShadow: [BoxShadow(color: const Color(0xFFFF7A2A).withOpacity(0.3), blurRadius: 10, offset: const Offset(0, 4))],
+                      boxShadow: [BoxShadow(color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.3), blurRadius: 10, offset: const Offset(0, 4))],
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -1121,27 +1157,26 @@ class _ProfileTabState extends State<_ProfileTab> {
                   width: double.infinity,
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Theme.of(context).cardColor,
                     borderRadius: BorderRadius.circular(24),
-                    border: Border.all(color: Colors.grey.withOpacity(0.05)),
-                    boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 4))],
+                    border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
+                    boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 10, offset: const Offset(0, 4))],
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildProfileItem(t.aboutMe, UserProfileData.aboutMe, Icons.info_outline),
-                      _buildProfileItem(isAr ? 'البريد الإلكتروني' : 'Email', UserProfileData.email, Icons.email_outlined),
-                      _buildProfileItem(isAr ? 'رقم الهاتف' : 'Phone', UserProfileData.phone, Icons.phone_android_outlined),
-                      _buildProfileItem(isAr ? 'الموقع' : 'Location', UserProfileData.location, Icons.location_on_outlined),
-                      _buildProfileItem(isAr ? 'المهارات' : 'Skills', UserProfileData.skills.join(', '), Icons.psychology_outlined),
-                      _buildProfileItem(isAr ? 'السيرة الذاتية' : 'CV', UserProfileData.cvName ?? "", Icons.description_outlined),
+                      _buildProfileItem(t.aboutMe, store.currentUserAbout, Icons.info_outline),
+                      _buildProfileItem(isAr ? 'البريد الإلكتروني' : 'Email', store.currentUserEmail, Icons.email_outlined),
+                      _buildProfileItem(isAr ? 'رقم الهاتف' : 'Phone', store.currentUserPhone, Icons.phone_android_outlined),
+                      _buildProfileItem(isAr ? 'الموقع' : 'Location', store.currentUserLocation, Icons.location_on_outlined),
+                      _buildProfileItem(isAr ? 'المهارات' : 'Skills', store.currentUserSkills.join(', '), Icons.psychology_outlined),
 
                       // Gallery Section
                       if (UserProfileData.portfolioImages.isNotEmpty) ...[
                         const SizedBox(height: 10),
                         Text(
                           isAr ? 'المعرض' : 'Gallery',
-                          style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: Color(0xFF011931)),
+                          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: Theme.of(context).colorScheme.onSurface),
                         ),
                         const SizedBox(height: 16),
                         SizedBox(
@@ -1180,24 +1215,24 @@ class _ProfileTabState extends State<_ProfileTab> {
                 if (UserProfileData.socialLinks.isNotEmpty) ...[
                   Text(
                     t.socialLinks,
-                    style: const TextStyle(color: Color(0xFF011931), fontSize: 20, fontWeight: FontWeight.w800),
+                    style: TextStyle(color: Theme.of(context).textTheme.titleLarge?.color, fontSize: 20, fontWeight: FontWeight.w800),
                   ),
                   const SizedBox(height: 16),
                   ...UserProfileData.socialLinks.map((link) => Container(
                     margin: const EdgeInsets.only(bottom: 12),
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Theme.of(context).cardColor,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.grey.withOpacity(0.05)),
+                      border: Border.all(color: Colors.grey.withValues(alpha: 0.05)),
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.link_rounded, color: Color(0xFF49769F), size: 22),
+                        const Icon(Icons.link_rounded, size: 22),
                         const SizedBox(width: 12),
                         Text(
                           "${link['platform']}: ",
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.black87),
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Theme.of(context).colorScheme.onSurface),
                         ),
                         Expanded(
                           child: GestureDetector(
@@ -1211,7 +1246,7 @@ class _ProfileTabState extends State<_ProfileTab> {
                             },
                             child: Text(
                               link['url'] ?? "",
-                              style: const TextStyle(color: Color(0xFF49769F), fontSize: 14, fontWeight: FontWeight.w600, decoration: TextDecoration.underline),
+                              style: TextStyle(color: Theme.of(context).colorScheme.primary, fontSize: 14, fontWeight: FontWeight.w600, decoration: TextDecoration.underline),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
@@ -1223,30 +1258,30 @@ class _ProfileTabState extends State<_ProfileTab> {
                 ],
 
                 // Education Section
-                if (UserProfileData.education.isNotEmpty) ...[
-                  Text(t.education, style: const TextStyle(color: Color(0xFF011931), fontSize: 20, fontWeight: FontWeight.w800)),
+                if (store.currentUserEducation.isNotEmpty) ...[
+                  Text(t.education, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 20, fontWeight: FontWeight.w800)),
                   const SizedBox(height: 16),
-                  ...UserProfileData.education.map((edu) => Container(
+                  ...store.currentUserEducation.map((edu) => Container(
                     margin: const EdgeInsets.only(bottom: 12),
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Theme.of(context).cardColor,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.grey.withOpacity(0.05)),
+                      border: Border.all(color: Colors.grey.withValues(alpha: 0.05)),
                     ),
                     child: Row(
                       children: [
                         Container(
                           padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(color: const Color(0xFFF0F3FF), borderRadius: BorderRadius.circular(14)),
-                          child: const Icon(Icons.school_rounded, color: Color(0xFF49769F)),
+                          decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(14)),
+                          child: Icon(Icons.school_rounded, color: Theme.of(context).colorScheme.primary),
                         ),
                         const SizedBox(width: 16),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(edu['institution'] ?? "", style: const TextStyle(color: Color(0xFF011931), fontWeight: FontWeight.bold, fontSize: 16)),
+                              Text(edu['institution'] ?? "", style: TextStyle(color: Theme.of(context).textTheme.titleMedium?.color, fontWeight: FontWeight.bold, fontSize: 16)),
                               const SizedBox(height: 4),
                               Text("${edu['degree']} • ${edu['duration']}", style: const TextStyle(color: Colors.black54, fontSize: 13, fontWeight: FontWeight.w500)),
                             ],
@@ -1263,6 +1298,8 @@ class _ProfileTabState extends State<_ProfileTab> {
         ],
       ),
     );
+      },
+    );
   }
 
   Widget _buildProfileItem(String label, String value, IconData icon) {
@@ -1274,10 +1311,10 @@ class _ProfileTabState extends State<_ProfileTab> {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: const Color(0xFFF0F3FF),
+              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(icon, color: const Color(0xFF49769F), size: 20),
+            child: Icon(icon, color: Theme.of(context).colorScheme.primary, size: 20),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -1286,12 +1323,12 @@ class _ProfileTabState extends State<_ProfileTab> {
               children: [
                 Text(
                   label,
-                  style: const TextStyle(color: Colors.black38, fontSize: 12, fontWeight: FontWeight.bold),
+                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 12, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   value.isEmpty ? "Not yet" : value,
-                  style: const TextStyle(color: Color(0xFF011931), fontSize: 15, fontWeight: FontWeight.w600),
+                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 15, fontWeight: FontWeight.w600),
                 ),
               ],
             ),

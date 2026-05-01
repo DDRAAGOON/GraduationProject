@@ -40,14 +40,14 @@ class _MessagesListState extends State<MessagesList> {
     final store = RecruitmentSyncStore.instance;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF9F5F1),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       floatingActionButton: FloatingActionButton(
         onPressed: () {
            Navigator.push(context, MaterialPageRoute(builder: (context) => const NewChatScreen()));
         },
-        backgroundColor: const Color(0xFFDDE6FF),
+        backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
         elevation: 6,
-        child: const Icon(Icons.add, color: Color(0xFF011931), size: 28),
+        child: Icon(Icons.add, color: Theme.of(context).colorScheme.primary, size: 28),
       ),
       appBar: AppBar(
         leading: Padding(
@@ -59,7 +59,7 @@ class _MessagesListState extends State<MessagesList> {
             ),
             child: CircleAvatar(
               radius: 18,
-              backgroundColor: Colors.white,
+              backgroundColor: Theme.of(context).colorScheme.surface,
               backgroundImage: getAppImageProvider(UserProfileData.profileImage),
               child: UserProfileData.profileImage == null 
                   ? const Icon(Icons.person, size: 20) 
@@ -67,7 +67,7 @@ class _MessagesListState extends State<MessagesList> {
             ),
           ),
         ),
-        backgroundColor: const Color(0xFFF9F5F1),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         title: Text(

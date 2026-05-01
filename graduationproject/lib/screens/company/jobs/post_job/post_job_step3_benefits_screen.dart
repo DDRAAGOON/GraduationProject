@@ -113,11 +113,11 @@ class _CompanyPostJobStep3BenefitsScreenState
     final descriptionPoints = (data['descriptionPoints'] as List<String>?) ?? [];
     final category = (data['category'] as String?) ?? 'General';
     final department = (data['department'] as String?) ?? '';
-    // ignore: unused_local_variable
     final positions = (data['positions'] as int?) ?? 1;
     final responsibilities = (data['responsibilities'] as List<String>?) ?? [];
     final niceToHaves = (data['niceToHaves'] as List<String>?) ?? [];
     final qualifications = (data['qualifications'] as List<String>?) ?? [];
+    final deadline = data['deadline'] as DateTime?;
 
     final fullDescription = [
       if (step1Description.isNotEmpty) step1Description,
@@ -128,20 +128,42 @@ class _CompanyPostJobStep3BenefitsScreenState
     final location = companyLocations.isNotEmpty ? companyLocations.first : 'Remote';
 
     try {
-      await RecruitmentSyncService.instance.postJob(
-        title: title,
-        location: location,
-        salaryRange: salaryRange,
-        description: fullDescription,
-        responsibilities: responsibilities,
-        qualifications: qualifications,
-        niceToHaves: niceToHaves,
-        benefits: _benefits.map((b) => b.title).toList(),
-        category: category,
-        companyName: CompanyStore.instance.companyName,
-        type: employmentType,
-        tags: [category, department].where((s) => s.isNotEmpty).toList(),
-      );
+      if (_isEditing && _jobId != null) {
+        await RecruitmentSyncService.instance.updateJob(
+          jobId: _jobId!,
+          title: title,
+          location: location,
+          salaryRange: salaryRange,
+          description: fullDescription,
+          responsibilities: responsibilities,
+          qualifications: qualifications,
+          niceToHaves: niceToHaves,
+          benefits: _benefits.map((b) => b.title).toList(),
+          category: category,
+          companyName: CompanyStore.instance.companyName,
+          type: employmentType,
+          tags: [category, department].where((s) => s.isNotEmpty).toList(),
+          requiredCount: positions,
+          deadline: deadline,
+        );
+      } else {
+        await RecruitmentSyncService.instance.postJob(
+          title: title,
+          location: location,
+          salaryRange: salaryRange,
+          description: fullDescription,
+          responsibilities: responsibilities,
+          qualifications: qualifications,
+          niceToHaves: niceToHaves,
+          benefits: _benefits.map((b) => b.title).toList(),
+          category: category,
+          companyName: CompanyStore.instance.companyName,
+          type: employmentType,
+          tags: [category, department].where((s) => s.isNotEmpty).toList(),
+          requiredCount: positions,
+          deadline: deadline,
+        );
+      }
 
       if (!mounted) return;
       setState(() => _loading = false);

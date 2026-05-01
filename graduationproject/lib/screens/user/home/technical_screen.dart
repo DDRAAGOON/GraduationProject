@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
 import '../../../app/router/app_router.dart';
 import '../../../constants/app_images.dart';
+import '../../../shared/services/recruitment_sync_service.dart';
+import '../../../shared/state/recruitment_sync_store.dart';
 import '../notifications/notifications_screen.dart';
 import '../settings/setting_screen.dart';
 import '../../../shared/l10n/app_localizations.dart';
@@ -28,19 +30,6 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
     "Damietta", "South Sinai", "Kafr El Sheikh", "Matrouh", "Luxor", "Qena", "Sohag", "North Sinai"
   ];
 
-  final List<Map<String, dynamic>> _allJobs = [
-    {"title": "Social Media Assistant", "company": "Nomad", "location": "Paris, France", "applied": 4, "capacity": 18, "category": "technical"},
-    {"title": "Interactive Developer", "company": "Terraform", "location": "Hamburg, Germany", "applied": 8, "capacity": 12, "category": "technical"},
-    {"title": "Brand Designer", "company": "Dropbox", "location": "San Fransisco, USA", "applied": 2, "capacity": 10, "category": "technical"},
-    {"title": "Email Marketing", "company": "Revolut", "location": "Madrid, Spain", "applied": 0, "capacity": 10, "category": "technical"},
-    {"title": "Lead Engineer", "company": "Canva", "location": "Ankara, Turkey", "applied": 4, "capacity": 10, "category": "technical"},
-    {"title": "HR Manager", "company": "LinkedIn", "location": "London, UK", "applied": 5, "capacity": 10, "category": "nontechnical"},
-    {"title": "Sales Executive", "company": "Amazon", "location": "Berlin, Germany", "applied": 12, "capacity": 20, "category": "nontechnical"},
-    {"title": "Marketing Coordinator", "company": "Facebook", "location": "Menlo Park, USA", "applied": 8, "capacity": 15, "category": "nontechnical"},
-    {"title": "Hotel Receptionist", "company": "Marriott", "location": "Paris, France", "applied": 4, "capacity": 10, "category": "services"},
-    {"title": "Delivery Driver", "company": "Uber", "location": "Madrid, Spain", "applied": 50, "capacity": 100, "category": "services"},
-    {"title": "Barista", "company": "Starbucks", "location": "Rome, Italy", "applied": 10, "capacity": 15, "category": "services"},
-  ];
 
   final Map<String, bool> _selectedFilters = {
     "Full-time (3)": true, "Part-Time (5)": false, "Remote (2)": false,
@@ -53,6 +42,13 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
   };
 
   @override
+  void initState() {
+    super.initState();
+    _searchController.addListener(() => setState(() {}));
+    RecruitmentSyncService.instance.startPolling();
+  }
+
+  @override
   void dispose() {
     _searchController.dispose();
     super.dispose();
@@ -61,9 +57,13 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: SafeArea(
+    final store = RecruitmentSyncStore.instance;
+    return AnimatedBuilder(
+      animation: store,
+      builder: (context, _) {
+        return Scaffold(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 10),
           child: Column(
@@ -121,6 +121,8 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
           ),
         ),
       ),
+        );
+      },
     );
   }
 
@@ -170,16 +172,14 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: Theme.of(context).brightness == Brightness.dark 
-            ? Colors.white.withValues(alpha: 0.05) 
-            : Colors.black.withValues(alpha: 0.05), 
-        borderRadius: BorderRadius.circular(30), 
-        border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.12))
+          color: Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(30),
+          border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1))
       ),
       child: Row(
         children: [
           const SizedBox(width: 12),
-          const Icon(Icons.search, color: Colors.white54, size: 18),
+          Icon(Icons.search, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), size: 18),
           Expanded(
             child: TextField(
               controller: _searchController,
@@ -192,17 +192,17 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
               )
             )
           ),
-          Container(height: 20, width: 1, color: Colors.white24),
+          Container(height: 20, width: 1, color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
           const SizedBox(width: 12),
           GestureDetector(
             onTap: _showLocationPicker,
             behavior: HitTestBehavior.opaque,
             child: Row(
               children: [
-                const Icon(Icons.location_on_outlined, color: Colors.white54, size: 18),
+                Icon(Icons.location_on_outlined, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), size: 18),
                 const SizedBox(width: 4),
-                Text(_selectedLocation, style: const TextStyle(color: Colors.white70, fontSize: 12)),
-                const Icon(Icons.keyboard_arrow_down, color: Colors.white54, size: 18),
+                Text(_selectedLocation, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 12)),
+                Icon(Icons.keyboard_arrow_down, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), size: 18),
               ],
             ),
           ),
@@ -220,7 +220,7 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
   void _showLocationPicker() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF0D2D4D),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -228,17 +228,17 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
         return Column(
           children: [
             const SizedBox(height: 10),
-            Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2))),
-            const Padding(
-              padding: EdgeInsets.all(20.0),
-              child: Text("Select Governorate", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+            Container(width: 40, height: 4, decoration: BoxDecoration(color: Theme.of(context).dividerColor.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(2))),
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Text("Select Governorate", style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 18, fontWeight: FontWeight.bold)),
             ),
             Expanded(
               child: ListView.builder(
                 itemCount: _egyptGovernorates.length,
                 itemBuilder: (context, index) {
                   return ListTile(
-                    title: Text(_egyptGovernorates[index], style: const TextStyle(color: Colors.white70)),
+                    title: Text(_egyptGovernorates[index], style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
                     onTap: () {
                       setState(() => _selectedLocation = _egyptGovernorates[index]);
                       Navigator.pop(context);
@@ -259,9 +259,9 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
       children: [
         Expanded(child: _buildTabItem(t.tr(en: "Technical", ar: "تقني"), "technical", Bootstrap.laptop, const Color(0xFF6C63FF))),
         const SizedBox(width: 10),
-        Expanded(child: _buildTabItem(t.tr(en: "Non-Technical", ar: "إداري"), "nontechnical", FontAwesome.user_tie_solid, const Color(0xFF4CAF50))),
+        Expanded(child: _buildTabItem(t.tr(en: "Non-Technical", ar: "إداري"), "non-technical", FontAwesome.user_tie_solid, const Color(0xFF4CAF50))),
         const SizedBox(width: 10),
-        Expanded(child: _buildTabItem(t.tr(en: "Services", ar: "خدمات"), "services", Bootstrap.bell, const Color(0xFFFF9800))),
+        Expanded(child: _buildTabItem(t.tr(en: "Services", ar: "خدمات"), "service", Bootstrap.bell, const Color(0xFFFF9800))),
       ],
     );
   }
@@ -279,7 +279,7 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
           curve: Curves.easeInOutQuart,
           padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 8),
           decoration: BoxDecoration(
-            color: isSelected ? activeColor : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0D2D4D) : Colors.black.withValues(alpha: 0.05)),
+            color: isSelected ? activeColor : (Theme.of(context).brightness == Brightness.dark ? Theme.of(context).cardColor : Colors.black.withValues(alpha: 0.05)),
             borderRadius: BorderRadius.circular(15),
             border: Border.all(color: isSelected ? Colors.white.withValues(alpha: 0.6) : Theme.of(context).dividerColor.withValues(alpha: 0.1)),
             boxShadow: isSelected ? [
@@ -364,11 +364,12 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
   }
 
   Widget _buildDynamicJobSection(AppLocalizations t) {
+    final store = RecruitmentSyncStore.instance;
     final String query = _searchController.text.toLowerCase();
     
-    final List<Map<String, dynamic>> categoryJobs = _allJobs
-        .where((job) => job["category"] == _selectedCategory && 
-                job["title"].toString().toLowerCase().contains(query))
+    final List<RecruitmentJob> categoryJobs = store.jobs
+        .where((job) => job.category.toLowerCase() == _selectedCategory.toLowerCase() && 
+                job.title.toLowerCase().contains(query))
         .toList();
 
     if (categoryJobs.isEmpty) {
@@ -385,11 +386,11 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
         _buildSectionHeader("All jobs"),
         const SizedBox(height: 15),
         ...categoryJobs.map((job) => _buildJobCard(
-          title: job["title"],
-          company: job["company"],
-          location: job["location"],
-          applied: job["applied"],
-          capacity: job["capacity"],
+          title: job.title,
+          company: job.companyName,
+          location: job.location,
+          applied: job.acceptedCount,
+          capacity: job.capacity,
         )),
       ],
     );
@@ -449,7 +450,7 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
                 Row(
                   children: [
                     _buildTag("Full-Time"),
-                    _buildTag("Marketing", isHighlighted: true),
+                    // Removed Technical tag if it existed as dark badge
                   ],
                 ),
               ],
@@ -477,7 +478,7 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
       margin: const EdgeInsets.only(right: 6),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: isHighlighted ? const Color(0xFF0D2D4D) : Colors.transparent,
+        color: isHighlighted ? Theme.of(context).cardColor : Colors.transparent,
         borderRadius: BorderRadius.circular(15),
         border: Border.all(color: isHighlighted ? Colors.orange.withValues(alpha: 0.5) : Theme.of(context).dividerColor.withValues(alpha: 0.2)),
       ),

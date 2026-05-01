@@ -24,12 +24,18 @@ class _CompanyChatThreadCandidateV2ScreenState
       text:
           'Hey, I wanted to reach out because we saw your work contributions and were impressed by your work.',
       fromMe: true,
+      time: DateTime.now().subtract(const Duration(minutes: 5)),
     ),
-    _Bubble(text: 'We want to invite you for a quick interview', fromMe: true),
+    _Bubble(
+      text: 'We want to invite you for a quick interview', 
+      fromMe: true,
+      time: DateTime.now().subtract(const Duration(minutes: 4)),
+    ),
     _Bubble(
       text:
           'Hi Maria, sure I would love to. Thanks for taking the time to see my work!',
       fromMe: false,
+      time: DateTime.now().subtract(const Duration(minutes: 2)),
     ),
   ];
 
@@ -43,7 +49,7 @@ class _CompanyChatThreadCandidateV2ScreenState
     final text = _input.text.trim();
     if (text.isEmpty) return;
     setState(() {
-      _bubbles.add(_Bubble(text: text, fromMe: true));
+      _bubbles.add(_Bubble(text: text, fromMe: true, time: DateTime.now()));
       _input.clear();
     });
   }
@@ -91,10 +97,11 @@ class _CompanyChatThreadCandidateV2ScreenState
 }
 
 final class _Bubble {
-  const _Bubble({required this.text, required this.fromMe});
+  const _Bubble({required this.text, required this.fromMe, required this.time});
 
   final String text;
   final bool fromMe;
+  final DateTime time;
 }
 
 class _ChatBubble extends StatelessWidget {
@@ -144,13 +151,30 @@ class _ChatBubble extends StatelessWidget {
             ),
           ],
         ),
-        child: Text(
-          bubble.text,
-          style: TextStyle(
-            color: textColor,
-            fontSize: 14,
-            height: 1.4,
-          ),
+        child: Wrap(
+          alignment: WrapAlignment.end,
+          crossAxisAlignment: WrapCrossAlignment.end,
+          runAlignment: WrapAlignment.end,
+          children: [
+            Text(
+              bubble.text,
+              style: TextStyle(
+                color: textColor,
+                fontSize: 14,
+                height: 1.4,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 8, top: 4),
+              child: Text(
+                TimeOfDay.fromDateTime(bubble.time).format(context),
+                style: TextStyle(
+                  color: textColor.withOpacity(0.7),
+                  fontSize: 10,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

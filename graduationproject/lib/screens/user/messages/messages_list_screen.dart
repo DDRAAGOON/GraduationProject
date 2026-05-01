@@ -36,7 +36,7 @@ class _MessagesListScreenState extends State<MessagesListScreen> {
     final store = RecruitmentSyncStore.instance;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF9F5F1),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       floatingActionButton: FloatingActionButton(
         onPressed: () => Navigator.push(
           context,

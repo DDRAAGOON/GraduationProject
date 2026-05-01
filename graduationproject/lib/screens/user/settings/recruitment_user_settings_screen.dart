@@ -12,7 +12,7 @@ class RecruitmentUserSettingsScreen extends StatelessWidget {
     final localeController = LocaleController.instance;
     final themeController = ThemeController.instance;
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      appBar: AppBar(title: Text('Settings', style: TextStyle(color: Theme.of(context).colorScheme.onSurface))),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [

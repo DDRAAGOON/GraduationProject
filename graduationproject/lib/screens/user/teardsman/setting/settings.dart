@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../../../app/router/app_router.dart';
-import '../../../../../shared/l10n/app_localizations.dart';
-import '../../profile/edit_profile_screen.dart';
-import '../../profile/profile_login_details_screen.dart';
-import '../../profile/setting_profile/notifications.dart';
-import '../../profile/setting_profile/preferences.dart';
+import 'package:graduationproject/app/router/app_router.dart';
+import 'package:graduationproject/shared/l10n/app_localizations.dart';
+import 'package:graduationproject/screens/user/profile/edit_profile_screen.dart';
+import 'package:graduationproject/screens/user/profile/profile_login_details_screen.dart';
+import 'package:graduationproject/screens/user/profile/setting_profile/notifications.dart';
+import 'package:graduationproject/screens/user/profile/setting_profile/preferences.dart';
 
 class Settings extends StatefulWidget {
   const Settings({super.key});
@@ -63,9 +63,9 @@ class _SettingsState extends State<Settings> {
     final isAr = t.isAr;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF9F5F1),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF9F5F1),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         title: Text(
@@ -85,7 +85,7 @@ class _SettingsState extends State<Settings> {
           children: [
             Text(
               t.tr(en: "Account Settings", ar: "إعدادات الحساب"),
-              style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 14, fontWeight: FontWeight.bold),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 14, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
             
@@ -136,23 +136,23 @@ class _SettingsState extends State<Settings> {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black.withValues(alpha: 0.05)),
+        border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.2)),
       ),
       child: ListTile(
         onTap: onTap,
         leading: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: const Color(0xFF49769F).withValues(alpha: 0.1),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
-          child: Icon(icon, color: const Color(0xFF49769F), size: 20),
+          child: Icon(icon, color: Theme.of(context).colorScheme.primary, size: 20),
         ),
-        title: Text(title, style: TextStyle(color: titleColor ?? Colors.black87, fontSize: 15, fontWeight: FontWeight.w600)),
-        subtitle: subtitle != null ? Text(subtitle, style: const TextStyle(color: Colors.black38, fontSize: 12)) : null,
-        trailing: showArrow ? Icon(isAr ? Icons.arrow_back_ios : Icons.arrow_forward_ios, color: Colors.black26, size: 14) : null,
+        title: Text(title, style: TextStyle(color: titleColor ?? Theme.of(context).colorScheme.onSurface, fontSize: 15, fontWeight: FontWeight.w600)),
+        subtitle: subtitle != null ? Text(subtitle, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5), fontSize: 12)) : null,
+        trailing: showArrow ? Icon(isAr ? Icons.arrow_back_ios : Icons.arrow_forward_ios, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3), size: 14) : null,
       ),
     );
   }

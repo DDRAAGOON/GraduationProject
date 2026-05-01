@@ -28,7 +28,7 @@ class _NavbottonState extends State<Navbotton> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF9F5F1),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: _pages[_selectedIndex],
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex,
@@ -37,7 +37,7 @@ class _NavbottonState extends State<Navbotton> {
             _selectedIndex = index;
           });
         },
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).cardColor,
         labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
         destinations: <NavigationDestination>[
           NavigationDestination(

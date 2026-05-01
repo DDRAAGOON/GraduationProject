@@ -15,30 +15,65 @@ public class JobsController(AppDbContext db) : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var items = await db.Jobs
-            .OrderByDescending(x => x.CreatedAt)
-            .Select(x => new
+        var items = await (
+            from job in db.Jobs
+            join user in db.Users on job.CompanyId equals user.Id into users
+            from user in users.DefaultIfEmpty()
+            orderby job.CreatedAt descending
+            select new
             {
-                id = x.Id,
-                title = x.Title,
-                companyId = x.CompanyId.ToString(),
-                companyName = x.CompanyName,
-                location = x.Location,
-                salaryRange = x.SalaryRange,
-                type = x.Type,
-                description = x.Description,
-                responsibilities = x.ResponsibilitiesCsv.Split('|', StringSplitOptions.RemoveEmptyEntries),
-                qualifications = x.QualificationsCsv.Split('|', StringSplitOptions.RemoveEmptyEntries),
-                niceToHaves = x.NiceToHavesCsv.Split('|', StringSplitOptions.RemoveEmptyEntries),
-                benefits = x.BenefitsCsv.Split('|', StringSplitOptions.RemoveEmptyEntries),
-                category = x.Category,
-                tags = x.TagsCsv.Split(',', StringSplitOptions.RemoveEmptyEntries),
-                createdAt = x.CreatedAt,
-                requiredCount = x.RequiredCount,
-                acceptedCount = x.AcceptedCount
+                id = job.Id,
+                title = job.Title,
+                companyId = job.CompanyId.ToString(),
+                companyName = job.CompanyName,
+                companyLogoUrl = user != null ? user.PhotoUrl : null,
+                location = job.Location,
+                salaryRange = job.SalaryRange,
+                type = job.Type,
+                description = job.Description,
+                responsibilities = job.ResponsibilitiesCsv.Split('|', StringSplitOptions.RemoveEmptyEntries),
+                qualifications = job.QualificationsCsv.Split('|', StringSplitOptions.RemoveEmptyEntries),
+                niceToHaves = job.NiceToHavesCsv.Split('|', StringSplitOptions.RemoveEmptyEntries),
+                benefits = job.BenefitsCsv.Split('|', StringSplitOptions.RemoveEmptyEntries),
+                category = job.Category,
+                tags = job.TagsCsv.Split(',', StringSplitOptions.RemoveEmptyEntries),
+                createdAt = job.CreatedAt,
+                requiredCount = job.RequiredCount,
+                acceptedCount = job.AcceptedCount,
+                deadline = job.Deadline,
+                status = job.Status
             })
             .ToListAsync();
         return Ok(items);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(string id)
+    {
+        if (!User.IsInRole("company"))
+        {
+            return Forbid();
+        }
+
+        var companyIdClaim = User.FindFirstValue("sub") ?? "0";
+        var companyId = int.TryParse(companyIdClaim, out var idVal) ? idVal : 0;
+
+        var job = await db.Jobs.FindAsync(id);
+        if (job == null)
+        {
+            return NotFound(new { message = "Job not found" });
+        }
+
+        // Only the owning company can delete this job
+        if (job.CompanyId != companyId)
+        {
+            return Forbid();
+        }
+
+        db.Jobs.Remove(job);
+        await db.SaveChangesAsync();
+
+        return Ok(new { message = "Job deleted successfully" });
     }
 
     [HttpPost]
@@ -73,7 +108,9 @@ public class JobsController(AppDbContext db) : ControllerBase
             Category = request.Category ?? "General",
             TagsCsv = request.Tags is { Length: > 0 } ? string.Join(",", request.Tags) : "",
             CreatedAt = DateTime.UtcNow,
-            RequiredCount = request.RequiredCount ?? 1
+            RequiredCount = request.RequiredCount ?? 1,
+            Deadline = request.Deadline,
+            Status = request.Status ?? "Open"
         };
 
         db.Jobs.Add(entity);
@@ -104,7 +141,80 @@ public class JobsController(AppDbContext db) : ControllerBase
             tags = entity.TagsCsv.Split(',', StringSplitOptions.RemoveEmptyEntries),
             createdAt = entity.CreatedAt,
             requiredCount = entity.RequiredCount,
-            acceptedCount = entity.AcceptedCount
+            acceptedCount = entity.AcceptedCount,
+            deadline = entity.Deadline,
+            status = entity.Status
+        });
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(string id, [FromBody] CreateJobRequest request)
+    {
+        if (!User.IsInRole("company"))
+        {
+            return Forbid();
+        }
+
+        var companyIdClaim = User.FindFirstValue("sub") ?? "0";
+        var companyId = int.TryParse(companyIdClaim, out var idVal) ? idVal : 0;
+
+        var job = await db.Jobs.FindAsync(id);
+        if (job == null)
+        {
+            return NotFound(new { message = "Job not found" });
+        }
+
+        if (job.CompanyId != companyId)
+        {
+            return Forbid();
+        }
+
+        if (string.IsNullOrWhiteSpace(request.Title) || string.IsNullOrWhiteSpace(request.CompanyName))
+        {
+            return BadRequest(new { message = "title and companyName are required" });
+        }
+
+        job.Title = request.Title;
+        job.CompanyName = request.CompanyName;
+        job.Location = request.Location ?? "Remote";
+        job.SalaryRange = request.SalaryRange ?? "Negotiable";
+        job.Type = request.Type ?? "Full-time";
+        job.Description = request.Description ?? "";
+        job.ResponsibilitiesCsv = request.Responsibilities is { Length: > 0 } ? string.Join("|", request.Responsibilities) : "";
+        job.QualificationsCsv = request.Qualifications is { Length: > 0 } ? string.Join("|", request.Qualifications) : "";
+        job.NiceToHavesCsv = request.NiceToHaves is { Length: > 0 } ? string.Join("|", request.NiceToHaves) : "";
+        job.BenefitsCsv = request.Benefits is { Length: > 0 } ? string.Join("|", request.Benefits) : "";
+        job.Category = request.Category ?? "General";
+        job.TagsCsv = request.Tags is { Length: > 0 } ? string.Join(",", request.Tags) : "";
+        job.RequiredCount = request.RequiredCount ?? job.RequiredCount;
+        job.Deadline = request.Deadline;
+        if (!string.IsNullOrEmpty(request.Status)) {
+            job.Status = request.Status;
+        }
+
+        await db.SaveChangesAsync();
+
+        return Ok(new
+        {
+            id = job.Id,
+            title = job.Title,
+            companyId = job.CompanyId.ToString(),
+            companyName = job.CompanyName,
+            location = job.Location,
+            salaryRange = job.SalaryRange,
+            type = job.Type,
+            description = job.Description,
+            responsibilities = job.ResponsibilitiesCsv.Split('|', StringSplitOptions.RemoveEmptyEntries),
+            qualifications = job.QualificationsCsv.Split('|', StringSplitOptions.RemoveEmptyEntries),
+            niceToHaves = job.NiceToHavesCsv.Split('|', StringSplitOptions.RemoveEmptyEntries),
+            benefits = job.BenefitsCsv.Split('|', StringSplitOptions.RemoveEmptyEntries),
+            category = job.Category,
+            tags = job.TagsCsv.Split(',', StringSplitOptions.RemoveEmptyEntries),
+            createdAt = job.CreatedAt,
+            requiredCount = job.RequiredCount,
+            acceptedCount = job.AcceptedCount,
+            deadline = job.Deadline,
+            status = job.Status
         });
     }
 }
@@ -124,4 +234,6 @@ public class CreateJobRequest
     public string? Category { get; set; }
     public string[]? Tags { get; set; }
     public int? RequiredCount { get; set; }
+    public DateTime? Deadline { get; set; }
+    public string? Status { get; set; }
 }

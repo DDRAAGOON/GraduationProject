@@ -81,11 +81,14 @@ class _AnalyticsBodyState extends State<_AnalyticsBody> {
         RecruitmentSyncStore.instance,
       ]),
       builder: (context, _) {
-        final openJobs = CompanyStore.instance.jobs
+        final companyJobs = RecruitmentSyncStore.instance.jobs
+            .where((j) => j.companyName == CompanyStore.instance.companyName)
+            .toList();
+        final openJobs = companyJobs
             .where((j) => j.status == 'Open')
             .length;
         final totalApplicants = RecruitmentSyncStore.instance.applications
-            .where((app) => CompanyStore.instance.jobs.any((j) => j.id == app.jobId))
+            .where((app) => companyJobs.any((j) => j.id == app.jobId))
             .length;
 
         final views = List<double>.from(_viewsData[_selectedPeriod]!);
@@ -135,7 +138,7 @@ class _AnalyticsBodyState extends State<_AnalyticsBody> {
         // ── Main chart card ────────────────────────────────────────
         Container(
           decoration: BoxDecoration(
-            color: isDark ? cs.surfaceContainerLow : Colors.white,
+            color: Theme.of(context).cardColor,
             borderRadius: BorderRadius.circular(20),
             border: Border.all(color: cs.outlineVariant.withValues(alpha: 0.4)),
             boxShadow: [
@@ -650,7 +653,9 @@ class _ApplicantsBreakdownCard extends StatelessWidget {
       ]),
       builder: (context, _) {
         final apps = RecruitmentSyncStore.instance.applications;
-        final jobs = CompanyStore.instance.jobs;
+        final companyJobs = RecruitmentSyncStore.instance.jobs
+            .where((j) => j.companyName == CompanyStore.instance.companyName)
+            .toList();
         
         // Calculate real breakdown by joining with Job data
         int fullTime = 0;
@@ -660,13 +665,10 @@ class _ApplicantsBreakdownCard extends StatelessWidget {
 
         for (final app in apps) {
           // Find the job to get its employment type
-          final job = jobs.firstWhere(
-            (j) => j.id == app.jobId,
-            orElse: () => Job.mock(), // Fallback if job not found
-          );
+          final job = companyJobs.where((j) => j.id == app.jobId).firstOrNull;
           
-          final type = job.employmentType.toLowerCase();
-          final loc = job.location.toLowerCase();
+          final type = job?.type.toLowerCase() ?? '';
+          final loc = job?.location.toLowerCase() ?? '';
 
           if (type.contains('full')) fullTime++;
           else if (type.contains('part')) partTime++;

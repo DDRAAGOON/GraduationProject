@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:graduationproject/shared/l10n/app_localizations.dart';
-import '../../../../../shared/state/recruitment_sync_store.dart';
-import '../../../../../shared/widgets/app_button.dart';
+import 'package:graduationproject/shared/utils/image_helper.dart';
+import 'package:graduationproject/shared/state/recruitment_sync_store.dart';
+import 'package:graduationproject/shared/widgets/app_button.dart';
 import 'tradesman_apply_job_screen.dart';
 
 class TradesmanJobDetailsScreen extends StatelessWidget {
@@ -15,9 +16,9 @@ class TradesmanJobDetailsScreen extends StatelessWidget {
     final store = RecruitmentSyncStore.instance;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF9F5F1),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF9F5F1),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         title: Text(t.tr(en: 'Job Details', ar: 'تفاصيل الوظيفة')),
@@ -34,9 +35,9 @@ class TradesmanJobDetailsScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Colors.grey.withOpacity(0.1)),
+                  border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
                 ),
                 child: Column(
                   children: [
@@ -44,26 +45,39 @@ class TradesmanJobDetailsScreen extends StatelessWidget {
                       width: 70,
                       height: 70,
                       decoration: BoxDecoration(
-                        color: Colors.grey.withOpacity(0.1),
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(15),
                       ),
                       child: Icon(job.logoIcon ?? Icons.work_outline, 
-                          color: const Color(0xFF49769F), size: 40),
+                          color: Theme.of(context).colorScheme.primary, size: 40),
                     ),
                     const SizedBox(height: 16),
                     Text(
                       job.title,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black87,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       job.companyName,
-                      style: const TextStyle(color: Colors.black54, fontSize: 14),
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 14),
+                    ),
+                    const SizedBox(height: 8),
+                    CircleAvatar(
+                      radius: 16,
+                      backgroundImage: getAppImageProvider(job.companyLogoUrl),
+                      child: getAppImageProvider(job.companyLogoUrl) == null
+                          ? const Icon(Icons.business, size: 16)
+                          : null,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      t.tr(en: 'Hiring ${job.capacity} people', ar: 'مطلوب ${job.capacity} أشخاص'),
+                      style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.w700),
                     ),
                     const SizedBox(height: 20),
                     Wrap(
@@ -71,8 +85,6 @@ class TradesmanJobDetailsScreen extends StatelessWidget {
                       spacing: 10,
                       runSpacing: 10,
                     children: [
-                      _buildBadge(job.salaryRange, Colors.grey),
-                      const SizedBox(width: 10),
                       Wrap(
                         alignment: WrapAlignment.center,
                         spacing: 10,
@@ -94,16 +106,16 @@ class TradesmanJobDetailsScreen extends StatelessWidget {
               if (job.description.trim().isNotEmpty) ...[
                 Text(
                   t.tr(en: 'Description', ar: 'الوصف الوظيفي'),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: 12),
                 Text(
                   job.description,
-                  style: const TextStyle(color: Colors.black54, fontSize: 15, height: 1.6),
+                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), fontSize: 15, height: 1.6),
                 ),
                 const SizedBox(height: 24),
               ],
@@ -112,10 +124,10 @@ class TradesmanJobDetailsScreen extends StatelessWidget {
               if (job.responsibilities.isNotEmpty) ...[
                 Text(
                   t.tr(en: 'Responsibilities', ar: 'المسؤوليات'),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -124,8 +136,8 @@ class TradesmanJobDetailsScreen extends StatelessWidget {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('• ', style: TextStyle(color: Color(0xFF49769F), fontWeight: FontWeight.bold)),
-                      Expanded(child: Text(item, style: const TextStyle(color: Colors.black54, fontSize: 14))),
+                      Text('• ', style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold)),
+                      Expanded(child: Text(item, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), fontSize: 14))),
                     ],
                   ),
                 )),
@@ -136,10 +148,10 @@ class TradesmanJobDetailsScreen extends StatelessWidget {
               if (job.qualifications.isNotEmpty) ...[
                 Text(
                   t.tr(en: 'Qualifications', ar: 'المؤهلات'),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -148,8 +160,8 @@ class TradesmanJobDetailsScreen extends StatelessWidget {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('• ', style: TextStyle(color: Color(0xFF49769F), fontWeight: FontWeight.bold)),
-                      Expanded(child: Text(item, style: const TextStyle(color: Colors.black54, fontSize: 14))),
+                      Text('• ', style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold)),
+                      Expanded(child: Text(item, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), fontSize: 14))),
                     ],
                   ),
                 )),
@@ -160,10 +172,10 @@ class TradesmanJobDetailsScreen extends StatelessWidget {
               if (job.benefits.isNotEmpty) ...[
                 Text(
                   t.tr(en: 'Benefits', ar: 'المميزات والفوائد'),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -190,26 +202,26 @@ class TradesmanJobDetailsScreen extends StatelessWidget {
               if (job.tags.isNotEmpty) ...[
                 Text(
                   t.tr(en: 'Skills', ar: 'المهارات'),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: 12),
                 Wrap(
                   spacing: 10,
                   runSpacing: 10,
-                  children: job.tags.map((tag) => Container(
+                  children: job.tags.where((tag) => tag.trim().toLowerCase() != 'technical').map((tag) => Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF49769F).withOpacity(0.05),
+                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: const Color(0xFF49769F).withOpacity(0.1)),
+                      border: Border.all(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1)),
                     ),
                     child: Text(
                       tag,
-                      style: const TextStyle(color: Color(0xFF49769F), fontWeight: FontWeight.w600),
+                      style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.w600),
                     ),
                   )).toList(),
                 ),
@@ -235,15 +247,15 @@ class TradesmanJobDetailsScreen extends StatelessWidget {
                   const SizedBox(width: 16),
                   Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Theme.of(context).cardColor,
                       borderRadius: BorderRadius.circular(15),
-                      border: Border.all(color: Colors.grey.withOpacity(0.2)),
+                      border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.12)),
                     ),
                     child: IconButton(
                       onPressed: () => store.toggleSaveJob(job.id),
                       icon: Icon(
                         isSaved ? Icons.bookmark : Icons.bookmark_border,
-                        color: const Color(0xFF49769F),
+                        color: Theme.of(context).colorScheme.primary,
                         size: 30,
                       ),
                     ),

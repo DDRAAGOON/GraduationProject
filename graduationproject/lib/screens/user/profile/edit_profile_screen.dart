@@ -114,9 +114,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: const Color(0xFFF9F5F1),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF9F5F1),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         title: Text(
@@ -156,7 +156,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               ),
             ),
             const SizedBox(height: 10),
-            const Divider(color: Colors.black12, height: 1),
+            Divider(color: Theme.of(context).dividerColor.withOpacity(0.12), height: 1),
             const SizedBox(height: 30),
 
             // Basic Information
@@ -264,6 +264,35 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             
             Divider(color: Theme.of(context).dividerColor.withOpacity(0.12), height: 40),
 
+            // Criminal Record Certificate
+            Text(t.tr(en: "Criminal Record Certificate", ar: "فيش وتشبيه"), style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 20),
+            GestureDetector(
+              onTap: _pickImage,
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).cardColor,
+                  border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.12)),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.cloud_upload_outlined, color: Theme.of(context).colorScheme.primary, size: 24),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        UserProfileData.cvName ?? t.tr(en: "Upload Certificate", ar: "رفع الشهادة"),
+                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7), fontSize: 13),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            Divider(color: Theme.of(context).dividerColor.withOpacity(0.12), height: 40),
+
             // About Me
             Text(t.aboutMe, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16, fontWeight: FontWeight.bold)),
             const SizedBox(height: 12),
@@ -307,48 +336,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             }),
             ..._socialLinks.map((link) => _buildRemovableItem(link['platform'] ?? "", link['url'] ?? "", () => setState(() => _socialLinks.remove(link)))),
             Divider(color: Theme.of(context).dividerColor.withOpacity(0.12), height: 40),
-
-            // CV
-            Text(t.tr(en: "Curriculum Vitae (CV)", ar: "السيرة الذاتية (CV)"), style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 12),
-            GestureDetector(
-              onTap: _pickCV,
-              child: Container(
-                width: double.infinity, padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(15), border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.12))),
-                child: Row(
-                  children: [
-                    const Icon(Icons.description_outlined, color: Color(0xFF49769F), size: 30),
-                    const SizedBox(width: 15),
-                    Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text(UserProfileData.cvName ?? t.tr(en: "Upload your CV", ar: "ارفع سيرتك الذاتية"), style: const TextStyle(fontWeight: FontWeight.bold)),
-                      Text(t.tr(en: "PDF, DOC, DOCX (Max 5MB)", ar: "PDF, DOC, DOCX (بحد أقصى 5 ميجابايت)"), style: const TextStyle(color: Colors.black38, fontSize: 12)),
-                    ])),
-                    const Icon(Icons.cloud_upload_outlined, color: Colors.blueAccent),
-                  ],
-                ),
-              ),
-            ),
-            Divider(color: Theme.of(context).dividerColor.withOpacity(0.12), height: 40),
-
-            // Gallery
-            _buildSectionHeader(t.tr(en: "Gallery", ar: "المعرض"), () async {
-               final ImagePicker picker = ImagePicker();
-               final List<XFile> images = await picker.pickMultiImage();
-               if (images.isNotEmpty) setState(() { _portfolioImages.addAll(images.map((i) => i.path)); });
-            }),
-            GridView.builder(
-              shrinkWrap: true, physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3, crossAxisSpacing: 10, mainAxisSpacing: 10),
-              itemCount: _portfolioImages.length,
-              itemBuilder: (context, index) {
-                final path = _portfolioImages[index];
-                return Stack(children: [
-                  ClipRRect(borderRadius: BorderRadius.circular(8), child: path.startsWith('http') ? Image.network(path, fit: BoxFit.cover, width: double.infinity, height: double.infinity) : Image.file(File(path), fit: BoxFit.cover, width: double.infinity, height: double.infinity)),
-                  Positioned(top: 2, right: 2, child: GestureDetector(onTap: () => setState(() => _portfolioImages.removeAt(index)), child: Container(decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle), child: const Icon(Icons.close, size: 16, color: Colors.white)))),
-                ]);
-              },
-            ),
 
             const SizedBox(height: 40),
             Align(
@@ -401,7 +388,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   Widget _buildRemovableItem(String title, String subtitle, VoidCallback onDelete) => ListTile(contentPadding: EdgeInsets.zero, title: Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)), subtitle: Text(subtitle, style: const TextStyle(fontSize: 12)), trailing: IconButton(icon: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 20), onPressed: onDelete));
 
-  Widget _buildTabItem(String title, bool isActive, VoidCallback onTap) => GestureDetector(onTap: onTap, child: Column(children: [Text(title, style: TextStyle(color: isActive ? const Color(0xFF49769F) : Colors.black38, fontWeight: isActive ? FontWeight.bold : FontWeight.normal, fontSize: 14)), if (isActive) Container(margin: const EdgeInsets.only(top: 8), height: 2, width: 60, color: const Color(0xFF49769F))]));
+  Widget _buildTabItem(String title, bool isActive, VoidCallback onTap) => GestureDetector(onTap: onTap, child: Column(children: [Text(title, style: TextStyle(color: isActive ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface.withOpacity(0.38), fontWeight: isActive ? FontWeight.bold : FontWeight.normal, fontSize: 14)), if (isActive) Container(margin: const EdgeInsets.only(top: 8), height: 2, width: 60, color: Theme.of(context).colorScheme.primary)]));
 
   Widget _buildTextField(TextEditingController controller, String hint, {int maxLines = 1}) => TextField(controller: controller, maxLines: maxLines, style: TextStyle(color: Theme.of(context).colorScheme.onSurface), decoration: InputDecoration(hintText: hint, hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.38)), filled: true, fillColor: Theme.of(context).brightness == Brightness.dark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.05), border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide(color: Theme.of(context).dividerColor.withOpacity(0.12))), enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide(color: Theme.of(context).dividerColor.withOpacity(0.12)))));
 

@@ -83,9 +83,9 @@ class _RecruitmentJobApplicationScreenState
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.grey.withOpacity(0.1)),
+              border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.1)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -94,13 +94,13 @@ class _RecruitmentJobApplicationScreenState
                   widget.job.title,
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.w800,
-                        color: Colors.black87,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                 ),
                 const SizedBox(height: 6),
                 Text(
                   widget.job.companyName,
-                  style: const TextStyle(color: Colors.black54),
+                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
                 ),
               ],
             ),
@@ -118,21 +118,21 @@ class _RecruitmentJobApplicationScreenState
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.grey.shade300),
+                border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.2)),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.description_outlined, color: Colors.blue),
+                  Icon(Icons.description_outlined, color: Theme.of(context).colorScheme.primary),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
                       _selectedCVName ?? 'Upload your CV (PDF, DOC)',
-                      style: TextStyle(color: _selectedCVName == null ? Colors.black38 : Colors.black87),
+                      style: TextStyle(color: _selectedCVName == null ? Theme.of(context).colorScheme.onSurface.withOpacity(0.5) : Theme.of(context).colorScheme.onSurface),
                     ),
                   ),
-                  const Icon(Icons.cloud_upload_outlined, color: Colors.blue),
+                  Icon(Icons.cloud_upload_outlined, color: Theme.of(context).colorScheme.primary),
                 ],
               ),
             ),
@@ -164,14 +164,14 @@ class _RecruitmentJobApplicationScreenState
         decoration: InputDecoration(
           labelText: label,
           filled: true,
-          fillColor: Colors.white,
+          fillColor: Theme.of(context).colorScheme.surface,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Colors.grey.withOpacity(0.1)),
+            borderSide: BorderSide(color: Theme.of(context).dividerColor.withOpacity(0.1)),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Colors.grey.shade300),
+            borderSide: BorderSide(color: Theme.of(context).dividerColor.withOpacity(0.2)),
           ),
         ),
       ),

@@ -56,35 +56,47 @@ class _CompanySignInScreenState extends State<CompanySignInScreen> {
     final t = AppLocalizations.of(context);
     setState(() => _loading = true);
     try {
-      final GoogleSignInAccount? googleUser = await _googleSignInInstance.signIn();
+      final GoogleSignInAccount? googleUser = await _googleSignInInstance
+          .signIn();
       if (googleUser == null) {
         setState(() => _loading = false);
         return;
       }
 
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
       final String? idToken = googleAuth.idToken;
 
       if (idToken == null) {
         throw Exception('Failed to get Google ID Token');
       }
 
-      final userData = await RecruitmentSyncService.instance.googleLogin(idToken);
-      
+      final userData = await RecruitmentSyncService.instance.googleLogin(
+        idToken,
+      );
+
+      final companyName =
+          userData['name']?.toString() ??
+          googleUser.displayName ??
+          googleUser.email.split('@').first;
+      final userEmail = userData['email']?.toString() ?? googleUser.email;
+
       await SessionManager.saveCompanySession(
-        email: googleUser.email,
-        name: googleUser.displayName ?? googleUser.email.split('@').first,
+        email: userEmail,
+        name: companyName,
       );
 
       if (!mounted) return;
 
       CompanyStore.instance.setRegistrationData(
-        companyName: googleUser.displayName ?? googleUser.email.split('@').first,
-        email: googleUser.email,
+        companyName: companyName,
+        email: userEmail,
       );
 
       setState(() => _loading = false);
-      Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.companyDashboard, (route) => false);
+      Navigator.of(
+        context,
+      ).pushNamedAndRemoveUntil(AppRoutes.companyDashboard, (route) => false);
     } catch (e) {
       if (!mounted) return;
       setState(() => _loading = false);
@@ -98,52 +110,67 @@ class _CompanySignInScreenState extends State<CompanySignInScreen> {
     final t = AppLocalizations.of(context);
     if (!_validate()) return;
     setState(() => _loading = true);
-    
+
     try {
-      await RecruitmentSyncService.instance.login(
+      final userData = await RecruitmentSyncService.instance.login(
         email: _email.text.trim(),
         password: _password.text,
         expectedRole: 'company',
       );
 
+      final userName =
+          userData['name']?.toString() ?? _email.text.split('@').first;
+
       await SessionManager.saveCompanySession(
         email: _email.text.trim(),
-        name: _email.text.split('@').first,
+        name: userName,
       );
-      
+
       if (!mounted) return;
 
       CompanyStore.instance.setRegistrationData(
-        companyName: _email.text.split('@').first,
+        companyName: userName,
         email: _email.text.trim(),
       );
 
       await RecruitmentSyncService.instance.startPolling();
 
       setState(() => _loading = false);
-      Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.companyDashboard, (route) => false);
+      Navigator.of(
+        context,
+      ).pushNamedAndRemoveUntil(AppRoutes.companyDashboard, (route) => false);
     } catch (e) {
       if (!mounted) return;
       setState(() => _loading = false);
-      String msg = t.isAr ? 'البريد الإلكتروني أو كلمة المرور غير صحيحة' : 'Invalid email or password.';
-      
+      String msg = t.isAr
+          ? 'البريد الإلكتروني أو كلمة المرور غير صحيحة'
+          : 'Invalid email or password.';
+
       if (e is DioException) {
-        if (e.type == DioExceptionType.connectionTimeout || e.type == DioExceptionType.receiveTimeout) {
-          msg = t.isAr ? 'فشل الاتصال بالخادم، تحقق من الإنترنت' : 'Connection timeout. Check your internet.';
-        } else if (e.response?.statusCode == 401 || e.response?.statusCode == 403) {
-          msg = t.isAr ? 'البريد الإلكتروني أو كلمة المرور غير صحيحة' : 'Invalid email or password.';
+        if (e.type == DioExceptionType.connectionTimeout ||
+            e.type == DioExceptionType.receiveTimeout) {
+          msg = t.isAr
+              ? 'فشل الاتصال بالخادم، تحقق من الإنترنت'
+              : 'Connection timeout. Check your internet.';
+        } else if (e.response?.statusCode == 401 ||
+            e.response?.statusCode == 403) {
+          msg = t.isAr
+              ? 'البريد الإلكتروني أو كلمة المرور غير صحيحة'
+              : 'Invalid email or password.';
         } else {
-          msg = t.isAr ? 'حدث خطأ في الاتصال بالخادم' : 'Server connection error.';
+          msg = t.isAr
+              ? 'حدث خطأ في الاتصال بالخادم'
+              : 'Server connection error.';
         }
       } else {
-        msg = e.toString().contains('حساب شركة') || e.toString().contains('company account')
+        msg =
+            e.toString().contains('حساب شركة') ||
+                e.toString().contains('company account')
             ? e.toString().replaceAll('Exception: ', '')
             : msg;
       }
-      
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(msg)),
-      );
+
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
     }
   }
 
@@ -160,9 +187,9 @@ class _CompanySignInScreenState extends State<CompanySignInScreen> {
           Text(
             t.signInToAccount,
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  fontSize: 32,
-                ),
+              fontWeight: FontWeight.w800,
+              fontSize: 32,
+            ),
           ),
           const SizedBox(height: 30),
           AppTextField(
@@ -181,8 +208,9 @@ class _CompanySignInScreenState extends State<CompanySignInScreen> {
             hint: t.enterYourPassword,
             obscureText: _obscure,
             validatorText: _passwordError,
-            onChanged: (_) =>
-                _passwordError == null ? null : setState(() => _passwordError = null),
+            onChanged: (_) => _passwordError == null
+                ? null
+                : setState(() => _passwordError = null),
             suffix: IconButton(
               onPressed: () => setState(() => _obscure = !_obscure),
               icon: Icon(_obscure ? Icons.visibility_off : Icons.visibility),
@@ -191,9 +219,9 @@ class _CompanySignInScreenState extends State<CompanySignInScreen> {
           Align(
             alignment: t.isAr ? Alignment.centerLeft : Alignment.centerRight,
             child: TextButton(
-              onPressed: () => Navigator.of(context).pushNamed(
-                AppRoutes.companyForgotPassword,
-              ),
+              onPressed: () => Navigator.of(
+                context,
+              ).pushNamed(AppRoutes.companyForgotPassword),
               child: Text(t.forgotPassword),
             ),
           ),
@@ -206,7 +234,11 @@ class _CompanySignInScreenState extends State<CompanySignInScreen> {
           const SizedBox(height: 18),
           Row(
             children: [
-              Expanded(child: Divider(color: Colors.white.withOpacity(0.15))),
+              Expanded(
+                child: Divider(
+                  color: Theme.of(context).dividerColor.withOpacity(0.15),
+                ),
+              ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 child: Text(t.orSignInWith),
@@ -231,7 +263,9 @@ class _CompanySignInScreenState extends State<CompanySignInScreen> {
               Text(
                 t.dontHaveAccount,
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.7),
                 ),
               ),
               TextButton(

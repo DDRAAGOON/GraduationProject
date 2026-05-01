@@ -87,9 +87,9 @@ class _TradesmanBrowseCompaniesScreenState extends State<TradesmanBrowseCompanie
         final companies = _getCompanies();
 
         return Scaffold(
-          backgroundColor: const Color(0xFFF9F5F1),
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           appBar: AppBar(
-            backgroundColor: const Color(0xFFF9F5F1),
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
             elevation: 0,
             surfaceTintColor: Colors.transparent,
             leadingWidth: 70,
@@ -150,10 +150,10 @@ class _TradesmanBrowseCompaniesScreenState extends State<TradesmanBrowseCompanie
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(24),
                   boxShadow: [
-                    BoxShadow(color: const Color(0xFF49769F).withOpacity(0.08), blurRadius: 20, offset: const Offset(0, 10))
+                    BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 20, offset: const Offset(0, 10))
                   ],
                 ),
                 child: Column(
@@ -217,7 +217,7 @@ class _TradesmanBrowseCompaniesScreenState extends State<TradesmanBrowseCompanie
               ),
               const SizedBox(height: 32),
               Text(isAr ? 'التصنيف' : 'Classification',
-                  style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: Color(0xFF011931))),
+                  style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: Theme.of(context).colorScheme.onSurface)),
               const SizedBox(height: 16),
               Row(
                 children: [
@@ -324,10 +324,10 @@ class _TradesmanBrowseCompaniesScreenState extends State<TradesmanBrowseCompanie
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: Colors.grey.withOpacity(0.05)),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 4))],
+          border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
+          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 4))],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -344,7 +344,7 @@ class _TradesmanBrowseCompaniesScreenState extends State<TradesmanBrowseCompanie
                           child: Image(
                             image: getAppImageProvider(company.logoUrl)!,
                             fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => const Icon(Icons.business_rounded, color: Color(0xFF49769F), size: 28),
+                            errorBuilder: (_, _, _) => const Icon(Icons.business_rounded, color: Color(0xFF49769F), size: 28),
                           ),
                         )
                       : const Icon(Icons.business_rounded, color: Color(0xFF49769F), size: 28),

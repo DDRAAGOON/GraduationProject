@@ -33,9 +33,9 @@ class _ProfileLoginDetailsScreenState extends State<ProfileLoginDetailsScreen> {
     final isAr = t.isAr;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF9F5F1),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF9F5F1),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         title: Text(
@@ -76,7 +76,7 @@ class _ProfileLoginDetailsScreenState extends State<ProfileLoginDetailsScreen> {
               ),
             ),
             const SizedBox(height: 10),
-            const Divider(color: Colors.black12, height: 1),
+            Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 1),
             const SizedBox(height: 30),
 
             // Account Security Title
@@ -121,7 +121,7 @@ class _ProfileLoginDetailsScreenState extends State<ProfileLoginDetailsScreen> {
             ),
             
             const SizedBox(height: 60),
-            const Divider(color: Colors.black12, height: 1),
+            Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 1),
             const SizedBox(height: 30),
 
             // Save Button
@@ -136,7 +136,7 @@ class _ProfileLoginDetailsScreenState extends State<ProfileLoginDetailsScreen> {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF49769F),
+                    backgroundColor: Theme.of(context).colorScheme.primary,
                     padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                   ),
@@ -159,7 +159,7 @@ class _ProfileLoginDetailsScreenState extends State<ProfileLoginDetailsScreen> {
           Text(
             title,
             style: TextStyle(
-              color: isActive ? const Color(0xFF49769F) : Colors.black38, 
+              color: isActive ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), 
               fontWeight: isActive ? FontWeight.bold : FontWeight.normal, 
               fontSize: 14,
             ),
@@ -169,7 +169,7 @@ class _ProfileLoginDetailsScreenState extends State<ProfileLoginDetailsScreen> {
               margin: const EdgeInsets.only(top: 8),
               height: 2,
               width: 60,
-              color: const Color(0xFF49769F),
+              color: Theme.of(context).colorScheme.primary,
             ),
         ],
       ),
@@ -180,23 +180,23 @@ class _ProfileLoginDetailsScreenState extends State<ProfileLoginDetailsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(color: Colors.black87, fontSize: 14, fontWeight: FontWeight.bold)),
+        Text(label, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14, fontWeight: FontWeight.bold)),
         const SizedBox(height: 8),
         TextField(
           controller: controller,
           obscureText: obscure,
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: const TextStyle(color: Colors.black26, fontSize: 13),
+            hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3), fontSize: 13),
             suffixIcon: TextButton(
               onPressed: onToggle,
-              child: Text(obscure ? "Show" : "Hide", style: const TextStyle(color: Color(0xFF49769F), fontSize: 12)),
+              child: Text(obscure ? "Show" : "Hide", style: TextStyle(color: Theme.of(context).colorScheme.primary, fontSize: 12)),
             ),
             filled: true,
-            fillColor: Colors.white,
+            fillColor: Theme.of(context).brightness == Brightness.dark ? Colors.white.withValues(alpha: 0.05) : Colors.white,
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Colors.black12)),
-            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Colors.black12)),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.12))),
+            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.12))),
           ),
         ),
       ],

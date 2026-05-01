@@ -47,10 +47,10 @@ class CompanyApplicantDetailsResumeScreen extends StatelessWidget {
           const SizedBox(height: 16),
           Card(
             child: ListTile(
-              leading: const Icon(Icons.picture_as_pdf_outlined),
-              title: const Text('my_cv.pdf'),
+              leading: Icon(Icons.description_outlined, color: Theme.of(context).colorScheme.primary),
+              title: Text(t.isAr ? 'فيش وتشبيه.pdf' : 'Criminal_Record.pdf'),
               subtitle: Text('498 kB • ${t.lastUsed}'),
-              trailing: const Icon(Icons.check_circle_outline),
+              trailing: Icon(Icons.check_circle_outline, color: Colors.green.shade600),
               onTap: () {},
             ),
           ),

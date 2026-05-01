@@ -1,10 +1,10 @@
-import 'package:url_launcher/url_launcher.dart';
-import '../../../../shared/utils/image_helper.dart';
 import 'package:flutter/material.dart';
-import '../../../../../shared/l10n/app_localizations.dart';
-import '../../profile/user_data.dart';
-import '../setting/settings.dart';
-import '../../home/recruitment_user_shell_screen.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:graduationproject/shared/utils/image_helper.dart';
+import 'package:graduationproject/shared/l10n/app_localizations.dart';
+import 'package:graduationproject/screens/user/profile/user_data.dart';
+import 'package:graduationproject/screens/user/teardsman/setting/settings.dart';
+import 'package:graduationproject/screens/user/home/recruitment_user_shell_screen.dart';
 
 class TradesmanProfile extends StatefulWidget {
   const TradesmanProfile({super.key});
@@ -19,7 +19,7 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
     final t = AppLocalizations.of(context);
     
     return Scaffold(
-      backgroundColor: const Color(0xFFF9F5F1),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -75,7 +75,7 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
                       ),
                       child: CircleAvatar(
                         radius: 60,
-                        backgroundColor: Colors.white,
+                        backgroundColor: Theme.of(context).cardColor,
                         backgroundImage: getAppImageProvider(UserProfileData.profileImage),
                         child: UserProfileData.profileImage == null 
                             ? const Icon(Icons.person, size: 70, color: Color(0xFF49769F)) 
@@ -93,13 +93,13 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
             Text(
               UserProfileData.fullName.isEmpty ? "No Name" : UserProfileData.fullName,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: Color(0xFF011931), fontSize: 28, fontWeight: FontWeight.w900),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 28, fontWeight: FontWeight.w900),
             ),
             const SizedBox(height: 6),
             Text(
               UserProfileData.jobTitle.isEmpty ? "Service Provider" : UserProfileData.jobTitle,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: Color(0xFF49769F), fontSize: 16, fontWeight: FontWeight.w700),
+              style: TextStyle(color: Theme.of(context).colorScheme.primary, fontSize: 16, fontWeight: FontWeight.w700),
             ),
             
             const SizedBox(height: 35),
@@ -146,7 +146,7 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
                         const SizedBox(height: 12),
                         Text(
                           UserProfileData.aboutMe.isEmpty ? "No info provided yet." : UserProfileData.aboutMe,
-                          style: const TextStyle(color: Colors.black54, fontSize: 14, height: 1.5),
+                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), fontSize: 14, height: 1.5),
                         ),
                       ],
                     ),
@@ -233,12 +233,12 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
                                 children: [
                                   Container(
                                     padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(color: const Color(0xFFF0F3FF), borderRadius: BorderRadius.circular(10)),
-                                    child: const Icon(Icons.link_rounded, color: Color(0xFF49769F), size: 18),
+                                    decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)),
+                                    child: Icon(Icons.link_rounded, color: Theme.of(context).colorScheme.primary, size: 18),
                                   ),
                                   const SizedBox(width: 12),
-                                  Text("${link['platform']}: ", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                                  Expanded(child: Text(link['url'] ?? "", style: const TextStyle(color: Color(0xFF49769F), decoration: TextDecoration.underline), overflow: TextOverflow.ellipsis)),
+                                  Text("${link['platform']}: ", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Theme.of(context).colorScheme.onSurface)),
+                                  Expanded(child: Text(link['url'] ?? "", style: TextStyle(color: Theme.of(context).colorScheme.primary, decoration: TextDecoration.underline), overflow: TextOverflow.ellipsis)),
                                 ],
                               ),
                             ),
@@ -263,16 +263,16 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
                               children: [
                                 Container(
                                   padding: const EdgeInsets.all(10),
-                                  decoration: BoxDecoration(color: const Color(0xFFF0F3FF), borderRadius: BorderRadius.circular(12)),
-                                  child: const Icon(Icons.school, color: Color(0xFF49769F), size: 20),
+                                  decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
+                                  child: Icon(Icons.school, color: Theme.of(context).colorScheme.primary, size: 20),
                                 ),
                                 const SizedBox(width: 16),
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text(edu['institution'] ?? "", style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF011931))),
-                                      Text("${edu['degree']} • ${edu['duration']}", style: const TextStyle(color: Colors.black45, fontSize: 12)),
+                                      Text(edu['institution'] ?? "", style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
+                                      Text("${edu['degree']} • ${edu['duration']}", style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 12)),
                                     ],
                                   ),
                                 ),
@@ -299,10 +299,10 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.grey.withOpacity(0.05)),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.015), blurRadius: 15, offset: const Offset(0, 8))],
+        border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 15, offset: const Offset(0, 8))],
       ),
       child: child,
     );
@@ -311,9 +311,9 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
   Widget _buildSectionHeader(String title, IconData icon) {
     return Row(
       children: [
-        Icon(icon, color: const Color(0xFF49769F), size: 22),
+        Icon(icon, color: Theme.of(context).colorScheme.primary, size: 22),
         const SizedBox(width: 10),
-        Text(title, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: Color(0xFF011931))),
+        Text(title, style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: Theme.of(context).colorScheme.onSurface)),
       ],
     );
   }
@@ -324,19 +324,22 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
       children: [
         Container(
           padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(color: const Color(0xFFF0F3FF), borderRadius: BorderRadius.circular(12)),
-          child: Icon(icon, color: const Color(0xFF49769F), size: 20),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(icon, color: Theme.of(context).colorScheme.primary, size: 20),
         ),
         const SizedBox(width: 16),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label, style: const TextStyle(color: Colors.black38, fontSize: 11, fontWeight: FontWeight.bold)),
+              Text(label, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 11, fontWeight: FontWeight.bold)),
               const SizedBox(height: 4),
               Text(
                 value.isEmpty ? "Not provided" : value,
-                style: const TextStyle(color: Color(0xFF011931), fontSize: 15, fontWeight: FontWeight.w600),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 15, fontWeight: FontWeight.w600),
               ),
             ],
           ),

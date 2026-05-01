@@ -21,8 +21,10 @@ class RecruitmentJob {
     this.niceToHaves = const [],
     required this.benefits,
     this.logoIcon,
+    this.companyLogoUrl,
     this.capacity = 1,
     this.acceptedCount = 0,
+    this.deadline,
   });
 
   final String id;
@@ -41,8 +43,10 @@ class RecruitmentJob {
   final List<String> niceToHaves;
   final List<String> benefits;
   final IconData? logoIcon;
+  final String? companyLogoUrl;
   final int capacity;
   final int acceptedCount;
+  final DateTime? deadline;
 }
 
 class RecruitmentApplication {
@@ -88,10 +92,7 @@ class RecruitmentApplication {
   final String? phone;
   final String? location;
 
-  RecruitmentApplication copyWith({
-    String? status,
-    DateTime? updatedAt,
-  }) {
+  RecruitmentApplication copyWith({String? status, DateTime? updatedAt}) {
     return RecruitmentApplication(
       id: id,
       jobId: jobId,
@@ -170,11 +171,19 @@ class RecruitmentSyncStore extends ChangeNotifier {
   static final RecruitmentSyncStore instance = RecruitmentSyncStore._();
 
   static const List<String> categories = [
-    'All', 'Technical', 'Non-technical', 'Service', 'Tradesman',
+    'All',
+    'Technical',
+    'Non-Technical',
+    'Service',
+    'Tradesman',
   ];
 
   static const List<String> salaryRanges = [
-    'All', '10k - 20k', '20k - 30k', '30k - 45k', 'Negotiable',
+    'All',
+    '10k - 20k',
+    '20k - 30k',
+    '30k - 45k',
+    'Negotiable',
   ];
 
   static const Map<String, String> locationTranslations = {
@@ -210,7 +219,35 @@ class RecruitmentSyncStore extends ChangeNotifier {
   };
 
   static const List<String> egyptGovernorates = [
-    'All', 'Cairo', 'Giza', 'Alexandria', 'Dakahlia', 'Red Sea', 'Beheira', 'Fayoum', 'Gharbia', 'Ismailia', 'Monufia', 'Minya', 'Qalyubia', 'New Valley', 'Sharqia', 'Suez', 'Aswan', 'Assiut', 'Beni Suef', 'Port Said', 'Damietta', 'South Sinai', 'Kafr El Sheikh', 'Matrouh', 'Luxor', 'Qena', 'Sohag', 'North Sinai', 'Remote',
+    'All',
+    'Cairo',
+    'Giza',
+    'Alexandria',
+    'Dakahlia',
+    'Red Sea',
+    'Beheira',
+    'Fayoum',
+    'Gharbia',
+    'Ismailia',
+    'Monufia',
+    'Minya',
+    'Qalyubia',
+    'New Valley',
+    'Sharqia',
+    'Suez',
+    'Aswan',
+    'Assiut',
+    'Beni Suef',
+    'Port Said',
+    'Damietta',
+    'South Sinai',
+    'Kafr El Sheikh',
+    'Matrouh',
+    'Luxor',
+    'Qena',
+    'Sohag',
+    'North Sinai',
+    'Remote',
   ];
 
   final List<RecruitmentJob> _jobs = <RecruitmentJob>[];
@@ -218,7 +255,7 @@ class RecruitmentSyncStore extends ChangeNotifier {
   final List<RecruitmentMessage> _messages = <RecruitmentMessage>[];
   final List<ChatThread> _tradesmanChatThreads = <ChatThread>[];
   final Set<String> _savedJobIds = <String>{};
-  
+
   String _currentUserName = 'Ahmed User';
   String _currentUserEmail = 'user@jobito.com';
   String _currentUserPhone = '';
@@ -241,11 +278,14 @@ class RecruitmentSyncStore extends ChangeNotifier {
   final List<ServiceRequestPost> _serviceRequests = <ServiceRequestPost>[];
 
   List<RecruitmentJob> get jobs => List<RecruitmentJob>.unmodifiable(_jobs);
-  List<RecruitmentApplication> get applications => List<RecruitmentApplication>.unmodifiable(_applications);
-  List<RecruitmentMessage> get messages => List<RecruitmentMessage>.unmodifiable(_messages);
-  List<ChatThread> get tradesmanChatThreads => List<ChatThread>.unmodifiable(_tradesmanChatThreads);
+  List<RecruitmentApplication> get applications =>
+      List<RecruitmentApplication>.unmodifiable(_applications);
+  List<RecruitmentMessage> get messages =>
+      List<RecruitmentMessage>.unmodifiable(_messages);
+  List<ChatThread> get tradesmanChatThreads =>
+      List<ChatThread>.unmodifiable(_tradesmanChatThreads);
   Set<String> get savedJobIds => Set<String>.unmodifiable(_savedJobIds);
-  
+
   String get currentUserName => _currentUserName;
   String get currentUserEmail => _currentUserEmail;
   String get currentUserPhone => _currentUserPhone;
@@ -265,7 +305,8 @@ class RecruitmentSyncStore extends ChangeNotifier {
   List<String> get currentUserSkills => _currentUserSkills;
   List<Map<String, String>> get currentUserEducation => _currentUserEducation;
   List<Map<String, String>> get currentUserExperience => _currentUserExperience;
-  List<ServiceRequestPost> get serviceRequests => List<ServiceRequestPost>.unmodifiable(_serviceRequests);
+  List<ServiceRequestPost> get serviceRequests =>
+      List<ServiceRequestPost>.unmodifiable(_serviceRequests);
 
   void updateCurrentUser({
     String? name,
@@ -289,41 +330,71 @@ class RecruitmentSyncStore extends ChangeNotifier {
       _jobs.where((item) => _savedJobIds.contains(item.id)).toList();
 
   List<RecruitmentJob> get filteredJobs {
+    final now = DateTime.now();
     return _jobs.where((job) {
-      final query = _searchQuery.toLowerCase();
-      final searchParts = query.split(RegExp(r'\s+')).where((part) => part.isNotEmpty);
-      
-      final matchesQuery = _searchQuery.isEmpty || searchParts.every((part) {
-          final titleMatch = job.title.toLowerCase().contains(part);
-          final companyMatch = job.companyName.toLowerCase().contains(part);
-          final locationEn = job.location;
-          final locationAr = locationTranslations[locationEn] ?? '';
-          final locationMatch = locationEn.toLowerCase().contains(part) || 
-                                locationAr.toLowerCase().contains(part);
-          
-          return titleMatch || companyMatch || locationMatch;
-      });
+      // Auto-close logic: Hide jobs where capacity is met or deadline has passed
+      if (job.acceptedCount >= job.capacity) return false;
+      if (job.deadline != null && job.deadline!.isBefore(now)) return false;
 
-      final matchesType = _filterType == 'All' || job.type == _filterType;
-      bool matchesLocation = _filterLocation == 'All' || _filterLocation == 'الكل';
+      final query = _searchQuery.toLowerCase();
+      final searchParts = query
+          .split(RegExp(r'\s+'))
+          .where((part) => part.isNotEmpty);
+
+      final matchesQuery =
+          _searchQuery.isEmpty ||
+          searchParts.every((part) {
+            final titleMatch = job.title.toLowerCase().contains(part);
+            final companyMatch = job.companyName.toLowerCase().contains(part);
+            final locationEn = job.location;
+            final locationAr = locationTranslations[locationEn] ?? '';
+            final locationMatch =
+                locationEn.toLowerCase().contains(part) ||
+                locationAr.toLowerCase().contains(part);
+
+            return titleMatch || companyMatch || locationMatch;
+          });
+
+      final matchesType =
+          _filterType == 'All' ||
+          job.type.toLowerCase() == _filterType.toLowerCase();
+      bool matchesLocation =
+          _filterLocation == 'All' || _filterLocation == 'الكل';
       if (!matchesLocation) {
-        final currentFilterAr = locationTranslations[_filterLocation] ?? _filterLocation;
-        final jobLocationAr = locationTranslations[job.location] ?? job.location;
-        matchesLocation = job.location == _filterLocation || jobLocationAr == _filterLocation || job.location == currentFilterAr;
+        final currentFilterAr =
+            locationTranslations[_filterLocation] ?? _filterLocation;
+        final jobLocationAr =
+            locationTranslations[job.location] ?? job.location;
+        matchesLocation =
+            job.location == _filterLocation ||
+            jobLocationAr == _filterLocation ||
+            job.location == currentFilterAr;
       }
 
-      final matchesCategory = _filterCategory == 'All' || job.category == _filterCategory;
-      final matchesSalary = _filterSalaryRange == 'All' || job.salaryRange.contains(_filterSalaryRange);
+      final matchesCategory =
+          _filterCategory == 'All' ||
+          job.category.toLowerCase() == _filterCategory.toLowerCase();
+      final matchesSalary =
+          _filterSalaryRange == 'All' ||
+          job.salaryRange.toLowerCase().contains(
+            _filterSalaryRange.toLowerCase(),
+          );
 
-      return matchesQuery && matchesType && matchesLocation && matchesCategory && matchesSalary;
+      return matchesQuery &&
+          matchesType &&
+          matchesLocation &&
+          matchesCategory &&
+          matchesSalary;
     }).toList();
   }
 
   void updateTradesmanChat(String name, String image, String text) {
-    final existingIndex = _tradesmanChatThreads.indexWhere((t) => t.name == name);
+    final existingIndex = _tradesmanChatThreads.indexWhere(
+      (t) => t.name == name,
+    );
     final now = DateTime.now();
     final timeStr = "${now.hour}:${now.minute.toString().padLeft(2, '0')}";
-    
+
     if (existingIndex != -1) {
       _tradesmanChatThreads[existingIndex].lastMessage = text;
       _tradesmanChatThreads[existingIndex].time = timeStr;
@@ -331,18 +402,21 @@ class RecruitmentSyncStore extends ChangeNotifier {
       final thread = _tradesmanChatThreads.removeAt(existingIndex);
       _tradesmanChatThreads.insert(0, thread);
     } else {
-      _tradesmanChatThreads.insert(0, ChatThread(
-        name: name,
-        image: image,
-        lastMessage: text,
-        time: timeStr,
-      ));
+      _tradesmanChatThreads.insert(
+        0,
+        ChatThread(name: name, image: image, lastMessage: text, time: timeStr),
+      );
     }
     notifyListeners();
   }
 
   void companyPostJob(RecruitmentJob job) {
     _jobs.insert(0, job);
+    notifyListeners();
+  }
+
+  void removeJob(String jobId) {
+    _jobs.removeWhere((j) => j.id == jobId);
     notifyListeners();
   }
 
@@ -427,11 +501,10 @@ class RecruitmentSyncStore extends ChangeNotifier {
     notifyListeners();
   }
 
-  void userApplyToJob({
-    required String jobId,
-    required String userName,
-  }) {
-    final int index = _jobs.indexWhere((RecruitmentJob item) => item.id == jobId);
+  void userApplyToJob({required String jobId, required String userName}) {
+    final int index = _jobs.indexWhere(
+      (RecruitmentJob item) => item.id == jobId,
+    );
     if (index < 0) return;
     final RecruitmentJob job = _jobs[index];
     _applications.insert(
@@ -453,12 +526,37 @@ class RecruitmentSyncStore extends ChangeNotifier {
     required String applicationId,
     required String nextStatus,
   }) {
-    final int index = _applications.indexWhere((app) => app.id == applicationId);
+    final int index = _applications.indexWhere(
+      (app) => app.id == applicationId,
+    );
     if (index < 0) return;
-    _applications[index] = _applications[index].copyWith(
+
+    final RecruitmentApplication previousApplication = _applications[index];
+    final String previousStatus = previousApplication.status;
+    _applications[index] = previousApplication.copyWith(
       status: nextStatus,
       updatedAt: DateTime.now(),
     );
+
+    final int jobIndex = CompanyStore.instance.jobs.indexWhere(
+      (job) => job.id == previousApplication.jobId,
+    );
+    if (jobIndex >= 0) {
+      final job = CompanyStore.instance.jobs[jobIndex];
+      final bool wasHired = previousStatus.toLowerCase().contains('hire');
+      final bool isHired = nextStatus.toLowerCase().contains('hire');
+      if (wasHired != isHired) {
+        final int updatedAcceptedCount =
+            (job.acceptedCount + (isHired ? 1 : -1)).clamp(
+              0,
+              job.requiredCount,
+            );
+        CompanyStore.instance.saveJob(
+          job.copyWith(acceptedCount: updatedAcceptedCount),
+        );
+      }
+    }
+
     notifyListeners();
   }
 
@@ -483,10 +581,24 @@ class RecruitmentSyncStore extends ChangeNotifier {
     // 1. Update Jobs
     _jobs.clear();
     final List<Job> companyJobs = [];
-    final currentCompanyName = CompanyStore.instance.companyName.trim().toLowerCase();
+    final currentCompanyName = CompanyStore.instance.companyName
+        .trim()
+        .toLowerCase();
     final currentCompanyId = CompanyStore.instance.companyId;
 
-    for (final item in jobs) {
+    // Convert and sort jobs by date descending
+    final List<Map<String, dynamic>> sortedJobs = List.from(jobs);
+    sortedJobs.sort((a, b) {
+      final da =
+          DateTime.tryParse(a['createdAt']?.toString() ?? '') ??
+          DateTime.fromMillisecondsSinceEpoch(0);
+      final db =
+          DateTime.tryParse(b['createdAt']?.toString() ?? '') ??
+          DateTime.fromMillisecondsSinceEpoch(0);
+      return db.compareTo(da);
+    });
+
+    for (final item in sortedJobs) {
       final rJob = RecruitmentJob(
         id: item['id']?.toString() ?? '',
         title: item['title']?.toString() ?? 'Untitled',
@@ -496,15 +608,34 @@ class RecruitmentSyncStore extends ChangeNotifier {
         type: item['type']?.toString() ?? 'Full-time',
         status: item['status']?.toString() ?? 'Open',
         category: item['category']?.toString() ?? 'Technical',
-        tags: item['tags'] is List ? (item['tags'] as List).map((e) => e.toString()).toList() : const [],
-        publishedAt: DateTime.tryParse(item['createdAt']?.toString() ?? '') ?? DateTime.now(),
+        tags: item['tags'] is List
+            ? (item['tags'] as List).map((e) => e.toString()).toList()
+            : const [],
+        publishedAt:
+            DateTime.tryParse(item['createdAt']?.toString() ?? '') ??
+            DateTime.now(),
         description: item['description']?.toString() ?? '',
-        responsibilities: item['responsibilities'] is List ? (item['responsibilities'] as List).map((e) => e.toString()).toList() : const [],
-        qualifications: item['qualifications'] is List ? (item['qualifications'] as List).map((e) => e.toString()).toList() : const [],
-        niceToHaves: item['niceToHaves'] is List ? (item['niceToHaves'] as List).map((e) => e.toString()).toList() : const [],
-        benefits: item['benefits'] is List ? (item['benefits'] as List).map((e) => e.toString()).toList() : const [],
+        responsibilities: item['responsibilities'] is List
+            ? (item['responsibilities'] as List)
+                  .map((e) => e.toString())
+                  .toList()
+            : const [],
+        qualifications: item['qualifications'] is List
+            ? (item['qualifications'] as List).map((e) => e.toString()).toList()
+            : const [],
+        niceToHaves: item['niceToHaves'] is List
+            ? (item['niceToHaves'] as List).map((e) => e.toString()).toList()
+            : const [],
+        benefits: item['benefits'] is List
+            ? (item['benefits'] as List).map((e) => e.toString()).toList()
+            : const [],
+        companyLogoUrl: item['companyLogoUrl']?.toString(),
         capacity: int.tryParse(item['requiredCount']?.toString() ?? '1') ?? 1,
-        acceptedCount: int.tryParse(item['acceptedCount']?.toString() ?? '0') ?? 0,
+        acceptedCount:
+            int.tryParse(item['acceptedCount']?.toString() ?? '0') ?? 0,
+        deadline: item['deadline'] != null
+            ? DateTime.tryParse(item['deadline'].toString())
+            : null,
       );
       _jobs.add(rJob);
 
@@ -533,31 +664,41 @@ class RecruitmentSyncStore extends ChangeNotifier {
     // 2. Update Applications
     _applications.clear();
     for (final item in applications) {
-      _applications.add(RecruitmentApplication(
-        id: item['id']?.toString() ?? '',
-        jobId: item['jobId']?.toString() ?? '',
-        jobTitle: item['jobTitle']?.toString() ?? '',
-        companyName: item['companyName']?.toString() ?? '',
-        userName: item['userName']?.toString() ?? '',
-        status: item['status']?.toString() ?? 'Pending',
-        updatedAt: DateTime.tryParse(item['updatedAt']?.toString() ?? '') ?? DateTime.now(),
-        email: item['email']?.toString(),
-        phone: item['phone']?.toString(),
-        location: item['location']?.toString(),
-        about: item['about']?.toString(),
-        skills: item['skills'] is List ? (item['skills'] as List).map((e) => e.toString()).toList() : const [],
-      ));
+      _applications.add(
+        RecruitmentApplication(
+          id: item['id']?.toString() ?? '',
+          jobId: item['jobId']?.toString() ?? '',
+          jobTitle: item['jobTitle']?.toString() ?? '',
+          companyName: item['companyName']?.toString() ?? '',
+          userName: item['userName']?.toString() ?? '',
+          status: item['status']?.toString() ?? 'Pending',
+          updatedAt:
+              DateTime.tryParse(item['updatedAt']?.toString() ?? '') ??
+              DateTime.now(),
+          email: item['email']?.toString(),
+          phone: item['phone']?.toString(),
+          location: item['location']?.toString(),
+          about: item['about']?.toString(),
+          skills: item['skills'] is List
+              ? (item['skills'] as List).map((e) => e.toString()).toList()
+              : const [],
+        ),
+      );
     }
 
     // 3. Update Messages
     _messages.clear();
     for (final item in messages) {
-      _messages.add(RecruitmentMessage(
-        id: item['id']?.toString() ?? '',
-        fromCompany: item['fromCompany'] == true,
-        text: item['text']?.toString() ?? '',
-        createdAt: DateTime.tryParse(item['createdAt']?.toString() ?? '') ?? DateTime.now(),
-      ));
+      _messages.add(
+        RecruitmentMessage(
+          id: item['id']?.toString() ?? '',
+          fromCompany: item['fromCompany'] == true,
+          text: item['text']?.toString() ?? '',
+          createdAt:
+              DateTime.tryParse(item['createdAt']?.toString() ?? '') ??
+              DateTime.now(),
+        ),
+      );
     }
 
     notifyListeners();

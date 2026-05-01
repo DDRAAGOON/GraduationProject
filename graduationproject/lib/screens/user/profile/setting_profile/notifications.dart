@@ -22,9 +22,9 @@ class _NotificationsState extends State<Notifications> {
     final isAr = t.isAr;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF9F5F1),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF9F5F1),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         title: Text(
@@ -65,13 +65,13 @@ class _NotificationsState extends State<Notifications> {
               ),
             ),
             const SizedBox(height: 10),
-            const Divider(color: Colors.black12, height: 1),
+            Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 1),
             const SizedBox(height: 30),
 
             // Notification Settings Title
             Text(t.tr(en: "Notification Settings", ar: "إعدادات الإشعارات"), style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
-            Text(t.tr(en: "Choose how and when you want to receive notifications from us.", ar: "اختر كيف ومتى تود استلام الإشعارات منا."), style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 13)),
+            Text(t.tr(en: "Choose how and when you want to receive notifications from us.", ar: "اختر كيف ومتى تود استلام الإشعارات منا."), style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 13)),
             const SizedBox(height: 40),
 
             _buildNotificationOption(
@@ -94,7 +94,7 @@ class _NotificationsState extends State<Notifications> {
             ),
 
             const SizedBox(height: 60),
-            const Divider(color: Colors.black12, height: 1),
+            Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 1),
             const SizedBox(height: 30),
 
             // Save Button
@@ -109,7 +109,7 @@ class _NotificationsState extends State<Notifications> {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF49769F),
+                    backgroundColor: Theme.of(context).colorScheme.primary,
                     padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                   ),
@@ -132,7 +132,7 @@ class _NotificationsState extends State<Notifications> {
           Text(
             title,
             style: TextStyle(
-              color: isActive ? const Color(0xFF49769F) : Colors.black38, 
+              color: isActive ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5), 
               fontWeight: isActive ? FontWeight.bold : FontWeight.normal, 
               fontSize: 14,
             ),
@@ -142,7 +142,7 @@ class _NotificationsState extends State<Notifications> {
               margin: const EdgeInsets.only(top: 8),
               height: 2,
               width: 60,
-              color: const Color(0xFF49769F),
+              color: Theme.of(context).colorScheme.primary,
             ),
         ],
       ),
@@ -158,9 +158,9 @@ class _NotificationsState extends State<Notifications> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: const TextStyle(color: Colors.black87, fontSize: 16, fontWeight: FontWeight.bold)),
+                Text(title, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 4),
-                Text(subtitle, style: const TextStyle(color: Colors.black38, fontSize: 13)),
+                Text(subtitle, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), fontSize: 13)),
               ],
             ),
           ),
@@ -168,9 +168,9 @@ class _NotificationsState extends State<Notifications> {
             value: value,
             onChanged: onChanged,
             activeThumbColor: Colors.white,
-            activeTrackColor: const Color(0xFF49769F),
+            activeTrackColor: Theme.of(context).colorScheme.primary,
             inactiveThumbColor: Colors.white,
-            inactiveTrackColor: Colors.black12,
+            inactiveTrackColor: Theme.of(context).colorScheme.outlineVariant,
           ),
         ],
       ),

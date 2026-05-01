@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../profile/user_data.dart';
-import '../../teardsman/nav_Botton_bar/nav_bottom_bar.dart';
-import '../../teardsman/profile/teardsman_data.dart';
-import '../../../../../shared/l10n/app_localizations.dart';
-import '../../../../../shared/state/recruitment_sync_store.dart';
-import '../../../../../shared/services/recruitment_sync_service.dart';
-import '../../../../../shared/services/session_manager.dart';
-import '../../../../../app/router/app_router.dart';
+import 'package:graduationproject/screens/user/profile/user_data.dart';
+import 'package:graduationproject/screens/user/teardsman/nav_Botton_bar/nav_bottom_bar.dart';
+import 'package:graduationproject/screens/user/teardsman/profile/teardsman_data.dart';
+import 'package:graduationproject/shared/l10n/app_localizations.dart';
+import 'package:graduationproject/shared/state/recruitment_sync_store.dart';
+import 'package:graduationproject/shared/services/recruitment_sync_service.dart';
+import 'package:graduationproject/shared/services/session_manager.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -62,9 +61,8 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
   final List<Map<String, String>> _educationList = [];
   final List<String> _skillsList = [];
   
-  // Criminal Record and Work Images state
+  // Criminal record state
   String? _criminalRecordPath;
-  List<String> _workImagesPaths = [];
   String? _profileImagePath;
 
   Future<void> _pickProfileImage() async {
@@ -87,16 +85,6 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
         _criminalRecordPath = result.files.single.path;
       });
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Criminal Record selected successfully")));
-    }
-  }
-
-  Future<void> _pickWorkImages() async {
-    final ImagePicker picker = ImagePicker();
-    final List<XFile> images = await picker.pickMultiImage();
-    if (images.isNotEmpty) {
-      setState(() {
-        _workImagesPaths.addAll(images.map((i) => i.path));
-      });
     }
   }
 
@@ -208,8 +196,7 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
         TradesmanProfileData.criminalRecordUploaded = _criminalRecordPath != null;
         TradesmanProfileData.profileImage = _profileImagePath;
         
-        UserProfileData.portfolioImages = List.from(_workImagesPaths);
-        UserProfileData.cvName = _criminalRecordPath != null ? "Criminal_Record" : null;
+        UserProfileData.cvName = _criminalRecordPath != null ? "Criminal_Record_Certificate" : null;
 
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Tradesman Profile saved successfully!")));
         
@@ -229,9 +216,9 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: const Color(0xFFF9F5F1),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF9F5F1),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         title: Text(
@@ -260,7 +247,7 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
                       TextSpan(text: t.isAr ? "يمكنك " : "You Can "),
                       TextSpan(
                         text: t.isAr ? "التسجيل " : "SignUp ",
-                        style: const TextStyle(color: Color(0xFF49769F)),
+                        style: TextStyle(color: Theme.of(context).colorScheme.primary),
                       ),
                       TextSpan(
                         text: t.isAr
@@ -294,7 +281,7 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
                     children: [
                       CircleAvatar(
                         radius: 50,
-                        backgroundColor: Colors.white,
+                        backgroundColor: Theme.of(context).cardColor,
                         backgroundImage: _profileImagePath != null 
                             ? FileImage(File(_profileImagePath!)) as ImageProvider
                             : null,
@@ -351,47 +338,21 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
                 const SizedBox(height: 30),
 
                 // Criminal Record Check (Required)
-                _buildUploadBox(
-                  _criminalRecordPath != null ? "Criminal Record: ${_criminalRecordPath!.split(Platform.pathSeparator).last} ✓" : t.uploadHint, 
-                  _pickCriminalRecord
-                ),
-                const SizedBox(height: 30),
-
-                // Gallery / Work Images
-                _buildSectionHeader(t.tr(en: "Work Images (Gallery)", ar: "صور العمل (المعرض)"), t.tr(en: "Upload photos of your previous work", ar: "ارفع صور لأعمالك السابقة")),
-                const SizedBox(height: 15),
-                _buildUploadBox(
-                  _workImagesPaths.isNotEmpty ? "${_workImagesPaths.length} Images Selected ✓" : t.uploadHint,
-                  _pickWorkImages
-                ),
-                if (_workImagesPaths.isNotEmpty) ...[
-                  const SizedBox(height: 10),
-                  SizedBox(
-                    height: 80,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: _workImagesPaths.length,
-                      itemBuilder: (context, index) => Padding(
-                        padding: const EdgeInsets.only(right: 8.0),
-                        child: Stack(
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: Image.file(File(_workImagesPaths[index]), width: 80, height: 80, fit: BoxFit.cover),
-                            ),
-                            Positioned(
-                              top: 2, right: 2,
-                              child: GestureDetector(
-                                onTap: () => setState(() => _workImagesPaths.removeAt(index)),
-                                child: Container(decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle), child: const Icon(Icons.close, size: 16, color: Colors.white)),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
+                Text(
+                  t.tr(en: "Criminal Record Certificate", ar: "فيش وتشبيه"),
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
                   ),
-                ],
+                ),
+                const SizedBox(height: 12),
+                _buildUploadBox(
+                  _criminalRecordPath != null
+                      ? "${t.tr(en: 'Criminal Record Certificate', ar: 'فيش وتشبيه')}: ${_criminalRecordPath!.split(Platform.pathSeparator).last} ✓"
+                      : t.tr(en: "Upload Criminal Record Certificate", ar: "ارفع فيش وتشبيه"),
+                  _pickCriminalRecord,
+                ),
                 const SizedBox(height: 30),
 
                 // About Me
@@ -534,19 +495,6 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
     );
   }
 
-  Widget _buildSectionHeader(String title, String subtitle) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(title, style: const TextStyle(color: Colors.black87, fontSize: 18, fontWeight: FontWeight.bold)),
-        if (subtitle.isNotEmpty) ...[
-          const SizedBox(height: 4),
-          Text(subtitle, style: const TextStyle(color: Colors.black38, fontSize: 12)),
-        ],
-      ],
-    );
-  }
-
   Widget _buildUploadBox(String text, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
@@ -561,9 +509,9 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
         child: Center(
           child: Column(
             children: [
-              const Icon(Icons.cloud_upload_outlined, color: Color(0xFF49769F), size: 30),
+              Icon(Icons.cloud_upload_outlined, color: Theme.of(context).colorScheme.primary, size: 30),
               const SizedBox(height: 8),
-              Text(text, textAlign: TextAlign.center, style: const TextStyle(color: Colors.black38, fontSize: 11)),
+              Text(text, textAlign: TextAlign.center, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.38), fontSize: 11)),
             ],
           ),
         ),
@@ -580,16 +528,16 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF49769F) : Colors.white,
+          color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(15),
-          border: Border.all(color: isSelected ? const Color(0xFF49769F) : Colors.grey.shade300, width: 1.5),
-          boxShadow: isSelected ? [BoxShadow(color: const Color(0xFF49769F).withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 4))] : [],
+          border: Border.all(color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).dividerColor.withOpacity(0.12), width: 1.5),
+          boxShadow: isSelected ? [BoxShadow(color: Theme.of(context).colorScheme.primary.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 4))] : [],
         ),
         alignment: Alignment.center,
         child: Text(
           role,
           style: TextStyle(
-            color: isSelected ? Colors.white : Colors.black54,
+            color: isSelected ? Colors.white : Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
             fontSize: 15,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
           ),
@@ -601,18 +549,18 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
   Widget _buildTextField(TextEditingController controller, String label, IconData? icon, {String? hint, String? prefixText, int maxLines = 1, TextInputType keyboardType = TextInputType.text, bool isRequired = false, VoidCallback? onIconTap, IconData? suffixIcon, VoidCallback? onSuffixTap, List<TextInputFormatter>? inputFormatters, String? Function(String?)? validator}) {
     return TextFormField(
       controller: controller, maxLines: maxLines, keyboardType: keyboardType, inputFormatters: inputFormatters, 
-      style: const TextStyle(color: Colors.black87, fontSize: 14),
+      style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14),
       validator: isRequired ? (validator ?? (value) => (value == null || value.isEmpty) ? "$label is required" : null) : null,
       decoration: InputDecoration(
-        prefixText: prefixText, prefixStyle: const TextStyle(color: Colors.black87, fontWeight: FontWeight.bold),
-        labelText: label, labelStyle: const TextStyle(color: Colors.black54, fontSize: 14),
-        hintText: hint, hintStyle: const TextStyle(color: Colors.black26, fontSize: 12),
-        prefixIcon: icon != null ? InkWell(onTap: onIconTap, child: Icon(icon, color: const Color(0xFF49769F), size: 20)) : null,
-        suffixIcon: suffixIcon != null ? IconButton(icon: Icon(suffixIcon, color: Colors.black54), onPressed: onSuffixTap) : null,
-        filled: true, fillColor: Colors.white, contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide(color: Colors.grey.shade300)),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide(color: Colors.grey.shade300)),
-        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: const BorderSide(color: Color(0xFF49769F))),
+        prefixText: prefixText, prefixStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold),
+        labelText: label, labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54), fontSize: 14),
+        hintText: hint, hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.26), fontSize: 12),
+        prefixIcon: icon != null ? InkWell(onTap: onIconTap, child: Icon(icon, color: Theme.of(context).colorScheme.primary, size: 20)) : null,
+        suffixIcon: suffixIcon != null ? IconButton(icon: Icon(suffixIcon, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54)), onPressed: onSuffixTap) : null,
+        filled: true, fillColor: Theme.of(context).brightness == Brightness.dark ? Colors.white.withOpacity(0.05) : Colors.white, contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide(color: Theme.of(context).dividerColor.withOpacity(0.12))),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide(color: Theme.of(context).dividerColor.withOpacity(0.12))),
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide(color: Theme.of(context).colorScheme.primary)),
       ),
     );
   }
@@ -620,17 +568,17 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
   Widget _buildDropdownField({required String label, required IconData icon, required String? value, required List<String> items, required ValueChanged<String?> onChanged, bool isRequired = false}) {
     return DropdownButtonFormField<String>(
       value: value,
-      items: items.map((item) => DropdownMenuItem(value: item, child: Text(item, style: const TextStyle(color: Colors.black87)))).toList(),
+      items: items.map((item) => DropdownMenuItem(value: item, child: Text(item, style: TextStyle(color: Theme.of(context).colorScheme.onSurface)))).toList(),
       onChanged: onChanged,
-      dropdownColor: Colors.white,
-      style: const TextStyle(color: Colors.black87),
+      dropdownColor: Theme.of(context).cardColor,
+      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
       validator: isRequired ? (v) => v == null ? "$label is required" : null : null,
       decoration: InputDecoration(
-        labelText: label, labelStyle: const TextStyle(color: Colors.black54, fontSize: 14),
-        prefixIcon: Icon(icon, color: const Color(0xFF49769F), size: 20),
-        filled: true, fillColor: Colors.white,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide(color: Colors.grey.shade300)),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide(color: Colors.grey.shade300)),
+        labelText: label, labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54), fontSize: 14),
+        prefixIcon: Icon(icon, color: Theme.of(context).colorScheme.primary, size: 20),
+        filled: true, fillColor: Theme.of(context).brightness == Brightness.dark ? Colors.white.withOpacity(0.05) : Colors.white,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide(color: Theme.of(context).dividerColor.withOpacity(0.12))),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide(color: Theme.of(context).dividerColor.withOpacity(0.12))),
       ),
     );
   }
