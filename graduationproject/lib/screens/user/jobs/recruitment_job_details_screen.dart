@@ -19,6 +19,7 @@ class RecruitmentJobDetailsScreen extends StatelessWidget {
       case 'remote':
         return Colors.purple;
       case 'freelance':
+      case 'freelancer':
         return Colors.teal;
       case 'one-time':
         return Colors.amber;
@@ -29,10 +30,43 @@ class RecruitmentJobDetailsScreen extends StatelessWidget {
     }
   }
 
+  String _translateLabel(String label, bool isAr) {
+    if (!isAr) return label;
+    final low = label.trim().toLowerCase();
+    switch (low) {
+      case 'full-time':
+      case 'full time':
+        return 'دوام كامل';
+      case 'part-time':
+      case 'part time':
+        return 'دوام جزئي';
+      case 'freelance':
+      case 'freelancer':
+        return 'عمل حر';
+      case 'remote':
+        return 'عن بعد';
+      case 'internship':
+        return 'تدريب';
+      case 'one-time':
+      case 'one time':
+        return 'مرة واحدة';
+      case 'service':
+      case 'services':
+        return 'خدمة';
+      case 'technical':
+        return 'تقني';
+      case 'non-technical':
+        return 'غير تقني';
+      default:
+        return label;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
     return Scaffold(
-      appBar: AppBar(title: const Text('Job Details')),
+      appBar: AppBar(title: Text(isAr ? 'تفاصيل الوظيفة' : 'Job Details')),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -47,8 +81,8 @@ class RecruitmentJobDetailsScreen extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 12,
-                backgroundImage: getAppImageProvider(job.companyLogoUrl),
-                child: getAppImageProvider(job.companyLogoUrl) == null
+                backgroundImage: job.companyLogoUrl != null ? getAppImageProvider(job.companyLogoUrl!) : null,
+                child: job.companyLogoUrl == null
                     ? const Icon(Icons.business, size: 14)
                     : null,
               ),
@@ -57,17 +91,18 @@ class RecruitmentJobDetailsScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          const SizedBox(height: 12),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Hiring ${job.capacity} people',
+                isAr ? 'مطلوب ${job.capacity} أشخاص' : 'Hiring ${job.capacity} people',
                 style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary),
               ),
               Text(
-                '${job.acceptedCount} / ${job.capacity} Accepted',
-                style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
+                isAr 
+                  ? 'تم قبول ${job.acceptedCount} من ${job.capacity}' 
+                  : '${job.acceptedCount} / ${job.capacity} Accepted',
+                style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)),
               ),
             ],
           ),
@@ -76,7 +111,7 @@ class RecruitmentJobDetailsScreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(10),
             child: LinearProgressIndicator(
               value: job.capacity > 0 ? (job.acceptedCount / job.capacity).clamp(0.0, 1.0) : 0,
-              backgroundColor: Theme.of(context).dividerColor.withOpacity(0.1),
+              backgroundColor: Theme.of(context).dividerColor.withValues(alpha: 0.1),
               color: job.acceptedCount >= job.capacity ? Colors.green : Theme.of(context).colorScheme.primary,
               minHeight: 8,
             ),
@@ -86,7 +121,6 @@ class RecruitmentJobDetailsScreen extends StatelessWidget {
             spacing: 8,
             runSpacing: 8,
             children: [
-              // Type Badges
               ...job.type.split(RegExp(r'[•,;]')).map((t) {
                 final type = t.trim();
                 if (type.isEmpty) return const SizedBox.shrink();
@@ -98,14 +132,14 @@ class RecruitmentJobDetailsScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                     boxShadow: [
                       BoxShadow(
-                        color: color.withOpacity(0.3),
+                        color: color.withValues(alpha: 0.3),
                         blurRadius: 4,
                         offset: const Offset(0, 2),
                       ),
                     ],
                   ),
                   child: Text(
-                    type,
+                    _translateLabel(type, isAr),
                     style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -113,25 +147,28 @@ class RecruitmentJobDetailsScreen extends StatelessWidget {
                     ),
                   ),
                 );
-              }).toList(),
+              }),
             ],
           ),
           const SizedBox(height: 12),
           if (job.tags.isNotEmpty) ...[
             Wrap(
               spacing: 8,
-              children: job.tags.where((tag) => tag.trim().toLowerCase() != 'technical').map((e) => Chip(label: Text(e))).toList(),
+              children: job.tags
+                  .where((tag) => tag.trim().toLowerCase() != 'technical')
+                  .map((e) => Chip(label: Text(_translateLabel(e, isAr))))
+                  .toList(),
             ),
             const SizedBox(height: 12),
           ],
-          if (job.category.toLowerCase() != 'services') ...[
-            Text('Salary: ${job.salaryRange}'),
+          if (job.category.toLowerCase() != 'services' && job.category.toLowerCase() != 'service') ...[
+            Text(isAr ? 'الراتب: ${job.salaryRange}' : 'Salary: ${job.salaryRange}'),
           ],
           const SizedBox(height: 24),
 
           if (job.description.trim().isNotEmpty) ...[
             Text(
-              'Role Overview',
+              isAr ? 'نظرة عامة' : 'Role Overview',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
@@ -141,7 +178,7 @@ class RecruitmentJobDetailsScreen extends StatelessWidget {
 
           if (job.responsibilities.isNotEmpty) ...[
             Text(
-              'Responsibilities',
+              isAr ? 'المسؤوليات' : 'Responsibilities',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
@@ -160,7 +197,7 @@ class RecruitmentJobDetailsScreen extends StatelessWidget {
 
           if (job.qualifications.isNotEmpty) ...[
             Text(
-              'Qualifications',
+              isAr ? 'المؤهلات' : 'Qualifications',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
@@ -179,7 +216,7 @@ class RecruitmentJobDetailsScreen extends StatelessWidget {
 
           if (job.benefits.isNotEmpty) ...[
             Text(
-              'Benefits',
+              isAr ? 'المميزات' : 'Benefits',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
@@ -189,7 +226,7 @@ class RecruitmentJobDetailsScreen extends StatelessWidget {
               children: job.benefits.map((item) => Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.1),
+                  color: Colors.green.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(item, style: const TextStyle(color: Colors.green, fontWeight: FontWeight.w600)),
@@ -199,7 +236,7 @@ class RecruitmentJobDetailsScreen extends StatelessWidget {
           ],
           const SizedBox(height: 18),
           AppButton(
-            label: 'Apply',
+            label: isAr ? 'قدّم الآن' : 'Apply',
             onPressed: () => Navigator.of(context).pushNamed(
               AppRoutes.userJobApplication,
               arguments: job,

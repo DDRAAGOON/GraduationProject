@@ -69,8 +69,8 @@ class TradesmanJobDetailsScreen extends StatelessWidget {
                     const SizedBox(height: 8),
                     CircleAvatar(
                       radius: 16,
-                      backgroundImage: getAppImageProvider(job.companyLogoUrl),
-                      child: getAppImageProvider(job.companyLogoUrl) == null
+                      backgroundImage: job.companyLogoUrl != null ? getAppImageProvider(job.companyLogoUrl) : null,
+                      child: job.companyLogoUrl == null
                           ? const Icon(Icons.business, size: 16)
                           : null,
                     ),
@@ -84,18 +84,11 @@ class TradesmanJobDetailsScreen extends StatelessWidget {
                       alignment: WrapAlignment.center,
                       spacing: 10,
                       runSpacing: 10,
-                    children: [
-                      Wrap(
-                        alignment: WrapAlignment.center,
-                        spacing: 10,
-                        runSpacing: 10,
-                        children: job.type.split(RegExp(r'[•,;]')).map((t) {
-                          final type = t.trim();
-                          if (type.isEmpty) return const SizedBox.shrink();
-                          return _buildBadge(type, _getJobTypeColor(type));
-                        }).toList(),
-                      ),
-                    ],
+                      children: job.type.split(RegExp(r'[•,;]')).map((t) {
+                        final type = t.trim();
+                        if (type.isEmpty) return const SizedBox.shrink();
+                        return _buildBadge(type, _getJobTypeColor(type));
+                      }).toList(),
                     ),
                   ],
                 ),
@@ -185,9 +178,9 @@ class TradesmanJobDetailsScreen extends StatelessWidget {
                   children: job.benefits.map((item) => Container(
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                     decoration: BoxDecoration(
-                      color: Colors.green.withOpacity(0.05),
+                      color: Colors.green.withValues(alpha: 0.05),
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Colors.green.withOpacity(0.1)),
+                      border: Border.all(color: Colors.green.withValues(alpha: 0.1)),
                     ),
                     child: Text(
                       item,
@@ -297,7 +290,7 @@ class TradesmanJobDetailsScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
-            color: color.withOpacity(0.3),
+            color: color.withValues(alpha: 0.3),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),

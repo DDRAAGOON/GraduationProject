@@ -68,13 +68,12 @@ class _MessagesListScreenState extends State<MessagesListScreen> {
                 child: AnimatedBuilder(
                   animation: store,
                   builder: (context, _) {
-                    // Logic to group messages by sender for the list view
-                    // For demo, we'll show current active threads or mock them if empty
+                    // Filter real messages from store
                     final messages = store.messages.where((m) => 
                       m.text.toLowerCase().contains(_searchQuery)
                     ).toList();
 
-                    if (messages.isEmpty && _searchQuery.isEmpty) {
+                    if (messages.isEmpty) {
                       return _buildEmptyState(t);
                     }
 
@@ -89,10 +88,10 @@ class _MessagesListScreenState extends State<MessagesListScreen> {
                         final msg = messages[index];
                         return _buildMessageItem(
                           context,
-                          name: msg.fromCompany ? "Company Support" : "Me",
+                          name: msg.fromCompany ? "Company Support" : "User",
                           message: msg.text,
                           time: "${msg.createdAt.hour}:${msg.createdAt.minute.toString().padLeft(2, '0')}",
-                          image: AppImages.companyProfile2,
+                          image: AppImages.companyProfile2, // Fallback image
                         );
                       },
                     );
@@ -111,11 +110,14 @@ class _MessagesListScreenState extends State<MessagesListScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.chat_bubble_outline, size: 64, color: Colors.grey.shade300),
+          Icon(Icons.chat_bubble_outline, size: 64, color: Colors.grey.withValues(alpha: 0.2)),
           const SizedBox(height: 16),
           Text(
             t.tr(en: "No messages yet", ar: "لا توجد رسائل بعد"),
-            style: const TextStyle(color: Colors.black54),
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
+              fontSize: 16,
+            ),
           ),
         ],
       ),
@@ -172,8 +174,15 @@ class _MessagesListScreenState extends State<MessagesListScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(name, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                      Text(time, style: const TextStyle(color: Colors.black38, fontSize: 12)),
+                      Text(name, style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
+                        fontSize: 16, 
+                        fontWeight: FontWeight.bold
+                      )),
+                      Text(time, style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), 
+                        fontSize: 12
+                      )),
                     ],
                   ),
                   const SizedBox(height: 5),
@@ -181,7 +190,10 @@ class _MessagesListScreenState extends State<MessagesListScreen> {
                     message,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(color: Colors.black54, fontSize: 14),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), 
+                      fontSize: 14
+                    ),
                   ),
                 ],
               ),

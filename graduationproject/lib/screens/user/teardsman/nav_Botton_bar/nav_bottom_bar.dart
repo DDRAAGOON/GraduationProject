@@ -58,7 +58,7 @@ class _NavbottonState extends State<Navbotton> {
           ),
           NavigationDestination(
             icon: const Icon(Icons.person),
-            label: _isAr ? 'البروفايل' : 'Profile',
+            label: _isAr ? 'الملف الشخصي' : 'Profile',
           ),
         ],
       ),

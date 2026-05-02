@@ -43,28 +43,78 @@ class LogoPage extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                t.isAr 
-                  ? 'ابحث عن وظيفتك القادمة أو وظّف أفضل الكوادر بسرعة.' 
-                  : 'Find your next role or hire top talent faster.',
+                t.isAr
+                    ? 'ابحث عن وظيفتك القادمة أو وظّف أفضل الكوادر بسرعة.'
+                    : 'Find your next role or hire top talent faster.',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: cs.onSurface.withValues(alpha: 0.7),
                 ),
               ),
-              SizedBox(height: size.height * 0.06),
+              SizedBox(height: size.height * 0.04),
+
+              // قسم الصورة مع الحجم المعدل (تكبير الحجم)
               Center(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxWidth: size.width * 0.84,
-                    maxHeight: size.height * 0.38,
-                  ),
-                  child: Icon(
-                    Icons.work_outline_rounded,
-                    size: size.width * 0.35,
-                    color: const Color(0xFF1B2D4F),
-                  ),
+                child: Column(
+                  children: [
+                    ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: size.width * 0.95, // تكبير العرض
+                        maxHeight: size.height * 0.38, // تكبير الارتفاع
+                      ),
+                      child: Image.asset(
+                        'assets/company/Onboarding/kkk.png',
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) => Icon(
+                          Icons.work_outline_rounded,
+                          size: size.width * 0.35,
+                          color: const Color(0xFF1B2D4F),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    // النص التوضيحي الملون تحت الصورة
+                    Text.rich(
+                      TextSpan(
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: cs.onSurface.withValues(alpha: 0.8),
+                        ),
+                        children: t.isAr
+                            ? [
+                          const TextSpan(text: 'تقدر الآن تسجل ك'),
+                          const TextSpan(
+                            text: 'باحث عن عمل',
+                            style: TextStyle(color: Color(0xFF4A6ED1)),
+                          ),
+                          const TextSpan(text: ' أو '),
+                          const TextSpan(
+                            text: 'شركة',
+                            style: TextStyle(color: Color(0xFFFF7A2A)),
+                          ),
+                        ]
+                            : [
+                          const TextSpan(text: 'You can now register as a '),
+                          const TextSpan(
+                            text: 'job seeker',
+                            style: TextStyle(color: Color(0xFF4A6ED1)),
+                          ),
+                          const TextSpan(text: ' or a '),
+                          const TextSpan(
+                            text: 'company',
+                            style: TextStyle(color: Color(0xFFFF7A2A)),
+                          ),
+                        ],
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                 ),
               ),
+
+              // زيادة المسافة لنزول الأزرار تحت أكثر
               SizedBox(height: size.height * 0.06),
+
               _RoleButton(
                 label: t.userTr(
                   'role.user',
@@ -87,7 +137,6 @@ class LogoPage extends StatelessWidget {
                     Navigator.of(context).pushNamed(AppRoutes.companyOnboardingNew),
               ),
               SizedBox(height: size.height * 0.012),
-
               SizedBox(height: size.height * 0.07),
             ],
           ),

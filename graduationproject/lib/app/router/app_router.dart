@@ -44,6 +44,7 @@ import '../../screens/company/settings/notification_setting_screen.dart';
 import '../../screens/company/settings/notifications_screen.dart';
 import '../../screens/company/settings/settings_screen.dart';
 import '../../screens/logo/logo_page.dart';
+import '../../screens/splash/splash_screen.dart';
 import '../../screens/user/jobs/recruitment_application_timeline_screen.dart';
 import '../../screens/user/jobs/recruitment_job_application_screen.dart';
 import '../../screens/user/jobs/recruitment_job_filters_screen.dart';
@@ -54,6 +55,7 @@ import '../../screens/user/onboarding/recruitment_user_onboarding_screen.dart';
 import '../../screens/user/profile/edit_profile_screen.dart';
 import '../../screens/user/settings/recruitment_user_settings_screen.dart';
 import '../../screens/user/home/recruitment_user_shell_screen.dart';
+import '../../screens/user/home/company_details_screen.dart';
 import '../../shared/state/recruitment_sync_store.dart';
 import '../../shared/models/applicant.dart';
 import '../../shared/models/job.dart';
@@ -62,8 +64,11 @@ import '../../shared/models/message_thread.dart';
 /// The [AppRoutes] class serves as a centralized registry for all named route string constants
 /// used to navigate through the application. Using this class avoids hard-coded strings.
 final class AppRoutes {
-  /// Role picker (User vs Company) shown on cold start.
-  static const roleSelection = '/';
+  /// Initial splash screen
+  static const splash = '/';
+
+  /// Role picker (User vs Company) shown after splash.
+  static const roleSelection = '/role_selection';
 
   /// Job seeker onboarding ([OnBoardingScreen]) before auth.
   static const userOnboarding = '/user/onboarding';
@@ -76,6 +81,7 @@ final class AppRoutes {
   static const userSettingsNew = '/user/settings/new';
   static const userSignInNew = '/user/auth/sign_in_new';
   static const userEditProfile = '/user/profile/edit';
+  static const userCompanyDetails = '/user/company/details';
 
   // --- Company Onboarding Routes ---
   static const companyOnboardingSmartSearch =
@@ -160,6 +166,8 @@ final class AppRouter {
 
     Widget page;
     switch (name) {
+      case AppRoutes.splash:
+        page = const SplashScreen();
       case AppRoutes.roleSelection:
         page = const LogoPage();
       case AppRoutes.userOnboarding:
@@ -202,6 +210,10 @@ final class AppRouter {
         page = const RecruitmentUserSignInScreen();
       case AppRoutes.userEditProfile:
         page = const EditProfileScreen();
+      case AppRoutes.userCompanyDetails:
+        page = CompanyDetailsScreen(
+          company: args is Map<String, dynamic> ? args : const {},
+        );
 
       case AppRoutes.companyOnboardingSmartSearch:
         page = const CompanyOnboardingSmartSearchScreen();
@@ -285,6 +297,10 @@ final class AppRouter {
         page = const CompanyPostJobStep2DescriptionScreen();
       case AppRoutes.companyPostJobStep3:
         page = const CompanyPostJobStep3BenefitsScreen();
+      case AppRoutes.companyJobApplicants:
+        page = CompanyJobApplicantsTableViewScreen(
+          job: args is Job ? args : Job.mock(),
+        );
       case AppRoutes.companyApplicantDetailsProfile:
         page = CompanyApplicantDetailsProfileScreen(
           applicant: args is Applicant ? args : Applicant.mock(),

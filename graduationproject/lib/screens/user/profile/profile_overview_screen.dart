@@ -5,7 +5,8 @@ import 'edit_profile_screen.dart';
 import 'profile_media_edit_screen.dart';
 import '../notifications/notifications_screen.dart';
 import '../settings/setting_screen.dart';
-import 'user_data.dart';
+import '../../../shared/state/recruitment_sync_store.dart';
+import '../../../shared/utils/image_helper.dart';
 
 class ProfileOverviewScreen extends StatefulWidget {
   const ProfileOverviewScreen({super.key});
@@ -18,339 +19,315 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
+    final store = RecruitmentSyncStore.instance;
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Top Bar Icons
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    _buildTopIconButton(
-                      Icons.notifications_none,
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const NotificationsScreen()),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    _buildTopIconButton(
-                      Icons.settings_outlined,
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const SettingScreen()),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              // Cover Image & Profile Pic
-              Stack(
-                clipBehavior: Clip.none,
+        child: AnimatedBuilder(
+          animation: store,
+          builder: (context, _) {
+            return SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    height: 150,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: Theme.of(context).brightness == Brightness.dark 
-                            ? [const Color(0xFF321A2C), const Color(0xFF0F0F10)]
-                            : [const Color(0xFFE3EAF2), const Color(0xFFF9FBFE)],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      image: UserProfileData.coverImage != null
-                          ? DecorationImage(
-                              image: NetworkImage(UserProfileData.coverImage!),
-                              fit: BoxFit.cover,
-                            )
-                          : null,
-                    ),
-                    child: Align(
-                      alignment: Alignment.topRight,
-                      child: Padding(
-                        padding: const EdgeInsets.all(10),
-                        child: GestureDetector(
-                          onTap: () async {
-                            await Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => const ProfileMediaEditScreen()),
-                            );
-                            setState(() {});
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.all(4),
-                            decoration: BoxDecoration(
-                              color: Colors.black26,
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: const Icon(Icons.edit_note, color: Colors.white, size: 20),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    bottom: -40,
-                    left: 20,
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).brightness == Brightness.dark 
-                            ? const Color(0xFF001E3A) 
-                            : Colors.white,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.1),
-                            blurRadius: 10,
-                            spreadRadius: 2,
-                          )
-                        ],
-                      ),
-                      child: CircleAvatar(
-                        radius: 45,
-                        backgroundImage: UserProfileData.profileImage != null
-                            ? NetworkImage(UserProfileData.profileImage!)
-                            : const AssetImage(AppImages.companyProfile1) as ImageProvider,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 50),
-
-              // User Info Header
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                  // Top Bar Icons
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        Expanded(
-                          child: Text(
-                            UserProfileData.fullName.isEmpty ? t.notYet : UserProfileData.fullName,
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface, 
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                        _buildTopIconButton(
+                          Icons.notifications_none,
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const NotificationsScreen()),
                           ),
                         ),
-                        const SizedBox(width: 10),
-                        OutlinedButton(
-                          onPressed: () async {
-                            await Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => const EditProfileScreen()),
-                            );
-                            setState(() {});
-                          },
-                          style: OutlinedButton.styleFrom(
-                            side: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.5)),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                        const SizedBox(width: 12),
+                        _buildTopIconButton(
+                          Icons.settings_outlined,
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const SettingScreen()),
                           ),
-                          child: Text(t.editProfile, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 11)),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      t.tr(en: "Job Seeker", ar: "باحث عن عمل"),
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      UserProfileData.jobTitle.isEmpty ? t.notYet : UserProfileData.jobTitle,
-                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 14),
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Icon(Icons.location_on_outlined, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), size: 16),
-                        const SizedBox(width: 4),
-                        Text(UserProfileData.location.isEmpty ? t.notYet : UserProfileData.location, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 14)),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // Opportunities Badge
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.teal.withValues(alpha: 0.3)),
                   ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
+
+                  // Cover Image & Profile Pic
+                  Stack(
+                    clipBehavior: Clip.none,
                     children: [
-                      const Icon(Icons.flag_outlined, color: Colors.teal, size: 18),
-                      const SizedBox(width: 8),
-                      Text(
-                        t.tr(en: "OPEN FOR OPPORTUNITIES", ar: "متاح للفرص"),
-                        style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? Colors.tealAccent : Colors.teal, fontSize: 12, fontWeight: FontWeight.bold),
+                      Container(
+                        height: 150,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: Theme.of(context).brightness == Brightness.dark 
+                                ? [const Color(0xFF321A2C), const Color(0xFF0F0F10)]
+                                : [const Color(0xFFE3EAF2), const Color(0xFFF9FBFE)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                        ),
+                        child: Align(
+                          alignment: Alignment.topRight,
+                          child: Padding(
+                            padding: const EdgeInsets.all(10),
+                            child: GestureDetector(
+                              onTap: () async {
+                                await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const ProfileMediaEditScreen()),
+                                );
+                                setState(() {});
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: BoxDecoration(
+                                  color: Colors.black26,
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: const Icon(Icons.edit_note, color: Colors.white, size: 20),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        bottom: -40,
+                        left: 20,
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).brightness == Brightness.dark 
+                                ? const Color(0xFF001E3A) 
+                                : Colors.white,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.1),
+                                blurRadius: 10,
+                                spreadRadius: 2,
+                              )
+                            ],
+                          ),
+                          child: CircleAvatar(
+                            radius: 45,
+                            backgroundColor: Colors.grey.shade200,
+                            backgroundImage: getAppImageProvider(store.profileImage),
+                            child: store.profileImage == null 
+                                ? const Icon(Icons.person, size: 45, color: Colors.grey) 
+                                : null,
+                          ),
+                        ),
                       ),
                     ],
                   ),
-                ),
-              ),
 
-              const SizedBox(height: 30),
+                  const SizedBox(height: 50),
 
-              // 1. Additional Details
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(t.additionalDetails, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 20),
-                    _buildDetailItem(Icons.email_outlined, t.email, UserProfileData.email),
-                    _buildDetailItem(Icons.phone_android_outlined, t.phone, UserProfileData.phone),
-                    _buildDetailItem(Icons.calendar_today_outlined, t.dob, UserProfileData.dob),
-                    _buildDetailItem(Icons.location_on_outlined, t.address, UserProfileData.location),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // 2. About Me Section
-              _buildSectionTitle(t.aboutMeSection),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Text(
-                  UserProfileData.aboutMe.isEmpty ? t.notYet : UserProfileData.aboutMe,
-                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 14, height: 1.5),
-                ),
-              ),
-
-              const SizedBox(height: 30),
-
-              // 3. Work Experience Section
-              _buildSectionTitle(t.workExperience),
-              if (UserProfileData.experiences.isEmpty)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Text(
-                    t.tr(en: "No experience added yet", ar: "لم يتم إضافة خبرة بعد"),
-                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 12),
-                  ),
-                )
-              else
-                ...UserProfileData.experiences.map((exp) => _buildEntryItem(
-                  Icons.work_outline,
-                  exp['title'] ?? "", 
-                  exp['company'] ?? "", 
-                  exp['duration'] ?? ""
-                )),
-
-              const SizedBox(height: 30),
-
-              // 4. Education Section
-              _buildSectionTitle(t.education),
-              if (UserProfileData.education.isEmpty)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Text(
-                    t.tr(en: "No education added yet", ar: "لم يتم إضافة تعليم بعد"),
-                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 12),
-                  ),
-                )
-              else
-                ...UserProfileData.education.map((edu) => _buildEntryItem(
-                  Icons.school_outlined,
-                  edu['institution'] ?? "", 
-                  edu['degree'] ?? "", 
-                  edu['duration'] ?? ""
-                )),
-
-              const SizedBox(height: 30),
-
-              // 5. Skills Section
-              _buildSectionTitle(t.skills),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: UserProfileData.skills.isEmpty
-                    ? Text(t.notYet, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 12))
-                    : Wrap(
-                        spacing: 10,
-                        runSpacing: 10,
-                        children: UserProfileData.skills.map((skill) => _buildSkillTag(skill)).toList(),
-                      ),
-              ),
-
-              const SizedBox(height: 30),
-
-              // 6. Social Media Section
-              _buildSectionTitle(t.socialMedia),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: UserProfileData.socialLinks.isEmpty
-                    ? Text(t.tr(en: "No social links added", ar: "لم يتم إضافة روابط تواصل"), style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 12))
-                    : Column(
-                        children: UserProfileData.socialLinks.map((link) => 
-                          _buildDetailItem(Icons.link, link["platform"]!, link["url"]!)
-                        ).toList(),
-                      ),
-              ),
-
-              const SizedBox(height: 30),
-
-              // 7. Gallery Section (Portfolio Images)
-              _buildSectionTitle(t.tr(en: "Gallery", ar: "المعرض")),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: UserProfileData.portfolioImages.isEmpty
-                    ? Text(t.tr(en: "No items in gallery", ar: "لا توجد عناصر في المعرض"), style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 12))
-                    : GridView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          crossAxisSpacing: 10,
-                          mainAxisSpacing: 10,
-                        ),
-                        itemCount: UserProfileData.portfolioImages.length,
-                        itemBuilder: (context, index) {
-                          return ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: Image.network(
-                              UserProfileData.portfolioImages[index],
-                              fit: BoxFit.cover,
+                  // User Info Header
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            if (!isAr) _buildEditButton(context, t),
+                            if (!isAr) const SizedBox(width: 12),
+                            
+                            Expanded(
+                              child: Text(
+                                store.currentUserName.isEmpty ? t.notYet : store.currentUserName,
+                                textAlign: isAr ? TextAlign.right : TextAlign.left,
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.onSurface, 
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
-                          );
-                        },
-                      ),
-              ),
+                            
+                            if (isAr) const SizedBox(width: 12),
+                            if (isAr) _buildEditButton(context, t),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          t.tr(en: "Job Seeker", ar: "باحث عن عمل"),
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          store.currentUserTitle.isEmpty ? t.notYet : store.currentUserTitle,
+                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 14),
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Icon(Icons.location_on_outlined, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), size: 16),
+                            const SizedBox(width: 4),
+                            Text(store.currentUserLocation.isEmpty ? t.notYet : store.currentUserLocation, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 14)),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
 
-              const SizedBox(height: 120),
-            ],
-          ),
+                  const SizedBox(height: 20),
+
+                  // Opportunities Badge
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.08),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.teal.withValues(alpha: 0.3)),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.flag_outlined, color: Colors.teal, size: 18),
+                          const SizedBox(width: 8),
+                          Text(
+                            t.tr(en: "OPEN FOR OPPORTUNITIES", ar: "متاح للفرص"),
+                            style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? Colors.tealAccent : Colors.teal, fontSize: 12, fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 30),
+
+                  // Details Section
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(t.additionalDetails, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 20),
+                        _buildDetailItem(context, Icons.email_outlined, t.email, store.currentUserEmail),
+                        _buildDetailItem(context, Icons.phone_android_outlined, t.phone, store.currentUserPhone),
+                        _buildDetailItem(context, Icons.location_on_outlined, t.address, store.currentUserLocation),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  _buildSectionTitle(t.aboutMeSection),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Text(
+                      store.currentUserAbout.isEmpty ? t.notYet : store.currentUserAbout,
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 14, height: 1.5),
+                    ),
+                  ),
+
+                  const SizedBox(height: 30),
+
+                  _buildSectionTitle(t.workExperience),
+                  if (store.currentUserExperience.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Text(t.notYet, style: TextStyle(color: Colors.grey.shade400, fontSize: 12)),
+                    )
+                  else
+                    ...store.currentUserExperience.map((exp) => _buildEntryItem(
+                      Icons.work_outline,
+                      exp['title'] ?? "", 
+                      exp['company'] ?? "", 
+                      exp['duration'] ?? ""
+                    )),
+
+                  const SizedBox(height: 30),
+
+                  _buildSectionTitle(t.education),
+                  if (store.currentUserEducation.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Text(t.notYet, style: TextStyle(color: Colors.grey.shade400, fontSize: 12)),
+                    )
+                  else
+                    ...store.currentUserEducation.map((edu) => _buildEntryItem(
+                      Icons.school_outlined,
+                      edu['institution'] ?? "", 
+                      edu['degree'] ?? "", 
+                      edu['duration'] ?? ""
+                    )),
+
+                  const SizedBox(height: 30),
+
+                  _buildSectionTitle(t.skills),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: store.currentUserSkills.isEmpty
+                        ? Text(t.notYet, style: TextStyle(color: Colors.grey.shade400, fontSize: 12))
+                        : Wrap(
+                            spacing: 10,
+                            runSpacing: 10,
+                            children: store.currentUserSkills.map((skill) => _buildSkillTag(skill)).toList(),
+                          ),
+                  ),
+
+                  const SizedBox(height: 120),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEditButton(BuildContext context, AppLocalizations t) {
+    return GestureDetector(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const EditProfileScreen()),
+      ),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: Colors.blue,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.blue.withValues(alpha: 0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            )
+          ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.edit, color: Colors.white, size: 14),
+            const SizedBox(width: 6),
+            Text(
+              t.editProfile,
+              style: const TextStyle(
+                color: Colors.white, 
+                fontSize: 12, 
+                fontWeight: FontWeight.bold
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -422,7 +399,7 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
     );
   }
 
-  Widget _buildDetailItem(IconData icon, String title, String value) {
+  Widget _buildDetailItem(BuildContext context, IconData icon, String title, String value) {
     final t = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.only(bottom: 20),
@@ -445,8 +422,6 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
                         : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), 
                     fontSize: 13
                   ), 
-                  maxLines: 1, 
-                  overflow: TextOverflow.ellipsis
                 ),
               ],
             ),

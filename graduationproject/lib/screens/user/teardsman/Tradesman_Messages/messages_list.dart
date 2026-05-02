@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import '../../../../shared/utils/image_helper.dart';
 import '../../../../shared/l10n/app_localizations.dart';
 import '../../../../shared/state/recruitment_sync_store.dart';
 import '../../messages/new_chat_screen.dart';
 import '../post/post_job.dart';
 import '../setting/settings.dart';
 import '../../profile/user_data.dart';
+import '../../../../shared/utils/image_helper.dart';
 import 'chat_tradesman.dart';
-
 
 class MessagesList extends StatefulWidget {
   const MessagesList({super.key});
@@ -105,19 +104,7 @@ class _MessagesListState extends State<MessagesList> {
                   ).toList();
 
                   if (threads.isEmpty) {
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.chat_bubble_outline, size: 60, color: Colors.grey.withOpacity(0.5)),
-                          const SizedBox(height: 16),
-                          Text(
-                            t.tr(en: "No messages yet", ar: "لا توجد رسائل بعد"),
-                            style: const TextStyle(color: Colors.black54, fontSize: 16),
-                          ),
-                        ],
-                      ),
-                    );
+                    return _buildEmptyState(t);
                   }
 
                   return ListView.separated(
@@ -126,7 +113,7 @@ class _MessagesListState extends State<MessagesList> {
                     itemCount: threads.length,
                     separatorBuilder: (context, index) => Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Divider(color: Colors.grey.withOpacity(0.15), height: 1),
+                      child: Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.1), height: 1),
                     ),
                     itemBuilder: (context, index) {
                       final thread = threads[index];
@@ -148,6 +135,22 @@ class _MessagesListState extends State<MessagesList> {
     );
   }
 
+  Widget _buildEmptyState(AppLocalizations t) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.chat_bubble_outline, size: 60, color: Colors.grey.withValues(alpha: 0.2)),
+          const SizedBox(height: 16),
+          Text(
+            t.tr(en: "No messages yet", ar: "لا توجد رسائل بعد"),
+            style: const TextStyle(color: Colors.black54, fontSize: 16),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildIconButton(IconData icon, {VoidCallback? onTap}) {
     return GestureDetector(
       onTap: onTap,
@@ -155,11 +158,11 @@ class _MessagesListState extends State<MessagesList> {
         width: 40,
         height: 40,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).cardColor,
           shape: BoxShape.circle,
-          border: Border.all(color: Colors.grey.withOpacity(0.2)),
+          border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
         ),
-        child: Icon(icon, color: Colors.black87, size: 20),
+        child: Icon(icon, color: Theme.of(context).colorScheme.onSurface, size: 20),
       ),
     );
   }
@@ -173,7 +176,7 @@ class _MessagesListState extends State<MessagesList> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -183,9 +186,9 @@ class _MessagesListState extends State<MessagesList> {
         controller: _searchController,
         style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
         decoration: InputDecoration(
-          prefixIcon: Icon(Icons.search, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5)),
+          prefixIcon: Icon(Icons.search, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
           hintText: t.tr(en: "Search messages", ar: "البحث في الرسائل"),
-          hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.35), fontSize: 15),
+          hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.35), fontSize: 15),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(vertical: 15),
         ),
@@ -247,7 +250,7 @@ class _MessagesListState extends State<MessagesList> {
                       Text(
                         time,
                         style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
                           fontSize: 12,
                         ),
                       ),
@@ -259,7 +262,7 @@ class _MessagesListState extends State<MessagesList> {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                       fontSize: 14,
                     ),
                   ),

@@ -30,6 +30,27 @@ class _RecruitmentApplicationTimelineScreenState extends State<RecruitmentApplic
     super.dispose();
   }
 
+  String _translateStatus(String status, bool isAr) {
+    if (!isAr) return status;
+    final low = status.toLowerCase();
+    if (low.contains('hire')) return 'تم التوظيف';
+    if (low.contains('reject') || low.contains('decline')) return 'تم الرفض';
+    if (low.contains('pend')) return 'قيد الانتظار';
+    if (low.contains('appli')) return 'تم التقديم';
+    if (low.contains('review')) return 'قيد المراجعة';
+    if (low.contains('interview')) return 'مقابلة';
+    return status;
+  }
+
+  Color _getStatusColor(String status) {
+    final low = status.toLowerCase();
+    if (low.contains('hire') || status == 'تم التوظيف') return Colors.green;
+    if (low.contains('reject') || low.contains('decline') || status == 'مرفوض') return Colors.red;
+    if (low.contains('review') || status == 'قيد المراجعة') return Colors.orange;
+    if (low.contains('interview')) return Colors.purple;
+    return Colors.blue;
+  }
+
   @override
   Widget build(BuildContext context) {
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
@@ -40,10 +61,11 @@ class _RecruitmentApplicationTimelineScreenState extends State<RecruitmentApplic
     // Filter by Tab AND Search Query
     final filteredApps = allApps.where((a) {
       bool matchesTab = true;
-      if (_selectedStatusTab == 'Applied') matchesTab = a.status == 'Applied' || a.status == 'تم التقديم';
-      else if (_selectedStatusTab == 'Hired') matchesTab = a.status == 'Hired' || a.status == 'تم التوظيف';
-      else if (_selectedStatusTab == 'In Review') matchesTab = a.status == 'In Review' || a.status == 'قيد المراجعة';
-      else if (_selectedStatusTab == 'Declined') matchesTab = a.status == 'Declined' || a.status == 'مرفوض';
+      final status = a.status.toLowerCase();
+      if (_selectedStatusTab == 'Applied') matchesTab = status.contains('appli') || a.status == 'تم التقديم';
+      else if (_selectedStatusTab == 'Hired') matchesTab = status.contains('hire') || a.status == 'تم التوظيف';
+      else if (_selectedStatusTab == 'In Review') matchesTab = status.contains('review') || a.status == 'قيد المراجعة';
+      else if (_selectedStatusTab == 'Declined') matchesTab = status.contains('reject') || status.contains('decline') || a.status == 'مرفوض';
       else if (_selectedStatusTab != 'All') matchesTab = a.status == _selectedStatusTab;
 
       bool matchesSearch = a.jobTitle.toLowerCase().contains(_searchQuery) || 
@@ -59,7 +81,7 @@ class _RecruitmentApplicationTimelineScreenState extends State<RecruitmentApplic
         backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         surfaceTintColor: Colors.transparent,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: Theme.of(context).colorScheme.onSurface, size: 20),
+          icon: Icon(isAr ? Icons.arrow_back_ios_new : Icons.arrow_back_ios, color: Theme.of(context).colorScheme.onSurface, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -94,7 +116,7 @@ class _RecruitmentApplicationTimelineScreenState extends State<RecruitmentApplic
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey.shade300),
+                        border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.2)),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Row(
@@ -110,7 +132,7 @@ class _RecruitmentApplicationTimelineScreenState extends State<RecruitmentApplic
                 const SizedBox(height: 6),
                 Text(
                   isAr ? 'إليك ما يحدث مع طلباتك اعتباراً من اليوم' : 'Here is what\'s happening with your apps as of today',
-                  style: const TextStyle(color: Colors.black54, fontSize: 12),
+                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), fontSize: 12),
                 ),
               ],
             ),
@@ -118,7 +140,7 @@ class _RecruitmentApplicationTimelineScreenState extends State<RecruitmentApplic
 
           // 2. Tabs
           Container(
-            color: Colors.white,
+            color: Theme.of(context).cardColor,
             height: 50,
             child: ListView(
               scrollDirection: Axis.horizontal,
@@ -127,7 +149,7 @@ class _RecruitmentApplicationTimelineScreenState extends State<RecruitmentApplic
                 _buildTab(isAr ? 'الكل' : 'All', 'All'),
                 _buildTab(isAr ? 'تم التوظيف' : 'Hired', 'Hired'),
                 _buildTab(isAr ? 'قيد المراجعة' : 'In Review', 'In Review'),
-                _buildTab(isAr ? 'الانتظار' : 'Pending', 'Applied'),
+                _buildTab(isAr ? 'تم التقديم' : 'Applied', 'Applied'),
                 _buildTab(isAr ? 'مرفوض' : 'Rejected', 'Declined'),
               ],
             ),
@@ -141,7 +163,7 @@ class _RecruitmentApplicationTimelineScreenState extends State<RecruitmentApplic
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  isAr ? 'سجل التقديم' : 'Application Log',
+                  isAr ? 'سجل الطلبات' : 'Application Records',
                   style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 15),
@@ -149,7 +171,7 @@ class _RecruitmentApplicationTimelineScreenState extends State<RecruitmentApplic
                   height: 45,
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF0F3FF),
+                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: TextField(
@@ -157,8 +179,8 @@ class _RecruitmentApplicationTimelineScreenState extends State<RecruitmentApplic
                     style: const TextStyle(fontSize: 14),
                     decoration: InputDecoration(
                       hintText: isAr ? 'بحث بالوظيفة أو الشركة...' : 'Search by job or company...',
-                      hintStyle: const TextStyle(color: Color(0xFF49769F), fontSize: 12),
-                      icon: const Icon(Icons.search, size: 18, color: Color(0xFF49769F)),
+                      hintStyle: TextStyle(color: Theme.of(context).colorScheme.primary, fontSize: 12),
+                      icon: Icon(Icons.search, size: 18, color: Theme.of(context).colorScheme.primary),
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.symmetric(vertical: 12),
                     ),
@@ -176,7 +198,7 @@ class _RecruitmentApplicationTimelineScreenState extends State<RecruitmentApplic
                 const SizedBox(width: 25, child: Text('#', style: TextStyle(color: Colors.grey, fontSize: 11, fontWeight: FontWeight.bold))),
                 Expanded(flex: 3, child: Text(isAr ? 'مقدم الخدمة / الشركة' : 'Company', style: const TextStyle(color: Colors.grey, fontSize: 11, fontWeight: FontWeight.bold))),
                 Expanded(flex: 3, child: Text(isAr ? 'المسمى الوظيفي' : 'Job Title', style: const TextStyle(color: Colors.grey, fontSize: 11, fontWeight: FontWeight.bold))),
-                Expanded(flex: 2, child: Text(isAr ? 'تاريخ التقديم' : 'Date', style: const TextStyle(color: Colors.grey, fontSize: 11, fontWeight: FontWeight.bold))),
+                Expanded(flex: 2, child: Text(isAr ? 'التاريخ' : 'Date', style: const TextStyle(color: Colors.grey, fontSize: 11, fontWeight: FontWeight.bold))),
                 Expanded(flex: 2, child: Text(isAr ? 'الحالة' : 'Status', style: const TextStyle(color: Colors.grey, fontSize: 11, fontWeight: FontWeight.bold))),
               ],
             ),
@@ -194,17 +216,17 @@ class _RecruitmentApplicationTimelineScreenState extends State<RecruitmentApplic
                     final app = filteredApps[index];
                     return Container(
                       padding: const EdgeInsets.symmetric(vertical: 12),
-                      decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.grey.shade200, width: 0.5))),
+                      decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.1), width: 0.5))),
                       child: Row(
                         children: [
-                          SizedBox(width: 25, child: Text('${index + 1}', style: const TextStyle(fontSize: 12, color: Colors.black87))),
+                          SizedBox(width: 25, child: Text('${index + 1}', style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurface))),
                           Expanded(
                             flex: 3,
                             child: Row(
                               children: [
                                 Container(
                                   padding: const EdgeInsets.all(4),
-                                  decoration: BoxDecoration(color: Colors.orange.shade50, borderRadius: BorderRadius.circular(6)),
+                                  decoration: BoxDecoration(color: Colors.orange.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(6)),
                                   child: const Icon(Icons.business, size: 14, color: Colors.orange),
                                 ),
                                 const SizedBox(width: 8),
@@ -213,17 +235,17 @@ class _RecruitmentApplicationTimelineScreenState extends State<RecruitmentApplic
                             ),
                           ),
                           Expanded(flex: 3, child: Text(app.jobTitle, style: const TextStyle(fontSize: 12), overflow: TextOverflow.ellipsis)),
-                          Expanded(flex: 2, child: Text('${app.updatedAt.day}/${app.updatedAt.month}/${app.updatedAt.year}', style: const TextStyle(fontSize: 11, color: Colors.black54))),
+                          Expanded(flex: 2, child: Text('${app.updatedAt.day}/${app.updatedAt.month}/${app.updatedAt.year}', style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)))),
                           Expanded(
                             flex: 2,
                             child: Container(
                               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                               decoration: BoxDecoration(
-                                color: _getStatusColor(app.status).withOpacity(0.1),
+                                color: _getStatusColor(app.status).withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Text(
-                                app.status,
+                                _translateStatus(app.status, isAr),
                                 textAlign: TextAlign.center,
                                 style: TextStyle(color: _getStatusColor(app.status), fontSize: 10, fontWeight: FontWeight.bold),
                                 overflow: TextOverflow.ellipsis,
@@ -239,13 +261,6 @@ class _RecruitmentApplicationTimelineScreenState extends State<RecruitmentApplic
         ],
       ),
     );
-  }
-
-  Color _getStatusColor(String status) {
-    if (status == 'Hired' || status == 'تم التوظيف') return Colors.green;
-    if (status == 'Declined' || status == 'مرفوض') return Colors.red;
-    if (status == 'In Review' || status == 'قيد المراجعة') return Colors.orange;
-    return Colors.blue;
   }
 
   Widget _buildTab(String label, String status) {

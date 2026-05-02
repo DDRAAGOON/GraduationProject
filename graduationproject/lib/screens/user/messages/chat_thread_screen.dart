@@ -17,7 +17,7 @@ class ChatThreadScreen extends StatefulWidget {
 
 class _ChatThreadScreenState extends State<ChatThreadScreen> {
   final TextEditingController _messageController = TextEditingController();
-  final List<Map<String, dynamic>> _messages = [];
+  final List<Map<String, dynamic>> _messages = []; // تبدأ فارغة دائماً
 
   @override
   void dispose() {
@@ -58,7 +58,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
         ),
         title: Row(
           children: [
-            CircleAvatar(radius: 18, backgroundImage: AssetImage(widget.image)),
+            CircleAvatar(radius: 18, backgroundImage: widget.image.startsWith('http') ? NetworkImage(widget.image) : AssetImage(widget.image) as ImageProvider),
             const SizedBox(width: 10),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -79,18 +79,35 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
         children: [
           Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 1),
           Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-              itemCount: _messages.length + 1,
-              itemBuilder: (context, index) {
-                if (index == 0) return _buildHeader();
-                final msg = _messages[index - 1];
-                return _buildMessageBubble(context, msg);
-              },
-            ),
+            child: _messages.isEmpty 
+              ? _buildEmptyChat(t)
+              : ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                  itemCount: _messages.length + 1,
+                  itemBuilder: (context, index) {
+                    if (index == 0) return _buildHeader();
+                    final msg = _messages[index - 1];
+                    return _buildMessageBubble(context, msg);
+                  },
+                ),
           ),
           _buildMessageInput(context, t),
           const SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyChat(AppLocalizations t) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          _buildHeader(),
+          Text(
+            t.tr(en: "No messages yet. Say hi!", ar: "لا توجد رسائل بعد. قل مرحباً!"),
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
+          ),
         ],
       ),
     );
@@ -106,7 +123,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
             isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
         children: [
           if (!isMe)
-            CircleAvatar(radius: 18, backgroundImage: AssetImage(widget.image)),
+            CircleAvatar(radius: 18, backgroundImage: widget.image.startsWith('http') ? NetworkImage(widget.image) : AssetImage(widget.image) as ImageProvider),
           const SizedBox(width: 12),
           Flexible(
             child: Column(
@@ -183,7 +200,7 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
     return Center(
       child: Column(
         children: [
-          CircleAvatar(radius: 40, backgroundImage: AssetImage(widget.image)),
+          CircleAvatar(radius: 40, backgroundImage: widget.image.startsWith('http') ? NetworkImage(widget.image) : AssetImage(widget.image) as ImageProvider),
           const SizedBox(height: 10),
           Text(widget.name,
               style: TextStyle(

@@ -44,35 +44,44 @@ class _RecruitmentJobApplicationScreenState
     }
   }
 
-  Future<void> _submit() async {
+  Future<void> _submit(bool isAr) async {
     if (_cover.text.trim().isEmpty || _selectedCVName == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please upload your CV and write a Cover Letter.')),
+        SnackBar(content: Text(isAr ? 'يرجى رفع السيرة الذاتية وكتابة خطاب التغطية.' : 'Please upload your CV and write a Cover Letter.')),
       );
       return;
     }
     
     setState(() => _loading = true);
-    await RecruitmentSyncService.instance.applyToJob(
-      jobId: widget.job.id,
-      userName: RecruitmentSyncStore.instance.currentUserName,
-    );
-    if (!mounted) return;
-    setState(() => _loading = false);
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Application submitted successfully.')),
-    );
-    Navigator.of(context).pop();
+    try {
+      await RecruitmentSyncService.instance.applyToJob(
+        jobId: widget.job.id,
+        userName: RecruitmentSyncStore.instance.currentUserName,
+      );
+      if (!mounted) return;
+      setState(() => _loading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(isAr ? 'تم تقديم الطلب بنجاح.' : 'Application submitted successfully.')),
+      );
+      Navigator.of(context).pop();
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _loading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(isAr ? 'حدث خطأ أثناء تقديم الطلب.' : 'Error submitting application.')),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         title: Text(
-          'Apply to Job',
+          isAr ? 'التقديم للوظيفة' : 'Apply to Job',
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
@@ -85,7 +94,7 @@ class _RecruitmentJobApplicationScreenState
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.1)),
+              border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -98,20 +107,22 @@ class _RecruitmentJobApplicationScreenState
                       ),
                 ),
                 const SizedBox(height: 6),
+                // تم إخفاء اسم الشركة بناءً على طلبك السابق في صفحات أخرى إذا كنت ترغب في ذلك، 
+                // هنا ما زال يظهر لضمان معرفة المستخدم لمن يرسل الطلب.
                 Text(
                   widget.job.companyName,
-                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
+                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)),
                 ),
               ],
             ),
           ),
           const SizedBox(height: 24),
           
-          _buildInputField('Portfolio URL', _portfolio),
-          _buildInputField('LinkedIn URL', _linkedIn),
+          _buildInputField(isAr ? 'رابط معرض الأعمال (Portfolio)' : 'Portfolio URL', _portfolio),
+          _buildInputField(isAr ? 'رابط LinkedIn' : 'LinkedIn URL', _linkedIn),
           
           const SizedBox(height: 8),
-          const Text('Curriculum Vitae (CV) *', style: TextStyle(fontWeight: FontWeight.bold)),
+          Text(isAr ? 'السيرة الذاتية (CV) *' : 'Curriculum Vitae (CV) *', style: const TextStyle(fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
           GestureDetector(
             onTap: _pickCV,
@@ -120,7 +131,7 @@ class _RecruitmentJobApplicationScreenState
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.2)),
+                border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.2)),
               ),
               child: Row(
                 children: [
@@ -128,8 +139,8 @@ class _RecruitmentJobApplicationScreenState
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      _selectedCVName ?? 'Upload your CV (PDF, DOC)',
-                      style: TextStyle(color: _selectedCVName == null ? Theme.of(context).colorScheme.onSurface.withOpacity(0.5) : Theme.of(context).colorScheme.onSurface),
+                      _selectedCVName ?? (isAr ? 'ارفع سيرتك الذاتية (PDF, DOC)' : 'Upload your CV (PDF, DOC)'),
+                      style: TextStyle(color: _selectedCVName == null ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5) : Theme.of(context).colorScheme.onSurface),
                     ),
                   ),
                   Icon(Icons.cloud_upload_outlined, color: Theme.of(context).colorScheme.primary),
@@ -139,13 +150,13 @@ class _RecruitmentJobApplicationScreenState
           ),
           
           const SizedBox(height: 20),
-          _buildInputField('Cover letter *', _cover, maxLines: 5),
+          _buildInputField(isAr ? 'خطاب التغطية *' : 'Cover letter *', _cover, maxLines: 5),
           
           const SizedBox(height: 24),
           AppButton(
-            label: 'Submit Application',
+            label: isAr ? 'تقديم الطلب' : 'Submit Application',
             loading: _loading,
-            onPressed: _loading ? null : _submit,
+            onPressed: _loading ? null : () => _submit(isAr),
           ),
           const SizedBox(height: 24),
         ],
@@ -167,11 +178,11 @@ class _RecruitmentJobApplicationScreenState
           fillColor: Theme.of(context).colorScheme.surface,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Theme.of(context).dividerColor.withOpacity(0.1)),
+            borderSide: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Theme.of(context).dividerColor.withOpacity(0.2)),
+            borderSide: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.2)),
           ),
         ),
       ),

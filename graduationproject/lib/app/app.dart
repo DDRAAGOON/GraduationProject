@@ -36,7 +36,7 @@ class App extends StatelessWidget {
               GlobalWidgetsLocalizations.delegate,
               GlobalCupertinoLocalizations.delegate,
             ],
-            initialRoute: AppRoutes.roleSelection,
+            initialRoute: AppRoutes.splash, // تم التعديل ليبدأ من الـ Splash
             onGenerateRoute: AppRouter.onGenerateRoute,
           ),
         ),
