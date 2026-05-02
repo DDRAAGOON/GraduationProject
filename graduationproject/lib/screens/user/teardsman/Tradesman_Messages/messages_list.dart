@@ -33,6 +33,48 @@ class _MessagesListState extends State<MessagesList> {
     super.dispose();
   }
 
+  void _showProfileImage(BuildContext context, ImageProvider? provider) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.all(20),
+        child: Stack(
+          alignment: Alignment.topRight,
+          children: [
+            if (provider != null)
+              ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Image(image: provider, fit: BoxFit.contain),
+              )
+            else
+              Container(
+                width: 280,
+                height: 280,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).cardColor,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: const Icon(Icons.person, size: 120, color: Colors.grey),
+              ),
+            Positioned(
+              right: 8,
+              top: 8,
+              child: GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: const CircleAvatar(
+                  backgroundColor: Colors.black54,
+                  radius: 15,
+                  child: Icon(Icons.close, color: Colors.white, size: 18),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
@@ -52,10 +94,10 @@ class _MessagesListState extends State<MessagesList> {
         leading: Padding(
           padding: const EdgeInsets.only(left: 16, top: 8, bottom: 8),
           child: GestureDetector(
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const Settings()),
-            ),
+            onTap: () {
+              final provider = getAppImageProvider(UserProfileData.profileImage);
+              _showProfileImage(context, provider);
+            },
             child: CircleAvatar(
               radius: 18,
               backgroundColor: Theme.of(context).colorScheme.surface,

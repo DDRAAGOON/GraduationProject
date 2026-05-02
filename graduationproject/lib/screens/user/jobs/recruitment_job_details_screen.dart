@@ -237,6 +237,7 @@ class RecruitmentJobDetailsScreen extends StatelessWidget {
           const SizedBox(height: 18),
           AppButton(
             label: isAr ? 'قدّم الآن' : 'Apply',
+            backgroundColor: const Color(0xFF4A6ED1),
             onPressed: () => Navigator.of(context).pushNamed(
               AppRoutes.userJobApplication,
               arguments: job,

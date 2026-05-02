@@ -227,6 +227,7 @@ class TradesmanJobDetailsScreen extends StatelessWidget {
                   Expanded(
                     child: AppButton(
                       label: t.tr(en: 'Apply Now', ar: 'قدّم الآن'),
+                      backgroundColor: const Color(0xFF4A6ED1),
                       onPressed: () {
                         Navigator.push(
                           context,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../shared/l10n/app_localizations.dart';
 import '../../../constants/app_images.dart';
+import '../../../app/router/app_router.dart';
 import 'edit_profile_screen.dart';
 import 'profile_media_edit_screen.dart';
 import '../notifications/notifications_screen.dart';
@@ -28,6 +29,11 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
         child: AnimatedBuilder(
           animation: store,
           builder: (context, _) {
+            // تحديد مسمى الحالة بناءً على دور المستخدم
+            final String statusLabel = store.userRole == 'Tradesman' 
+                ? t.tr(en: "Tradesman", ar: "صنايعي")
+                : t.tr(en: "Job Seeker", ar: "باحث عن عمل");
+
             return SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -109,7 +115,7 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.1),
+                                color: Colors.black.withOpacity(0.1),
                                 blurRadius: 10,
                                 spreadRadius: 2,
                               )
@@ -138,8 +144,10 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
                       children: [
                         Row(
                           children: [
-                            if (!isAr) _buildEditButton(context, t),
-                            if (!isAr) const SizedBox(width: 12),
+                            if (!isAr) ...[
+                              _buildEditButton(context, t),
+                              const SizedBox(width: 12),
+                            ],
                             
                             Expanded(
                               child: Text(
@@ -147,7 +155,7 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
                                 textAlign: isAr ? TextAlign.right : TextAlign.left,
                                 style: TextStyle(
                                   color: Theme.of(context).colorScheme.onSurface, 
-                                  fontSize: 20,
+                                  fontSize: 22,
                                   fontWeight: FontWeight.bold
                                 ),
                                 maxLines: 1,
@@ -155,30 +163,32 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
                               ),
                             ),
                             
-                            if (isAr) const SizedBox(width: 12),
-                            if (isAr) _buildEditButton(context, t),
+                            if (isAr) ...[
+                              const SizedBox(width: 12),
+                              _buildEditButton(context, t),
+                            ],
                           ],
                         ),
                         const SizedBox(height: 4),
+                        // عرض الحالة (باحث عن عمل / صنايعي)
                         Text(
-                          t.tr(en: "Job Seeker", ar: "باحث عن عمل"),
+                          statusLabel,
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.primary,
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          store.currentUserTitle.isEmpty ? t.notYet : store.currentUserTitle,
-                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 14),
-                        ),
                         const SizedBox(height: 8),
+                        // عرض العنوان تحت الحالة مباشرة
                         Row(
                           children: [
-                            Icon(Icons.location_on_outlined, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), size: 16),
+                            Icon(Icons.location_on_outlined, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54), size: 16),
                             const SizedBox(width: 4),
-                            Text(store.currentUserLocation.isEmpty ? t.notYet : store.currentUserLocation, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 14)),
+                            Text(
+                              store.currentUserLocation.isEmpty ? t.notYet : store.currentUserLocation, 
+                              style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54), fontSize: 14)
+                            ),
                           ],
                         ),
                       ],
@@ -193,9 +203,9 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.08),
+                        color: Theme.of(context).colorScheme.primary.withOpacity(0.08),
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.teal.withValues(alpha: 0.3)),
+                        border: Border.all(color: Colors.teal.withOpacity(0.3)),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -213,7 +223,7 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
 
                   const SizedBox(height: 30),
 
-                  // Details Section
+                  // Details Section with Dividers
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Column(
@@ -222,24 +232,36 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
                         Text(t.additionalDetails, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold)),
                         const SizedBox(height: 20),
                         _buildDetailItem(context, Icons.email_outlined, t.email, store.currentUserEmail),
+                        const Divider(height: 1, thickness: 0.5),
+                        const SizedBox(height: 15),
                         _buildDetailItem(context, Icons.phone_android_outlined, t.phone, store.currentUserPhone),
+                        const Divider(height: 1, thickness: 0.5),
+                        const SizedBox(height: 15),
                         _buildDetailItem(context, Icons.location_on_outlined, t.address, store.currentUserLocation),
+                        const Divider(height: 1, thickness: 0.5),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  _buildSectionTitle(t.aboutMeSection),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          store.currentUserAbout.isEmpty ? t.notYet : store.currentUserAbout,
+                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7), fontSize: 14, height: 1.5),
+                        ),
+                        const SizedBox(height: 15),
+                        Divider(color: Theme.of(context).dividerColor.withOpacity(0.12), height: 1),
                       ],
                     ),
                   ),
 
                   const SizedBox(height: 20),
-
-                  _buildSectionTitle(t.aboutMeSection),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Text(
-                      store.currentUserAbout.isEmpty ? t.notYet : store.currentUserAbout,
-                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 14, height: 1.5),
-                    ),
-                  ),
-
-                  const SizedBox(height: 30),
 
                   _buildSectionTitle(t.workExperience),
                   if (store.currentUserExperience.isEmpty)
@@ -297,18 +319,15 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
 
   Widget _buildEditButton(BuildContext context, AppLocalizations t) {
     return GestureDetector(
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const EditProfileScreen()),
-      ),
+      onTap: () => Navigator.of(context).pushNamed(AppRoutes.userEditProfile),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
-          color: Colors.blue,
+          color: const Color(0xFF007BFF), 
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.blue.withValues(alpha: 0.3),
+              color: const Color(0xFF007BFF).withOpacity(0.3),
               blurRadius: 8,
               offset: const Offset(0, 2),
             )
@@ -320,7 +339,7 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
             const Icon(Icons.edit, color: Colors.white, size: 14),
             const SizedBox(width: 6),
             Text(
-              t.editProfile,
+              t.editProfile, 
               style: const TextStyle(
                 color: Colors.white, 
                 fontSize: 12, 
@@ -342,9 +361,9 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
         decoration: BoxDecoration(
           color: Theme.of(context).brightness == Brightness.dark 
               ? const Color(0xFF0D2D4D) 
-              : Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+              : Theme.of(context).colorScheme.primary.withOpacity(0.1),
           shape: BoxShape.circle,
-          border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.12)),
+          border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.12)),
         ),
         child: Icon(icon, color: Theme.of(context).colorScheme.onSurface, size: 22),
       ),
@@ -375,7 +394,7 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
               children: [
                 Text(title, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 4),
-                Text("$subtitle • $duration", style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 13)),
+                Text("$subtitle • $duration", style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54), fontSize: 13)),
               ],
             ),
           ),
@@ -388,13 +407,13 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+        color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3)),
+        border: Border.all(color: Theme.of(context).colorScheme.primary.withOpacity(0.3)),
       ),
       child: Text(
         label,
-        style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 13),
+        style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7), fontSize: 13),
       ),
     );
   }
@@ -402,11 +421,11 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
   Widget _buildDetailItem(BuildContext context, IconData icon, String title, String value) {
     final t = AppLocalizations.of(context);
     return Padding(
-      padding: const EdgeInsets.only(bottom: 20),
+      padding: const EdgeInsets.only(bottom: 5),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), size: 20),
+          Icon(icon, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7), size: 20),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -418,8 +437,8 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
                   value.isEmpty ? t.notYet : value, 
                   style: TextStyle(
                     color: value.isEmpty 
-                        ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)
-                        : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), 
+                        ? Theme.of(context).colorScheme.onSurface.withOpacity(0.38)
+                        : Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                     fontSize: 13
                   ), 
                 ),

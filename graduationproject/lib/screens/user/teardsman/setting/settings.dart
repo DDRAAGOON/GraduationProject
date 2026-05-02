@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:graduationproject/app/router/app_router.dart';
 import 'package:graduationproject/shared/l10n/app_localizations.dart';
-import 'package:graduationproject/screens/user/profile/edit_profile_screen.dart';
-import 'package:graduationproject/screens/user/profile/profile_login_details_screen.dart';
-import 'package:graduationproject/screens/user/profile/setting_profile/notifications.dart';
 import 'package:graduationproject/screens/user/profile/setting_profile/preferences.dart';
 
 class Settings extends StatefulWidget {
@@ -90,24 +87,14 @@ class _SettingsState extends State<Settings> {
             const SizedBox(height: 20),
             
             _buildSettingItem(
-              icon: Icons.person_outline,
-              title: t.tr(en: "Profile Setting", ar: "إعدادات الملف الشخصي"),
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const EditProfileScreen())),
-            ),
-            _buildSettingItem(
-              icon: Icons.security_outlined,
-              title: t.tr(en: "Account Security", ar: "أمان الحساب"),
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const ProfileLoginDetailsScreen())),
-            ),
-            _buildSettingItem(
-              icon: Icons.notifications_none,
-              title: t.tr(en: "Notification", ar: "الإشعارات"),
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const Notifications())),
-            ),
-            _buildSettingItem(
               icon: Icons.tune_outlined,
               title: t.tr(en: "Preferences", ar: "التفضيلات"),
               onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const Preferences())),
+            ),
+            _buildSettingItem(
+              icon: Icons.help_outline_rounded,
+              title: t.tr(en: "Help Center", ar: "مركز المساعدة"),
+              onTap: () => Navigator.of(context).pushNamed(AppRoutes.companyHelpCenter),
             ),
 
             const SizedBox(height: 40),

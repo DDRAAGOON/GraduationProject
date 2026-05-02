@@ -129,6 +129,22 @@ class _RecruitmentUserShellScreenState extends State<RecruitmentUserShellScreen>
             ],
           ),
           body: pages[_tab],
+          floatingActionButton: _tab == 0 
+            ? FloatingActionButton(
+                onPressed: () {
+                  // TODO: Implement chatbot navigation or functionality
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(_isAr ? 'قريباً: المساعد الذكي!' : 'Chatbot coming soon!'),
+                      backgroundColor: const Color(0xFF4A6ED1),
+                    ),
+                  );
+                },
+                backgroundColor: const Color(0xFF4A6ED1),
+                shape: const CircleBorder(),
+                child: const Icon(Icons.smart_toy_outlined, color: Colors.white, size: 28),
+              )
+            : null,
           bottomNavigationBar: NavigationBar(
             backgroundColor: Theme.of(context).cardColor,
             selectedIndex: _tab,
@@ -248,7 +264,7 @@ class _DiscoverTab extends StatelessWidget {
                       const SizedBox(height: 12),
                       Row(children: [Expanded(child: OutlinedButton(style: OutlinedButton.styleFrom(side: BorderSide(color: Theme.of(context).colorScheme.secondary), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), padding: const EdgeInsets.symmetric(vertical: 8)), onPressed: () => Navigator.of(context).pushNamed(AppRoutes.userJobDetails, arguments: job), child: Text(isAr ? 'عرض التفاصيل' : 'View Details', style: TextStyle(color: Theme.of(context).colorScheme.secondary, fontWeight: FontWeight.bold))))]),
                       const SizedBox(height: 12),
-                      AppButton(label: isAr ? 'قدّم الآن' : 'Apply Now', onPressed: () => Navigator.of(context).pushNamed(AppRoutes.userJobApplication, arguments: job)),
+                      AppButton(label: isAr ? 'قدّم الآن' : 'Apply Now', backgroundColor: const Color(0xFF4A6ED1), onPressed: () => Navigator.of(context).pushNamed(AppRoutes.userJobApplication, arguments: job)),
                     ],
                   ),
                 ),
@@ -416,33 +432,65 @@ class _ProfileTabState extends State<_ProfileTab> {
     final t = AppLocalizations.of(context);
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
     final store = RecruitmentSyncStore.instance;
+
+    // Determine status based on role
+    final String statusLabel = store.userRole == 'Tradesman' 
+        ? t.tr(en: "Tradesman", ar: "صنايعي")
+        : t.tr(en: "Job Seeker", ar: "باحث عن عمل");
+
     return AnimatedBuilder(
       animation: store,
       builder: (context, _) {
+        final profileImageProvider = getAppImageProvider(store.profileImage);
         return SingleChildScrollView(
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Stack(clipBehavior: Clip.none, children: [Container(height: 180, width: double.infinity, decoration: BoxDecoration(gradient: LinearGradient(colors: [Theme.of(context).colorScheme.primary.withValues(alpha: 0.9), Theme.of(context).colorScheme.primary.withValues(alpha: 0.6)], begin: Alignment.topLeft, end: Alignment.bottomRight))), Positioned(bottom: -50, left: isAr ? null : 24, right: isAr ? 24 : null, child: Container(decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: Colors.white, width: 4), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 10)]), child: CircleAvatar(radius: 50, backgroundColor: Theme.of(context).cardColor, backgroundImage: getAppImageProvider(store.profileImage), child: store.profileImage == null ? Icon(Icons.person, size: 55, color: Theme.of(context).colorScheme.primary) : null)))]),
+              Stack(clipBehavior: Clip.none, children: [Container(height: 180, width: double.infinity, decoration: BoxDecoration(gradient: LinearGradient(colors: [Theme.of(context).colorScheme.primary.withValues(alpha: 0.9), Theme.of(context).colorScheme.primary.withValues(alpha: 0.6)], begin: Alignment.topLeft, end: Alignment.bottomRight))), Positioned(bottom: -50, left: isAr ? null : 24, right: isAr ? 24 : null, child: Container(decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: Colors.white, width: 4), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 10)]), child: CircleAvatar(radius: 50, backgroundColor: Theme.of(context).cardColor, backgroundImage: profileImageProvider, child: store.profileImage == null ? Icon(Icons.person, size: 55, color: Theme.of(context).colorScheme.primary) : null)))]),
               const SizedBox(height: 60),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(store.currentUserName.isEmpty ? t.notYet : store.currentUserName, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 26, fontWeight: FontWeight.w900)),
+                    Row(
+                      children: [
+                        if (!isAr) ...[
+                          _buildEditButton(context, t),
+                          const SizedBox(width: 12),
+                        ],
+                        Expanded(
+                          child: Text(store.currentUserName.isEmpty ? t.notYet : store.currentUserName, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 26, fontWeight: FontWeight.w900)),
+                        ),
+                        if (isAr) ...[
+                          const SizedBox(width: 12),
+                          _buildEditButton(context, t),
+                        ],
+                      ],
+                    ),
                     const SizedBox(height: 4),
-                    Text(store.currentUserTitle.isEmpty ? t.notYet : _translateValue(store.currentUserTitle, isAr), style: TextStyle(color: Theme.of(context).colorScheme.primary, fontSize: 16, fontWeight: FontWeight.w700)),
+                    // الحالة (باحث عن عمل / صنايعي)
+                    Text(statusLabel, style: TextStyle(color: Theme.of(context).colorScheme.primary, fontSize: 16, fontWeight: FontWeight.w700)),
+                    const SizedBox(height: 8),
+                    // العنوان تحت الحالة
+                    Row(
+                      children: [
+                        Icon(Icons.location_on_outlined, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), size: 16),
+                        const SizedBox(width: 4),
+                        Text(store.currentUserLocation.isEmpty ? t.notYet : store.currentUserLocation, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 14)),
+                      ],
+                    ),
                     const SizedBox(height: 30),
                     GestureDetector(onTap: () { ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.tr(en: "Switching to Tradesman Mode...", ar: "التبديل إلى وضع الصنايعي...")), backgroundColor: Theme.of(context).colorScheme.secondary, duration: const Duration(seconds: 1))); Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Navbotton())); }, child: Container(width: double.infinity, padding: const EdgeInsets.symmetric(vertical: 16), decoration: BoxDecoration(color: Theme.of(context).colorScheme.secondary, borderRadius: BorderRadius.circular(16), boxShadow: [BoxShadow(color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.3), blurRadius: 10, offset: const Offset(0, 4))]), child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [const Icon(Icons.swap_horiz, color: Colors.white), const SizedBox(width: 10), Text(t.tr(en: "Switch to Tradesman", ar: "التبديل إلى وضع الصنايعي"), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold))]))),
                     const SizedBox(height: 30),
                     Container(
                       width: double.infinity, padding: const EdgeInsets.all(24), decoration: BoxDecoration(color: Theme.of(context).cardColor, borderRadius: BorderRadius.circular(24), border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 10, offset: const Offset(0, 4))]),
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        _buildProfileItem(t.aboutMe, store.currentUserAbout, Icons.info_outline),
-                        _buildProfileItem(isAr ? 'البريد الإلكتروني' : 'Email', store.currentUserEmail, Icons.email_outlined),
-                        _buildProfileItem(isAr ? 'رقم الهاتف' : 'Phone', store.currentUserPhone, Icons.phone_android_outlined),
-                        _buildProfileItem(isAr ? 'الموقع' : 'Location', store.currentUserLocation, Icons.location_on_outlined),
-                        _buildProfileItem(isAr ? 'المهارات' : 'Skills', store.currentUserSkills.join(', '), Icons.psychology_outlined),
+                        _buildProfileItem(context, t.aboutMe, store.currentUserAbout, Icons.info_outline, showDivider: true),
+                        _buildProfileItem(context, isAr ? 'البريد الإلكتروني' : 'Email', store.currentUserEmail, Icons.email_outlined, showDivider: true),
+                        _buildProfileItem(context, isAr ? 'رقم الهاتف' : 'Phone', store.currentUserPhone, Icons.phone_android_outlined, showDivider: true),
+                        _buildProfileItem(context, isAr ? 'الموقع' : 'Location', store.currentUserLocation, Icons.location_on_outlined, showDivider: true),
+                        _buildProfileItem(context, isAr ? 'المهارات' : 'Skills', store.currentUserSkills.join(', '), Icons.psychology_outlined),
                         if (store.portfolioImages.isNotEmpty) ...[const SizedBox(height: 10), Text(isAr ? 'المعرض' : 'Gallery', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: Theme.of(context).colorScheme.onSurface)), const SizedBox(height: 16), SizedBox(height: 100, child: ListView.builder(scrollDirection: Axis.horizontal, itemCount: store.portfolioImages.length, itemBuilder: (context, index) { final path = store.portfolioImages[index]; return Container(margin: const EdgeInsets.only(right: 12), width: 100, decoration: BoxDecoration(borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.grey.shade100)), child: ClipRRect(borderRadius: BorderRadius.circular(14), child: Image(image: getAppImageProvider(path) ?? const AssetImage('assets/placeholder.png'), fit: BoxFit.cover))); }))],
                       ]),
                     ),
@@ -461,11 +509,81 @@ class _ProfileTabState extends State<_ProfileTab> {
     );
   }
 
+  Widget _buildEditButton(BuildContext context, AppLocalizations t) {
+    return GestureDetector(
+      onTap: () => Navigator.of(context).pushNamed(AppRoutes.userEditProfile),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: const Color(0xFF007BFF), // اللون الأزرق
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF007BFF).withValues(alpha: 0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            )
+          ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.edit, color: Colors.white, size: 14),
+            const SizedBox(width: 6),
+            Text(
+              t.editProfile,
+              style: const TextStyle(
+                color: Colors.white, 
+                fontSize: 12, 
+                fontWeight: FontWeight.bold
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildRecordItem(BuildContext context, String? title, String? subtitle, IconData icon, bool isAr) => Container(margin: const EdgeInsets.only(bottom: 12), padding: const EdgeInsets.all(20), decoration: BoxDecoration(color: Theme.of(context).cardColor, borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.grey.withValues(alpha: 0.05))), child: Row(children: [Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(14)), child: Icon(icon, color: Theme.of(context).colorScheme.primary)), const SizedBox(width: 16), Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(_translateValue(title, isAr), style: TextStyle(color: Theme.of(context).textTheme.titleMedium?.color, fontWeight: FontWeight.bold, fontSize: 16)), const SizedBox(height: 4), Text(subtitle ?? "", style: const TextStyle(color: Colors.black54, fontSize: 13, fontWeight: FontWeight.w500))]))]));
 
-  Widget _buildProfileItem(String label, String value, IconData icon) {
+  Widget _buildProfileItem(BuildContext context, String label, String value, IconData icon, {bool showDivider = false}) {
     final t = AppLocalizations.of(context);
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
-    return Padding(padding: const EdgeInsets.only(bottom: 24), child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)), child: Icon(icon, color: Theme.of(context).colorScheme.primary, size: 20)), const SizedBox(width: 16), Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(label, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 12, fontWeight: FontWeight.bold)), const SizedBox(height: 4), Text(value.isEmpty ? t.notYet : _translateValue(value, isAr), style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 15, fontWeight: FontWeight.w600))]))]));
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 24),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(icon, color: Theme.of(context).colorScheme.primary, size: 20),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(label, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 12, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 4),
+                    Text(value.isEmpty ? t.notYet : _translateValue(value, isAr), style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 15, fontWeight: FontWeight.w600)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (showDivider)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 24),
+            child: Divider(height: 1, color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
+          ),
+      ],
+    );
   }
 }

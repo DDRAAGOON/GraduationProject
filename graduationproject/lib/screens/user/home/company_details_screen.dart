@@ -12,6 +12,7 @@ class CompanyDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
     final store = RecruitmentSyncStore.instance;
     final theme = Theme.of(context);
@@ -31,7 +32,10 @@ class CompanyDetailsScreen extends StatelessWidget {
           icon: Icon(isAr ? Icons.arrow_back_ios_new : Icons.arrow_back_ios, color: theme.colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text(isAr ? 'تفاصيل الشركة' : 'Company Details', style: const TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(
+          t.tr(en: 'Company Details', ar: 'تفاصيل الشركة'),
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -92,7 +96,7 @@ class CompanyDetailsScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    isAr ? 'عن الشركة' : 'About Company',
+                    t.tr(en: 'About Company', ar: 'عن الشركة'),
                     style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 12),
@@ -117,7 +121,7 @@ class CompanyDetailsScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    isAr ? 'الوظائف المتاحة' : 'Open Vacancies',
+                    t.tr(en: 'Open Vacancies', ar: 'الوظائف المتاحة'),
                     style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   Text(
@@ -138,7 +142,7 @@ class CompanyDetailsScreen extends StatelessWidget {
                       Icon(Icons.work_off_outlined, size: 64, color: theme.dividerColor.withValues(alpha: 0.2)),
                       const SizedBox(height: 16),
                       Text(
-                        isAr ? 'لا توجد وظائف متاحة حالياً' : 'No jobs available right now',
+                        t.tr(en: 'No jobs available right now', ar: 'لا توجد وظائف متاحة حالياً'),
                         style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.38)),
                       ),
                     ],
@@ -153,7 +157,7 @@ class CompanyDetailsScreen extends StatelessWidget {
                 itemCount: companyJobs.length,
                 itemBuilder: (context, index) {
                   final job = companyJobs[index];
-                  return _buildJobCard(context, job, isAr);
+                  return _buildJobCard(context, job, t);
                 },
               ),
             const SizedBox(height: 100),
@@ -163,8 +167,9 @@ class CompanyDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildJobCard(BuildContext context, RecruitmentJob job, bool isAr) {
+  Widget _buildJobCard(BuildContext context, RecruitmentJob job, AppLocalizations t) {
     final theme = Theme.of(context);
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       color: theme.cardColor,
@@ -206,7 +211,8 @@ class CompanyDetailsScreen extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               AppButton(
-                label: isAr ? 'قدّم الآن' : 'Apply Now',
+                label: t.tr(en: 'Apply Now', ar: 'قدّم الآن'),
+                backgroundColor: const Color(0xFF4A6ED1),
                 onPressed: () => Navigator.of(context).pushNamed(AppRoutes.userJobApplication, arguments: job),
               ),
             ],

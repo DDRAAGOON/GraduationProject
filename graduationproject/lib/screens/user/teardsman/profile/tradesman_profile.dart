@@ -5,6 +5,8 @@ import 'package:graduationproject/shared/l10n/app_localizations.dart';
 import 'package:graduationproject/screens/user/profile/user_data.dart';
 import 'package:graduationproject/screens/user/teardsman/setting/settings.dart';
 import 'package:graduationproject/screens/user/home/recruitment_user_shell_screen.dart';
+import 'package:graduationproject/app/router/app_router.dart';
+import 'package:graduationproject/shared/state/recruitment_sync_store.dart';
 
 class TradesmanProfile extends StatefulWidget {
   const TradesmanProfile({super.key});
@@ -17,6 +19,8 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
+    final store = RecruitmentSyncStore.instance;
     
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -76,8 +80,8 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
                       child: CircleAvatar(
                         radius: 60,
                         backgroundColor: Theme.of(context).cardColor,
-                        backgroundImage: getAppImageProvider(UserProfileData.profileImage),
-                        child: UserProfileData.profileImage == null 
+                        backgroundImage: getAppImageProvider(store.profileImage),
+                        child: store.profileImage == null 
                             ? const Icon(Icons.person, size: 70, color: Color(0xFF49769F)) 
                             : null,
                       ),
@@ -89,22 +93,42 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
             
             const SizedBox(height: 75),
 
-            // User Primary Info
-            Text(
-              UserProfileData.fullName.isEmpty ? "No Name" : UserProfileData.fullName,
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 28, fontWeight: FontWeight.w900),
+            // User Primary Info (Name and Edit Button)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (!isAr) ...[
+                    _buildEditButton(context, t),
+                    const SizedBox(width: 12),
+                  ],
+                  Expanded(
+                    child: Text(
+                      store.currentUserName.isEmpty ? "No Name" : store.currentUserName,
+                      textAlign: isAr ? TextAlign.right : TextAlign.left,
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 24, fontWeight: FontWeight.w900),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  if (isAr) ...[
+                    const SizedBox(width: 12),
+                    _buildEditButton(context, t),
+                  ],
+                ],
+              ),
             ),
             const SizedBox(height: 6),
             Text(
-              UserProfileData.jobTitle.isEmpty ? "Service Provider" : UserProfileData.jobTitle,
+              store.currentUserTitle.isEmpty ? "Service Provider" : store.currentUserTitle,
               textAlign: TextAlign.center,
               style: TextStyle(color: Theme.of(context).colorScheme.primary, fontSize: 16, fontWeight: FontWeight.w700),
             ),
             
             const SizedBox(height: 35),
 
-            // Main Content Area with reduced side padding for "Full Width" look
+            // Main Content Area
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
@@ -145,8 +169,8 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
                         _buildSectionHeader(t.aboutMe, Icons.info_outline),
                         const SizedBox(height: 12),
                         Text(
-                          UserProfileData.aboutMe.isEmpty ? "No info provided yet." : UserProfileData.aboutMe,
-                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), fontSize: 14, height: 1.5),
+                          store.currentUserAbout.isEmpty ? "No info provided yet." : store.currentUserAbout,
+                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6), fontSize: 14, height: 1.5),
                         ),
                       ],
                     ),
@@ -158,13 +182,13 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
                   _buildFullWidthCard(
                     child: Column(
                       children: [
-                        _buildInfoRow(t.emailAddress, UserProfileData.email, Icons.email_outlined),
+                        _buildInfoRow(t.emailAddress, store.currentUserEmail, Icons.email_outlined),
                         const Divider(height: 32),
-                        _buildInfoRow(t.phoneNumber, UserProfileData.phone, Icons.phone_android_outlined),
+                        _buildInfoRow(t.phoneNumber, store.currentUserPhone, Icons.phone_android_outlined),
                         const Divider(height: 32),
-                        _buildInfoRow(t.address, UserProfileData.location, Icons.location_on_outlined),
+                        _buildInfoRow(t.address, store.currentUserLocation, Icons.location_on_outlined),
                         const Divider(height: 32),
-                        _buildInfoRow(t.tr(en: "Skills", ar: "المهارات"), UserProfileData.skills.join(', '), Icons.psychology_outlined),
+                        _buildInfoRow(t.tr(en: "Skills", ar: "المهارات"), store.currentUserSkills.join(', '), Icons.psychology_outlined),
                       ],
                     ),
                   ),
@@ -172,7 +196,7 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
                   const SizedBox(height: 16),
 
                   // Gallery Section
-                  if (UserProfileData.portfolioImages.isNotEmpty) ...[
+                  if (store.portfolioImages.isNotEmpty) ...[
                     _buildFullWidthCard(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -183,9 +207,9 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
                             height: 110,
                             child: ListView.builder(
                               scrollDirection: Axis.horizontal,
-                              itemCount: UserProfileData.portfolioImages.length,
+                              itemCount: store.portfolioImages.length,
                               itemBuilder: (context, index) {
-                                final path = UserProfileData.portfolioImages[index];
+                                final path = store.portfolioImages[index];
                                 return Container(
                                   margin: const EdgeInsets.only(right: 12),
                                   width: 110,
@@ -211,14 +235,14 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
                   ],
 
                   // Social Links
-                  if (UserProfileData.socialLinks.isNotEmpty) ...[
+                  if (store.socialLinks.isNotEmpty) ...[
                     _buildFullWidthCard(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           _buildSectionHeader(t.socialLinks, Icons.link),
                           const SizedBox(height: 16),
-                          ...UserProfileData.socialLinks.map((link) => Padding(
+                          ...store.socialLinks.map((link) => Padding(
                             padding: const EdgeInsets.only(bottom: 12),
                             child: InkWell(
                               onTap: () async {
@@ -233,7 +257,7 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
                                 children: [
                                   Container(
                                     padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)),
+                                    decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
                                     child: Icon(Icons.link_rounded, color: Theme.of(context).colorScheme.primary, size: 18),
                                   ),
                                   const SizedBox(width: 12),
@@ -250,20 +274,20 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
                   ],
 
                   // Education Section
-                  if (UserProfileData.education.isNotEmpty) ...[
+                  if (store.currentUserEducation.isNotEmpty) ...[
                     _buildFullWidthCard(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           _buildSectionHeader(t.education, Icons.school_outlined),
                           const SizedBox(height: 16),
-                          ...UserProfileData.education.map((edu) => Padding(
+                          ...store.currentUserEducation.map((edu) => Padding(
                             padding: const EdgeInsets.only(bottom: 16),
                             child: Row(
                               children: [
                                 Container(
                                   padding: const EdgeInsets.all(10),
-                                  decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
+                                  decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
                                   child: Icon(Icons.school, color: Theme.of(context).colorScheme.primary, size: 20),
                                 ),
                                 const SizedBox(width: 16),
@@ -272,7 +296,7 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(edu['institution'] ?? "", style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
-                                      Text("${edu['degree']} • ${edu['duration']}", style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 12)),
+                                      Text("${edu['degree']} • ${edu['duration']}", style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.38), fontSize: 12)),
                                     ],
                                   ),
                                 ),
@@ -294,6 +318,41 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
     );
   }
 
+  Widget _buildEditButton(BuildContext context, AppLocalizations t) {
+    return GestureDetector(
+      onTap: () => Navigator.of(context).pushNamed(AppRoutes.userEditProfile),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: const Color(0xFF007BFF), // اللون الأزرق
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF007BFF).withOpacity(0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            )
+          ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.edit, color: Colors.white, size: 14),
+            const SizedBox(width: 6),
+            Text(
+              t.editProfile,
+              style: const TextStyle(
+                color: Colors.white, 
+                fontSize: 12, 
+                fontWeight: FontWeight.bold
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildFullWidthCard({required Widget child}) {
     return Container(
       width: double.infinity,
@@ -301,7 +360,7 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
+        border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.1)),
         boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 15, offset: const Offset(0, 8))],
       ),
       child: child,
@@ -325,7 +384,7 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+            color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(icon, color: Theme.of(context).colorScheme.primary, size: 20),
@@ -335,7 +394,7 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 11, fontWeight: FontWeight.bold)),
+              Text(label, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.38), fontSize: 11, fontWeight: FontWeight.bold)),
               const SizedBox(height: 4),
               Text(
                 value.isEmpty ? "Not provided" : value,

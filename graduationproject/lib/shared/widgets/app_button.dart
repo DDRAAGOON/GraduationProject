@@ -10,6 +10,7 @@ class AppButton extends StatelessWidget {
     this.loading = false,
     this.icon,
     this.variant = AppButtonVariant.primary,
+    this.backgroundColor,
   });
 
   final String label;
@@ -17,6 +18,7 @@ class AppButton extends StatelessWidget {
   final bool loading;
   final IconData? icon;
   final AppButtonVariant variant;
+  final Color? backgroundColor;
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +29,8 @@ class AppButton extends StatelessWidget {
       child: isPrimary
           ? Container(
               decoration: BoxDecoration(
-                gradient: LinearGradient(
+                color: backgroundColor,
+                gradient: backgroundColor != null ? null : LinearGradient(
                   colors: [
                     Theme.of(context).colorScheme.primary,
                     Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
@@ -98,4 +101,3 @@ class AppButton extends StatelessWidget {
 }
 
 enum AppButtonVariant { primary, secondary }
-

@@ -4,6 +4,7 @@ import '../../../app/router/app_router.dart';
 import '../../../constants/app_images.dart';
 import '../../../shared/services/recruitment_sync_service.dart';
 import '../../../shared/state/recruitment_sync_store.dart';
+import '../../../shared/utils/image_helper.dart';
 import '../notifications/notifications_screen.dart';
 import '../settings/setting_screen.dart';
 import '../../../shared/l10n/app_localizations.dart';
@@ -54,6 +55,48 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
     super.dispose();
   }
 
+  void _showProfileImage(BuildContext context, ImageProvider? provider) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.all(20),
+        child: Stack(
+          alignment: Alignment.topRight,
+          children: [
+            if (provider != null)
+              ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Image(image: provider, fit: BoxFit.contain),
+              )
+            else
+              Container(
+                width: 280,
+                height: 280,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).cardColor,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: const Icon(Icons.person, size: 120, color: Colors.grey),
+              ),
+            Positioned(
+              right: 8,
+              top: 8,
+              child: GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: const CircleAvatar(
+                  backgroundColor: Colors.black54,
+                  radius: 15,
+                  child: Icon(Icons.close, color: Colors.white, size: 18),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
@@ -69,7 +112,7 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildTopBar(),
+              _buildTopBar(store),
               const SizedBox(height: 25),
               _buildSearchSection(),
               const SizedBox(height: 15),
@@ -126,16 +169,18 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
     );
   }
 
-  Widget _buildTopBar() {
+  Widget _buildTopBar(RecruitmentSyncStore store) {
+    final profileImageProvider = getAppImageProvider(store.profileImage);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        InkWell(
-          onTap: () => Navigator.of(context).pushNamed(AppRoutes.userEditProfile),
-          borderRadius: BorderRadius.circular(20),
-          child: const CircleAvatar(
+        GestureDetector(
+          onTap: () => _showProfileImage(context, profileImageProvider),
+          child: CircleAvatar(
             radius: 20,
-            backgroundImage: AssetImage(AppImages.companyProfile1),
+            backgroundColor: Theme.of(context).cardColor,
+            backgroundImage: profileImageProvider,
+            child: store.profileImage == null ? const Icon(Icons.person, size: 22) : null,
           ),
         ),
         Row(
@@ -209,7 +254,7 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
           const SizedBox(width: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8), 
-            decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary, borderRadius: BorderRadius.circular(20)), 
+            decoration: BoxDecoration(color: const Color(0xFF4A6ED1), borderRadius: BorderRadius.circular(20)), 
             child: Text(AppLocalizations.of(context).tr(en: "Search", ar: "بحث"), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13))
           ),
         ],
@@ -461,7 +506,7 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
             children: [
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-                decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary, borderRadius: BorderRadius.circular(20)),
+                decoration: BoxDecoration(color: const Color(0xFF4A6ED1), borderRadius: BorderRadius.circular(20)),
                 child: Text(t.tr(en: "Apply", ar: "تقديم"), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
               ),
               const SizedBox(height: 10),
@@ -489,4 +534,3 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
     );
   }
 }
-
