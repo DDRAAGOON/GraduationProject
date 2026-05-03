@@ -247,9 +247,9 @@ class _DiscoverTab extends StatelessWidget {
                           return Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(8), boxShadow: [BoxShadow(color: color.withValues(alpha: 0.3), blurRadius: 4, offset: const Offset(0, 2))]), child: Text(_translateValue(type, isAr), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)));
                         }).toList(),
                       ),
-                      if (job.category.isNotEmpty && job.category != 'General' && job.category != 'All' && job.category.toLowerCase() != 'services' && job.category.toLowerCase() != 'service') ...[
+                      if (job.classification.isNotEmpty && job.classification != 'General' && job.classification != 'All' && job.classification.toLowerCase() != 'services' && job.classification.toLowerCase() != 'service') ...[
                         const SizedBox(height: 8),
-                        Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), decoration: BoxDecoration(color: const Color(0xFF8B5CF6), borderRadius: BorderRadius.circular(8)), child: Text(_translateValue(job.category, isAr), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12))),
+                        Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), decoration: BoxDecoration(color: const Color(0xFF8B5CF6), borderRadius: BorderRadius.circular(8)), child: Text(_translateValue(job.classification, isAr), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12))),
                       ],
                       const SizedBox(height: 8),
                       Wrap(spacing: 8, runSpacing: 8, children: job.tags.where((tag) => tag.trim().toLowerCase() != 'technical').map((String tag) => Chip(label: Text(_translateValue(tag, isAr)), backgroundColor: Theme.of(context).scaffoldBackgroundColor, side: BorderSide.none, padding: const EdgeInsets.symmetric(horizontal: 4))).toList()),
@@ -374,11 +374,11 @@ class _CompaniesTabState extends State<_CompaniesTab> {
       if (!companiesMap.containsKey(key)) {
         companiesMap[key] = {
           'name': job.companyName,
-          'industry': _translateValue(job.category.isEmpty ? 'General' : job.category, isAr),
+          'industry': _translateValue(job.classification.isEmpty ? 'General' : job.classification, isAr),
           'description': isAr ? 'شركة توظف حالياً عبر Jobito' : 'Hiring now on Jobito',
           'logoUrl': job.companyLogoUrl,
           'vacancies': openVacancies,
-          'type': job.category.toLowerCase().contains('technical') ? 'Technical' : 'Non-Technical',
+          'type': job.classification.toLowerCase().contains('technical') ? 'Technical' : 'Non-Technical',
         };
       } else {
         companiesMap[key]!['vacancies'] = (companiesMap[key]!['vacancies'] as int) + openVacancies;

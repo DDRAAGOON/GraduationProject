@@ -57,7 +57,7 @@ class _PostJobState extends State<PostJob> {
           location: store.currentUserLocation,
           salaryRange: _priceController.text,
           type: 'one-time',
-          category: 'Service',
+          classification: 'Service',
           tags: _selectedDays.toList(),
           description: _descriptionController.text,
           responsibilities: [],

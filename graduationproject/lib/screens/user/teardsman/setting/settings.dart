@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:graduationproject/app/router/app_router.dart';
 import 'package:graduationproject/shared/l10n/app_localizations.dart';
+import 'package:graduationproject/shared/services/recruitment_sync_service.dart';
 import 'package:graduationproject/screens/user/profile/setting_profile/preferences.dart';
 
 class Settings extends StatefulWidget {
@@ -33,12 +34,15 @@ class _SettingsState extends State<Settings> {
             child: Text(t.cancel, style: const TextStyle(color: Colors.grey)),
           ),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(context); // Close dialog
-              Navigator.of(context).pushNamedAndRemoveUntil(
-                AppRoutes.roleSelection, 
-                (route) => false,
-              );
+              await RecruitmentSyncService.instance.logout();
+              if (context.mounted) {
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                  AppRoutes.roleSelection, 
+                  (route) => false,
+                );
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.redAccent,

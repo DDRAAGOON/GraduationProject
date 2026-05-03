@@ -17,7 +17,7 @@ public class JwtTokenService(IConfiguration configuration)
         var claims = new List<Claim>
         {
             new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-            new(ClaimTypes.Role, user.Role),
+            new("role", user.Role),
             new("name", user.Name),
             new("email", user.Email)
         };
@@ -30,7 +30,7 @@ public class JwtTokenService(IConfiguration configuration)
             issuer: issuer,
             audience: audience,
             claims: claims,
-            expires: DateTime.UtcNow.AddDays(7),
+            expires: DateTime.UtcNow.AddDays(30),
             signingCredentials: creds);
 
         return new JwtSecurityTokenHandler().WriteToken(token);

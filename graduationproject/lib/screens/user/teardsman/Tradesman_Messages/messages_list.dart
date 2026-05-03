@@ -4,7 +4,6 @@ import '../../../../shared/state/recruitment_sync_store.dart';
 import '../../messages/new_chat_screen.dart';
 import '../post/post_job.dart';
 import '../setting/settings.dart';
-import '../../profile/user_data.dart';
 import '../../../../shared/utils/image_helper.dart';
 import 'chat_tradesman.dart';
 
@@ -93,19 +92,20 @@ class _MessagesListState extends State<MessagesList> {
       appBar: AppBar(
         leading: Padding(
           padding: const EdgeInsets.only(left: 16, top: 8, bottom: 8),
-          child: GestureDetector(
-            onTap: () {
-              final provider = getAppImageProvider(UserProfileData.profileImage);
-              _showProfileImage(context, provider);
+          child: AnimatedBuilder(
+            animation: store,
+            builder: (context, _) {
+              final provider = getAppImageProvider(store.profileImage);
+              return GestureDetector(
+                onTap: () => _showProfileImage(context, provider),
+                child: CircleAvatar(
+                  radius: 18,
+                  backgroundColor: Theme.of(context).colorScheme.surface,
+                  backgroundImage: provider,
+                  child: provider == null ? const Icon(Icons.person, size: 20) : null,
+                ),
+              );
             },
-            child: CircleAvatar(
-              radius: 18,
-              backgroundColor: Theme.of(context).colorScheme.surface,
-              backgroundImage: getAppImageProvider(UserProfileData.profileImage),
-              child: UserProfileData.profileImage == null 
-                  ? const Icon(Icons.person, size: 20) 
-                  : null,
-            ),
           ),
         ),
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -262,12 +262,16 @@ class _MessagesListState extends State<MessagesList> {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
         child: Row(
           children: [
-            CircleAvatar(
-              radius: 30, 
-              backgroundColor: Colors.grey.shade200,
-              backgroundImage: image.startsWith('http') 
-                ? NetworkImage(image) 
-                : AssetImage(image) as ImageProvider,
+            Builder(
+              builder: (context) {
+                final avatar = getAppImageProvider(image);
+                return CircleAvatar(
+                  radius: 30,
+                  backgroundColor: Colors.grey.shade200,
+                  backgroundImage: avatar,
+                  child: avatar == null ? const Icon(Icons.person, size: 30) : null,
+                );
+              },
             ),
             const SizedBox(width: 15),
             Expanded(

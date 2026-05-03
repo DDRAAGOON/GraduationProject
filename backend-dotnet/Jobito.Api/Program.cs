@@ -5,9 +5,13 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.IdentityModel.Tokens.Jwt;
 
 try
 {
+    // Disable default claim mapping to keep standard names like 'sub'
+    JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+    
     var builder = WebApplication.CreateBuilder(args);
 
     builder.Services.AddDbContext<AppDbContext>(options =>
@@ -78,6 +82,8 @@ try
         .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         .AddJwtBearer(options =>
         {
+            // Keep JWT claim names (e.g. "sub") instead of mapped CLR claim URIs.
+            options.MapInboundClaims = false;
             options.TokenValidationParameters = new TokenValidationParameters
             {
                 ValidateIssuer = true,
@@ -86,7 +92,8 @@ try
                 ValidateIssuerSigningKey = true,
                 ValidIssuer = jwtIssuer,
                 ValidAudience = jwtAudience,
-                IssuerSigningKey = signingKey
+                IssuerSigningKey = signingKey,
+                ClockSkew = TimeSpan.FromMinutes(5)
             };
         });
 

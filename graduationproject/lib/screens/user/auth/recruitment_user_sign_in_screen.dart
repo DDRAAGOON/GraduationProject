@@ -94,7 +94,6 @@ class _RecruitmentUserSignInScreenState extends State<RecruitmentUserSignInScree
   }
 
   Future<void> _handleGoogleSignIn() async {
-    final t = AppLocalizations.of(context);
     setState(() => _loading = true);
     try {
       final GoogleSignInAccount? googleUser = await _googleSignInInstance.signIn();

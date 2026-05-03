@@ -51,18 +51,6 @@ class _RecruitmentCompanySignInScreenState
         expectedRole: 'company',
       );
 
-      final name = user['name']?.toString() ?? 'Company User';
-
-      await SessionManager.saveCompanySession(
-        email: _email.text.trim(),
-        name: name,
-      );
-
-      CompanyStore.instance.setRegistrationData(
-        companyName: name,
-        email: _email.text.trim(),
-      );
-
       // Pull all jobs/data from server before navigating to workspace
       await RecruitmentSyncService.instance.startPolling();
 

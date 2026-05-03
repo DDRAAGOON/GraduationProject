@@ -25,6 +25,7 @@ class CompanyJobDetailsScreen extends StatefulWidget {
 
 class _CompanyJobDetailsScreenState extends State<CompanyJobDetailsScreen> {
   bool _deleting = false;
+  bool _reopening = false;
 
   Job get _job {
     final storedJob = CompanyStore.instance.jobById(widget.job.id);
@@ -32,6 +33,49 @@ class _CompanyJobDetailsScreenState extends State<CompanyJobDetailsScreen> {
       return storedJob;
     }
     return widget.job;
+  }
+
+  Future<void> _reopenJob() async {
+    final t = AppLocalizations.of(context);
+    setState(() => _reopening = true);
+    try {
+      final job = _job;
+      await RecruitmentSyncService.instance.updateJob(
+        jobId: job.id,
+        title: job.title,
+        companyName: job.companyName,
+        location: job.location,
+        salaryRange: job.salaryRange,
+        type: job.employmentType,
+        description: job.description,
+        responsibilities: job.responsibilities,
+        qualifications: job.qualifications,
+        niceToHaves: job.niceToHaves,
+        benefits: job.benefits.map((b) => b.title).toList(),
+        classification: job.classification,
+        tags: job.tags,
+        requiredCount: job.requiredCount,
+        status: 'Open',
+      );
+      if (!mounted) return;
+      setState(() {});
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(t.isAr ? 'تم إعادة فتح الوظيفة بنجاح' : 'Job reopened successfully'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _reopening = false);
+    }
   }
 
   Future<void> _confirmDelete(BuildContext context) async {
@@ -99,15 +143,35 @@ class _CompanyJobDetailsScreenState extends State<CompanyJobDetailsScreen> {
           child: ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              Text(
-                '${job.companyName} • ${job.employmentType}',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.onSurface.withOpacity(0.7),
+              // ── Status Banner ─────────────────────────────────────────────
+              if (job.status.toLowerCase() == 'closed')
+                Container(
+                  margin: const EdgeInsets.only(bottom: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.orange.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.orange.withValues(alpha: 0.4)),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.lock_outline, color: Colors.orange, size: 20),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          t.isAr
+                              ? 'هذه الوظيفة مغلقة حالياً. اضغط على "إعادة الفتح" لاستقبال طلبات جديدة.'
+                              : 'This job is currently closed. Tap "Reopen" to start accepting new applicants.',
+                          style: const TextStyle(
+                            color: Colors.orange,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
               SectionTitle(
                 t.descriptionSection,
                 trailing: IconButton(
@@ -146,19 +210,43 @@ class _CompanyJobDetailsScreenState extends State<CompanyJobDetailsScreen> {
                   ),
                 )
               else
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
+                Column(
                   children: job.benefits
                       .map(
-                        (b) => Chip(
-                          label: Text(b.title),
-                          avatar: Icon(
-                            Icons.check_circle_outline,
-                            size: 16,
-                            color: Theme.of(context).colorScheme.primary,
+                        (b) => Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Icon(
+                                Icons.check_circle_outline,
+                                size: 20,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      b.title,
+                                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                                    ),
+                                    if (b.description.isNotEmpty) ...[
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        b.description,
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                                        ),
+                                      ),
+                                    ],
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
-                          visualDensity: VisualDensity.compact,
                         ),
                       )
                       .toList(),
@@ -168,7 +256,7 @@ class _CompanyJobDetailsScreenState extends State<CompanyJobDetailsScreen> {
               const SizedBox(height: 10),
               _InfoRow(label: t.salaryLabel, value: job.salaryRange),
               _InfoRow(label: t.jobTypeLabel, value: job.employmentType),
-              _InfoRow(label: t.categoryLabel, value: job.category),
+              _InfoRow(label: t.categoryLabel, value: job.classification),
               const SizedBox(height: 18),
               _JobApplicantsSection(jobId: job.id),
               const SizedBox(height: 14),
@@ -179,7 +267,76 @@ class _CompanyJobDetailsScreenState extends State<CompanyJobDetailsScreen> {
                 ).pushNamed(AppRoutes.companyApplicantsTable, arguments: job),
               ),
               const SizedBox(height: 16),
-              // ── Delete Job Button ────────────────────────────────────────
+              // ── Reopen Button (only for closed jobs) ─────────────────────
+              if (job.status.toLowerCase() == 'closed')
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Theme.of(context).colorScheme.primary.withValues(alpha: 0.85),
+                            Theme.of(context).colorScheme.primary,
+                          ],
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                        ),
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(25),
+                          bottomLeft: Radius.circular(70),
+                          topRight: Radius.circular(70),
+                          bottomRight: Radius.circular(25),
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.35),
+                            blurRadius: 12,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: ElevatedButton.icon(
+                        onPressed: _reopening ? null : _reopenJob,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.transparent,
+                          shadowColor: Colors.transparent,
+                          foregroundColor: Colors.white,
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(25),
+                              bottomLeft: Radius.circular(70),
+                              topRight: Radius.circular(70),
+                              bottomRight: Radius.circular(25),
+                            ),
+                          ),
+                        ),
+                        icon: _reopening
+                            ? const SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : const Icon(Icons.lock_open_outlined, size: 20),
+                        label: Text(
+                          _reopening
+                              ? (t.isAr ? 'جاري إعادة الفتح...' : 'Reopening...')
+                              : (t.isAr ? 'إعادة فتح الوظيفة' : 'Reopen Job'),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              // ── Delete Job Button ─────────────────────────────────────────
               SizedBox(
                 width: double.infinity,
                 height: 56,
@@ -187,9 +344,9 @@ class _CompanyJobDetailsScreenState extends State<CompanyJobDetailsScreen> {
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
                       colors: [
-                        Color(0xFF7F1D1D), // dark red
-                        Color(0xFFB91C1C), // mid red
-                        Color(0xFFEF4444), // light red
+                        Color(0xFF7F1D1D),
+                        Color(0xFFB91C1C),
+                        Color(0xFFEF4444),
                       ],
                       begin: Alignment.centerLeft,
                       end: Alignment.centerRight,

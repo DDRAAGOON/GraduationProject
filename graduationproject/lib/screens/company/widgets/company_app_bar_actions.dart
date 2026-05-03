@@ -1,13 +1,11 @@
 // Shared app-bar icons (e.g. messages) for company shell screens.
 
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';
-import '../../../shared/state/company_store.dart';
-
 import '../../../shared/l10n/app_localizations.dart';
+import '../../../shared/state/company_store.dart';
+import '../../../shared/utils/image_helper.dart';
 
 class CompanyProfileLeading extends StatelessWidget {
   const CompanyProfileLeading({super.key});
@@ -15,38 +13,30 @@ class CompanyProfileLeading extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
-    final profileImage = CompanyStore.instance.companyProfileImage;
-
-    return IconButton(
-      tooltip: t.profile,
-      onPressed: () =>
-          Navigator.of(context).pushNamed(AppRoutes.companyProfileOverview),
-      icon: ClipOval(
-        child: profileImage == null
-            ? Container(
-                width: 32,
-                height: 32,
-                color: Theme.of(context).colorScheme.surfaceBright,
-                child: Icon(
-                  Icons.business,
-                  color: Theme.of(context).colorScheme.primary,
-                  size: 20,
-                ),
-              )
-            : profileImage.startsWith('assets/')
-                ? Image.asset(
-                    profileImage,
-                    width: 32,
-                    height: 32,
-                    fit: BoxFit.cover,
+    return ListenableBuilder(
+      listenable: CompanyStore.instance,
+      builder: (context, _) {
+        final profileImage = CompanyStore.instance.companyProfileImage;
+        final provider = getAppImageProvider(profileImage);
+        return IconButton(
+          tooltip: t.profile,
+          onPressed: () =>
+              Navigator.of(context).pushNamed(AppRoutes.companyProfileOverview),
+          icon: CircleAvatar(
+            radius: 16,
+            backgroundColor:
+                Theme.of(context).colorScheme.surfaceContainerHighest,
+            backgroundImage: provider,
+            child: provider == null
+                ? Icon(
+                    Icons.business,
+                    color: Theme.of(context).colorScheme.primary,
+                    size: 18,
                   )
-                : Image.file(
-                    File(profileImage),
-                    width: 32,
-                    height: 32,
-                    fit: BoxFit.cover,
-                  ),
-      ),
+                : null,
+          ),
+        );
+      },
     );
   }
 }

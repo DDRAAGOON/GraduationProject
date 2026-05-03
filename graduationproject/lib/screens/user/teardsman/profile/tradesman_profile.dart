@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:graduationproject/shared/utils/image_helper.dart';
 import 'package:graduationproject/shared/l10n/app_localizations.dart';
-import 'package:graduationproject/screens/user/profile/user_data.dart';
 import 'package:graduationproject/screens/user/teardsman/setting/settings.dart';
 import 'package:graduationproject/screens/user/home/recruitment_user_shell_screen.dart';
 import 'package:graduationproject/app/router/app_router.dart';
@@ -24,9 +23,12 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
     
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
+      body: AnimatedBuilder(
+        animation: store,
+        builder: (context, _) {
+          return SingleChildScrollView(
+            child: Column(
+              children: [
             // Edge-to-edge Top Cover Section
             Stack(
               clipBehavior: Clip.none,
@@ -314,6 +316,8 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
             ),
           ],
         ),
+      );
+        },
       ),
     );
   }

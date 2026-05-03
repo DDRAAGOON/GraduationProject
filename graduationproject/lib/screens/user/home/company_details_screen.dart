@@ -169,7 +169,6 @@ class CompanyDetailsScreen extends StatelessWidget {
 
   Widget _buildJobCard(BuildContext context, RecruitmentJob job, AppLocalizations t) {
     final theme = Theme.of(context);
-    final isAr = Localizations.localeOf(context).languageCode == 'ar';
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       color: theme.cardColor,

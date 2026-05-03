@@ -1,6 +1,7 @@
 // [ChangeNotifier] holding company profile, jobs, and contacts.
 
 import 'package:flutter/foundation.dart';
+import 'dart:convert';
 
 import '../models/contact_entry.dart';
 import '../models/job.dart';
@@ -19,7 +20,7 @@ class CompanyStore extends ChangeNotifier {
   // --- Company Basic Details ---
   String _companyName = '';
   String _website = '';
-  String _employee = '';
+  String _staff = '';
   String _industry = '';
 
   // --- Company Extended Details ---
@@ -32,7 +33,7 @@ class CompanyStore extends ChangeNotifier {
   int _foundedYear = 0;
 
   // --- Category and Benefits ---
-  String _category = '';
+  String _classification = '';
   List<String> _benefits = [];
 
   // --- Registration Data ---
@@ -45,7 +46,7 @@ class CompanyStore extends ChangeNotifier {
   String get companyId => _companyId;
   String get companyName => _companyName;
   String get website => _website;
-  String get employee => _employee;
+  String get staff => _staff;
   String get industry => _industry;
   
   /// Returns an unmodifiable list of locations to prevent accidental mutations.
@@ -58,7 +59,7 @@ class CompanyStore extends ChangeNotifier {
   int get foundedMonth => _foundedMonth;
   int get foundedYear => _foundedYear;
 
-  String get category => _category;
+  String get classification => _classification;
   List<String> get benefits => List.unmodifiable(_benefits);
 
   String get commercialRegister => _commercialRegister;
@@ -111,7 +112,7 @@ class CompanyStore extends ChangeNotifier {
   void updateProfile({
     required String name,
     required String website,
-    required String employee,
+    required String staff,
     required String industry,
     required String aboutEn,
     required String aboutAr,
@@ -120,14 +121,14 @@ class CompanyStore extends ChangeNotifier {
     required int foundedDay,
     required int foundedMonth,
     required int foundedYear,
-    required String category,
+    required String classification,
     required List<String> benefits,
     required String commercialRegister,
     required String nationalNumber,
   }) {
     _companyName = name;
     _website = website;
-    _employee = employee;
+    _staff = staff;
     _industry = industry;
     _aboutEn = aboutEn;
     _aboutAr = aboutAr;
@@ -136,7 +137,7 @@ class CompanyStore extends ChangeNotifier {
     _foundedDay = foundedDay;
     _foundedMonth = foundedMonth;
     _foundedYear = foundedYear;
-    _category = category;
+    _classification = classification;
     _benefits = List.from(benefits.toSet());
     _commercialRegister = commercialRegister;
     _nationalNumber = nationalNumber;
@@ -146,14 +147,67 @@ class CompanyStore extends ChangeNotifier {
   Future<void> initFromSession() async {
     final data = await SessionManager.getCompanyData();
     if (data['name'] != null) _companyName = data['name']!;
+    if (data['id'] != null) _companyId = data['id']!;
     if (data['photo'] != null) _customProfileImage = data['photo']!;
     
     final full = await SessionManager.getCompanyFullProfile();
     await loadFromSession(full);
   }
 
+  Future<void> syncFromMap(Map<String, dynamic> data) async {
+    if (data['staff'] != null) _staff = data['staff'].toString();
+    if (data['industry'] != null) _industry = data['industry'].toString();
+    
+    // In the backend 'about' is a single field. For now we sync it to both locales 
+    // unless the backend eventually returns separate fields.
+    if (data['about'] != null) {
+      _aboutEn = data['about'].toString();
+      _aboutAr = data['about'].toString();
+    }
+    
+    if (data['locations'] is List) {
+      _locations = List<String>.from(data['locations']);
+    } else if (data['locationsCsv'] != null) {
+       _locations = data['locationsCsv'].toString().split(',').where((s) => s.isNotEmpty).toList();
+    }
+
+    if (data['techStack'] is List) {
+      _techStack = List<String>.from(data['techStack']);
+    }
+
+    if (data['foundedDay'] != null) _foundedDay = int.tryParse(data['foundedDay'].toString()) ?? 0;
+    if (data['foundedMonth'] != null) _foundedMonth = int.tryParse(data['foundedMonth'].toString()) ?? 0;
+    if (data['foundedYear'] != null) _foundedYear = int.tryParse(data['foundedYear'].toString()) ?? 0;
+    
+    if (data['classification'] != null) _classification = data['classification'].toString();
+    
+    if (data['benefits'] is List) {
+      _benefits = List<String>.from(data['benefits']);
+    }
+
+    if (data['commercialRegister'] != null) _commercialRegister = data['commercialRegister'].toString();
+    if (data['nationalNumber'] != null) _nationalNumber = data['nationalNumber'].toString();
+    
+    if (data['contactsJson'] != null) {
+       try {
+         final List<dynamic> decoded = jsonDecode(data['contactsJson'].toString());
+         _contacts.clear();
+         for (final item in decoded) {
+           if (item is Map) {
+             _contacts.add(ContactEntry(
+               name: item['name']?.toString() ?? '',
+               value: item['value']?.toString() ?? '',
+             ));
+           }
+         }
+       } catch (_) {}
+    }
+
+    notifyListeners();
+  }
+
   Future<void> loadFromSession(Map<String, dynamic> data) async {
-    _employee = data['employee'] as String? ?? '';
+    _staff = data['staff'] as String? ?? '';
     _industry = data['industry'] as String? ?? '';
     _aboutEn = data['aboutEn'] as String? ?? '';
     _aboutAr = data['aboutAr'] as String? ?? '';
@@ -162,10 +216,28 @@ class CompanyStore extends ChangeNotifier {
     _foundedDay = data['foundedDay'] as int? ?? 0;
     _foundedMonth = data['foundedMonth'] as int? ?? 0;
     _foundedYear = data['foundedYear'] as int? ?? 0;
-    _category = data['category'] as String? ?? '';
+    _classification = data['classification'] as String? ?? '';
     _benefits = List<String>.from(data['benefits'] as List? ?? []);
     _commercialRegister = data['commercialRegister'] as String? ?? '';
     _nationalNumber = data['nationalNumber'] as String? ?? '';
+    
+    // Load contacts
+    try {
+      final contactsJson = data['contacts'] as String? ?? '';
+      if (contactsJson.isNotEmpty) {
+        final List<dynamic> decoded = jsonDecode(contactsJson);
+        _contacts.clear();
+        for (final item in decoded) {
+          if (item is Map) {
+            _contacts.add(ContactEntry(
+              name: item['name']?.toString() ?? '',
+              value: item['value']?.toString() ?? '',
+            ));
+          }
+        }
+      }
+    } catch (_) {}
+
     notifyListeners();
   }
 
@@ -225,18 +297,50 @@ class CompanyStore extends ChangeNotifier {
 
   void addContact(ContactEntry contact) {
     _contacts.add(contact);
+    _saveContacts();
     notifyListeners();
   }
 
   void updateContact(int index, ContactEntry updated) {
     if (index < 0 || index >= _contacts.length) return;
     _contacts[index] = updated;
+    _saveContacts();
     notifyListeners();
   }
 
   void removeContact(int index) {
     if (index < 0 || index >= _contacts.length) return;
     _contacts.removeAt(index);
+    _saveContacts();
+    notifyListeners();
+  }
+
+  void _saveContacts() {
+    SessionManager.saveCompanyContacts(
+      _contacts.map((c) => {'name': c.name, 'value': c.value}).toList(),
+    );
+  }
+
+  void clear() {
+    _companyName = '';
+    _website = '';
+    _staff = '';
+    _industry = '';
+    _aboutEn = '';
+    _aboutAr = '';
+    _locations = [];
+    _techStack = [];
+    _foundedDay = 0;
+    _foundedMonth = 0;
+    _foundedYear = 0;
+    _classification = '';
+    _benefits = [];
+    _commercialRegister = '';
+    _nationalNumber = '';
+    _customProfileImage = null;
+    _companyId = '';
+    _jobs.clear();
+    _contacts.clear();
     notifyListeners();
   }
 }

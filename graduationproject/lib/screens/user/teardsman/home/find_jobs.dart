@@ -115,7 +115,7 @@ class _FindJobsState extends State<FindJobs> {
       body: SafeArea(
         child: Builder(
           builder: (context) {
-            final jobs = store.filteredJobs.where((j) => j.category.toLowerCase() == 'tradesman' || j.category.toLowerCase() == 'service').toList();
+            final jobs = store.filteredJobs.where((j) => j.classification.toLowerCase() == 'tradesman' || j.classification.toLowerCase() == 'service').toList();
             return SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 10),
               child: Column(
