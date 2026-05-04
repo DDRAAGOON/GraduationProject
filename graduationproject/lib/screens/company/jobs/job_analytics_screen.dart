@@ -91,17 +91,49 @@ class _AnalyticsBodyState extends State<_AnalyticsBody> {
             .where((app) => companyJobs.any((j) => j.id == app.jobId))
             .length;
 
-        final views = List<double>.from(_viewsData[_selectedPeriod]!);
-        final apps = List<double>.from(_appsData[_selectedPeriod]!);
+        final viewsData = List<double>.from(_viewsData[_selectedPeriod]!);
+        final appsData = List<double>.from(_appsData[_selectedPeriod]!);
         
-        // Make stats reflect real data for the current period (simplified for MVP)
-        // We update the last point in the chart to reflect the current real-time totals
-        if (apps.isNotEmpty) {
-          apps[apps.length - 1] = totalApplicants.toDouble();
+        final totalViews = companyJobs.fold(0, (sum, j) => sum + j.viewsCount);
+        final totalApps = totalApplicants;
+
+        // Calculate real deltas based on time periods
+        final now = DateTime.now();
+        final Duration periodDuration;
+        if (_selectedPeriod == 0) periodDuration = const Duration(days: 1);
+        else if (_selectedPeriod == 1) periodDuration = const Duration(days: 30);
+        else periodDuration = const Duration(days: 365);
+
+        final newAppsCount = RecruitmentSyncStore.instance.applications
+            .where((app) => 
+                companyJobs.any((j) => j.id == app.jobId) &&
+                now.difference(app.updatedAt) <= periodDuration)
+            .length;
+        
+        final String appsDelta;
+        if (totalApps == 0) {
+          appsDelta = '+0%';
+        } else {
+          final double delta = (newAppsCount / totalApps) * 100;
+          appsDelta = '+${delta.toStringAsFixed(1)}%';
         }
 
-        final totalViews = views.fold(0.0, (a, b) => a + b).toInt();
-        final totalApps = totalApplicants; // Use real count directly
+        // For Job Views, we don't have historical data, so we base the delta 
+        // on how many jobs were published in this period relative to the total.
+        final newJobsCount = companyJobs
+            .where((j) => now.difference(j.publishedAt) <= periodDuration)
+            .length;
+        
+        final String viewsDelta;
+        if (totalViews == 0) {
+          viewsDelta = '+0%';
+        } else if (companyJobs.isEmpty) {
+           viewsDelta = '+0%';
+        } else {
+          // Semi-real: if 50% of jobs are new, we estimate a portion of views are also "new growth"
+          final double delta = (newJobsCount / companyJobs.length) * 15.0; // 15% max growth estimate
+          viewsDelta = '+${delta.toStringAsFixed(1)}%';
+        }
 
         final periods = isAr ? ['يوم', 'شهر', 'سنة'] : ['Day', 'Month', 'Year'];
         final tabs = isAr
@@ -263,7 +295,7 @@ class _AnalyticsBodyState extends State<_AnalyticsBody> {
                     _InlineStat(
                       label: isAr ? 'مشاهدات الوظائف' : 'Job Views',
                       value: '$totalViews',
-                      delta: '+6.4%',
+                      delta: viewsDelta,
                       color: Colors.orange,
                       icon: Icons.visibility_outlined,
                     ),
@@ -271,7 +303,7 @@ class _AnalyticsBodyState extends State<_AnalyticsBody> {
                     _InlineStat(
                       label: isAr ? 'طلبات التقديم' : 'Applications',
                       value: '$totalApps',
-                      delta: '+12.4%',
+                      delta: appsDelta,
                       color: const Color(0xFF4A80D8),
                       icon: Icons.assignment_outlined,
                     ),
@@ -286,8 +318,8 @@ class _AnalyticsBodyState extends State<_AnalyticsBody> {
                 child: SizedBox(
                   height: 200,
                   child: _AnalyticsBarChart(
-                    views: views,
-                    apps: apps,
+                    views: viewsData,
+                    apps: appsData,
                     isAr: isAr,
                     xLabels: isAr
                         ? _labelsAr[_selectedPeriod]!

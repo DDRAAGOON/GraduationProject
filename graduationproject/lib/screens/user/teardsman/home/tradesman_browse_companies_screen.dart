@@ -9,10 +9,12 @@ class TradesmanBrowseCompaniesScreen extends StatefulWidget {
   const TradesmanBrowseCompaniesScreen({super.key});
 
   @override
-  State<TradesmanBrowseCompaniesScreen> createState() => _TradesmanBrowseCompaniesScreenState();
+  State<TradesmanBrowseCompaniesScreen> createState() =>
+      _TradesmanBrowseCompaniesScreenState();
 }
 
-class _TradesmanBrowseCompaniesScreenState extends State<TradesmanBrowseCompaniesScreen> {
+class _TradesmanBrowseCompaniesScreenState
+    extends State<TradesmanBrowseCompaniesScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _selectedLocation = 'All';
   bool _isTechnical = false;
@@ -22,7 +24,9 @@ class _TradesmanBrowseCompaniesScreenState extends State<TradesmanBrowseCompanie
   @override
   void initState() {
     super.initState();
-    _searchController.addListener(() => setState(() => _query = _searchController.text.toLowerCase()));
+    _searchController.addListener(
+      () => setState(() => _query = _searchController.text.toLowerCase()),
+    );
   }
 
   @override
@@ -31,71 +35,43 @@ class _TradesmanBrowseCompaniesScreenState extends State<TradesmanBrowseCompanie
     super.dispose();
   }
 
-  void _showProfileImage(BuildContext context, ImageProvider? provider) {
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        backgroundColor: Colors.transparent,
-        insetPadding: const EdgeInsets.all(20),
-        child: Stack(
-          alignment: Alignment.topRight,
-          children: [
-            if (provider != null)
-              ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: Image(image: provider, fit: BoxFit.contain),
-              )
-            else
-              Container(
-                width: 280,
-                height: 280,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).cardColor,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: const Icon(Icons.person, size: 120, color: Colors.grey),
-              ),
-            Positioned(
-              right: 8,
-              top: 8,
-              child: GestureDetector(
-                onTap: () => Navigator.pop(context),
-                child: const CircleAvatar(
-                  backgroundColor: Colors.black54,
-                  radius: 15,
-                  child: Icon(Icons.close, color: Colors.white, size: 18),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   List<_CompanyData> _getCompanies() {
     final jobs = RecruitmentSyncStore.instance.jobs;
     final Map<String, _CompanyData> map = {};
 
     for (final job in jobs) {
       final key = job.companyName.toLowerCase();
-      final isCurrentCompany = job.companyName.toLowerCase() == CompanyStore.instance.companyName.toLowerCase();
+      final isCurrentCompany =
+          job.companyName.toLowerCase() ==
+          CompanyStore.instance.companyName.toLowerCase();
       if (map.containsKey(key)) {
         map[key]!.jobs.add(job);
       } else {
         map[key] = _CompanyData(
           name: job.companyName,
           jobs: [job],
-          logoUrl: isCurrentCompany ? CompanyStore.instance.companyProfileImage : null,
-          industry: job.category,
+          logoUrl: isCurrentCompany
+              ? CompanyStore.instance.companyProfileImage
+              : job.companyLogoUrl,
+          industry: isCurrentCompany
+              ? CompanyStore.instance.industry
+              : (job.companyIndustry ?? job.classification),
           aboutEn: isCurrentCompany ? CompanyStore.instance.companyAboutEn : '',
           aboutAr: isCurrentCompany ? CompanyStore.instance.companyAboutAr : '',
           website: isCurrentCompany ? CompanyStore.instance.website : '',
-          employee: isCurrentCompany ? CompanyStore.instance.employee : '',
-          category: isCurrentCompany ? CompanyStore.instance.category : '',
-          locations: isCurrentCompany ? List.from(CompanyStore.instance.locations) : [],
-          techStack: isCurrentCompany ? List.from(CompanyStore.instance.techStack) : [],
-          benefits: isCurrentCompany ? List.from(CompanyStore.instance.benefits) : [],
+          staff: isCurrentCompany ? CompanyStore.instance.staff : '',
+          classification: isCurrentCompany
+              ? CompanyStore.instance.classification
+              : job.classification,
+          locations: isCurrentCompany
+              ? List.from(CompanyStore.instance.locations)
+              : [],
+          techStack: isCurrentCompany
+              ? List.from(CompanyStore.instance.techStack)
+              : [],
+          benefits: isCurrentCompany
+              ? List.from(CompanyStore.instance.benefits)
+              : [],
           foundedYear: isCurrentCompany ? CompanyStore.instance.foundedYear : 0,
         );
       }
@@ -104,15 +80,23 @@ class _TradesmanBrowseCompaniesScreenState extends State<TradesmanBrowseCompanie
     var list = map.values.toList();
 
     if (_query.isNotEmpty) {
-      list = list.where((c) => c.name.toLowerCase().contains(_query) || c.industry.toLowerCase().contains(_query)).toList();
+      list = list
+          .where(
+            (c) =>
+                c.name.toLowerCase().contains(_query) ||
+                c.industry.toLowerCase().contains(_query),
+          )
+          .toList();
     }
     if (_selectedLocation != 'All') {
-      list = list.where((c) => c.jobs.any((j) => j.location == _selectedLocation)).toList();
+      list = list
+          .where((c) => c.jobs.any((j) => j.location == _selectedLocation))
+          .toList();
     }
     if (_isTechnical && !_isNonTechnical) {
-      list = list.where((c) => c.industry.toLowerCase().contains('tech') || c.category.toLowerCase().contains('tech')).toList();
+      list = list.where((c) => c.classification == 'Technical').toList();
     } else if (_isNonTechnical && !_isTechnical) {
-      list = list.where((c) => !c.industry.toLowerCase().contains('tech')).toList();
+      list = list.where((c) => c.classification == 'Non-Technical').toList();
     }
 
     return list;
@@ -121,11 +105,9 @@ class _TradesmanBrowseCompaniesScreenState extends State<TradesmanBrowseCompanie
   @override
   Widget build(BuildContext context) {
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final store = RecruitmentSyncStore.instance;
 
     return AnimatedBuilder(
-      animation: store,
+      animation: RecruitmentSyncStore.instance,
       builder: (context, _) {
         final companies = _getCompanies();
 
@@ -140,19 +122,33 @@ class _TradesmanBrowseCompaniesScreenState extends State<TradesmanBrowseCompanie
               padding: const EdgeInsets.only(left: 16),
               child: Center(
                 child: GestureDetector(
-                  onTap: () => _showProfileImage(context, getAppImageProvider(store.profileImage)),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const Settings()),
+                  ),
                   child: Container(
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(color: Colors.white, width: 2),
-                      boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 4)],
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 4,
+                        ),
+                      ],
                     ),
                     child: CircleAvatar(
                       radius: 18,
-                      backgroundColor: Theme.of(context).cardColor,
-                      backgroundImage: getAppImageProvider(store.profileImage),
-                      child: store.profileImage == null
-                          ? Icon(Icons.person, size: 20, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38))
+                      backgroundColor: Colors.grey.shade200,
+                      backgroundImage: getAppImageProvider(
+                        RecruitmentSyncStore.instance.profileImage,
+                      ),
+                      child: RecruitmentSyncStore.instance.profileImage == null
+                          ? const Icon(
+                              Icons.person,
+                              size: 20,
+                              color: Colors.grey,
+                            )
                           : null,
                     ),
                   ),
@@ -161,12 +157,22 @@ class _TradesmanBrowseCompaniesScreenState extends State<TradesmanBrowseCompanie
             ),
             title: Text(
               isAr ? 'تصفح الشركات' : 'Browse Companies',
-              style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w800, fontSize: 22),
+              style: const TextStyle(
+                color: Color(0xFF011931),
+                fontWeight: FontWeight.w800,
+                fontSize: 22,
+              ),
             ),
             actions: [
               IconButton(
-                onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const Settings())),
-                icon: Icon(Icons.settings_outlined, color: Theme.of(context).colorScheme.onSurface),
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const Settings()),
+                ),
+                icon: const Icon(
+                  Icons.settings_outlined,
+                  color: Color(0xFF011931),
+                ),
               ),
               const SizedBox(width: 8),
             ],
@@ -176,8 +182,15 @@ class _TradesmanBrowseCompaniesScreenState extends State<TradesmanBrowseCompanie
             children: [
               const SizedBox(height: 24),
               Text(
-                isAr ? 'ابحث عن شركات أحلامك' : 'Search for companies you dream of',
-                style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900, color: Theme.of(context).colorScheme.onSurface, height: 1.1),
+                isAr
+                    ? 'ابحث عن شركات أحلامك'
+                    : 'Search for companies you dream of',
+                style: const TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w900,
+                  color: Color(0xFF011931),
+                  height: 1.1,
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 12),
@@ -185,69 +198,150 @@ class _TradesmanBrowseCompaniesScreenState extends State<TradesmanBrowseCompanie
                 isAr
                     ? 'اكتشف أفضل الشركات وبيئات العمل المثالية لمستقبلك المهني'
                     : 'Discover the best companies and ideal work environments for your professional future',
-                style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), height: 1.5),
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Colors.black45,
+                  height: 1.5,
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 32),
               // Search & Filter Bar
               Container(
-                padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: Theme.of(context).cardColor,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
-                  boxShadow: isDark ? [] : [
-                    BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4))
+                  borderRadius: BorderRadius.circular(24),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 20,
+                      offset: const Offset(0, 10),
+                    ),
                   ],
                 ),
-                child: Row(
+                child: Column(
                   children: [
-                    Icon(Icons.search, color: Theme.of(context).colorScheme.primary, size: 20),
-                    Expanded(
-                      flex: 3,
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF1F1F1),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
                       child: TextField(
                         controller: _searchController,
-                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 13),
                         decoration: InputDecoration(
-                          hintText: isAr ? 'اسم الشركة أو المجال...' : 'Company or industry...',
-                          hintStyle: TextStyle(fontSize: 13, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)),
+                          icon: const Icon(
+                            Icons.search,
+                            color: Color(0xFF49769F),
+                            size: 20,
+                          ),
+                          hintText: isAr
+                              ? 'اسم الشركة أو المجال...'
+                              : 'Company or industry...',
                           border: InputBorder.none,
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+                          hintStyle: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.black26,
+                          ),
                         ),
                       ),
                     ),
-                    Container(height: 24, width: 1, color: Theme.of(context).dividerColor.withValues(alpha: 0.2)),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      flex: 2,
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButton<String>(
-                          value: _selectedLocation,
-                          isExpanded: true,
-                          dropdownColor: Theme.of(context).cardColor,
-                          icon: Icon(Icons.keyboard_arrow_down, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), size: 18),
-                          items: RecruitmentSyncStore.egyptGovernorates.map((String gov) {
-                            return DropdownMenuItem<String>(
-                              value: gov,
-                              child: Text(gov, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: Theme.of(context).colorScheme.onSurface)),
-                            );
-                          }).toList(),
-                          onChanged: (val) { if (val != null) setState(() => _selectedLocation = val); },
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 3,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF1F1F1),
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: DropdownButtonHideUnderline(
+                              child: DropdownButton<String>(
+                                value: _selectedLocation,
+                                isExpanded: true,
+                                icon: const Icon(
+                                  Icons.keyboard_arrow_down,
+                                  color: Color(0xFF49769F),
+                                ),
+                                items: RecruitmentSyncStore.egyptGovernorates
+                                    .map((String gov) {
+                                      return DropdownMenuItem<String>(
+                                        value: gov,
+                                        child: Text(
+                                          gov,
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      );
+                                    })
+                                    .toList(),
+                                onChanged: (val) {
+                                  if (val != null)
+                                    setState(() => _selectedLocation = val);
+                                },
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          flex: 2,
+                          child: ElevatedButton(
+                            onPressed: () => setState(() {}),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF49769F),
+                              foregroundColor: Colors.white,
+                              elevation: 0,
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                            ),
+                            child: Text(
+                              isAr ? 'بحث' : 'Search',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ),
               const SizedBox(height: 32),
-              Text(isAr ? 'التصنيف' : 'Classification',
-                  style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: Theme.of(context).colorScheme.onSurface)),
+              Text(
+                isAr ? 'التصنيف' : 'Classification',
+                style: TextStyle(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 18,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
               const SizedBox(height: 16),
               Row(
                 children: [
-                  Expanded(child: _buildTypeButton(isAr ? 'تقني' : 'Technical', _isTechnical, () => setState(() => _isTechnical = !_isTechnical))),
+                  Expanded(
+                    child: _buildTypeButton(
+                      isAr ? 'تقني' : 'Technical',
+                      _isTechnical,
+                      () => setState(() => _isTechnical = !_isTechnical),
+                    ),
+                  ),
                   const SizedBox(width: 12),
-                  Expanded(child: _buildTypeButton(isAr ? 'غير تقني' : 'Non-Technical', _isNonTechnical, () => setState(() => _isNonTechnical = !_isNonTechnical))),
+                  Expanded(
+                    child: _buildTypeButton(
+                      isAr ? 'غير تقني' : 'Non-Technical',
+                      _isNonTechnical,
+                      () => setState(() => _isNonTechnical = !_isNonTechnical),
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 32),
@@ -258,14 +352,27 @@ class _TradesmanBrowseCompaniesScreenState extends State<TradesmanBrowseCompanie
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(isAr ? 'جميع الشركات' : 'All Companies',
-                          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20, color: Theme.of(context).colorScheme.onSurface)),
                       Text(
-                        isAr ? 'إجمالي الشركات المدرجة: ${companies.length}' : 'Total listed companies: ${companies.length}',
-                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 12, fontWeight: FontWeight.w500),
+                        isAr ? 'جميع الشركات' : 'All Companies',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 20,
+                          color: Color(0xFF011931),
+                        ),
+                      ),
+                      Text(
+                        isAr
+                            ? 'إجمالي الشركات المدرجة: ${companies.length}'
+                            : 'Total listed companies: ${companies.length}',
+                        style: const TextStyle(
+                          color: Colors.black38,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ],
                   ),
+                  const Icon(Icons.sort_rounded, color: Color(0xFF49769F)),
                 ],
               ),
               const SizedBox(height: 20),
@@ -273,19 +380,35 @@ class _TradesmanBrowseCompaniesScreenState extends State<TradesmanBrowseCompanie
                 Container(
                   margin: const EdgeInsets.only(top: 20),
                   padding: const EdgeInsets.all(40),
-                  decoration: BoxDecoration(color: Theme.of(context).cardColor, borderRadius: BorderRadius.circular(20)),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
                   child: Column(
                     children: [
-                      Icon(Icons.business_outlined, size: 60, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12)),
+                      Icon(
+                        Icons.business_outlined,
+                        size: 60,
+                        color: Colors.grey.shade300,
+                      ),
                       const SizedBox(height: 16),
                       Text(
                         isAr ? 'لا توجد شركات حالياً' : 'No companies found',
-                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 15, fontWeight: FontWeight.w600),
+                        style: TextStyle(
+                          color: Colors.grey.shade500,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        isAr ? 'سيتم عرض الشركات بعد نشر الوظائف' : 'Companies will appear once they post jobs',
-                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.26), fontSize: 13),
+                        isAr
+                            ? 'سيتم عرض الشركات بعد نشر الوظائف'
+                            : 'Companies will appear once they post jobs',
+                        style: TextStyle(
+                          color: Colors.grey.shade400,
+                          fontSize: 13,
+                        ),
                         textAlign: TextAlign.center,
                       ),
                     ],
@@ -308,18 +431,42 @@ class _TradesmanBrowseCompaniesScreenState extends State<TradesmanBrowseCompanie
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(vertical: 14),
         decoration: BoxDecoration(
-          color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).cardColor,
+          color: isSelected ? const Color(0xFF49769F) : Colors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).dividerColor.withValues(alpha: 0.15), width: 1.5),
-          boxShadow: isSelected ? [BoxShadow(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3), blurRadius: 8, offset: const Offset(0, 4))] : [],
+          border: Border.all(
+            color: isSelected
+                ? const Color(0xFF49769F)
+                : Colors.grey.withOpacity(0.15),
+            width: 1.5,
+          ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: const Color(0xFF49769F).withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
+              : [],
         ),
         alignment: Alignment.center,
-        child: Text(label, style: TextStyle(color: isSelected ? Colors.white : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.87), fontWeight: FontWeight.w600, fontSize: 14)),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: isSelected ? Colors.white : Colors.black87,
+            fontWeight: FontWeight.w600,
+            fontSize: 14,
+          ),
+        ),
       ),
     );
   }
 
-  Widget _buildCompanyCard(BuildContext context, _CompanyData company, bool isAr) {
+  Widget _buildCompanyCard(
+    BuildContext context,
+    _CompanyData company,
+    bool isAr,
+  ) {
     return GestureDetector(
       onTap: () => Navigator.push(
         context,
@@ -332,8 +479,8 @@ class _TradesmanBrowseCompaniesScreenState extends State<TradesmanBrowseCompanie
               aboutEn: company.aboutEn,
               aboutAr: company.aboutAr,
               website: company.website,
-              employee: company.employee,
-              category: company.category,
+              staff: company.staff,
+              classification: company.classification,
               locations: company.locations,
               techStack: company.techStack,
               benefits: company.benefits,
@@ -349,8 +496,16 @@ class _TradesmanBrowseCompaniesScreenState extends State<TradesmanBrowseCompanie
         decoration: BoxDecoration(
           color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
-          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 10, offset: const Offset(0, 4))],
+          border: Border.all(
+            color: Theme.of(context).dividerColor.withOpacity(0.1),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -360,35 +515,72 @@ class _TradesmanBrowseCompaniesScreenState extends State<TradesmanBrowseCompanie
                 Container(
                   width: 52,
                   height: 52,
-                  decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(14)),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF0F3FF),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
                   child: company.logoUrl != null
                       ? ClipRRect(
                           borderRadius: BorderRadius.circular(14),
                           child: Image(
                             image: getAppImageProvider(company.logoUrl)!,
                             fit: BoxFit.cover,
-                            errorBuilder: (_, _, _) => Icon(Icons.business_rounded, color: Theme.of(context).colorScheme.primary, size: 28),
+                            errorBuilder: (_, _, _) => const Icon(
+                              Icons.business_rounded,
+                              color: Color(0xFF49769F),
+                              size: 28,
+                            ),
                           ),
                         )
-                      : Icon(Icons.business_rounded, color: Theme.of(context).colorScheme.primary, size: 28),
+                      : const Icon(
+                          Icons.business_rounded,
+                          color: Color(0xFF49769F),
+                          size: 28,
+                        ),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(company.name, style: TextStyle(fontWeight: FontWeight.w900, fontSize: 17, color: Theme.of(context).colorScheme.onSurface)),
+                      Text(
+                        company.name,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w900,
+                          fontSize: 17,
+                          color: Color(0xFF011931),
+                        ),
+                      ),
                       if (company.industry.isNotEmpty)
-                        Text(company.industry, style: TextStyle(color: Theme.of(context).colorScheme.primary, fontSize: 12, fontWeight: FontWeight.w700)),
+                        Text(
+                          company.industry,
+                          style: const TextStyle(
+                            color: Color(0xFF49769F),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
                     ],
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                  decoration: BoxDecoration(color: const Color(0xFFFF7A2A).withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFF7A2A).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   child: Text(
-                    isAr ? 'وظائف: ${company.jobs.length}' : '${company.jobs.length} Jobs',
-                    style: const TextStyle(color: Color(0xFFFF7A2A), fontSize: 10, fontWeight: FontWeight.w800),
+                    isAr
+                        ? 'وظائف: ${company.jobs.length}'
+                        : '${company.jobs.length} Jobs',
+                    style: const TextStyle(
+                      color: Color(0xFFFF7A2A),
+                      fontSize: 10,
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
                 ),
               ],
@@ -396,23 +588,39 @@ class _TradesmanBrowseCompaniesScreenState extends State<TradesmanBrowseCompanie
             if (company.aboutEn.isNotEmpty || company.aboutAr.isNotEmpty) ...[
               const SizedBox(height: 14),
               Text(
-                isAr ? (company.aboutAr.isNotEmpty ? company.aboutAr : company.aboutEn) : company.aboutEn,
-                style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 13, height: 1.5),
+                isAr
+                    ? (company.aboutAr.isNotEmpty
+                          ? company.aboutAr
+                          : company.aboutEn)
+                    : company.aboutEn,
+                style: const TextStyle(
+                  color: Colors.black54,
+                  fontSize: 13,
+                  height: 1.5,
+                ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
             ],
             const SizedBox(height: 14),
-            Divider(height: 1, thickness: 0.5, color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
+            const Divider(height: 1, thickness: 0.5),
             const SizedBox(height: 12),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   isAr ? 'عرض ملف الشركة' : 'View company profile',
-                  style: TextStyle(color: Theme.of(context).colorScheme.primary, fontSize: 12, fontWeight: FontWeight.w700),
+                  style: const TextStyle(
+                    color: Color(0xFF49769F),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
-                Icon(Icons.arrow_forward_rounded, size: 18, color: Theme.of(context).colorScheme.primary),
+                const Icon(
+                  Icons.arrow_forward_rounded,
+                  size: 18,
+                  color: Color(0xFF49769F),
+                ),
               ],
             ),
           ],
@@ -430,8 +638,8 @@ class _CompanyData {
   final String aboutEn;
   final String aboutAr;
   final String website;
-  final String employee;
-  final String category;
+  final String staff;
+  final String classification;
   final List<String> locations;
   final List<String> techStack;
   final List<String> benefits;
@@ -445,8 +653,8 @@ class _CompanyData {
     required this.aboutEn,
     required this.aboutAr,
     required this.website,
-    required this.employee,
-    required this.category,
+    required this.staff,
+    required this.classification,
     required this.locations,
     required this.techStack,
     required this.benefits,

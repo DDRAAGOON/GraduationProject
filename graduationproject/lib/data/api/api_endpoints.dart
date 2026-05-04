@@ -13,6 +13,7 @@ final class ApiEndpoints {
   static const String login = '/api/auth/login';
   static const String googleLogin = '/api/auth/google';
   static const String register = '/api/auth/register';
+  static const String profile = '/api/auth/profile';
 
   // Recruitment entities
   static const String jobs = '/api/jobs';

@@ -9,8 +9,8 @@ class CompanyPublicProfile {
   final String aboutEn;
   final String aboutAr;
   final String website;
-  final String employee;
-  final String category;
+  final String staff;
+  final String classification;
   final List<String> locations;
   final List<String> techStack;
   final List<String> benefits;
@@ -24,8 +24,8 @@ class CompanyPublicProfile {
     required this.aboutEn,
     required this.aboutAr,
     required this.website,
-    required this.employee,
-    required this.category,
+    required this.staff,
+    required this.classification,
     required this.locations,
     required this.techStack,
     required this.benefits,
@@ -155,13 +155,13 @@ class CompanyPublicProfileScreen extends StatelessWidget {
                   // Quick Stats Row
                   Row(
                     children: [
-                      if (company.employee.isNotEmpty)
+                      if (company.staff.isNotEmpty)
                         _buildStatChip(
                           icon: Icons.people_outline,
-                          label: company.employee,
+                          label: company.staff,
                           color: const Color(0xFF49769F),
                         ),
-                      if (company.employee.isNotEmpty) const SizedBox(width: 10),
+                      if (company.staff.isNotEmpty) const SizedBox(width: 10),
                       if (company.foundedYear > 0)
                         _buildStatChip(
                           icon: Icons.calendar_today_outlined,
@@ -169,6 +169,15 @@ class CompanyPublicProfileScreen extends StatelessWidget {
                           color: const Color(0xFF49769F),
                         ),
                       if (company.foundedYear > 0) const SizedBox(width: 10),
+                      if (company.classification.isNotEmpty)
+                        _buildStatChip(
+                          icon: Icons.category_outlined,
+                          label: company.classification == 'Technical'
+                              ? (isAr ? 'تقني' : 'Technical')
+                              : (isAr ? 'غير تقني' : 'Non-Technical'),
+                          color: const Color(0xFF49769F),
+                        ),
+                      if (company.classification.isNotEmpty) const SizedBox(width: 10),
                       _buildStatChip(
                         icon: Icons.work_outline,
                         label: isAr
@@ -246,31 +255,54 @@ class CompanyPublicProfileScreen extends StatelessWidget {
                     _buildSectionTitle(isAr ? 'المزايا' : 'Benefits'),
                     const SizedBox(height: 12),
                     ...company.benefits.map(
-                      (benefit) => Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 8,
-                              height: 8,
-                              decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Color(0xFF49769F),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Text(
-                                benefit,
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.black87,
+                      (benefit) {
+                        final parts = benefit.split(':::');
+                        final title = parts[0];
+                        final desc = parts.length > 1 ? parts[1] : '';
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                margin: const EdgeInsets.only(top: 4),
+                                width: 8,
+                                height: 8,
+                                decoration: const BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Color(0xFF49769F),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      title,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
+                                    if (desc.isNotEmpty) ...[
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        desc,
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.black.withOpacity(0.5),
+                                        ),
+                                      ),
+                                    ],
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
                     ),
                   ],
 

@@ -9,7 +9,8 @@ class UserProfileData {
   static String location = "";
   static String jobTitle = "";
   static String? cvName;
-  static String? profileImage = "https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg";
+  /// Kept in sync with [RecruitmentSyncStore.profileImage] when the user sets a photo.
+  static String? profileImage;
   static String? coverImage;
   
   static List<String> skills = [];

@@ -154,6 +154,7 @@ final class AppRouter {
         ? RecruitmentSyncStore.instance.jobs.first
         : RecruitmentJob(
             id: 'fallback',
+            companyId: 'fallback',
             title: 'No Job',
             companyName: 'Company',
             location: 'N/A',
@@ -162,7 +163,7 @@ final class AppRouter {
             status: 'Open',
             tags: const <String>[],
             publishedAt: DateTime.now(),
-            category: 'N/A',
+            classification: 'N/A',
             benefits: const <String>[],
           );
 

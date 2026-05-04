@@ -1,7 +1,5 @@
 // Company home: KPIs, shortcuts, and recent jobs.
 
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';
@@ -12,6 +10,7 @@ import '../../../shared/services/recruitment_sync_service.dart';
 import '../../../shared/state/recruitment_sync_store.dart';
 import '../../../shared/widgets/app_scaffold.dart';
 import '../../../shared/widgets/section_title.dart';
+import '../widgets/company_app_bar_title.dart';
 import '../widgets/company_bottom_nav.dart';
 
 class CompanyDashboardScreen extends StatefulWidget {
@@ -39,53 +38,7 @@ class _CompanyDashboardScreenState extends State<CompanyDashboardScreen> {
       ]),
       builder: (context, _) {
         return AppScaffold(
-          titleWidget: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              InkWell(
-                onTap: () => Navigator.of(
-                  context,
-                ).pushNamed(AppRoutes.companyProfileOverview),
-                borderRadius: BorderRadius.circular(20),
-                child: ClipOval(
-                  child: companyStore.companyProfileImage == null
-                      ? Container(
-                          width: 40,
-                          height: 40,
-                          color: Theme.of(context).colorScheme.surfaceBright,
-                          child: Icon(
-                            Icons.business,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                        )
-                      : companyStore.companyProfileImage!.startsWith('assets/')
-                      ? Image.asset(
-                          companyStore.companyProfileImage!,
-                          width: 40,
-                          height: 40,
-                          fit: BoxFit.cover,
-                        )
-                      : Image.file(
-                          File(companyStore.companyProfileImage!),
-                          width: 40,
-                          height: 40,
-                          fit: BoxFit.cover,
-                        ),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Flexible(
-                child: Text(
-                  companyStore.companyName,
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w900,
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-                ),
-              ),
-            ],
-          ),
+          titleWidget: const CompanyAppBarIdentity(),
           showBack: false,
           centerTitle: false,
           showAppBarDivider: true,
@@ -95,7 +48,7 @@ class _CompanyDashboardScreenState extends State<CompanyDashboardScreen> {
               child: LayoutBuilder(
                 builder: (context, constraints) {
                   final jobs = RecruitmentSyncStore.instance.jobs
-                      .where((j) => j.companyName == companyStore.companyName)
+                      .where((j) => j.companyId == companyStore.companyId)
                       .toList();
                   final t = AppLocalizations.of(context);
                   void onTapNewCandidates() {
@@ -125,11 +78,12 @@ class _CompanyDashboardScreenState extends State<CompanyDashboardScreen> {
                       AppRoutes.companyApplicantsTable,
                       arguments: Job(
                         id: firstJob.id,
+                        companyId: firstJob.companyId,
                         title: firstJob.title,
                         companyName: firstJob.companyName,
                         location: firstJob.location,
                         employmentType: firstJob.type,
-                        category: firstJob.category,
+                        classification: firstJob.classification,
                         salaryRange: firstJob.salaryRange,
                         description: firstJob.description,
                         responsibilities: firstJob.responsibilities,
@@ -360,11 +314,12 @@ class _JobUpdateCard extends StatelessWidget {
           AppRoutes.companyJobDetails,
           arguments: Job(
             id: job.id,
+            companyId: job.companyId,
             title: job.title,
             companyName: job.companyName,
             location: job.location,
             employmentType: job.type,
-            category: job.category,
+            classification: job.classification,
             salaryRange: job.salaryRange,
             description: job.description,
             responsibilities: job.responsibilities,
@@ -409,65 +364,73 @@ class _JobUpdateCard extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    if (job.status == 'Open')
-                      PopupMenuButton<String>(
-                        icon: const Icon(Icons.more_vert, color: Colors.grey),
-                        onSelected: (val) async {
-                          if (val == 'close') {
-                            try {
-                              await RecruitmentSyncService.instance.updateJob(
-                                jobId: job.id,
-                                title: job.title,
-                                companyName: job.companyName,
-                                location: job.location,
-                                salaryRange: job.salaryRange,
-                                type: job.type,
-                                description: job.description,
-                                responsibilities: job.responsibilities,
-                                qualifications: job.qualifications,
-                                niceToHaves: job.niceToHaves,
-                                benefits: job.benefits,
-                                category: job.category,
-                                tags: job.tags,
-                                requiredCount: job.capacity,
-                                status: 'Closed',
-                              );
-                              if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text(t.isAr ? 'تم إغلاق الوظيفة' : 'Job closed')),
-                                );
-                              }
-                            } catch (e) {
-                              if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('Error closing job: $e')),
-                                );
-                              }
-                            }
+                    PopupMenuButton<String>(
+                      icon: Icon(Icons.more_vert,
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
+                      onSelected: (val) async {
+                        final newStatus = val == 'close' ? 'Closed' : 'Open';
+                        final msg = val == 'close'
+                            ? (t.isAr ? 'تم إغلاق الوظيفة' : 'Job closed')
+                            : (t.isAr ? 'تم إعادة فتح الوظيفة' : 'Job reopened');
+                        try {
+                          await RecruitmentSyncService.instance.updateJob(
+                            jobId: job.id,
+                            title: job.title,
+                            companyName: job.companyName,
+                            location: job.location,
+                            salaryRange: job.salaryRange,
+                            type: job.type,
+                            description: job.description,
+                            responsibilities: job.responsibilities,
+                            qualifications: job.qualifications,
+                            niceToHaves: job.niceToHaves,
+                            benefits: job.benefits,
+                            classification: job.classification,
+                            tags: job.tags,
+                            requiredCount: job.capacity,
+                            status: newStatus,
+                          );
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(msg)),
+                            );
                           }
-                        },
-                        itemBuilder: (context) => [
+                        } catch (e) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Error: $e')),
+                            );
+                          }
+                        }
+                      },
+                      itemBuilder: (context) => [
+                        if (job.status == 'Open')
                           PopupMenuItem(
                             value: 'close',
-                            child: Text(t.isAr ? 'إغلاق' : 'Close'),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.lock_outline, size: 18, color: Colors.red),
+                                const SizedBox(width: 8),
+                                Text(t.isAr ? 'إغلاق الوظيفة' : 'Close Job',
+                                    style: const TextStyle(color: Colors.red)),
+                              ],
+                            ),
+                          )
+                        else
+                          PopupMenuItem(
+                            value: 'reopen',
+                            child: Row(
+                              children: [
+                                Icon(Icons.lock_open_outlined, size: 18,
+                                    color: Theme.of(context).colorScheme.primary),
+                                const SizedBox(width: 8),
+                                Text(t.isAr ? 'إعادة الفتح' : 'Reopen',
+                                    style: TextStyle(
+                                        color: Theme.of(context).colorScheme.primary)),
+                              ],
+                            ),
                           ),
-                        ],
-                      ),
-                  ],
-                ),
-                const SizedBox(height: 6),
-                Row(
-                  children: [
-                    const Icon(Icons.business, size: 16, color: Colors.grey),
-                    const SizedBox(width: 6),
-                    Text(
-                      job.companyName,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.onSurface.withOpacity(0.7),
-                        fontWeight: FontWeight.w600,
-                      ),
+                      ],
                     ),
                   ],
                 ),

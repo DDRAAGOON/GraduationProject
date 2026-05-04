@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../shared/l10n/app_localizations.dart';
+import '../../../shared/utils/image_helper.dart';
 
 class ChatThreadScreen extends StatefulWidget {
   final String name;
@@ -16,6 +17,8 @@ class ChatThreadScreen extends StatefulWidget {
 }
 
 class _ChatThreadScreenState extends State<ChatThreadScreen> {
+  ImageProvider? get _peerAvatar => getAppImageProvider(widget.image.trim());
+
   final TextEditingController _messageController = TextEditingController();
   final List<Map<String, dynamic>> _messages = []; // تبدأ فارغة دائماً
 
@@ -58,7 +61,11 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
         ),
         title: Row(
           children: [
-            CircleAvatar(radius: 18, backgroundImage: widget.image.startsWith('http') ? NetworkImage(widget.image) : AssetImage(widget.image) as ImageProvider),
+            CircleAvatar(
+              radius: 18,
+              backgroundImage: _peerAvatar,
+              child: _peerAvatar == null ? const Icon(Icons.person, size: 18) : null,
+            ),
             const SizedBox(width: 10),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -123,7 +130,11 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
             isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
         children: [
           if (!isMe)
-            CircleAvatar(radius: 18, backgroundImage: widget.image.startsWith('http') ? NetworkImage(widget.image) : AssetImage(widget.image) as ImageProvider),
+            CircleAvatar(
+              radius: 18,
+              backgroundImage: _peerAvatar,
+              child: _peerAvatar == null ? const Icon(Icons.person, size: 18) : null,
+            ),
           const SizedBox(width: 12),
           Flexible(
             child: Column(
@@ -200,7 +211,11 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
     return Center(
       child: Column(
         children: [
-          CircleAvatar(radius: 40, backgroundImage: widget.image.startsWith('http') ? NetworkImage(widget.image) : AssetImage(widget.image) as ImageProvider),
+          CircleAvatar(
+            radius: 40,
+            backgroundImage: _peerAvatar,
+            child: _peerAvatar == null ? const Icon(Icons.person, size: 40) : null,
+          ),
           const SizedBox(height: 10),
           Text(widget.name,
               style: TextStyle(

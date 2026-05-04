@@ -1,8 +1,12 @@
 import 'dart:async';
+import 'dart:convert';
+
+import 'package:dio/dio.dart';
 
 import '../../data/api/company_api_client.dart';
 import '../state/company_store.dart';
 import '../state/recruitment_sync_store.dart';
+import '../models/job.dart';
 import 'session_manager.dart';
 
 class RecruitmentSyncService {
@@ -13,6 +17,10 @@ class RecruitmentSyncService {
   final CompanyApiClient _client = CompanyApiClient();
   Timer? _timer;
   bool get isAuthenticated => _client.hasToken;
+
+  void setTokenManually(String token) {
+    _client.setToken(token);
+  }
 
   Future<Map<String, dynamic>> login({
     required String email,
@@ -47,29 +55,37 @@ class RecruitmentSyncService {
       }
     }
 
-    _client.setToken(token);
-
-    // Update store with user info
-    if (user != null) {
-      final String name = user['name']?.toString() ?? 'User';
-      RecruitmentSyncStore.instance.updateCurrentUser(
-        name: name,
-        email: user['email']?.toString(),
-        photoUrl: user['photoUrl']?.toString(),
-      );
-
-      if (role == 'company') {
-        CompanyStore.instance.setRegistrationData(
-          companyId: user['id']?.toString(),
-          companyName: name,
-          email: user['email']?.toString(),
-        );
-        final fullProfile = await SessionManager.getCompanyFullProfile();
-        await CompanyStore.instance.loadFromSession(fullProfile);
-      }
-    }
-
+    await _handleLoginSuccess(user, token, email, role ?? '');
     return user ?? {};
+  }
+
+  Future<void> _handleLoginSuccess(Map<String, dynamic>? user, String? token, String email, String role) async {
+    if (user == null || token == null || token.isEmpty) return;
+
+    _client.setToken(token);
+    await SessionManager.saveToken(token);
+    
+    final String name = user['name']?.toString() ?? 'User';
+    final String userId = user['id']?.toString() ?? '0';
+    _syncUserFromResponse(user);
+
+    if (role.toLowerCase().trim() == 'company') {
+      await SessionManager.saveCompanySession(
+        email: email,
+        name: name,
+        id: userId,
+      );
+      CompanyStore.instance.setRegistrationData(
+        companyId: userId,
+        companyName: name,
+        email: email,
+      );
+      final fullProfile = await SessionManager.getCompanyFullProfile();
+      await CompanyStore.instance.loadFromSession(fullProfile);
+    } else {
+      await SessionManager.saveUserSession(email: email, name: name);
+      await _pullProfileFromServer();
+    }
   }
 
   Future<Map<String, dynamic>> googleLogin(String idToken) async {
@@ -82,29 +98,7 @@ class RecruitmentSyncService {
       throw Exception('Google login response missing token');
     }
 
-    _client.setToken(token);
-
-    // Update store with user info
-    if (user != null) {
-      final String name = user['name']?.toString() ?? 'User';
-      RecruitmentSyncStore.instance.updateCurrentUser(
-        name: name,
-        email: user['email']?.toString(),
-        photoUrl: user['photoUrl']?.toString(),
-      );
-
-      final role = user['role']?.toString().toLowerCase().trim();
-      if (role == 'company') {
-        CompanyStore.instance.setRegistrationData(
-          companyId: user['id']?.toString(),
-          companyName: name,
-          email: user['email']?.toString(),
-        );
-        final fullProfile = await SessionManager.getCompanyFullProfile();
-        await CompanyStore.instance.loadFromSession(fullProfile);
-      }
-    }
-
+    await _handleLoginSuccess(user, token, user?['email']?.toString() ?? '', user?['role']?.toString() ?? '');
     return user ?? {};
   }
 
@@ -128,62 +122,143 @@ class RecruitmentSyncService {
       throw Exception('Registration response missing token');
     }
 
-    _client.setToken(token);
-
-    // Update store with user info
-    if (user != null) {
-      final String name = user['name']?.toString() ?? 'User';
-      RecruitmentSyncStore.instance.updateCurrentUser(
-        name: name,
-        email: user['email']?.toString(),
-        photoUrl: user['photoUrl']?.toString(),
-      );
-
-      if (role.toLowerCase().trim() == 'company') {
-        CompanyStore.instance.setRegistrationData(
-          companyId: user['id']?.toString(),
-          companyName: name,
-          email: user['email']?.toString(),
-        );
-        final fullProfile = await SessionManager.getCompanyFullProfile();
-        await CompanyStore.instance.loadFromSession(fullProfile);
-      }
-    }
-
+    await _handleLoginSuccess(user, token, email, role);
     return user ?? {};
   }
 
   Future<Map<String, dynamic>> updateProfile({
     String? name,
     String? photoUrl,
+    String? about,
+    String? staff,
+    String? industry,
+    String? location,
+    String? website,
+    List<String>? locations,
+    List<String>? techStack,
+    List<String>? benefits,
+    String? classification,
+    int? foundedDay,
+    int? foundedMonth,
+    int? foundedYear,
+    String? phone,
+    String? gender,
+    String? dob,
+    String? address,
+    String? title,
+    List<String>? skills,
+    String? educationJson,
+    String? experienceJson,
+    String? socialLinksJson,
+    String? portfolioImagesJson,
   }) async {
-    _assertAuthenticated();
-    final user = await _client.updateProfile(name: name, photoUrl: photoUrl);
-
-    final String currentName = user['name']?.toString() ?? 'User';
-    RecruitmentSyncStore.instance.updateCurrentUser(
-      name: currentName,
-      photoUrl: user['photoUrl']?.toString(),
+    await _ensureAuthenticated();
+    final user = await _client.updateProfile(
+      name: name,
+      photoUrl: photoUrl,
+      about: about,
+      staff: staff,
+      industry: industry,
+      location: location,
+      website: website,
+      locations: locations,
+      techStack: techStack,
+      benefits: benefits,
+      classification: classification,
+      foundedDay: foundedDay,
+      foundedMonth: foundedMonth,
+      foundedYear: foundedYear,
+      phone: phone,
+      gender: gender,
+      dob: dob,
+      address: address,
+      title: title,
+      skills: skills,
+      educationJson: educationJson,
+      experienceJson: experienceJson,
+      socialLinksJson: socialLinksJson,
+      portfolioImagesJson: portfolioImagesJson,
     );
 
+    _syncUserFromResponse(user, photoUrl: photoUrl);
+
     if (RecruitmentSyncStore.instance.userRole.toLowerCase() == 'company') {
+      final String currentName = user['name']?.toString() ?? 'User';
+      final apiPhoto = user['photoUrl']?.toString().trim();
+      final String? effectivePhoto = (apiPhoto != null && apiPhoto.isNotEmpty) ? apiPhoto : photoUrl;
+      
       CompanyStore.instance.setRegistrationData(
         companyName: currentName,
-        customProfileImage: user['photoUrl']?.toString(),
+        customProfileImage: (effectivePhoto != null && effectivePhoto.isNotEmpty) ? effectivePhoto : null,
       );
     }
 
     return user;
   }
 
-  void logout() {
-    _client.clearToken();
-    stopPolling();
+  void _syncUserFromResponse(Map<String, dynamic> user, {String? photoUrl}) {
+    final String currentName = user['name']?.toString() ?? 'User';
+    final apiPhoto = user['photoUrl']?.toString().trim();
+    final String? effectivePhoto = (apiPhoto != null && apiPhoto.isNotEmpty) ? apiPhoto : photoUrl;
+
+    RecruitmentSyncStore.instance.updateCurrentUser(
+      name: currentName,
+      email: user['email']?.toString(),
+      phone: user['phone']?.toString(),
+      location: user['location']?.toString(),
+      photoUrl: (effectivePhoto != null && effectivePhoto.isNotEmpty) ? effectivePhoto : null,
+    );
+    RecruitmentSyncStore.instance.updateUserProfile(
+      fullName: currentName,
+      title: user['title']?.toString() ?? RecruitmentSyncStore.instance.currentUserTitle,
+      email: user['email']?.toString(),
+      phone: user['phone']?.toString(),
+      location: user['address']?.toString() ?? user['location']?.toString(),
+      about: user['about']?.toString(),
+      industry: user['industry']?.toString(),
+      gender: user['gender']?.toString(),
+      role: user['role']?.toString() ?? RecruitmentSyncStore.instance.userRole,
+      skills: user['skills'] is List ? List<String>.from(user['skills']) : null,
+      education: _decodeMapList(user['educationJson']?.toString()),
+      experience: _decodeMapList(user['experienceJson']?.toString()),
+      socialLinks: _decodeMapList(user['socialLinksJson']?.toString()),
+      portfolioImages: user['portfolioImagesJson'] != null ? List<String>.from(jsonDecode(user['portfolioImagesJson']?.toString() ?? '[]')) : null,
+    );
+
+    if (RecruitmentSyncStore.instance.userRole.toLowerCase() == 'company') {
+      CompanyStore.instance.syncFromMap(user);
+    }
   }
 
-  void _assertAuthenticated() {
-    if (!isAuthenticated) {
-      throw Exception('Not authenticated. Please login first.');
+  Future<void> _pullProfileFromServer() async {
+    try {
+      await _ensureAuthenticated();
+      final user = await _client.updateProfile();
+      _syncUserFromResponse(user);
+    } catch (e) {
+      // Ignore errors if profile fetch fails
+    }
+  }
+
+  Future<void> logout() async {
+    _client.clearToken();
+    stopPolling();
+    RecruitmentSyncStore.instance.clear();
+    CompanyStore.instance.clear();
+    await SessionManager.logoutCompany();
+    await SessionManager.logoutUser();
+  }
+
+  Future<void> _ensureAuthenticated() async {
+    await _hydrateTokenFromSession();
+    if (!isAuthenticated) throw Exception('Not authenticated. Please login first.');
+  }
+
+  Future<void> _hydrateTokenFromSession() async {
+    if (_client.hasToken) return;
+    final token = await SessionManager.getToken();
+    if (token != null && token.isNotEmpty) {
+      _client.setToken(token);
     }
   }
 
@@ -196,6 +271,7 @@ class RecruitmentSyncService {
   }
 
   Future<void> startPolling() async {
+    await _hydrateUserStateFromSession();
     try {
       await CompanyStore.instance.initFromSession();
     } catch (_) {}
@@ -214,6 +290,7 @@ class RecruitmentSyncService {
   Future<void> _pullServerState() async {
     final RecruitmentSyncStore store = RecruitmentSyncStore.instance;
     try {
+      await _ensureAuthenticated();
       final jobs = await _client.fetchJobs();
       final applications = await _client.fetchApplications();
       final messages = await _client.fetchMessages();
@@ -222,7 +299,29 @@ class RecruitmentSyncService {
         applications: applications,
         messages: messages,
       );
-    } catch (_) {
+
+      // Also sync CompanyStore jobs if the user is a company
+      if (store.userRole.toLowerCase() == 'company') {
+        final String companyId = CompanyStore.instance.companyId;
+        if (companyId.isNotEmpty) {
+          final myJobs = jobs
+              .where((j) =>
+                  j['companyId']?.toString() == companyId)
+              .toList();
+          CompanyStore.instance.clearJobs();
+          for (var j in myJobs) {
+            CompanyStore.instance.saveJob(Job.fromMap(j));
+          }
+        }
+      }
+    } catch (e) {
+      if (_isUnauthorizedError(e)) {
+        // Do not destroy local session on polling 401.
+        // Some endpoints can return unauthorized based on role/permission state.
+        // We simply stop polling and keep the user signed in.
+        stopPolling();
+        return;
+      }
       // Keep local state if backend is unreachable.
     }
   }
@@ -236,14 +335,14 @@ class RecruitmentSyncService {
     required List<String> qualifications,
     required List<String> niceToHaves,
     required List<String> benefits,
-    required String category,
+    required String classification,
     String companyName = 'Jobito Labs',
     String type = 'Full-time',
     List<String> tags = const <String>['General'],
     int requiredCount = 1,
     DateTime? deadline,
   }) async {
-    _assertAuthenticated();
+    await _ensureAuthenticated();
     final response = await _client.createJob(
       title: title,
       companyName: companyName,
@@ -256,7 +355,7 @@ class RecruitmentSyncService {
       niceToHaves: niceToHaves,
       benefits: benefits,
       tags: tags,
-      category: category,
+      classification: classification,
       requiredCount: requiredCount,
       deadline: deadline,
     );
@@ -275,7 +374,7 @@ class RecruitmentSyncService {
     required List<String> qualifications,
     required List<String> niceToHaves,
     required List<String> benefits,
-    required String category,
+    required String classification,
     String companyName = 'Jobito Labs',
     String type = 'Full-time',
     List<String> tags = const <String>['General'],
@@ -283,7 +382,7 @@ class RecruitmentSyncService {
     DateTime? deadline,
     String? status,
   }) async {
-    _assertAuthenticated();
+    await _ensureAuthenticated();
     await _client.updateJob(
       jobId: jobId,
       title: title,
@@ -297,7 +396,7 @@ class RecruitmentSyncService {
       niceToHaves: niceToHaves,
       benefits: benefits,
       tags: tags,
-      category: category,
+      classification: classification,
       requiredCount: requiredCount,
       deadline: deadline,
       status: status,
@@ -309,7 +408,7 @@ class RecruitmentSyncService {
     required String jobId,
     required String userName,
   }) async {
-    _assertAuthenticated();
+    await _ensureAuthenticated();
     await _client.createApplication(jobId: jobId, userName: userName);
     await _pullServerState();
   }
@@ -318,14 +417,18 @@ class RecruitmentSyncService {
     required String applicationId,
     required String status,
   }) async {
-    _assertAuthenticated();
+    await _ensureAuthenticated();
     try {
       await _client.updateApplicationStatus(
         applicationId: applicationId,
         status: status,
       );
       await _pullServerState();
-    } catch (_) {
+    } catch (e) {
+      if (_isUnauthorizedError(e)) {
+        await logout();
+        rethrow;
+      }
       RecruitmentSyncStore.instance.companyUpdateApplicationStatus(
         applicationId: applicationId,
         nextStatus: status,
@@ -334,21 +437,82 @@ class RecruitmentSyncService {
   }
 
   Future<void> sendBroadcast(String text) async {
-    _assertAuthenticated();
+    await _ensureAuthenticated();
     try {
       await _client.sendMessage(text);
       await _pullServerState();
-    } catch (_) {
+    } catch (e) {
+      if (_isUnauthorizedError(e)) {
+        await logout();
+        rethrow;
+      }
       RecruitmentSyncStore.instance.companySendMessage(text);
     }
   }
 
   Future<void> deleteJob(String jobId) async {
-    _assertAuthenticated();
+    await _ensureAuthenticated();
     await _client.deleteJob(jobId);
     // Optimistically remove from both local stores before server refresh
     RecruitmentSyncStore.instance.removeJob(jobId);
     CompanyStore.instance.deleteJob(jobId);
     await _pullServerState();
+  }
+
+  bool _isUnauthorizedError(Object error) {
+    if (error is DioException) {
+      return error.response?.statusCode == 401;
+    }
+    final text = error.toString();
+    return text.contains('status code of 401') || text.contains('status code 401');
+  }
+
+  Future<void> _hydrateUserStateFromSession() async {
+    final data = await SessionManager.getUserData();
+    final full = await SessionManager.getUserFullProfile();
+
+    final String name = data['name']?.toString() ?? '';
+    final String email = data['email']?.toString() ?? '';
+    final String? photo = data['photo']?.toString();
+    final String role = full['role']?.toString() ?? RecruitmentSyncStore.instance.userRole;
+    final String title = full['title']?.toString() ?? RecruitmentSyncStore.instance.currentUserTitle;
+
+    if (name.isEmpty && email.isEmpty && (photo == null || photo.isEmpty) && title.isEmpty) {
+      return;
+    }
+
+    RecruitmentSyncStore.instance.updateCurrentUser(
+      name: name.isEmpty ? RecruitmentSyncStore.instance.currentUserName : name,
+      email: email.isEmpty ? RecruitmentSyncStore.instance.currentUserEmail : email,
+      phone: full['phone']?.toString(),
+      location: full['location']?.toString(),
+      photoUrl: (photo != null && photo.isNotEmpty) ? photo : null,
+    );
+    RecruitmentSyncStore.instance.updateUserProfile(
+      fullName: name.isEmpty ? RecruitmentSyncStore.instance.currentUserName : name,
+      title: title,
+      about: full['about']?.toString(),
+      role: role,
+      skills: List<String>.from(full['skills'] as List<dynamic>? ?? const <String>[]),
+      education: _decodeMapList(full['education']?.toString()),
+      experience: _decodeMapList(full['experience']?.toString()),
+      socialLinks: _decodeMapList(full['socialLinks']?.toString()),
+      portfolioImages: List<String>.from(full['portfolioImages'] as List<dynamic>? ?? const <String>[]),
+    );
+  }
+
+  List<Map<String, String>> _decodeMapList(String? jsonValue) {
+    if (jsonValue == null || jsonValue.trim().isEmpty) return <Map<String, String>>[];
+    try {
+      final dynamic decoded = jsonDecode(jsonValue);
+      if (decoded is List) {
+        return decoded
+            .map((dynamic item) => Map<String, String>.from((item as Map).map(
+                  (key, value) => MapEntry(key.toString(), value?.toString() ?? ''),
+                )))
+            .toList();
+      }
+    } catch (_) {}
+    return <Map<String, String>>[];
   }
 }

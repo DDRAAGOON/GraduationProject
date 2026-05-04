@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
-import '../../../app/router/app_router.dart';
 import '../../../constants/app_images.dart';
 import '../../../shared/services/recruitment_sync_service.dart';
 import '../../../shared/state/recruitment_sync_store.dart';
@@ -20,7 +19,7 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
   bool _isEmploymentExpanded = false;
   bool _isSalaryExpanded = false;
 
-  String _selectedCategory = "technical";
+  String _selectedClassification = "technical";
   String _selectedLocation = "Cairo";
   final TextEditingController _searchController = TextEditingController();
 
@@ -312,9 +311,9 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
   }
 
   Widget _buildTabItem(String label, String value, IconData icon, Color activeColor) {
-    bool isSelected = _selectedCategory == value;
+    bool isSelected = _selectedClassification == value;
     return GestureDetector(
-      onTap: () => setState(() => _selectedCategory = value),
+      onTap: () => setState(() => _selectedClassification = value),
       child: AnimatedScale(
         scale: isSelected ? 1.05 : 1.0,
         duration: const Duration(milliseconds: 500),
@@ -412,12 +411,12 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
     final store = RecruitmentSyncStore.instance;
     final String query = _searchController.text.toLowerCase();
     
-    final List<RecruitmentJob> categoryJobs = store.jobs
-        .where((job) => job.category.toLowerCase() == _selectedCategory.toLowerCase() && 
+    final List<RecruitmentJob> classificationJobs = store.jobs
+        .where((job) => job.classification.toLowerCase() == _selectedClassification.toLowerCase() && 
                 job.title.toLowerCase().contains(query))
         .toList();
 
-    if (categoryJobs.isEmpty) {
+    if (classificationJobs.isEmpty) {
       return Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 40),
@@ -430,7 +429,7 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
       children: [
         _buildSectionHeader("All jobs"),
         const SizedBox(height: 15),
-        ...categoryJobs.map((job) => _buildJobCard(
+        ...classificationJobs.map((job) => _buildJobCard(
           title: job.title,
           company: job.companyName,
           location: job.location,

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../app/router/app_router.dart';
-import '../../../shared/services/session_manager.dart';
+import '../../../shared/services/recruitment_sync_service.dart';
 import '../../../shared/state/locale_controller.dart';
 import '../../../shared/state/theme_controller.dart';
 
@@ -84,7 +84,7 @@ class RecruitmentUserSettingsScreen extends StatelessWidget {
               leading: const Icon(Icons.logout, color: Colors.red),
               title: const Text('Logout', style: TextStyle(color: Colors.red)),
               onTap: () async {
-                await SessionManager.logoutUser();
+                await RecruitmentSyncService.instance.logout();
                 if (context.mounted) {
                   Navigator.of(context).pushNamedAndRemoveUntil(
                       AppRoutes.roleSelection, (route) => false);

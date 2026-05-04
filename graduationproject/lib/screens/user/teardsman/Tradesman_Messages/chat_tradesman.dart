@@ -1,5 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import '../../../../shared/l10n/app_localizations.dart';
+import '../../../../shared/utils/image_helper.dart';
 
 class ChatTradesman extends StatefulWidget {
   final String name;
@@ -16,6 +17,8 @@ class ChatTradesman extends StatefulWidget {
 }
 
 class _ChatTradesmanState extends State<ChatTradesman> {
+  ImageProvider? get _peerAvatar => getAppImageProvider(widget.image.trim());
+
   final TextEditingController _messageController = TextEditingController();
   final List<Map<String, dynamic>> _messages = []; // تبدأ فارغة للبيانات الحقيقية
 
@@ -62,10 +65,9 @@ class _ChatTradesmanState extends State<ChatTradesman> {
         title: Row(
           children: [
             CircleAvatar(
-              radius: 18, 
-              backgroundImage: widget.image.startsWith('http') 
-                ? NetworkImage(widget.image) 
-                : AssetImage(widget.image) as ImageProvider
+              radius: 18,
+              backgroundImage: _peerAvatar,
+              child: _peerAvatar == null ? const Icon(Icons.person, size: 18) : null,
             ),
             const SizedBox(width: 10),
             Expanded(
@@ -133,10 +135,9 @@ class _ChatTradesmanState extends State<ChatTradesman> {
         children: [
           if (!isMe)
             CircleAvatar(
-              radius: 16, 
-              backgroundImage: widget.image.startsWith('http') 
-                ? NetworkImage(widget.image) 
-                : AssetImage(widget.image) as ImageProvider
+              radius: 16,
+              backgroundImage: _peerAvatar,
+              child: _peerAvatar == null ? const Icon(Icons.person, size: 16) : null,
             ),
           const SizedBox(width: 10),
           Flexible(

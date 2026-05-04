@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../app/router/app_router.dart';
-import '../../../constants/app_images.dart';
 import '../../../shared/l10n/app_localizations.dart';
+import '../../../shared/state/recruitment_sync_store.dart';
+import '../../../shared/utils/image_helper.dart';
 
 class AnalysisScreen extends StatelessWidget {
   const AnalysisScreen({super.key});
@@ -9,6 +10,7 @@ class AnalysisScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
+    final store = RecruitmentSyncStore.instance;
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
@@ -21,13 +23,21 @@ class AnalysisScreen extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  InkWell(
-                    onTap: () => Navigator.of(context).pushNamed(AppRoutes.userEditProfile),
-                    borderRadius: BorderRadius.circular(20),
-                    child: const CircleAvatar(
-                      radius: 20,
-                      backgroundImage: AssetImage(AppImages.companyProfile1),
-                    ),
+                  ListenableBuilder(
+                    listenable: store,
+                    builder: (context, _) {
+                      final p = getAppImageProvider(store.profileImage);
+                      return InkWell(
+                        onTap: () => Navigator.of(context).pushNamed(AppRoutes.userEditProfile),
+                        borderRadius: BorderRadius.circular(20),
+                        child: CircleAvatar(
+                          radius: 20,
+                          backgroundColor: Theme.of(context).cardColor,
+                          backgroundImage: p,
+                          child: p == null ? const Icon(Icons.person, size: 22) : null,
+                        ),
+                      );
+                    },
                   ),
                   Row(
                     children: [

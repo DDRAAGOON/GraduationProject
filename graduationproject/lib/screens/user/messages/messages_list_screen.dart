@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../constants/app_images.dart';
 import '../../../shared/l10n/app_localizations.dart';
 import '../../../shared/state/recruitment_sync_store.dart';
+import '../../../shared/utils/image_helper.dart';
 import 'chat_thread_screen.dart';
 import 'new_chat_screen.dart';
 
@@ -91,7 +92,9 @@ class _MessagesListScreenState extends State<MessagesListScreen> {
                           name: msg.fromCompany ? "Company Support" : "User",
                           message: msg.text,
                           time: "${msg.createdAt.hour}:${msg.createdAt.minute.toString().padLeft(2, '0')}",
-                          image: AppImages.companyProfile2, // Fallback image
+                          image: msg.fromCompany
+                              ? AppImages.companyProfile2
+                              : (store.profileImage ?? AppImages.companyProfile2),
                         );
                       },
                     );
@@ -165,7 +168,17 @@ class _MessagesListScreenState extends State<MessagesListScreen> {
         padding: const EdgeInsets.symmetric(vertical: 12),
         child: Row(
           children: [
-            CircleAvatar(radius: 28, backgroundImage: AssetImage(image)),
+            Builder(
+              builder: (context) {
+                final avatar = getAppImageProvider(image);
+                return CircleAvatar(
+                  radius: 28,
+                  backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                  backgroundImage: avatar,
+                  child: avatar == null ? const Icon(Icons.person, size: 28) : null,
+                );
+              },
+            ),
             const SizedBox(width: 15),
             Expanded(
               child: Column(

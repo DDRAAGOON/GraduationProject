@@ -89,20 +89,6 @@ class _CompanySignUpScreenState extends State<CompanySignUpScreen> {
         role: 'company',
       );
 
-      CompanyStore.instance.setRegistrationData(
-        companyName: _companyName.text.trim(),
-        customProfileImage: null,
-        commercialRegister: _commercialRegister.text.trim(),
-        nationalNumber: _nationalNumber.text.trim(),
-        email: _email.text.trim(),
-      );
-
-      await SessionManager.saveCompanySession(
-        email: _email.text.trim(),
-        name: _companyName.text.trim(),
-        photoPath: null,
-      );
-
       if (!mounted) return;
 
       setState(() => _loading = false);

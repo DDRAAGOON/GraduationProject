@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';
 import '../../../shared/l10n/app_localizations.dart';
-import '../../../shared/services/session_manager.dart';
+import '../../../shared/services/recruitment_sync_service.dart';
 import '../../../shared/widgets/app_scaffold.dart';
 
 class CompanySettingsScreen extends StatelessWidget {
@@ -60,7 +60,7 @@ class CompanySettingsScreen extends StatelessWidget {
                 ),
                 TextButton.icon(
                   onPressed: () async {
-                    await SessionManager.logoutCompany();
+                    await RecruitmentSyncService.instance.logout();
                     if (context.mounted) {
                       Navigator.of(context).pushNamedAndRemoveUntil(
                           AppRoutes.roleSelection, (route) => false);
