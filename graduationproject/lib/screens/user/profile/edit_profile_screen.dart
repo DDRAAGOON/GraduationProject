@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:graduationproject/shared/l10n/app_localizations.dart';
 import 'package:graduationproject/shared/utils/image_helper.dart';
 import 'package:graduationproject/shared/services/recruitment_sync_service.dart';
@@ -24,7 +25,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   late TextEditingController _titleController;
   late TextEditingController _phoneController;
   late TextEditingController _emailController;
-  late TextEditingController _dobController;
+  late TextEditingController _dayController;
+  late TextEditingController _monthController;
+  late TextEditingController _yearController;
   late TextEditingController _locationController;
   late TextEditingController _skillController;
   
@@ -41,13 +44,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     super.initState();
     final store = RecruitmentSyncStore.instance;
 
-    // تم حذف النصوص التجريبية والاعتماد على بيانات الـ Store الحقيقية فقط
     _aboutMeController = TextEditingController(text: store.currentUserAbout);
     _fullNameController = TextEditingController(text: store.currentUserName == 'User' ? '' : store.currentUserName);
     _titleController = TextEditingController(text: store.currentUserTitle);
     _phoneController = TextEditingController(text: store.currentUserPhone);
     _emailController = TextEditingController(text: store.currentUserEmail);
-    _dobController = TextEditingController(text: UserProfileData.dob);
+    
+    // Parse DOB into Day, Month, Year
+    String currentDob = UserProfileData.dob;
+    List<String> dobParts = currentDob.split('/');
+    _dayController = TextEditingController(text: dobParts.isNotEmpty ? dobParts[0] : '');
+    _monthController = TextEditingController(text: dobParts.length > 1 ? dobParts[1] : '');
+    _yearController = TextEditingController(text: dobParts.length > 2 ? dobParts[2] : '');
+
     _locationController = TextEditingController(text: store.currentUserLocation);
     _skillController = TextEditingController();
     
@@ -66,7 +75,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _titleController.dispose();
     _phoneController.dispose();
     _emailController.dispose();
-    _dobController.dispose();
+    _dayController.dispose();
+    _monthController.dispose();
+    _yearController.dispose();
     _locationController.dispose();
     _skillController.dispose();
     super.dispose();
@@ -83,6 +94,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   void _saveData() {
     final t = AppLocalizations.of(context);
     final store = RecruitmentSyncStore.instance;
+
+    String dob = "${_dayController.text}/${_monthController.text}/${_yearController.text}";
+    UserProfileData.dob = dob;
 
     store.updateUserProfile(
       fullName: _fullNameController.text,
@@ -210,17 +224,48 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             const SizedBox(height: 20),
             Row(
               children: [
-                Expanded(child: _buildTextFieldWithLabel(_phoneController, t.tr(en: "Phone Number", ar: "رقم الهاتف"), t.tr(en: "Enter Phone Number", ar: "أدخل رقم الهاتف"))),
+                Expanded(
+                    child: _buildTextFieldWithLabel(
+                        _phoneController, 
+                        t.tr(en: "Phone Number", ar: "رقم الهاتف"), 
+                        t.tr(en: "Enter Phone Number", ar: "أدخل رقم الهاتف"),
+                        keyboardType: TextInputType.phone,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          LengthLimitingTextInputFormatter(11),
+                        ],
+                    )
+                ),
                 const SizedBox(width: 15),
-                Expanded(child: _buildTextFieldWithLabel(_emailController, t.tr(en: "Email", ar: "البريد الإلكتروني"), t.tr(en: "Enter Email", ar: "أدخل البريد الإلكتروني"))),
+                Expanded(child: _buildTextFieldWithLabel(_emailController, t.tr(en: "Email", ar: "البريد الإلكتروني"), t.tr(en: "Enter Email", ar: "أدخل البريد الإلكتروني"), keyboardType: TextInputType.emailAddress)),
               ],
             ),
             const SizedBox(height: 20),
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(child: _buildTextFieldWithLabel(_dobController, t.dob, t.tr(en: "Enter Date of Birth", ar: "أدخل تاريخ الميلاد"), suffixIcon: Icons.calendar_today_outlined)),
+                Expanded(
+                  flex: 2,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(t.dob, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Expanded(child: _buildTextField(_dayController, "DD", keyboardType: TextInputType.number, inputFormatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(2)])),
+                          const SizedBox(width: 5),
+                          Expanded(child: _buildTextField(_monthController, "MM", keyboardType: TextInputType.number, inputFormatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(2)])),
+                          const SizedBox(width: 5),
+                          Expanded(flex: 2, child: _buildTextField(_yearController, "YYYY", keyboardType: TextInputType.number, inputFormatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(4)])),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
                 const SizedBox(width: 15),
                 Expanded(
+                  flex: 1,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -332,6 +377,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             AppButton(
               label: t.tr(en: "Save Profile", ar: "حفظ الملف الشخصي"),
               onPressed: _saveData,
+              backgroundColor: const Color(0xFF4A6ED1),
             ),
             const SizedBox(height: 100),
           ],
@@ -352,21 +398,23 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
-  Widget _buildTextFieldWithLabel(TextEditingController controller, String label, String hint, {IconData? suffixIcon}) {
+  Widget _buildTextFieldWithLabel(TextEditingController controller, String label, String hint, {IconData? suffixIcon, TextInputType? keyboardType, List<TextInputFormatter>? inputFormatters}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
         const SizedBox(height: 8),
-        _buildTextField(controller, hint, suffixIcon: suffixIcon),
+        _buildTextField(controller, hint, suffixIcon: suffixIcon, keyboardType: keyboardType, inputFormatters: inputFormatters),
       ],
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String hint, {IconData? suffixIcon, int maxLines = 1}) {
+  Widget _buildTextField(TextEditingController controller, String hint, {IconData? suffixIcon, int maxLines = 1, TextInputType? keyboardType, List<TextInputFormatter>? inputFormatters}) {
     return TextField(
       controller: controller,
       maxLines: maxLines,
+      keyboardType: keyboardType,
+      inputFormatters: inputFormatters,
       style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
       decoration: InputDecoration(
         hintText: hint,

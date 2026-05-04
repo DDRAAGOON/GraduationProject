@@ -66,10 +66,6 @@ class _PreferencesState extends State<Preferences> {
             Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 1),
             const SizedBox(height: 30),
 
-
-
-            
-
             // App Settings
             Text(t.tr(en: "App Settings", ar: "إعدادات التطبيق"), style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 20),
@@ -88,30 +84,6 @@ class _PreferencesState extends State<Preferences> {
               onTap: () => _showThemeDialog(context, t),
             ),
 
-            const SizedBox(height: 60),
-            Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 1),
-            const SizedBox(height: 30),
-
-            // Save Button
-            SizedBox(
-              width: double.infinity,
-              child: Align(
-                alignment: isAr ? Alignment.centerLeft : Alignment.centerRight,
-                child: ElevatedButton(
-                  onPressed: () {
-                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Preferences Saved Successfully!")),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                  ),
-                  child: Text(t.tr(en: "Save Profile", ar: "حفظ الملف الشخصي"), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                ),
-              ),
-            ),
             const SizedBox(height: 100),
           ],
         ),
@@ -237,4 +209,3 @@ class _PreferencesState extends State<Preferences> {
     );
   }
 }
-

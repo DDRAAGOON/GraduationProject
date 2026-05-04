@@ -29,7 +29,6 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
 
   late TextEditingController _titleController;
   late TextEditingController _descController;
-  late TextEditingController _budgetController;
   late List<String> _selectedDays;
   
   final List<String> _allDays = ["Saturday", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
@@ -51,7 +50,6 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
 
     _titleController = TextEditingController(text: existingJob?.title ?? widget.jobTitle);
     _descController = TextEditingController(text: widget.initialDesc ?? "");
-    _budgetController = TextEditingController(text: existingJob?.salaryRange ?? widget.initialBudget ?? "");
     _selectedDays = List.from(existingJob?.tags ?? widget.initialDays ?? []);
   }
 
@@ -60,7 +58,6 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
     _searchController.dispose();
     _titleController.dispose();
     _descController.dispose();
-    _budgetController.dispose();
     super.dispose();
   }
 
@@ -107,25 +104,28 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
     final t = AppLocalizations.of(context);
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
     final store = RecruitmentSyncStore.instance;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     // Real applicants filtered by jobId
     final realApplicants = store.applications.where((app) => app.jobId == widget.jobId).toList();
 
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         leading: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.grey.shade100,
+              color: theme.cardColor,
               borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: theme.dividerColor.withValues(alpha: 0.1)),
             ),
             child: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.black87, size: 20),
+              icon: Icon(Icons.arrow_back, color: colorScheme.onSurface, size: 20),
               onPressed: () => Navigator.pop(context),
             ),
           ),
@@ -137,7 +137,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.red.shade50,
+                    color: Colors.red.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: IconButton(
@@ -150,12 +150,13 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
               padding: const EdgeInsets.all(8.0),
               child: Container(
                 decoration: BoxDecoration(
-                  color: _isEditing ? Colors.green.shade50 : Colors.grey.shade100,
+                  color: _isEditing ? Colors.green.withValues(alpha: 0.1) : theme.cardColor,
                   borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: theme.dividerColor.withValues(alpha: 0.1)),
                 ),
                 child: IconButton(
                   icon: Icon(_isEditing ? Icons.check : Icons.edit_outlined, 
-                      color: _isEditing ? Colors.green : Colors.black87, size: 20),
+                      color: _isEditing ? Colors.green : colorScheme.onSurface, size: 20),
                   onPressed: _toggleEdit,
                 ),
               ),
@@ -176,13 +177,17 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                   _isEditing && _activeTabIndex == 1
                   ? TextField(
                       controller: _titleController,
-                      style: const TextStyle(color: Color(0xFF6366F1), fontSize: 24, fontWeight: FontWeight.w900),
-                      decoration: const InputDecoration(border: InputBorder.none, hintText: "Job Title"),
+                      style: TextStyle(color: colorScheme.primary, fontSize: 24, fontWeight: FontWeight.w900),
+                      decoration: InputDecoration(
+                        border: InputBorder.none, 
+                        hintText: "Job Title",
+                        hintStyle: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.38)),
+                      ),
                     )
                   : Text(
                     _titleController.text.isEmpty ? (isAr ? "بدون عنوان" : "Untitled") : _titleController.text,
-                    style: const TextStyle(
-                      color: Color(0xFF6366F1),
+                    style: TextStyle(
+                      color: colorScheme.primary,
                       fontSize: 28,
                       fontWeight: FontWeight.w900,
                     ),
@@ -190,7 +195,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                   const SizedBox(height: 8),
                   Text(
                     isAr ? 'عام • لمرة واحدة • ${realApplicants.length} متقدمين' : 'General • one-time • ${realApplicants.length} applicants',
-                    style: const TextStyle(color: Colors.black38, fontSize: 14, fontWeight: FontWeight.w500),
+                    style: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 14, fontWeight: FontWeight.w500),
                   ),
                 ],
               ),
@@ -208,7 +213,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                 ],
               ),
             ),
-            const Divider(height: 1, thickness: 1, color: Color(0xFFF3F4F6)),
+            Divider(height: 1, thickness: 1, color: theme.dividerColor.withValues(alpha: 0.1)),
             
             const SizedBox(height: 30),
 
@@ -222,6 +227,8 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
   }
 
   Widget _buildApplicantsView(bool isAr, AppLocalizations t, List<RecruitmentApplication> applicants) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     return Column(
       children: [
         Padding(
@@ -234,26 +241,27 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
             children: [
               Text(
                 isAr ? 'إجمالي المتقدمين: ${applicants.length}' : 'Total Applicants: ${applicants.length}',
-                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: Color(0xFF011931)),
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: colorScheme.onSurface),
               ),
               Container(
                 width: double.infinity,
                 constraints: const BoxConstraints(maxWidth: 300),
                 height: 45,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: theme.cardColor,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey.shade200),
+                  border: Border.all(color: theme.dividerColor.withValues(alpha: 0.1)),
                   boxShadow: [
-                    BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 4))
+                    BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10, offset: const Offset(0, 4))
                   ],
                 ),
                 child: TextField(
                   controller: _searchController,
+                  style: TextStyle(color: colorScheme.onSurface),
                   decoration: InputDecoration(
                     hintText: isAr ? 'البحث في المتقدمين...' : 'Search applicants...',
-                    hintStyle: const TextStyle(fontSize: 13, color: Colors.grey),
-                    prefixIcon: const Icon(Icons.search, size: 18, color: Colors.grey),
+                    hintStyle: TextStyle(fontSize: 13, color: colorScheme.onSurface.withValues(alpha: 0.38)),
+                    prefixIcon: Icon(Icons.search, size: 18, color: colorScheme.onSurface.withValues(alpha: 0.38)),
                     border: InputBorder.none,
                     contentPadding: const EdgeInsets.symmetric(vertical: 12),
                   ),
@@ -267,8 +275,8 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 12),
-            decoration: const BoxDecoration(
-              border: Border(bottom: BorderSide(color: Color(0xFFF3F4F6), width: 1.5)),
+            decoration: BoxDecoration(
+              border: Border(bottom: BorderSide(color: theme.dividerColor.withValues(alpha: 0.1), width: 1.5)),
             ),
             child: Row(
               children: [
@@ -286,12 +294,12 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
               padding: const EdgeInsets.only(top: 60),
               child: Column(
                 children: [
-                  Icon(Icons.people_outline, size: 40, color: Colors.grey.shade200),
+                  Icon(Icons.people_outline, size: 40, color: colorScheme.onSurface.withValues(alpha: 0.12)),
                   const SizedBox(height: 16),
                   Text(
                     isAr ? 'لا يوجد متقدمين حتى الآن' : 'No applicants yet',
-                    style: const TextStyle(
-                      color: Colors.black26,
+                    style: TextStyle(
+                      color: colorScheme.onSurface.withValues(alpha: 0.38),
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                     ),
@@ -317,14 +325,14 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                         children: [
                           CircleAvatar(
                             radius: 18,
-                            backgroundColor: Colors.grey.shade100,
-                            child: const Icon(Icons.person, size: 20, color: Colors.grey),
+                            backgroundColor: colorScheme.primary.withValues(alpha: 0.1),
+                            child: Icon(Icons.person, size: 20, color: colorScheme.primary),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(
                               app.userName,
-                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: colorScheme.onSurface),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
@@ -333,7 +341,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                     ),
                     Expanded(
                       child: IconButton(
-                        icon: const Icon(Icons.chat_outlined, color: Color(0xFF49769F), size: 20),
+                        icon: Icon(Icons.chat_outlined, color: colorScheme.primary, size: 20),
                         onPressed: () {
                           Navigator.push(
                             context,
@@ -351,7 +359,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 4),
                         decoration: BoxDecoration(
-                          color: Colors.blue.withOpacity(0.1),
+                          color: Colors.blue.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
@@ -400,13 +408,6 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
           ),
           const SizedBox(height: 24),
           _buildDetailSection(
-            icon: Icons.payments_outlined,
-            title: t.tr(en: "Rate / Budget", ar: "السعر / الميزانية"),
-            content: _budgetController.text,
-            controller: _budgetController,
-          ),
-          const SizedBox(height: 24),
-          _buildDetailSection(
             icon: Icons.calendar_today_outlined,
             title: t.tr(en: "Posted Date", ar: "تاريخ النشر"),
             content: DateTime.now().toString().split(' ')[0],
@@ -418,15 +419,15 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
             children: [
               Container(
                 padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(color: const Color(0xFFF0F3FF), borderRadius: BorderRadius.circular(12)),
-                child: const Icon(Icons.access_time_outlined, color: Color(0xFF49769F), size: 24),
+                decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
+                child: Icon(Icons.access_time_outlined, color: Theme.of(context).colorScheme.primary, size: 24),
               ),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(t.tr(en: "Work Days", ar: "أيام العمل"), style: const TextStyle(color: Colors.black38, fontSize: 13, fontWeight: FontWeight.bold)),
+                    Text(t.tr(en: "Work Days", ar: "أيام العمل"), style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 13, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 4),
                     _isEditing
                     ? Wrap(
@@ -445,13 +446,13 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                                 }
                               });
                             },
-                            selectedColor: const Color(0xFF6366F1).withOpacity(0.2),
-                            checkmarkColor: const Color(0xFF6366F1),
+                            selectedColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+                            checkmarkColor: Theme.of(context).colorScheme.primary,
                           );
                         }).toList(),
                       )
                     : Text(_selectedDays.isEmpty ? (isAr ? "غير محدد" : "None selected") : _selectedDays.join(", "), 
-                        style: const TextStyle(color: Color(0xFF011931), fontSize: 15, fontWeight: FontWeight.w600, height: 1.4)),
+                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 15, fontWeight: FontWeight.w600, height: 1.4)),
                   ],
                 ),
               ),
@@ -470,29 +471,31 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
     bool isEditable = true,
     bool isMultiLine = false,
   }) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
           padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(color: const Color(0xFFF0F3FF), borderRadius: BorderRadius.circular(12)),
-          child: Icon(icon, color: const Color(0xFF49769F), size: 24),
+          decoration: BoxDecoration(color: colorScheme.primary.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
+          child: Icon(icon, color: colorScheme.primary, size: 24),
         ),
         const SizedBox(width: 16),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, style: const TextStyle(color: Colors.black38, fontSize: 13, fontWeight: FontWeight.bold)),
+              Text(title, style: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 13, fontWeight: FontWeight.bold)),
               const SizedBox(height: 4),
               _isEditing && isEditable && controller != null
               ? TextField(
                   controller: controller,
                   maxLines: isMultiLine ? null : 1,
-                  style: const TextStyle(color: Color(0xFF011931), fontSize: 15, fontWeight: FontWeight.w600),
+                  style: TextStyle(color: colorScheme.onSurface, fontSize: 15, fontWeight: FontWeight.w600),
                   decoration: const InputDecoration(isDense: true, contentPadding: EdgeInsets.symmetric(vertical: 8)),
                 )
-              : Text(content, style: const TextStyle(color: Color(0xFF011931), fontSize: 15, fontWeight: FontWeight.w600, height: 1.4)),
+              : Text(content, style: TextStyle(color: colorScheme.onSurface, fontSize: 15, fontWeight: FontWeight.w600, height: 1.4)),
             ],
           ),
         ),
@@ -501,6 +504,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
   }
 
   Widget _buildTab(String label, int index) {
+    final colorScheme = Theme.of(context).colorScheme;
     bool isActive = _activeTabIndex == index;
     return GestureDetector(
       onTap: () {
@@ -515,7 +519,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
           Text(
             label,
             style: TextStyle(
-              color: isActive ? const Color(0xFF6366F1) : Colors.black45,
+              color: isActive ? colorScheme.primary : colorScheme.onSurface.withValues(alpha: 0.45),
               fontWeight: isActive ? FontWeight.w800 : FontWeight.w600,
               fontSize: 15,
             ),
@@ -526,7 +530,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
               height: 3,
               width: 45,
               decoration: BoxDecoration(
-                color: const Color(0xFF6366F1),
+                color: colorScheme.primary,
                 borderRadius: BorderRadius.circular(10),
               ),
             )
@@ -542,8 +546,8 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
       flex: flex,
       child: Text(
         label,
-        style: const TextStyle(
-          color: Colors.black26,
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.26),
           fontSize: 12,
           fontWeight: FontWeight.w800,
           letterSpacing: 0.5,

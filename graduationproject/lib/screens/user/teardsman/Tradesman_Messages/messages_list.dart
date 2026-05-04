@@ -4,7 +4,6 @@ import '../../../../shared/state/recruitment_sync_store.dart';
 import '../../messages/new_chat_screen.dart';
 import '../post/post_job.dart';
 import '../setting/settings.dart';
-import '../../profile/user_data.dart';
 import '../../../../shared/utils/image_helper.dart';
 import 'chat_tradesman.dart';
 
@@ -80,100 +79,104 @@ class _MessagesListState extends State<MessagesList> {
     final t = AppLocalizations.of(context);
     final store = RecruitmentSyncStore.instance;
 
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-           Navigator.push(context, MaterialPageRoute(builder: (context) => const NewChatScreen()));
-        },
-        backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-        elevation: 6,
-        child: Icon(Icons.add, color: Theme.of(context).colorScheme.primary, size: 28),
-      ),
-      appBar: AppBar(
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 16, top: 8, bottom: 8),
-          child: GestureDetector(
-            onTap: () {
-              final provider = getAppImageProvider(UserProfileData.profileImage);
-              _showProfileImage(context, provider);
+    return AnimatedBuilder(
+      animation: store,
+      builder: (context, _) {
+        return Scaffold(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const NewChatScreen()));
             },
-            child: CircleAvatar(
-              radius: 18,
-              backgroundColor: Theme.of(context).colorScheme.surface,
-              backgroundImage: getAppImageProvider(UserProfileData.profileImage),
-              child: UserProfileData.profileImage == null 
-                  ? const Icon(Icons.person, size: 20) 
-                  : null,
-            ),
+            backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+            elevation: 6,
+            child: Icon(Icons.add, color: Theme.of(context).colorScheme.primary, size: 28),
           ),
-        ),
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        elevation: 0,
-        surfaceTintColor: Colors.transparent,
-        title: Text(
-          t.tr(en: "Messages", ar: "الرسائل"),
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        centerTitle: false,
-        actions: [
-          _buildIconButton(Icons.add_circle_outline, onTap: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => const PostJob()));
-          }),
-          const SizedBox(width: 8),
-          _buildIconButton(Icons.settings_outlined, onTap: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => const Settings()));
-          }),
-          const SizedBox(width: 24),
-        ],
-      ),
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 10),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              child: _buildSearchBar(context, t),
-            ),
-            const SizedBox(height: 10),
-            Expanded(
-              child: AnimatedBuilder(
-                animation: store,
-                builder: (context, _) {
-                  final threads = store.tradesmanChatThreads.where((thread) => 
-                    thread.name.toLowerCase().contains(_searchQuery)
-                  ).toList();
-
-                  if (threads.isEmpty) {
-                    return _buildEmptyState(t);
-                  }
-
-                  return ListView.separated(
-                    physics: const BouncingScrollPhysics(),
-                    padding: const EdgeInsets.fromLTRB(10, 0, 10, 100),
-                    itemCount: threads.length,
-                    separatorBuilder: (context, index) => Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.1), height: 1),
-                    ),
-                    itemBuilder: (context, index) {
-                      final thread = threads[index];
-                      return _buildMessageItem(
-                        context,
-                        name: thread.name,
-                        message: thread.lastMessage,
-                        time: thread.time,
-                        image: thread.image,
-                      );
-                    },
-                  );
+          appBar: AppBar(
+            leading: Padding(
+              padding: const EdgeInsets.only(left: 16, top: 8, bottom: 8),
+              child: GestureDetector(
+                onTap: () {
+                  final provider = getAppImageProvider(store.profileImage);
+                  _showProfileImage(context, provider);
                 },
+                child: CircleAvatar(
+                  radius: 18,
+                  backgroundColor: Theme.of(context).colorScheme.surface,
+                  backgroundImage: getAppImageProvider(store.profileImage),
+                  child: store.profileImage == null
+                      ? const Icon(Icons.person, size: 20)
+                      : null,
+                ),
               ),
             ),
-          ],
-        ),
-      ),
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            elevation: 0,
+            surfaceTintColor: Colors.transparent,
+            title: Text(
+              t.tr(en: "Messages", ar: "الرسائل"),
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            centerTitle: false,
+            actions: [
+              _buildIconButton(Icons.add_circle_outline, onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const PostJob()));
+              }),
+              const SizedBox(width: 8),
+              _buildIconButton(Icons.settings_outlined, onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const Settings()));
+              }),
+              const SizedBox(width: 24),
+            ],
+          ),
+          body: SafeArea(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 10),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  child: _buildSearchBar(context, t),
+                ),
+                const SizedBox(height: 10),
+                Expanded(
+                  child: Builder(
+                    builder: (context) {
+                      final threads = store.tradesmanChatThreads.where((thread) =>
+                          thread.name.toLowerCase().contains(_searchQuery)
+                      ).toList();
+
+                      if (threads.isEmpty) {
+                        return _buildEmptyState(t);
+                      }
+
+                      return ListView.separated(
+                        physics: const BouncingScrollPhysics(),
+                        padding: const EdgeInsets.fromLTRB(10, 0, 10, 100),
+                        itemCount: threads.length,
+                        separatorBuilder: (context, index) => Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.1), height: 1),
+                        ),
+                        itemBuilder: (context, index) {
+                          final thread = threads[index];
+                          return _buildMessageItem(
+                            context,
+                            name: thread.name,
+                            message: thread.lastMessage,
+                            time: thread.time,
+                            image: thread.image,
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 

@@ -32,13 +32,19 @@ class _TradesmanApplyJobScreenState extends State<TradesmanApplyJobScreen> {
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     final store = RecruitmentSyncStore.instance;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios, color: colorScheme.onSurface),
+          onPressed: () => Navigator.pop(context),
+        ),
         title: Image.asset(
           'assets/company/logo/logo.png',
           height: 150,
@@ -53,26 +59,34 @@ class _TradesmanApplyJobScreenState extends State<TradesmanApplyJobScreen> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: theme.cardColor,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.grey.withOpacity(0.1)),
+              border: Border.all(color: theme.dividerColor.withValues(alpha: 0.1)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   widget.job.title,
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  style: theme.textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.w800,
-                        color: Colors.black87,
+                        color: colorScheme.onSurface,
                       ),
                 ),
+                if (widget.job.companyName.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    widget.job.companyName,
+                    style: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 14),
+                  ),
+                ],
               ],
             ),
           ),
           const SizedBox(height: 30),
           
           _buildTextField(
+            context,
             t.tr(en: 'Cover Letter', ar: 'خطاب التقديم'), 
             _coverLetterController, 
             Icons.description_outlined, 
@@ -80,6 +94,7 @@ class _TradesmanApplyJobScreenState extends State<TradesmanApplyJobScreen> {
             hint: t.tr(en: 'Explain why you are the best fit...', ar: 'اشرح لماذا أنت الأنسب لهذه الوظيفة...')
           ),
           _buildTextField(
+            context,
             t.tr(en: 'Price for this job', ar: 'السعر لهذه الوظيفة'), 
             _priceController, 
             Icons.payments_outlined,
@@ -87,6 +102,7 @@ class _TradesmanApplyJobScreenState extends State<TradesmanApplyJobScreen> {
             hint: 'Example: 500 EGP'
           ),
           _buildTextField(
+            context,
             t.tr(en: 'Time to Complete', ar: 'الوقت المتوقع للإنجاز'), 
             _timeController, 
             Icons.timer_outlined,
@@ -97,6 +113,7 @@ class _TradesmanApplyJobScreenState extends State<TradesmanApplyJobScreen> {
           AppButton(
             label: t.tr(en: 'Submit Application', ar: 'إرسال الطلب'),
             loading: _loading,
+            backgroundColor: const Color(0xFF4A6ED1),
             onPressed: () async {
               if (_coverLetterController.text.isEmpty || _priceController.text.isEmpty || _timeController.text.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -137,33 +154,42 @@ class _TradesmanApplyJobScreenState extends State<TradesmanApplyJobScreen> {
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller, IconData icon, 
-      {TextInputType? keyboardType, int maxLines = 1, String? hint}) {
+  Widget _buildTextField(
+    BuildContext context,
+    String label, 
+    TextEditingController controller, 
+    IconData icon, 
+    {TextInputType? keyboardType, int maxLines = 1, String? hint}
+  ) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Padding(
       padding: const EdgeInsets.only(bottom: 20),
       child: TextField(
         controller: controller,
         keyboardType: keyboardType,
         maxLines: maxLines,
-        style: const TextStyle(color: Colors.black87, fontSize: 14),
+        style: TextStyle(color: colorScheme.onSurface, fontSize: 14),
         decoration: InputDecoration(
           labelText: label,
+          labelStyle: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.6)),
           hintText: hint,
-          hintStyle: const TextStyle(color: Colors.black26, fontSize: 13),
-          prefixIcon: Icon(icon, color: const Color(0xFF49769F), size: 20),
+          hintStyle: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 13),
+          prefixIcon: Icon(icon, color: colorScheme.primary, size: 20),
           filled: true,
-          fillColor: Colors.white,
+          fillColor: theme.cardColor,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Colors.grey.withOpacity(0.1)),
+            borderSide: BorderSide(color: theme.dividerColor.withValues(alpha: 0.1)),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Colors.grey.shade200),
+            borderSide: BorderSide(color: theme.dividerColor.withValues(alpha: 0.12)),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: Color(0xFF49769F)),
+            borderSide: BorderSide(color: colorScheme.primary, width: 1.5),
           ),
         ),
       ),

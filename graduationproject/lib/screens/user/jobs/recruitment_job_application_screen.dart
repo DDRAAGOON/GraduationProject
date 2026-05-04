@@ -156,6 +156,7 @@ class _RecruitmentJobApplicationScreenState
           AppButton(
             label: isAr ? 'تقديم الطلب' : 'Submit Application',
             loading: _loading,
+            backgroundColor: const Color(0xFF4A6ED1),
             onPressed: _loading ? null : () => _submit(isAr),
           ),
           const SizedBox(height: 24),

@@ -8,6 +8,7 @@ class TradesmanMyAppsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -17,8 +18,8 @@ class TradesmanMyAppsScreen extends StatelessWidget {
         surfaceTintColor: Colors.transparent,
         title: Text(
           t.tr(en: 'My Applications', ar: 'قائمة الأعمال'),
-          style: const TextStyle(
-            color: Color(0xFF011931), 
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface, 
             fontWeight: FontWeight.w900,
             fontSize: 22,
           ),
@@ -32,33 +33,33 @@ class TradesmanMyAppsScreen extends StatelessWidget {
           children: [
             Text(
               isAr ? 'شاهد حالة أعمالك المنشورة وإحصائيات المتقدمين' : 'View the status of your posted works and applicant stats',
-              style: const TextStyle(color: Colors.black45, fontSize: 13, height: 1.5),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 13, height: 1.5),
             ),
             const SizedBox(height: 30),
             
-            // Stats Row (Optional but adds value to UI)
+            // Stats Row
             Row(
               children: [
-                _buildSimpleStat(isAr ? 'الأعمال النشطة' : 'Active Works', '0', Colors.blue),
+                _buildSimpleStat(context, isAr ? 'الأعمال النشطة' : 'Active Works', '0', Colors.blue),
                 const SizedBox(width: 12),
-                _buildSimpleStat(isAr ? 'المتقدمين' : 'Applicants', '0', Colors.orange),
+                _buildSimpleStat(context, isAr ? 'المتقدمين' : 'Applicants', '0', Colors.orange),
               ],
             ),
             const SizedBox(height: 30),
             
-            // Table Header with better styling
+            // Table Header
             Container(
               padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
               decoration: BoxDecoration(
-                color: const Color(0xFF011931).withOpacity(0.03),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.03),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
                 children: [
-                  _buildHeaderCell('ROLES', flex: 2, align: TextAlign.start),
-                  _buildHeaderCell('RATE'),
-                  _buildHeaderCell('STATUS'),
-                  _buildHeaderCell('APPLICANTS'),
+                  _buildHeaderCell(context, 'ROLES', flex: 2, align: TextAlign.start),
+                  _buildHeaderCell(context, 'RATE'),
+                  _buildHeaderCell(context, 'STATUS'),
+                  _buildHeaderCell(context, 'APPLICANTS'),
                 ],
               ),
             ),
@@ -69,12 +70,12 @@ class TradesmanMyAppsScreen extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 60, horizontal: 20),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Theme.of(context).cardColor,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.grey.withOpacity(0.1)),
-                boxShadow: [
+                border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
+                boxShadow: isDark ? [] : [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.02),
+                    color: Colors.black.withValues(alpha: 0.02),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -82,12 +83,12 @@ class TradesmanMyAppsScreen extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  Icon(Icons.assignment_late_outlined, size: 48, color: Colors.grey.withOpacity(0.3)),
+                  Icon(Icons.assignment_late_outlined, size: 48, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2)),
                   const SizedBox(height: 16),
                   Text(
                     isAr ? 'لا توجد أعمال منشورة بعد.' : 'No posted works yet.',
-                    style: const TextStyle(
-                      color: Colors.black38,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
                       fontSize: 15,
                       fontWeight: FontWeight.w500,
                     ),
@@ -95,7 +96,7 @@ class TradesmanMyAppsScreen extends StatelessWidget {
                   const SizedBox(height: 8),
                   Text(
                     isAr ? 'ابدأ بإضافة عملك الأول ليظهر هنا' : 'Start by adding your first work to see it here',
-                    style: TextStyle(color: Colors.grey.withOpacity(0.6), fontSize: 12),
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 12),
                   ),
                 ],
               ),
@@ -106,34 +107,34 @@ class TradesmanMyAppsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSimpleStat(String label, String value, Color color) {
+  Widget _buildSimpleStat(BuildContext context, String label, String value, Color color) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: color.withOpacity(0.1)),
+          border: Border.all(color: color.withValues(alpha: 0.1)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(value, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: color)),
             const SizedBox(height: 4),
-            Text(label, style: const TextStyle(fontSize: 11, color: Colors.black54, fontWeight: FontWeight.w600)),
+            Text(label, style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), fontWeight: FontWeight.w600)),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildHeaderCell(String label, {int flex = 1, TextAlign align = TextAlign.center}) {
+  Widget _buildHeaderCell(BuildContext context, String label, {int flex = 1, TextAlign align = TextAlign.center}) {
     return Expanded(
       flex: flex,
       child: Text(
         label,
-        style: const TextStyle(
-          color: Color(0xFF011931),
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.onSurface,
           fontSize: 10,
           fontWeight: FontWeight.w800,
           letterSpacing: 0.5,

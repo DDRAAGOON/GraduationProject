@@ -49,6 +49,7 @@ import '../../screens/user/jobs/recruitment_application_timeline_screen.dart';
 import '../../screens/user/jobs/recruitment_job_application_screen.dart';
 import '../../screens/user/jobs/recruitment_job_filters_screen.dart';
 import '../../screens/user/jobs/recruitment_job_details_screen.dart';
+import '../../screens/user/jobs/recruitment_all_applications_screen.dart';
 import '../../screens/user/auth/recruitment_user_sign_in_screen.dart';
 import '../../screens/user/onboarding/onboarding.dart';
 import '../../screens/user/onboarding/recruitment_user_onboarding_screen.dart';
@@ -82,6 +83,7 @@ final class AppRoutes {
   static const userSignInNew = '/user/auth/sign_in_new';
   static const userEditProfile = '/user/profile/edit';
   static const userCompanyDetails = '/user/company/details';
+  static const userAllApplications = '/user/jobs/all_applications';
 
   // --- Company Onboarding Routes ---
   static const companyOnboardingSmartSearch =
@@ -214,6 +216,8 @@ final class AppRouter {
         page = CompanyDetailsScreen(
           company: args is Map<String, dynamic> ? args : const {},
         );
+      case AppRoutes.userAllApplications:
+        page = const RecruitmentAllApplicationsScreen();
 
       case AppRoutes.companyOnboardingSmartSearch:
         page = const CompanyOnboardingSmartSearchScreen();

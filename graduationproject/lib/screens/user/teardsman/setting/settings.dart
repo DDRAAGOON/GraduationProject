@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:graduationproject/app/router/app_router.dart';
 import 'package:graduationproject/shared/l10n/app_localizations.dart';
 import 'package:graduationproject/screens/user/profile/setting_profile/preferences.dart';
+import 'package:graduationproject/screens/user/profile/edit_profile_screen.dart';
+import 'package:graduationproject/screens/user/profile/profile_login_details_screen.dart';
+import 'package:graduationproject/screens/user/profile/setting_profile/notifications.dart';
 
 class Settings extends StatefulWidget {
   const Settings({super.key});
@@ -86,6 +89,21 @@ class _SettingsState extends State<Settings> {
             ),
             const SizedBox(height: 20),
             
+            _buildSettingItem(
+              icon: Icons.person_outline,
+              title: t.tr(en: "Profile Settings", ar: "إعدادات الملف الشخصي"),
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const EditProfileScreen())),
+            ),
+            _buildSettingItem(
+              icon: Icons.lock_outline,
+              title: t.tr(en: "Account Security", ar: "أمان الحساب"),
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const ProfileLoginDetailsScreen())),
+            ),
+            _buildSettingItem(
+              icon: Icons.notifications_none_outlined,
+              title: t.notifications,
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const Notifications())),
+            ),
             _buildSettingItem(
               icon: Icons.tune_outlined,
               title: t.tr(en: "Preferences", ar: "التفضيلات"),

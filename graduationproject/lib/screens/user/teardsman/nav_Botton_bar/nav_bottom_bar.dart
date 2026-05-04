@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import '../Tradesman_Messages/messages_list.dart';
-import '../home/find_jobs.dart';
-import '../home/tradesman_my_apps_screen.dart';
-import '../home/tradesman_browse_companies_screen.dart';
-import '../profile/tradesman_profile.dart';
+import 'package:graduationproject/screens/user/teardsman/Tradesman_Messages/messages_list.dart';
+import 'package:graduationproject/screens/user/teardsman/home/find_jobs.dart';
+import 'package:graduationproject/screens/user/teardsman/home/tradesman_my_apps_screen.dart';
+import 'package:graduationproject/screens/user/teardsman/home/tradesman_browse_companies_screen.dart';
+import 'package:graduationproject/screens/user/teardsman/profile/tradesman_profile.dart';
+import 'package:graduationproject/screens/user/messages/chat_thread_screen.dart';
+import 'package:graduationproject/constants/app_images.dart';
 
 class Navbotton extends StatefulWidget {
   const Navbotton({super.key});
@@ -30,6 +32,24 @@ class _NavbottonState extends State<Navbotton> {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: _pages[_selectedIndex],
+      floatingActionButton: _selectedIndex == 0 
+        ? FloatingActionButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ChatThreadScreen(
+                    name: _isAr ? 'مساعد جوبيتو الذكي' : 'Jobito AI Assistant',
+                    image: AppImages.jobito,
+                  ),
+                ),
+              );
+            },
+            backgroundColor: const Color(0xFF4A6ED1),
+            shape: const CircleBorder(),
+            child: const Icon(Icons.smart_toy_outlined, color: Colors.white, size: 28),
+          )
+        : null,
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex,
         onDestinationSelected: (int index) {

@@ -144,11 +144,6 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
                       children: [
                         Row(
                           children: [
-                            if (!isAr) ...[
-                              _buildEditButton(context, t),
-                              const SizedBox(width: 12),
-                            ],
-                            
                             Expanded(
                               child: Text(
                                 store.currentUserName.isEmpty ? t.notYet : store.currentUserName,
@@ -162,11 +157,6 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
-                            
-                            if (isAr) ...[
-                              const SizedBox(width: 12),
-                              _buildEditButton(context, t),
-                            ],
                           ],
                         ),
                         const SizedBox(height: 4),
@@ -312,41 +302,6 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
               ),
             );
           },
-        ),
-      ),
-    );
-  }
-
-  Widget _buildEditButton(BuildContext context, AppLocalizations t) {
-    return GestureDetector(
-      onTap: () => Navigator.of(context).pushNamed(AppRoutes.userEditProfile),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        decoration: BoxDecoration(
-          color: const Color(0xFF007BFF), 
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0xFF007BFF).withOpacity(0.3),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            )
-          ],
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.edit, color: Colors.white, size: 14),
-            const SizedBox(width: 6),
-            Text(
-              t.editProfile, 
-              style: const TextStyle(
-                color: Colors.white, 
-                fontSize: 12, 
-                fontWeight: FontWeight.bold
-              ),
-            ),
-          ],
         ),
       ),
     );
