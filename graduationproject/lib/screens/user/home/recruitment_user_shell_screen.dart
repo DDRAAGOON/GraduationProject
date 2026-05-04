@@ -96,6 +96,19 @@ class _RecruitmentUserShellScreenState extends State<RecruitmentUserShellScreen>
     return AnimatedBuilder(
       animation: store,
       builder: (context, _) {
+        // Ensure the Discover tab defaults to showing all jobs.
+        if (_tab == 0 &&
+            (store.filterLocation != 'All' ||
+                store.filterType != 'All' ||
+                store.filterCategory != 'All' ||
+                store.filterSalaryRange != 'All')) {
+          store.updateFilters(
+            location: 'All',
+            type: 'All',
+            classification: 'All',
+            salaryRange: 'All',
+          );
+        }
         return Scaffold(
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           appBar: AppBar(
@@ -193,7 +206,8 @@ class _DiscoverTab extends StatelessWidget {
     return AnimatedBuilder(
       animation: store,
       builder: (BuildContext context, _) {
-        final jobs = store.filteredJobs;
+        // Home (Discover) should show all posted jobs.
+        final jobs = store.jobs;
         return RefreshIndicator(
           onRefresh: () => RecruitmentSyncService.instance.startPolling(),
           child: ListView.builder(

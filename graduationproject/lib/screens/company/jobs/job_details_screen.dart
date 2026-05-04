@@ -40,38 +40,21 @@ class _CompanyJobDetailsScreenState extends State<CompanyJobDetailsScreen> {
     setState(() => _reopening = true);
     try {
       final job = _job;
-      await RecruitmentSyncService.instance.updateJob(
-        jobId: job.id,
-        title: job.title,
-        companyName: job.companyName,
-        location: job.location,
-        salaryRange: job.salaryRange,
-        type: job.employmentType,
-        description: job.description,
-        responsibilities: job.responsibilities,
-        qualifications: job.qualifications,
-        niceToHaves: job.niceToHaves,
-        benefits: job.benefits.map((b) => b.title).toList(),
-        classification: job.classification,
-        tags: job.tags,
-        requiredCount: job.requiredCount,
-        status: 'Open',
-      );
+      await RecruitmentSyncService.instance.reopenJobAndResetAccepted(job.id);
       if (!mounted) return;
       setState(() {});
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(t.isAr ? 'تم إعادة فتح الوظيفة بنجاح' : 'Job reopened successfully'),
+          content: Text(
+            t.isAr ? 'تم إعادة فتح الوظيفة بنجاح' : 'Job reopened successfully',
+          ),
           backgroundColor: Colors.green,
         ),
       );
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error: $e'),
-          backgroundColor: Colors.red,
-        ),
+        SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
       );
     } finally {
       if (mounted) setState(() => _reopening = false);
@@ -83,7 +66,10 @@ class _CompanyJobDetailsScreenState extends State<CompanyJobDetailsScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Delete Job', style: TextStyle(fontWeight: FontWeight.w800)),
+        title: const Text(
+          'Delete Job',
+          style: TextStyle(fontWeight: FontWeight.w800),
+        ),
         content: Text(
           'Are you sure you want to delete "${_job.title}"? This cannot be undone.',
         ),
@@ -94,8 +80,13 @@ class _CompanyJobDetailsScreenState extends State<CompanyJobDetailsScreen> {
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            style: TextButton.styleFrom(foregroundColor: const Color(0xFFB91C1C)),
-            child: const Text('Delete', style: TextStyle(fontWeight: FontWeight.bold)),
+            style: TextButton.styleFrom(
+              foregroundColor: const Color(0xFFB91C1C),
+            ),
+            child: const Text(
+              'Delete',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),
@@ -108,9 +99,9 @@ class _CompanyJobDetailsScreenState extends State<CompanyJobDetailsScreen> {
       Navigator.of(context).pop(); // Go back to jobs list
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to delete job: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Failed to delete job: $e')));
     } finally {
       if (mounted) setState(() => _deleting = false);
     }
@@ -147,15 +138,24 @@ class _CompanyJobDetailsScreenState extends State<CompanyJobDetailsScreen> {
               if (job.status.toLowerCase() == 'closed')
                 Container(
                   margin: const EdgeInsets.only(bottom: 16),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.orange.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.orange.withValues(alpha: 0.4)),
+                    border: Border.all(
+                      color: Colors.orange.withValues(alpha: 0.4),
+                    ),
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.lock_outline, color: Colors.orange, size: 20),
+                      const Icon(
+                        Icons.lock_outline,
+                        color: Colors.orange,
+                        size: 20,
+                      ),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
@@ -230,7 +230,10 @@ class _CompanyJobDetailsScreenState extends State<CompanyJobDetailsScreen> {
                                   children: [
                                     Text(
                                       b.title,
-                                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                      ),
                                     ),
                                     if (b.description.isNotEmpty) ...[
                                       const SizedBox(height: 2),
@@ -238,7 +241,10 @@ class _CompanyJobDetailsScreenState extends State<CompanyJobDetailsScreen> {
                                         b.description,
                                         style: TextStyle(
                                           fontSize: 12,
-                                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface
+                                              .withOpacity(0.6),
                                         ),
                                       ),
                                     ],
@@ -278,7 +284,9 @@ class _CompanyJobDetailsScreenState extends State<CompanyJobDetailsScreen> {
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [
-                            Theme.of(context).colorScheme.primary.withValues(alpha: 0.85),
+                            Theme.of(
+                              context,
+                            ).colorScheme.primary.withValues(alpha: 0.85),
                             Theme.of(context).colorScheme.primary,
                           ],
                           begin: Alignment.centerLeft,
@@ -292,7 +300,9 @@ class _CompanyJobDetailsScreenState extends State<CompanyJobDetailsScreen> {
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.35),
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.primary.withValues(alpha: 0.35),
                             blurRadius: 12,
                             offset: const Offset(0, 4),
                           ),
@@ -325,7 +335,9 @@ class _CompanyJobDetailsScreenState extends State<CompanyJobDetailsScreen> {
                             : const Icon(Icons.lock_open_outlined, size: 20),
                         label: Text(
                           _reopening
-                              ? (t.isAr ? 'جاري إعادة الفتح...' : 'Reopening...')
+                              ? (t.isAr
+                                    ? 'جاري إعادة الفتح...'
+                                    : 'Reopening...')
                               : (t.isAr ? 'إعادة فتح الوظيفة' : 'Reopen Job'),
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,

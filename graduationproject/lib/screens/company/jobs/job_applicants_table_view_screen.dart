@@ -161,6 +161,8 @@ class _CompanyJobApplicantsTableViewScreenState
                 education: app.education,
                 skills: app.skills,
                 hasCv: app.hasCv,
+                cvUrl: app.cvUrl,
+                cvFileName: app.cvFileName,
                 jobId: app.jobId,
               ),
             )

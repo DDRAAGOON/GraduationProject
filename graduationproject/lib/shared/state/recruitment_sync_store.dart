@@ -73,6 +73,8 @@ class RecruitmentApplication {
     this.education,
     this.skills = const [],
     this.hasCv = false,
+    this.cvUrl,
+    this.cvFileName,
     this.email,
     this.phone,
     this.location,
@@ -93,6 +95,8 @@ class RecruitmentApplication {
   final String? education;
   final List<String> skills;
   final bool hasCv;
+  final String? cvUrl;
+  final String? cvFileName;
   final String? email;
   final String? phone;
   final String? location;
@@ -114,6 +118,8 @@ class RecruitmentApplication {
       education: education,
       skills: skills,
       hasCv: hasCv,
+      cvUrl: cvUrl,
+      cvFileName: cvFileName,
       email: email,
       phone: phone,
       location: location,
@@ -289,8 +295,9 @@ class RecruitmentSyncStore extends ChangeNotifier {
         _filterType == 'All' &&
         _filterLocation == 'All' &&
         _filterClassification == 'All' &&
-        _filterSalaryRange == 'All')
+        _filterSalaryRange == 'All') {
       return _jobs;
+    }
     return _jobs.where((job) {
       final matchesQuery =
           _searchQuery.isEmpty ||
@@ -465,10 +472,20 @@ class RecruitmentSyncStore extends ChangeNotifier {
   }) {
     _jobs.clear();
     for (var item in jobs) {
+      final companyMap = item['company'] is Map
+          ? Map<String, dynamic>.from(item['company'] as Map)
+          : <String, dynamic>{};
       _jobs.add(
         RecruitmentJob(
           id: item['id']?.toString() ?? '',
-          companyId: item['companyId']?.toString() ?? '',
+          companyId:
+              item['companyId']?.toString() ??
+              item['company_id']?.toString() ??
+              item['ownerId']?.toString() ??
+              item['createdBy']?.toString() ??
+              companyMap['id']?.toString() ??
+              companyMap['_id']?.toString() ??
+              '',
           title: item['title']?.toString() ?? '',
           companyName: item['companyName']?.toString() ?? '',
           location: item['location']?.toString() ?? '',
@@ -505,6 +522,26 @@ class RecruitmentSyncStore extends ChangeNotifier {
           updatedAt:
               DateTime.tryParse(item['updatedAt']?.toString() ?? '') ??
               DateTime.now(),
+          gender: item['gender']?.toString(),
+          birthDate: item['birthDate']?.toString() ?? item['dob']?.toString(),
+          languages: item['languages'] is List
+              ? List<String>.from(item['languages'])
+              : const <String>[],
+          about: item['about']?.toString(),
+          experienceYears:
+              int.tryParse(item['experienceYears']?.toString() ?? '0') ?? 0,
+          education: item['education']?.toString(),
+          skills: item['skills'] is List
+              ? List<String>.from(item['skills'])
+              : const <String>[],
+          hasCv:
+              item['hasCv'] == true ||
+              (item['cvUrl']?.toString().trim().isNotEmpty ?? false),
+          cvUrl: item['cvUrl']?.toString(),
+          cvFileName: item['cvFileName']?.toString(),
+          email: item['email']?.toString(),
+          phone: item['phone']?.toString(),
+          location: item['location']?.toString(),
         ),
       );
     }
