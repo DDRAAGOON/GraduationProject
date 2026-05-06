@@ -17,7 +17,7 @@ class FindJobs extends StatefulWidget {
 
 class _FindJobsState extends State<FindJobs> {
   final TextEditingController _searchController = TextEditingController();
-  String _selectedLocation = "Cairo";
+  String _selectedLocation = "All";
 
   final List<String> _egyptGovernorates = [
     "Cairo", "Giza", "Alexandria", "Dakahlia", "Red Sea", "Beheira", "Fayoum", 
@@ -111,7 +111,8 @@ class _FindJobsState extends State<FindJobs> {
       body: SafeArea(
         child: Builder(
           builder: (context) {
-            final jobs = store.filteredJobs.where((j) => j.classification.toLowerCase() == 'tradesman' || j.classification.toLowerCase() == 'service').toList();
+            // Show all posted jobs (filters are handled by RecruitmentSyncStore).
+            final jobs = store.filteredJobs.toList();
             return SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 10),
               child: Column(

@@ -1,0 +1,951 @@
+Index: graduationproject/lib/screens/company/profile/profile_settings_overview_screen.dart
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>// Profile settings hub for the company account.\r\n\r\nimport 'dart:convert';\r\n\r\nimport 'package:flutter/material.dart';\r\nimport 'package:image_picker/image_picker.dart';\r\n\r\nimport '../../../shared/utils/image_helper.dart';\r\n\r\nimport '../../../app/router/app_router.dart';\r\nimport '../../../shared/l10n/app_localizations.dart';\r\nimport '../../../shared/state/company_store.dart';\r\nimport '../../../shared/state/locale_controller.dart';\r\nimport '../../../shared/widgets/app_button.dart';\r\nimport '../../../shared/widgets/app_scaffold.dart';\r\nimport '../../../shared/widgets/app_text_field.dart';\r\nimport '../../../shared/services/session_manager.dart';\r\nimport '../../../shared/services/recruitment_sync_service.dart';\r\n\r\nclass CompanyProfileSettingsOverviewScreen extends StatefulWidget {\r\n  const CompanyProfileSettingsOverviewScreen({super.key});\r\n\r\n  @override\r\n  State<CompanyProfileSettingsOverviewScreen> createState() =>\r\n      _CompanyProfileSettingsOverviewScreenState();\r\n}\r\n\r\nclass _CompanyProfileSettingsOverviewScreenState\r\n    extends State<CompanyProfileSettingsOverviewScreen> {\r\n  late final TextEditingController _companyName;\r\n  late final TextEditingController _employee;\r\n  late final TextEditingController _about;\r\n  late String _selectedCategory;\r\n  late List<String> _benefits;\r\n  \r\n  late List<String> _locations;\r\n  late List<String> _techStack;\r\n\r\n  late int _selectedDay;\r\n  late int _selectedMonth;\r\n  late int _selectedYear;\r\n  bool _loading = false;\r\n\r\n  @override\r\n  void initState() {\r\n    super.initState();\r\n    final store = CompanyStore.instance;\r\n    final isAr = LocaleController.instance.locale.value.languageCode == 'ar';\r\n    _companyName = TextEditingController(text: store.companyName);\r\n    _employee = TextEditingController(text: store.employee);\r\n    _about = TextEditingController(text: isAr ? store.companyAboutAr : store.companyAboutEn);\r\n    _benefits = List.from(store.benefits);\r\n    \r\n    _selectedCategory = store.category;\r\n    if (_selectedCategory != 'technical' && _selectedCategory != 'nontechnical') {\r\n      _selectedCategory = 'technical';\r\n    }\r\n    _locations = List.from(store.locations);\r\n    _techStack = List.from(store.techStack);\r\n    _selectedDay = store.foundedDay;\r\n    _selectedMonth = store.foundedMonth;\r\n    _selectedYear = store.foundedYear;\r\n  }\r\n\r\n  @override\r\n  void dispose() {\r\n    _companyName.dispose();\r\n    _employee.dispose();\r\n    _about.dispose();\r\n    super.dispose();\r\n  }\r\n\r\n  Future<void> _save() async {\r\n    final t = AppLocalizations.of(context);\r\n    setState(() => _loading = true);\r\n    await Future<void>.delayed(const Duration(milliseconds: 600));\r\n    if (!mounted) return;\r\n    \r\n    final store = CompanyStore.instance;\r\n    final isAr = LocaleController.instance.locale.value.languageCode == 'ar';\r\n    \r\n    CompanyStore.instance.updateProfile(\r\n      name: _companyName.text,\r\n      website: store.website,\r\n      employee: _employee.text,\r\n      industry: store.industry,\r\n      aboutEn: isAr ? store.companyAboutEn : _about.text,\r\n      aboutAr: isAr ? _about.text : store.companyAboutAr,\r\n      locations: _locations,\r\n      techStack: _techStack,\r\n      foundedDay: _selectedDay,\r\n      foundedMonth: _selectedMonth,\r\n      foundedYear: _selectedYear,\r\n      commercialRegister: store.commercialRegister,\r\n      nationalNumber: store.nationalNumber,\r\n      benefits: _benefits,\r\n      category: _selectedCategory,\r\n    );\r\n\r\n    // Persist company name change\r\n    final data = await SessionManager.getCompanyData();\r\n    await SessionManager.saveCompanySession(\r\n      email: data['email'] ?? '',\r\n      name: _companyName.text,\r\n      photoPath: store.companyProfileImage,\r\n    );\r\n\r\n    // Sync with backend\r\n    await RecruitmentSyncService.instance.updateProfile(\r\n      name: _companyName.text,\r\n      // Backend only supports name and photoUrl for now\r\n    );\r\n\r\n    if (!mounted) return;\r\n\r\n    setState(() => _loading = false);\r\n    ScaffoldMessenger.of(\r\n      context,\r\n    ).showSnackBar(SnackBar(content: Text(t.saved)));\r\n  }\r\n\r\n  Future<void> _addTagDialog(String title, List<String> targetList) async {\r\n    final t = AppLocalizations.of(context);\r\n    final controller = TextEditingController();\r\n    final newTag = await showDialog<String>(\r\n      context: context,\r\n      builder: (ctx) => AlertDialog(\r\n        title: Text(title),\r\n        content: TextField(\r\n          controller: controller,\r\n          decoration: InputDecoration(\r\n            hintText: t.tr(en: 'Enter value', ar: 'أدخل القيمة'),\r\n            border: const OutlineInputBorder(),\r\n          ),\r\n          autofocus: true,\r\n          onSubmitted: (val) => Navigator.of(ctx).pop(val),\r\n        ),\r\n        actions: [\r\n          TextButton(\r\n            onPressed: () => Navigator.of(ctx).pop(),\r\n            child: Text(t.cancel),\r\n          ),\r\n          FilledButton(\r\n            onPressed: () => Navigator.of(ctx).pop(controller.text),\r\n            child: Text(t.save),\r\n          ),\r\n        ],\r\n      ),\r\n    );\r\n    if (newTag != null && newTag.trim().isNotEmpty) {\r\n      setState(() => targetList.add(newTag.trim()));\r\n    }\r\n  }\r\n\r\n  Widget _buildChipField(String label, List<String> items, VoidCallback onAdd) {\r\n    final t = AppLocalizations.of(context);\r\n    return Column(\r\n      crossAxisAlignment: CrossAxisAlignment.start,\r\n      children: [\r\n        Text(label, style: Theme.of(context).textTheme.labelLarge),\r\n        const SizedBox(height: 8),\r\n        Container(\r\n          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),\r\n          width: double.infinity,\r\n          constraints: const BoxConstraints(minHeight: 56),\r\n          decoration: BoxDecoration(\r\n            border: Border.all(\r\n                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2)),\r\n            borderRadius: BorderRadius.circular(12),\r\n          ),\r\n          child: Wrap(\r\n            spacing: 8,\r\n            runSpacing: 8,\r\n            crossAxisAlignment: WrapCrossAlignment.center,\r\n            children: [\r\n              ...items.map(\r\n                (item) => Chip(\r\n                  label: Text(item, style: const TextStyle(fontSize: 12)),\r\n                  onDeleted: () {\r\n                    setState(() => items.remove(item));\r\n                  },\r\n                  visualDensity: VisualDensity.compact,\r\n                  deleteIcon: const Icon(Icons.close, size: 16),\r\n                ),\r\n              ),\r\n              ActionChip(\r\n                label: Text(t.tr(en: '+ Add', ar: '+ إضافة'), style: const TextStyle(fontSize: 12)),\r\n                onPressed: onAdd,\r\n                visualDensity: VisualDensity.compact,\r\n                backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),\r\n                side: BorderSide.none,\r\n              ),\r\n            ],\r\n          ),\r\n        ),\r\n      ],\r\n    );\r\n  }\r\n\r\n  @override\r\n  Widget build(BuildContext context) {\r\n    final t = AppLocalizations.of(context);\r\n    \r\n    // Month abbreviations\r\n    final months = [\r\n      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',\r\n      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'\r\n    ];\r\n\r\n    return AppScaffold(\r\n      title: t.profileSettings,\r\n      showBack: false,\r\n      actions: [\r\n        TextButton(\r\n          onPressed: () => Navigator.of(\r\n            context,\r\n          ).pushNamed(AppRoutes.companyProfileSocialLinks),\r\n          child: Text(t.socialLinks),\r\n        ),\r\n      ],\r\n      body: ListView(\r\n        padding: const EdgeInsets.all(16),\r\n        children: [\r\n          Text(\r\n            t.overviewSection,\r\n            style: Theme.of(\r\n              context,\r\n            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900),\r\n          ),\r\n          const SizedBox(height: 16),\r\n          Text(t.companyLogo, style: Theme.of(context).textTheme.titleSmall),\r\n          const SizedBox(height: 10),\r\n          Card(\r\n            child: Padding(\r\n              padding: const EdgeInsets.all(14),\r\n              child: Row(\r\n                children: [\r\n                  AnimatedBuilder(\r\n                    animation: CompanyStore.instance,\r\n                    builder: (context, _) {\r\n                      final profileImage = CompanyStore.instance.companyProfileImage;\r\n                      final imageProvider = getAppImageProvider(profileImage);\r\n                      \r\n                      return ClipOval(\r\n                        child: imageProvider == null\r\n                            ? Container(\r\n                                width: 44,\r\n                                height: 44,\r\n                                color: Theme.of(context).colorScheme.surfaceBright,\r\n                                child: Icon(\r\n                                  Icons.business,\r\n                                  color: Theme.of(context).colorScheme.primary,\r\n                                  size: 24,\r\n                                ),\r\n                              )\r\n                            : Image(\r\n                                image: imageProvider,\r\n                                width: 44,\r\n                                height: 44,\r\n                                fit: BoxFit.cover,\r\n                              ),\r\n                      );\r\n                    },\r\n                  ),\r\n                  const SizedBox(width: 12),\r\n                  Expanded(\r\n                    child: Text(\r\n                      t.logoHint,\r\n                      style: Theme.of(context).textTheme.bodySmall,\r\n                    ),\r\n                  ),\r\n                  OutlinedButton(\r\n                    onPressed: () async {\r\n                      final picker = ImagePicker();\r\n                      final pickedFile = await picker.pickImage(\r\n                        source: ImageSource.gallery,\r\n                        imageQuality: 50,\r\n                        maxWidth: 500,\r\n                        maxHeight: 500,\r\n                      );\r\n                      if (pickedFile != null) {\r\n                        try {\r\n                          final bytes = await pickedFile.readAsBytes();\r\n                          final base64Image = 'data:image/jpeg;base64,${base64Encode(bytes)}';\r\n                          \r\n                          // Save locally for immediate feedback\r\n                          CompanyStore.instance.setRegistrationData(customProfileImage: base64Image);\r\n                          \r\n                          // Sync with backend and update session automatically\r\n                          await RecruitmentSyncService.instance.updateProfile(photoUrl: base64Image);\r\n                        } catch (e) {\r\n                          ScaffoldMessenger.of(context).showSnackBar(\r\n                            SnackBar(content: Text(t.tr(en: 'Failed to upload image', ar: 'فشل رفع الصورة'))),\r\n                          );\r\n                        }\r\n                      }\r\n                    }, \r\n                    child: Text(t.upload),\r\n                  ),\r\n                ],\r\n              ),\r\n            ),\r\n          ),\r\n          const SizedBox(height: 16),\r\n          AppTextField(label: t.companyName, controller: _companyName),\r\n          const SizedBox(height: 16),\r\n          AppTextField(label: t.employee, controller: _employee),\r\n          const SizedBox(height: 16),\r\n          Text(t.categoryLabel, style: Theme.of(context).textTheme.labelLarge),\r\n          const SizedBox(height: 8),\r\n          _buildDropdown<String>(\r\n            value: _selectedCategory,\r\n            items: const ['technical', 'nontechnical'],\r\n            labelBuilder: (v) => v == 'technical' ? t.technical : t.nonTechnical,\r\n            onChanged: (v) => setState(() => _selectedCategory = v!),\r\n          ),\r\n          const SizedBox(height: 16),\r\n          _buildChipField(t.locationInfo, _locations, () => _addTagDialog(t.locationInfo, _locations)),\r\n          const SizedBox(height: 16),\r\n\r\n          Text(t.dateFounded, style: Theme.of(context).textTheme.labelLarge),\r\n          const SizedBox(height: 8),\r\n          Row(\r\n            children: [\r\n              Expanded(\r\n                flex: 1,\r\n                child: _buildDropdown<int>(\r\n                  value: _selectedDay,\r\n                  items: _selectedDay == 0 \r\n                      ? [0, ...List.generate(31, (i) => i + 1)] \r\n                      : List.generate(31, (i) => i + 1),\r\n                  labelBuilder: (v) => v == 0 ? (t.isAr ? 'اليوم' : 'Day') : t.tr(\r\n                    en: v.toString(), \r\n                    ar: v.toString().replaceAll('0', '٠').replaceAll('1', '١').replaceAll('2', '٢').replaceAll('3', '٣').replaceAll('4', '٤').replaceAll('5', '٥').replaceAll('6', '٦').replaceAll('7', '٧').replaceAll('8', '٨').replaceAll('9', '٩')\r\n                  ),\r\n                  onChanged: (v) => setState(() => _selectedDay = v!),\r\n                ),\r\n              ),\r\n              const SizedBox(width: 12),\r\n              Expanded(\r\n                flex: 1,\r\n                child: _buildDropdown<int>(\r\n                  value: _selectedMonth,\r\n                  items: _selectedMonth == 0 \r\n                      ? [0, ...List.generate(12, (i) => i + 1)] \r\n                      : List.generate(12, (i) => i + 1),\r\n                  labelBuilder: (v) {\r\n                    if (v == 0) return t.isAr ? 'الشهر' : 'Month';\r\n                    return t.isAr ? [\r\n                      'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',\r\n                      'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'\r\n                    ][v - 1] : months[v - 1];\r\n                  },\r\n                  onChanged: (v) => setState(() => _selectedMonth = v!),\r\n                ),\r\n              ),\r\n              const SizedBox(width: 12),\r\n              Expanded(\r\n                flex: 1,\r\n                child: _buildDropdown<int>(\r\n                  value: _selectedYear,\r\n                  items: _selectedYear == 0 \r\n                      ? [0, ...List.generate(50, (i) => 2024 - i)] \r\n                      : List.generate(50, (i) => 2024 - i),\r\n                  labelBuilder: (v) => v == 0 ? (t.isAr ? 'السنة' : 'Year') : t.tr(\r\n                    en: v.toString(), \r\n                    ar: v.toString().replaceAll('0', '٠').replaceAll('1', '١').replaceAll('2', '٢').replaceAll('3', '٣').replaceAll('4', '٤').replaceAll('5', '٥').replaceAll('6', '٦').replaceAll('7', '٧').replaceAll('8', '٨').replaceAll('9', '٩')\r\n                  ),\r\n                  onChanged: (v) => setState(() => _selectedYear = v!),\r\n                ),\r\n              ),\r\n            ],\r\n          ),\r\n          \r\n          const SizedBox(height: 16),\r\n          AppTextField(label: t.aboutCompany, controller: _about, maxLines: 4),\r\n          const SizedBox(height: 16),\r\n          _buildChipField(t.benefits, _benefits, () => _addTagDialog(t.benefits, _benefits)),\r\n          const SizedBox(height: 18),\r\n          AppButton(label: t.saveChange, loading: _loading, onPressed: _save),\r\n          const SizedBox(height: 10),\r\n          TextButton(\r\n            onPressed: () => Navigator.of(\r\n              context,\r\n            ).pushNamed(AppRoutes.companyCompanyProfile),\r\n            child: Text(t.previewProfile),\r\n          ),\r\n        ],\r\n      ),\r\n    );\r\n  }\r\n\r\n  Widget _buildDropdown<T>({\r\n    required T value,\r\n    required List<T> items,\r\n    required String Function(T) labelBuilder,\r\n    required ValueChanged<T?> onChanged,\r\n  }) {\r\n    return Container(\r\n      padding: const EdgeInsets.symmetric(horizontal: 12),\r\n      decoration: BoxDecoration(\r\n        border: Border.all(\r\n            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2)),\r\n        borderRadius: BorderRadius.circular(12),\r\n      ),\r\n      child: DropdownButtonHideUnderline(\r\n        child: DropdownButton<T>(\r\n          value: value,\r\n          isExpanded: true,\r\n          items: items.map((e) {\r\n            return DropdownMenuItem<T>(\r\n              value: e,\r\n              child: Text(labelBuilder(e)),\r\n            );\r\n          }).toList(),\r\n          onChanged: onChanged,\r\n        ),\r\n      ),\r\n    );\r\n  }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/graduationproject/lib/screens/company/profile/profile_settings_overview_screen.dart b/graduationproject/lib/screens/company/profile/profile_settings_overview_screen.dart
+--- a/graduationproject/lib/screens/company/profile/profile_settings_overview_screen.dart	(revision 9a2095cfa431944a01862decd89cfba0f0ab2aab)
++++ b/graduationproject/lib/screens/company/profile/profile_settings_overview_screen.dart	(date 1777751128784)
+@@ -7,7 +7,6 @@
+ 
+ import '../../../shared/utils/image_helper.dart';
+ 
+-import '../../../app/router/app_router.dart';
+ import '../../../shared/l10n/app_localizations.dart';
+ import '../../../shared/state/company_store.dart';
+ import '../../../shared/state/locale_controller.dart';
+@@ -17,6 +16,8 @@
+ import '../../../shared/services/session_manager.dart';
+ import '../../../shared/services/recruitment_sync_service.dart';
+ 
++import '../../../app/router/app_router.dart';
++
+ class CompanyProfileSettingsOverviewScreen extends StatefulWidget {
+   const CompanyProfileSettingsOverviewScreen({super.key});
+ 
+@@ -26,7 +27,9 @@
+ }
+ 
+ class _CompanyProfileSettingsOverviewScreenState
+-    extends State<CompanyProfileSettingsOverviewScreen> {
++    extends State<CompanyProfileSettingsOverviewScreen>
++    with SingleTickerProviderStateMixin {
++  late final TabController _tabController;
+   late final TextEditingController _companyName;
+   late final TextEditingController _employee;
+   late final TextEditingController _about;
+@@ -40,10 +43,13 @@
+   late int _selectedMonth;
+   late int _selectedYear;
+   bool _loading = false;
++  bool _saveSuccess = false;
++  bool _saveError = false;
+ 
+   @override
+   void initState() {
+     super.initState();
++    _tabController = TabController(length: 3, vsync: this);
+     final store = CompanyStore.instance;
+     final isAr = LocaleController.instance.locale.value.languageCode == 'ar';
+     _companyName = TextEditingController(text: store.companyName);
+@@ -64,6 +70,7 @@
+ 
+   @override
+   void dispose() {
++    _tabController.dispose();
+     _companyName.dispose();
+     _employee.dispose();
+     _about.dispose();
+@@ -72,323 +79,365 @@
+ 
+   Future<void> _save() async {
+     final t = AppLocalizations.of(context);
+-    setState(() => _loading = true);
+-    await Future<void>.delayed(const Duration(milliseconds: 600));
+-    if (!mounted) return;
++    final messenger = ScaffoldMessenger.of(context);
+     
+-    final store = CompanyStore.instance;
+-    final isAr = LocaleController.instance.locale.value.languageCode == 'ar';
+-    
+-    CompanyStore.instance.updateProfile(
+-      name: _companyName.text,
+-      website: store.website,
+-      employee: _employee.text,
+-      industry: store.industry,
+-      aboutEn: isAr ? store.companyAboutEn : _about.text,
+-      aboutAr: isAr ? _about.text : store.companyAboutAr,
+-      locations: _locations,
+-      techStack: _techStack,
+-      foundedDay: _selectedDay,
+-      foundedMonth: _selectedMonth,
+-      foundedYear: _selectedYear,
+-      commercialRegister: store.commercialRegister,
+-      nationalNumber: store.nationalNumber,
+-      benefits: _benefits,
+-      category: _selectedCategory,
+-    );
+-
+-    // Persist company name change
+-    final data = await SessionManager.getCompanyData();
+-    await SessionManager.saveCompanySession(
+-      email: data['email'] ?? '',
+-      name: _companyName.text,
+-      photoPath: store.companyProfileImage,
+-    );
++    // Validate
++    if (_companyName.text.trim().isEmpty) {
++      messenger.showSnackBar(
++        SnackBar(content: Text(t.tr(en: 'Company name is required', ar: 'اسم الشركة مطلوب')))
++      );
++      return;
++    }
++
++    setState(() {
++      _loading = true;
++      _saveSuccess = false;
++      _saveError = false;
++    });
++
++    try {
++      final store = CompanyStore.instance;
++      final isAr = LocaleController.instance.locale.value.languageCode == 'ar';
++      
++      // Sync with backend first to ensure persistence
++      await RecruitmentSyncService.instance.updateProfile(
++        name: _companyName.text.trim(),
++      );
++
++      // Local persistence
++      CompanyStore.instance.updateProfile(
++        name: _companyName.text.trim(),
++        website: store.website,
++        employee: _employee.text.trim(),
++        industry: store.industry,
++        aboutEn: isAr ? store.companyAboutEn : _about.text.trim(),
++        aboutAr: isAr ? _about.text.trim() : store.companyAboutAr,
++        locations: _locations,
++        techStack: _techStack,
++        foundedDay: _selectedDay,
++        foundedMonth: _selectedMonth,
++        foundedYear: _selectedYear,
++        benefits: _benefits,
++        category: _selectedCategory,
++        commercialRegister: store.commercialRegister,
++        nationalNumber: store.nationalNumber,
++      );
++
++      await SessionManager.saveCompanyFullProfile(
++        employee: _employee.text.trim(),
++        industry: store.industry,
++        aboutEn: isAr ? store.companyAboutEn : _about.text.trim(),
++        aboutAr: isAr ? _about.text.trim() : store.companyAboutAr,
++        locations: _locations,
++        techStack: _techStack,
++        foundedDay: _selectedDay,
++        foundedMonth: _selectedMonth,
++        foundedYear: _selectedYear,
++        category: _selectedCategory,
++        benefits: _benefits,
++        commercialRegister: store.commercialRegister,
++        nationalNumber: store.nationalNumber,
++      );
+ 
+-    // Sync with backend
+-    await RecruitmentSyncService.instance.updateProfile(
+-      name: _companyName.text,
+-      // Backend only supports name and photoUrl for now
+-    );
+-
+-    if (!mounted) return;
+-
+-    setState(() => _loading = false);
+-    ScaffoldMessenger.of(
+-      context,
+-    ).showSnackBar(SnackBar(content: Text(t.saved)));
++      if (!mounted) return;
++      setState(() => _saveSuccess = true);
++      messenger.showSnackBar(
++        SnackBar(
++          content: Text(t.saved),
++          backgroundColor: Colors.green,
++          behavior: SnackBarBehavior.floating,
++        )
++      );
++    } catch (e) {
++      if (!mounted) return;
++      setState(() => _saveError = true);
++      messenger.showSnackBar(
++        SnackBar(
++          content: Text(t.tr(en: 'Save failed. Please try again.', ar: 'فشل الحفظ. يرجى المحاولة مرة أخرى.')),
++          backgroundColor: Theme.of(context).colorScheme.error,
++          behavior: SnackBarBehavior.floating,
++        ),
++      );
++    } finally {
++      if (mounted) {
++        setState(() => _loading = false);
++      }
++    }
+   }
+ 
+-  Future<void> _addTagDialog(String title, List<String> targetList) async {
++  @override
++  Widget build(BuildContext context) {
+     final t = AppLocalizations.of(context);
+-    final controller = TextEditingController();
+-    final newTag = await showDialog<String>(
+-      context: context,
+-      builder: (ctx) => AlertDialog(
+-        title: Text(title),
+-        content: TextField(
+-          controller: controller,
+-          decoration: InputDecoration(
+-            hintText: t.tr(en: 'Enter value', ar: 'أدخل القيمة'),
+-            border: const OutlineInputBorder(),
+-          ),
+-          autofocus: true,
+-          onSubmitted: (val) => Navigator.of(ctx).pop(val),
+-        ),
+-        actions: [
+-          TextButton(
+-            onPressed: () => Navigator.of(ctx).pop(),
+-            child: Text(t.cancel),
+-          ),
+-          FilledButton(
+-            onPressed: () => Navigator.of(ctx).pop(controller.text),
+-            child: Text(t.save),
+-          ),
+-        ],
+-      ),
+-    );
+-    if (newTag != null && newTag.trim().isNotEmpty) {
+-      setState(() => targetList.add(newTag.trim()));
+-    }
+-  }
+-
+-  Widget _buildChipField(String label, List<String> items, VoidCallback onAdd) {
+-    final t = AppLocalizations.of(context);
+-    return Column(
+-      crossAxisAlignment: CrossAxisAlignment.start,
+-      children: [
+-        Text(label, style: Theme.of(context).textTheme.labelLarge),
+-        const SizedBox(height: 8),
+-        Container(
+-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+-          width: double.infinity,
+-          constraints: const BoxConstraints(minHeight: 56),
+-          decoration: BoxDecoration(
+-            border: Border.all(
+-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2)),
+-            borderRadius: BorderRadius.circular(12),
++    
++    return AppScaffold(
++      title: t.profileSettings,
++      showBack: true,
++      body: Column(
++        children: [
++          TabBar(
++            controller: _tabController,
++            onTap: (index) {
++              if (index == 1) {
++                _tabController.index = 0; // Reset to profile tab for next time
++                Navigator.of(context).pushNamed(AppRoutes.companyAccountSecurity);
++              } else if (index == 2) {
++                _tabController.index = 0; // Reset to profile tab for next time
++                Navigator.of(context).pushNamed(AppRoutes.companyAppearanceLight);
++              }
++            },
++            labelColor: Theme.of(context).colorScheme.primary,
++            unselectedLabelColor: Colors.grey,
++            indicatorColor: Theme.of(context).colorScheme.primary,
++            indicatorWeight: 3,
++            labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
++            tabs: [
++              Tab(text: t.profileSettings),
++              Tab(text: t.accountSecurity),
++              Tab(text: t.tr(en: "Appearance", ar: "المظهر")),
++            ],
+           ),
+-          child: Wrap(
+-            spacing: 8,
+-            runSpacing: 8,
+-            crossAxisAlignment: WrapCrossAlignment.center,
+-            children: [
+-              ...items.map(
+-                (item) => Chip(
+-                  label: Text(item, style: const TextStyle(fontSize: 12)),
+-                  onDeleted: () {
+-                    setState(() => items.remove(item));
+-                  },
+-                  visualDensity: VisualDensity.compact,
+-                  deleteIcon: const Icon(Icons.close, size: 16),
+-                ),
+-              ),
+-              ActionChip(
+-                label: Text(t.tr(en: '+ Add', ar: '+ إضافة'), style: const TextStyle(fontSize: 12)),
+-                onPressed: onAdd,
+-                visualDensity: VisualDensity.compact,
+-                backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+-                side: BorderSide.none,
+-              ),
+-            ],
+-          ),
+-        ),
+-      ],
++          Expanded(
++            child: TabBarView(
++              controller: _tabController,
++              physics: const NeverScrollableScrollPhysics(),
++              children: [
++                _buildProfileTab(),
++                const Center(child: CircularProgressIndicator()),
++                const Center(child: CircularProgressIndicator()),
++              ],
++            ),
++          ),
++        ],
++      ),
+     );
+   }
+ 
+-  @override
+-  Widget build(BuildContext context) {
++  Widget _buildProfileTab() {
+     final t = AppLocalizations.of(context);
+-    
+-    // Month abbreviations
+     final months = [
+       'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+       'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+     ];
+ 
+-    return AppScaffold(
+-      title: t.profileSettings,
+-      showBack: false,
+-      actions: [
+-        TextButton(
+-          onPressed: () => Navigator.of(
+-            context,
+-          ).pushNamed(AppRoutes.companyProfileSocialLinks),
+-          child: Text(t.socialLinks),
+-        ),
+-      ],
+-      body: ListView(
+-        padding: const EdgeInsets.all(16),
+-        children: [
+-          Text(
+-            t.overviewSection,
+-            style: Theme.of(
+-              context,
+-            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900),
+-          ),
+-          const SizedBox(height: 16),
+-          Text(t.companyLogo, style: Theme.of(context).textTheme.titleSmall),
+-          const SizedBox(height: 10),
+-          Card(
+-            child: Padding(
+-              padding: const EdgeInsets.all(14),
+-              child: Row(
+-                children: [
+-                  AnimatedBuilder(
+-                    animation: CompanyStore.instance,
+-                    builder: (context, _) {
+-                      final profileImage = CompanyStore.instance.companyProfileImage;
+-                      final imageProvider = getAppImageProvider(profileImage);
+-                      
+-                      return ClipOval(
+-                        child: imageProvider == null
+-                            ? Container(
+-                                width: 44,
+-                                height: 44,
+-                                color: Theme.of(context).colorScheme.surfaceBright,
+-                                child: Icon(
+-                                  Icons.business,
+-                                  color: Theme.of(context).colorScheme.primary,
+-                                  size: 24,
+-                                ),
+-                              )
+-                            : Image(
+-                                image: imageProvider,
+-                                width: 44,
+-                                height: 44,
+-                                fit: BoxFit.cover,
+-                              ),
+-                      );
+-                    },
+-                  ),
+-                  const SizedBox(width: 12),
+-                  Expanded(
+-                    child: Text(
+-                      t.logoHint,
+-                      style: Theme.of(context).textTheme.bodySmall,
+-                    ),
+-                  ),
+-                  OutlinedButton(
+-                    onPressed: () async {
+-                      final picker = ImagePicker();
+-                      final pickedFile = await picker.pickImage(
+-                        source: ImageSource.gallery,
+-                        imageQuality: 50,
+-                        maxWidth: 500,
+-                        maxHeight: 500,
+-                      );
+-                      if (pickedFile != null) {
+-                        try {
+-                          final bytes = await pickedFile.readAsBytes();
+-                          final base64Image = 'data:image/jpeg;base64,${base64Encode(bytes)}';
+-                          
+-                          // Save locally for immediate feedback
+-                          CompanyStore.instance.setRegistrationData(customProfileImage: base64Image);
+-                          
+-                          // Sync with backend and update session automatically
+-                          await RecruitmentSyncService.instance.updateProfile(photoUrl: base64Image);
+-                        } catch (e) {
+-                          ScaffoldMessenger.of(context).showSnackBar(
+-                            SnackBar(content: Text(t.tr(en: 'Failed to upload image', ar: 'فشل رفع الصورة'))),
+-                          );
+-                        }
+-                      }
+-                    }, 
+-                    child: Text(t.upload),
+-                  ),
+-                ],
+-              ),
+-            ),
+-          ),
+-          const SizedBox(height: 16),
+-          AppTextField(label: t.companyName, controller: _companyName),
+-          const SizedBox(height: 16),
+-          AppTextField(label: t.employee, controller: _employee),
+-          const SizedBox(height: 16),
+-          Text(t.categoryLabel, style: Theme.of(context).textTheme.labelLarge),
+-          const SizedBox(height: 8),
+-          _buildDropdown<String>(
+-            value: _selectedCategory,
+-            items: const ['technical', 'nontechnical'],
+-            labelBuilder: (v) => v == 'technical' ? t.technical : t.nonTechnical,
+-            onChanged: (v) => setState(() => _selectedCategory = v!),
+-          ),
+-          const SizedBox(height: 16),
+-          _buildChipField(t.locationInfo, _locations, () => _addTagDialog(t.locationInfo, _locations)),
+-          const SizedBox(height: 16),
++    return ListView(
++      padding: const EdgeInsets.all(24),
++      children: [
++        _buildProfileHeader(),
++        const SizedBox(height: 30),
++        
++        Text(t.tr(en: "Basic Information", ar: "معلومات أساسية"), 
++          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
++        const SizedBox(height: 8),
++        Text(t.tr(en: "Update your company identity and contact details.", ar: "قم بتحديث هوية شركتك وتفاصيل الاتصال."), 
++          style: TextStyle(color: Colors.grey.shade600, fontSize: 13)),
++        const Divider(height: 40),
++
++        AppTextField(
++          label: t.companyName, 
++          controller: _companyName,
++          validatorText: _saveError && _companyName.text.isEmpty ? 'Required' : null,
++        ),
++        const SizedBox(height: 20),
++        AppTextField(label: t.employee, controller: _employee),
++        const SizedBox(height: 20),
++        
++        Text(t.categoryLabel, style: Theme.of(context).textTheme.labelLarge),
++        const SizedBox(height: 8),
++        _buildDropdown<String>(
++          value: _selectedCategory,
++          items: const ['technical', 'nontechnical'],
++          labelBuilder: (v) => v == 'technical' ? t.technical : t.nonTechnical,
++          onChanged: (v) => setState(() => _selectedCategory = v!),
++        ),
++        const SizedBox(height: 20),
++        
++        _buildChipField(t.locationInfo, _locations, () => _addTagDialog(t.locationInfo, _locations)),
++        const SizedBox(height: 20),
+ 
+-          Text(t.dateFounded, style: Theme.of(context).textTheme.labelLarge),
+-          const SizedBox(height: 8),
+-          Row(
+-            children: [
+-              Expanded(
+-                flex: 1,
+-                child: _buildDropdown<int>(
+-                  value: _selectedDay,
+-                  items: _selectedDay == 0 
+-                      ? [0, ...List.generate(31, (i) => i + 1)] 
+-                      : List.generate(31, (i) => i + 1),
+-                  labelBuilder: (v) => v == 0 ? (t.isAr ? 'اليوم' : 'Day') : t.tr(
+-                    en: v.toString(), 
+-                    ar: v.toString().replaceAll('0', '٠').replaceAll('1', '١').replaceAll('2', '٢').replaceAll('3', '٣').replaceAll('4', '٤').replaceAll('5', '٥').replaceAll('6', '٦').replaceAll('7', '٧').replaceAll('8', '٨').replaceAll('9', '٩')
+-                  ),
+-                  onChanged: (v) => setState(() => _selectedDay = v!),
+-                ),
+-              ),
+-              const SizedBox(width: 12),
+-              Expanded(
+-                flex: 1,
+-                child: _buildDropdown<int>(
+-                  value: _selectedMonth,
+-                  items: _selectedMonth == 0 
+-                      ? [0, ...List.generate(12, (i) => i + 1)] 
+-                      : List.generate(12, (i) => i + 1),
+-                  labelBuilder: (v) {
+-                    if (v == 0) return t.isAr ? 'الشهر' : 'Month';
+-                    return t.isAr ? [
+-                      'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
+-                      'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
+-                    ][v - 1] : months[v - 1];
+-                  },
+-                  onChanged: (v) => setState(() => _selectedMonth = v!),
+-                ),
+-              ),
+-              const SizedBox(width: 12),
+-              Expanded(
+-                flex: 1,
+-                child: _buildDropdown<int>(
+-                  value: _selectedYear,
+-                  items: _selectedYear == 0 
+-                      ? [0, ...List.generate(50, (i) => 2024 - i)] 
+-                      : List.generate(50, (i) => 2024 - i),
+-                  labelBuilder: (v) => v == 0 ? (t.isAr ? 'السنة' : 'Year') : t.tr(
+-                    en: v.toString(), 
+-                    ar: v.toString().replaceAll('0', '٠').replaceAll('1', '١').replaceAll('2', '٢').replaceAll('3', '٣').replaceAll('4', '٤').replaceAll('5', '٥').replaceAll('6', '٦').replaceAll('7', '٧').replaceAll('8', '٨').replaceAll('9', '٩')
+-                  ),
+-                  onChanged: (v) => setState(() => _selectedYear = v!),
+-                ),
+-              ),
+-            ],
+-          ),
+-          
+-          const SizedBox(height: 16),
+-          AppTextField(label: t.aboutCompany, controller: _about, maxLines: 4),
+-          const SizedBox(height: 16),
+-          _buildChipField(t.benefits, _benefits, () => _addTagDialog(t.benefits, _benefits)),
+-          const SizedBox(height: 18),
+-          AppButton(label: t.saveChange, loading: _loading, onPressed: _save),
+-          const SizedBox(height: 10),
+-          TextButton(
+-            onPressed: () => Navigator.of(
+-              context,
+-            ).pushNamed(AppRoutes.companyCompanyProfile),
+-            child: Text(t.previewProfile),
++        Text(t.dateFounded, style: Theme.of(context).textTheme.labelLarge),
++        const SizedBox(height: 8),
++        Row(
++          children: [
++            Expanded(child: _buildDropdown<int>(
++              value: _selectedDay,
++              items: List.generate(32, (i) => i),
++              labelBuilder: (v) => v == 0 ? (t.isAr ? 'اليوم' : 'Day') : v.toString(),
++              onChanged: (v) => setState(() => _selectedDay = v!),
++            )),
++            const SizedBox(width: 12),
++            Expanded(child: _buildDropdown<int>(
++              value: _selectedMonth,
++              items: List.generate(13, (i) => i),
++              labelBuilder: (v) => v == 0 ? (t.isAr ? 'الشهر' : 'Month') : (t.isAr ? ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'][v-1] : months[v-1]),
++              onChanged: (v) => setState(() => _selectedMonth = v!),
++            )),
++            const SizedBox(width: 12),
++            Expanded(child: _buildDropdown<int>(
++              value: _selectedYear,
++              items: [0, ...List.generate(50, (i) => 2024 - i)],
++              labelBuilder: (v) => v == 0 ? (t.isAr ? 'السنة' : 'Year') : v.toString(),
++              onChanged: (v) => setState(() => _selectedYear = v!),
++            )),
++          ],
++        ),
++        const SizedBox(height: 20),
++        
++        AppTextField(label: t.aboutCompany, controller: _about, maxLines: 4),
++        const SizedBox(height: 20),
++        _buildChipField(t.benefits, _benefits, () => _addTagDialog(t.benefits, _benefits)),
++        
++        const SizedBox(height: 40),
++        AppButton(
++          label: t.saveChange, 
++          loading: _loading, 
++          onPressed: _save,
++          icon: _saveSuccess ? Icons.check_circle : null,
++        ),
++        const SizedBox(height: 100),
++      ],
++    );
++  }
++
++  Widget _buildProfileHeader() {
++    return Center(
++      child: Stack(
++        children: [
++          AnimatedBuilder(
++            animation: CompanyStore.instance,
++            builder: (context, _) {
++              final profileImage = CompanyStore.instance.companyProfileImage;
++              final imageProvider = getAppImageProvider(profileImage);
++              return Container(
++                width: 100,
++                height: 100,
++                decoration: BoxDecoration(
++                  shape: BoxShape.circle,
++                  border: Border.all(
++                    color: _saveError ? Colors.red : (_saveSuccess ? Colors.green : Colors.blue.withValues(alpha: 0.2)),
++                    width: 3
++                  ),
++                  image: imageProvider != null ? DecorationImage(image: imageProvider, fit: BoxFit.cover) : null,
++                  color: Colors.grey.shade100,
++                ),
++                child: imageProvider == null ? const Icon(Icons.business, size: 40, color: Colors.grey) : null,
++              );
++            },
++          ),
++          Positioned(
++            bottom: 0,
++            right: 0,
++            child: GestureDetector(
++              onTap: _pickImage,
++              child: CircleAvatar(
++                radius: 18,
++                backgroundColor: Theme.of(context).colorScheme.primary,
++                child: const Icon(Icons.camera_alt, size: 18, color: Colors.white),
++              ),
++            ),
+           ),
++          if (_saveError)
++            const Positioned.fill(
++              child: Center(child: Icon(Icons.error, color: Colors.red, size: 40)),
++            ),
+         ],
+       ),
+     );
+   }
++
++  Future<void> _pickImage() async {
++    final t = AppLocalizations.of(context);
++    final messenger = ScaffoldMessenger.of(context);
++    final picker = ImagePicker();
++    try {
++      final pickedFile = await picker.pickImage(source: ImageSource.gallery, imageQuality: 50);
++      if (pickedFile != null) {
++        setState(() {
++          _loading = true;
++          _saveError = false;
++        });
++        
++        final bytes = await pickedFile.readAsBytes();
++        final base64Image = 'data:image/jpeg;base64,${base64Encode(bytes)}';
++        
++        // Update local store first for immediate feedback
++        CompanyStore.instance.setRegistrationData(customProfileImage: base64Image);
++        await SessionManager.saveCompanyPhoto(base64Image);
++        
++        // Sync with backend
++        await RecruitmentSyncService.instance.updateProfile(photoUrl: base64Image);
++        
++        if (mounted) {
++          setState(() {
++            _saveSuccess = true;
++          });
++          messenger.showSnackBar(
++            SnackBar(content: Text(t.saved), backgroundColor: Colors.green, behavior: SnackBarBehavior.floating)
++          );
++        }
++      }
++    } catch (e) {
++      if (mounted) {
++        setState(() {
++          _saveError = true;
++          _saveSuccess = false;
++        });
++        messenger.showSnackBar(
++          SnackBar(
++            content: Text(t.tr(en: 'Image upload failed', ar: 'فشل تحميل الصورة')),
++            backgroundColor: Colors.red,
++            behavior: SnackBarBehavior.floating
++          )
++        );
++      }
++    } finally {
++      if (mounted) setState(() => _loading = false);
++    }
++  }
++
++  Future<void> _addTagDialog(String title, List<String> targetList) async {
++    final controller = TextEditingController();
++    final newTag = await showDialog<String>(
++      context: context,
++      builder: (ctx) => AlertDialog(
++        title: Text(title),
++        content: TextField(controller: controller, autofocus: true),
++        actions: [
++          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
++          FilledButton(onPressed: () => Navigator.pop(ctx, controller.text), child: const Text('Add')),
++        ],
++      ),
++    );
++    if (newTag != null && newTag.trim().isNotEmpty) {
++      setState(() => targetList.add(newTag.trim()));
++    }
++  }
++
++  Widget _buildChipField(String label, List<String> items, VoidCallback onAdd) {
++    return Column(
++      crossAxisAlignment: CrossAxisAlignment.start,
++      children: [
++        Text(label, style: Theme.of(context).textTheme.labelLarge),
++        const SizedBox(height: 8),
++        Container(
++          padding: const EdgeInsets.all(8),
++          decoration: BoxDecoration(
++            border: Border.all(color: Colors.grey.shade300),
++            borderRadius: BorderRadius.circular(12),
++          ),
++          child: Wrap(
++            spacing: 8,
++            children: [
++              ...items.map((item) => Chip(
++                label: Text(item),
++                onDeleted: () => setState(() => items.remove(item)),
++              )),
++              ActionChip(label: const Text('+ Add'), onPressed: onAdd),
++            ],
++          ),
++        ),
++      ],
++    );
++  }
+ 
+   Widget _buildDropdown<T>({
+     required T value,
+@@ -399,20 +448,14 @@
+     return Container(
+       padding: const EdgeInsets.symmetric(horizontal: 12),
+       decoration: BoxDecoration(
+-        border: Border.all(
+-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2)),
++        border: Border.all(color: Colors.grey.shade300),
+         borderRadius: BorderRadius.circular(12),
+       ),
+       child: DropdownButtonHideUnderline(
+         child: DropdownButton<T>(
+           value: value,
+           isExpanded: true,
+-          items: items.map((e) {
+-            return DropdownMenuItem<T>(
+-              value: e,
+-              child: Text(labelBuilder(e)),
+-            );
+-          }).toList(),
++          items: items.map((e) => DropdownMenuItem(value: e, child: Text(labelBuilder(e)))).toList(),
+           onChanged: onChanged,
+         ),
+       ),
+Index: graduationproject/lib/screens/company/jobs/job_details_screen.dart
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>// Full job posting details and management actions.\r\n\r\nimport 'package:flutter/material.dart';\r\n\r\nimport '../../../app/router/app_router.dart';\r\nimport '../../../shared/l10n/app_localizations.dart';\r\nimport '../../../shared/mock/mock_data.dart';\r\nimport '../../../shared/models/job.dart';\r\nimport '../../../shared/state/company_store.dart';\r\nimport '../../../shared/widgets/app_button.dart';\r\nimport '../../../shared/widgets/app_scaffold.dart';\r\nimport '../../../shared/widgets/section_title.dart';\r\nimport '../widgets/company_bottom_nav.dart';\r\n\r\nclass CompanyJobDetailsScreen extends StatefulWidget {\r\n  const CompanyJobDetailsScreen({super.key, required this.job});\r\n\r\n  final Job job;\r\n\r\n  @override\r\n  State<CompanyJobDetailsScreen> createState() =>\r\n      _CompanyJobDetailsScreenState();\r\n}\r\n\r\nclass _CompanyJobDetailsScreenState extends State<CompanyJobDetailsScreen> {\r\n  Job get _job => CompanyStore.instance.jobById(widget.job.id);\r\n\r\n  @override\r\n  Widget build(BuildContext context) {\r\n    final t = AppLocalizations.of(context);\r\n    final job = _job;\r\n    return AppScaffold(\r\n      title: job.title,\r\n      showBack: true,\r\n      actions: [\r\n        IconButton(\r\n          onPressed: () => Navigator.of(\r\n            context,\r\n          ).pushNamed(AppRoutes.companyApplicantsTable, arguments: job),\r\n          icon: const Icon(Icons.groups_outlined),\r\n        ),\r\n        IconButton(\r\n          onPressed: () => Navigator.of(\r\n            context,\r\n          ).pushNamed(AppRoutes.companyJobAnalytics, arguments: job),\r\n          icon: const Icon(Icons.bar_chart_outlined),\r\n        ),\r\n      ],\r\n      body: Center(\r\n        child: ConstrainedBox(\r\n          constraints: const BoxConstraints(maxWidth: 980),\r\n          child: ListView(\r\n            padding: const EdgeInsets.all(16),\r\n            children: [\r\n              Text(\r\n                '${job.companyName} • ${job.employmentType}',\r\n                style: Theme.of(context).textTheme.bodyMedium?.copyWith(\r\n                  color: Theme.of(\r\n                    context,\r\n                  ).colorScheme.onSurface.withOpacity(0.7),\r\n                ),\r\n              ),\r\n              const SizedBox(height: 16),\r\n              SectionTitle(\r\n                t.descriptionSection,\r\n                trailing: IconButton(\r\n                  tooltip: t.edit,\r\n                  onPressed: () => _editJob(context, job),\r\n                  icon: const Icon(Icons.edit_outlined),\r\n                ),\r\n              ),\r\n              const SizedBox(height: 8),\r\n              Text(\r\n                job.description.isEmpty\r\n                    ? t.noDescriptionYet\r\n                    : job.description,\r\n                style: Theme.of(context).textTheme.bodyMedium,\r\n              ),\r\n              const SizedBox(height: 16),\r\n              SectionTitle(t.responsibilities),\r\n              const SizedBox(height: 10),\r\n              _Bullets(items: job.responsibilities),\r\n              const SizedBox(height: 16),\r\n              SectionTitle(t.niceToHavesSection),\r\n              const SizedBox(height: 10),\r\n              _Bullets(items: job.niceToHaves),\r\n              const SizedBox(height: 16),\r\n              SectionTitle(t.qualifications),\r\n              const SizedBox(height: 10),\r\n              _Bullets(items: job.qualifications),\r\n              const SizedBox(height: 16),\r\n              SectionTitle(t.benefits),\r\n              const SizedBox(height: 10),\r\n              if (job.benefits.isEmpty)\r\n                Text(t.notYet, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)))\r\n              else\r\n                Wrap(\r\n                  spacing: 8,\r\n                  runSpacing: 8,\r\n                  children: job.benefits.map((b) => Chip(\r\n                    label: Text(b.title),\r\n                    avatar: Icon(Icons.check_circle_outline, size: 16, color: Theme.of(context).colorScheme.primary),\r\n                    visualDensity: VisualDensity.compact,\r\n                  )).toList(),\r\n                ),\r\n              const SizedBox(height: 16),\r\n              SectionTitle(t.aboutThisRole),\r\n              const SizedBox(height: 10),\r\n              _InfoRow(label: t.salaryLabel, value: job.salaryRange),\r\n              _InfoRow(label: t.jobTypeLabel, value: job.employmentType),\r\n              _InfoRow(label: t.categoryLabel, value: job.category),\r\n              const SizedBox(height: 18),\r\n              _JobApplicantsSection(),\r\n              const SizedBox(height: 14),\r\n              AppButton(\r\n                label: t.openFullTable,\r\n                onPressed: () => Navigator.of(context).pushNamed(\r\n                  AppRoutes.companyApplicantsTable,\r\n                  arguments: job,\r\n                ),\r\n              ),\r\n            ],\r\n          ),\r\n        ),\r\n      ),\r\n      bottomNavigationBar: const CompanyBottomNav(\r\n        current: CompanyTab.applicants,\r\n      ),\r\n    );\r\n  }\r\n\r\n  Future<void> _editJob(BuildContext context, Job job) async {\r\n    Navigator.of(context).pushNamed(\r\n      AppRoutes.companyPostJobStep1,\r\n      arguments: job,\r\n    );\r\n  }\r\n}\r\n\r\nclass _Bullets extends StatelessWidget {\r\n  const _Bullets({required this.items});\r\n\r\n  final List<String> items;\r\n\r\n  @override\r\n  Widget build(BuildContext context) {\r\n    final t = AppLocalizations.of(context);\r\n    if (items.isEmpty) {\r\n      return Text(\r\n        t.noItemsYet,\r\n        style: Theme.of(context).textTheme.bodyMedium,\r\n      );\r\n    }\r\n    return Column(\r\n      children: items\r\n          .map(\r\n            (text) => Padding(\r\n              padding: const EdgeInsets.only(bottom: 10),\r\n              child: Row(\r\n                crossAxisAlignment: CrossAxisAlignment.start,\r\n                children: [\r\n                  const Padding(\r\n                    padding: EdgeInsets.only(top: 6),\r\n                    child: Icon(Icons.circle, size: 6),\r\n                  ),\r\n                  const SizedBox(width: 10),\r\n                  Expanded(child: Text(text)),\r\n                ],\r\n              ),\r\n            ),\r\n          )\r\n          .toList(),\r\n    );\r\n  }\r\n}\r\n\r\nclass _JobApplicantsSection extends StatelessWidget {\r\n  const _JobApplicantsSection();\r\n\r\n  @override\r\n  Widget build(BuildContext context) {\r\n    final applicants = MockData.applicants();\r\n    return Card(\r\n      child: Column(\r\n        children: applicants\r\n            .take(4)\r\n            .map(\r\n              (a) => ListTile(\r\n                dense: true,\r\n                title: Text(a.fullName),\r\n                subtitle: Text('${a.role} • ${a.stage}'),\r\n                trailing: const Icon(Icons.chevron_right),\r\n              ),\r\n            )\r\n            .toList(),\r\n      ),\r\n    );\r\n  }\r\n}\r\n\r\nclass _InfoRow extends StatelessWidget {\r\n  const _InfoRow({required this.label, required this.value});\r\n\r\n  final String label;\r\n  final String value;\r\n\r\n  @override\r\n  Widget build(BuildContext context) {\r\n    final isNarrow = MediaQuery.of(context).size.width < 420;\r\n    return Padding(\r\n      padding: const EdgeInsets.symmetric(vertical: 6),\r\n      child: isNarrow\r\n          ? Column(\r\n              crossAxisAlignment: CrossAxisAlignment.start,\r\n              children: [\r\n                Text(label),\r\n                const SizedBox(height: 4),\r\n                Text(\r\n                  value,\r\n                  style: TextStyle(\r\n                    color: Theme.of(\r\n                      context,\r\n                    ).colorScheme.onSurface.withOpacity(0.8),\r\n                  ),\r\n                ),\r\n              ],\r\n            )\r\n          : Row(\r\n              children: [\r\n                SizedBox(width: 110, child: Text(label)),\r\n                Expanded(\r\n                  child: Text(\r\n                    value,\r\n                    style: TextStyle(\r\n                      color: Theme.of(\r\n                        context,\r\n                      ).colorScheme.onSurface.withOpacity(0.8),\r\n                    ),\r\n                  ),\r\n                ),\r\n              ],\r\n            ),\r\n    );\r\n  }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/graduationproject/lib/screens/company/jobs/job_details_screen.dart b/graduationproject/lib/screens/company/jobs/job_details_screen.dart
+--- a/graduationproject/lib/screens/company/jobs/job_details_screen.dart	(revision 9a2095cfa431944a01862decd89cfba0f0ab2aab)
++++ b/graduationproject/lib/screens/company/jobs/job_details_screen.dart	(date 1777751128821)
+@@ -53,7 +53,7 @@
+             padding: const EdgeInsets.all(16),
+             children: [
+               Text(
+-                '${job.companyName} • ${job.employmentType}',
++                job.employmentType,
+                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                   color: Theme.of(
+                     context,
+Index: graduationproject/lib/shared/services/recruitment_sync_service.dart
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import 'dart:async';\r\n\r\nimport '../../data/api/company_api_client.dart';\r\nimport '../state/company_store.dart';\r\nimport '../state/recruitment_sync_store.dart';\r\n\r\nclass RecruitmentSyncService {\r\n  RecruitmentSyncService._();\r\n\r\n  static final RecruitmentSyncService instance = RecruitmentSyncService._();\r\n\r\n  final CompanyApiClient _client = CompanyApiClient();\r\n  Timer? _timer;\r\n  bool get isAuthenticated => _client.hasToken;\r\n\r\n  Future<Map<String, dynamic>> login({required String email, required String password, required String expectedRole}) async {\r\n    final auth = await _client.login(\r\n      email: email.trim(),\r\n      password: password,\r\n      role: expectedRole,\r\n    );\r\n\r\n    final user = auth['user'] as Map<String, dynamic>?;\r\n    final role = user?['role']?.toString().toLowerCase().trim();\r\n    final token = auth['token']?.toString().trim();\r\n    final expected = expectedRole.toLowerCase().trim();\r\n\r\n    if (token == null || token.isEmpty) {\r\n      throw Exception('Login response missing token');\r\n    }\r\n    if (role == null || role.isEmpty) {\r\n      throw Exception('Login response missing role');\r\n    }\r\n    if (expected == 'company') {\r\n      if (role != 'company') {\r\n        throw Exception('هذا الحساب ليس حساب شركة');\r\n      }\r\n    } else {\r\n      // For user login, block company accounts from signing in\r\n      if (role == 'company') {\r\n        throw Exception('هذا الحساب مخصص للشركات');\r\n      }\r\n    }\r\n\r\n    _client.setToken(token);\r\n\r\n    // Update store with user info\r\n    if (user != null) {\r\n      final String name = user['name']?.toString() ?? 'User';\r\n      RecruitmentSyncStore.instance.updateCurrentUser(\r\n        name: name,\r\n        email: user['email']?.toString(),\r\n        photoUrl: user['photoUrl']?.toString(),\r\n      );\r\n\r\n      if (role == 'company') {\r\n        CompanyStore.instance.setRegistrationData(\r\n          companyId: user['id']?.toString(),\r\n          companyName: name,\r\n          email: user['email']?.toString(),\r\n        );\r\n      }\r\n    }\r\n\r\n    return user ?? {};\r\n  }\r\n\r\n  Future<Map<String, dynamic>> googleLogin(String idToken) async {\r\n    final auth = await _client.googleLogin(idToken: idToken);\r\n\r\n    final user = auth['user'] as Map<String, dynamic>?;\r\n    final token = auth['token']?.toString().trim();\r\n\r\n    if (token == null || token.isEmpty) {\r\n      throw Exception('Google login response missing token');\r\n    }\r\n\r\n    _client.setToken(token);\r\n\r\n    // Update store with user info\r\n    if (user != null) {\r\n      final String name = user['name']?.toString() ?? 'User';\r\n      RecruitmentSyncStore.instance.updateCurrentUser(\r\n        name: name,\r\n        email: user['email']?.toString(),\r\n        photoUrl: user['photoUrl']?.toString(),\r\n      );\r\n\r\n      final role = user['role']?.toString().toLowerCase().trim();\r\n      if (role == 'company') {\r\n        CompanyStore.instance.setRegistrationData(\r\n          companyId: user['id']?.toString(),\r\n          companyName: name,\r\n          email: user['email']?.toString(),\r\n        );\r\n      }\r\n    }\r\n\r\n    return user ?? {};\r\n  }\r\n\r\n  Future<Map<String, dynamic>> register({\r\n    required String email,\r\n    required String password,\r\n    required String name,\r\n    required String role,\r\n  }) async {\r\n    final auth = await _client.register(\r\n      email: email.trim(),\r\n      password: password,\r\n      name: name.trim(),\r\n      role: role.toLowerCase().trim(),\r\n    );\r\n\r\n    final user = auth['user'] as Map<String, dynamic>?;\r\n    final token = auth['token']?.toString().trim();\r\n\r\n    if (token == null || token.isEmpty) {\r\n      throw Exception('Registration response missing token');\r\n    }\r\n\r\n    _client.setToken(token);\r\n\r\n    // Update store with user info\r\n    if (user != null) {\r\n      final String name = user['name']?.toString() ?? 'User';\r\n      RecruitmentSyncStore.instance.updateCurrentUser(\r\n        name: name,\r\n        email: user['email']?.toString(),\r\n        photoUrl: user['photoUrl']?.toString(),\r\n      );\r\n\r\n      if (role.toLowerCase().trim() == 'company') {\r\n        CompanyStore.instance.setRegistrationData(\r\n          companyId: user['id']?.toString(),\r\n          companyName: name,\r\n          email: user['email']?.toString(),\r\n        );\r\n      }\r\n    }\r\n\r\n    return user ?? {};\r\n  }\r\n\r\n  Future<Map<String, dynamic>> updateProfile({\r\n    String? name,\r\n    String? photoUrl,\r\n  }) async {\r\n    _assertAuthenticated();\r\n    final user = await _client.updateProfile(name: name, photoUrl: photoUrl);\r\n    \r\n    final String currentName = user['name']?.toString() ?? 'User';\r\n    RecruitmentSyncStore.instance.updateCurrentUser(\r\n      name: currentName,\r\n      photoUrl: user['photoUrl']?.toString(),\r\n    );\r\n\r\n    if (RecruitmentSyncStore.instance.userRole.toLowerCase() == 'company') {\r\n      CompanyStore.instance.setRegistrationData(\r\n        companyName: currentName,\r\n        customProfileImage: user['photoUrl']?.toString(),\r\n      );\r\n    }\r\n\r\n    return user;\r\n  }\r\n\r\n  void logout() {\r\n    _client.clearToken();\r\n    stopPolling();\r\n  }\r\n\r\n  void _assertAuthenticated() {\r\n    if (!isAuthenticated) {\r\n      throw Exception('Not authenticated. Please login first.');\r\n    }\r\n  }\r\n\r\n  Future<void> loginForDemo({required bool companyRole}) async {\r\n    await login(\r\n      email: companyRole ? 'company@jobito.com' : 'user@jobito.com',\r\n      password: '12345678',\r\n      expectedRole: companyRole ? 'company' : 'user',\r\n    );\r\n  }\r\n\r\n  Future<void> startPolling() async {\r\n    await _pullServerState();\r\n    _timer?.cancel();\r\n    _timer = Timer.periodic(const Duration(seconds: 12), (_) async {\r\n      await _pullServerState();\r\n    });\r\n  }\r\n\r\n  void stopPolling() {\r\n    _timer?.cancel();\r\n    _timer = null;\r\n  }\r\n\r\n  Future<void> _pullServerState() async {\r\n    final RecruitmentSyncStore store = RecruitmentSyncStore.instance;\r\n    try {\r\n      final jobs = await _client.fetchJobs();\r\n      final applications = await _client.fetchApplications();\r\n      final messages = await _client.fetchMessages();\r\n      store.replaceFromRemote(\r\n        jobs: jobs,\r\n        applications: applications,\r\n        messages: messages,\r\n      );\r\n    } catch (_) {\r\n      // Keep local state if backend is unreachable.\r\n    }\r\n  }\r\n\r\n  Future<String> postJob({\r\n    required String title,\r\n    required String location,\r\n    required String salaryRange,\r\n    required String description,\r\n    required List<String> responsibilities,\r\n    required List<String> qualifications,\r\n    required List<String> niceToHaves,\r\n    required List<String> benefits,\r\n    required String category,\r\n    String companyName = 'Jobito Labs',\r\n    String type = 'Full-time',\r\n    List<String> tags = const <String>['General'],\r\n    int requiredCount = 1,\r\n  }) async {\r\n    _assertAuthenticated();\r\n    final response = await _client.createJob(\r\n      title: title,\r\n      companyName: companyName,\r\n      location: location,\r\n      salaryRange: salaryRange,\r\n      type: type,\r\n      tags: tags,\r\n      category: category,\r\n      requiredCount: requiredCount,\r\n    );\r\n    final String jobId = response['id']?.toString() ?? '';\r\n    await _pullServerState();\r\n    return jobId;\r\n  }\r\n\r\n  Future<void> applyToJob({\r\n    required String jobId,\r\n    required String userName,\r\n  }) async {\r\n    _assertAuthenticated();\r\n    await _client.createApplication(jobId: jobId, userName: userName);\r\n    await _pullServerState();\r\n  }\r\n\r\n  Future<void> updateStatus({\r\n    required String applicationId,\r\n    required String status,\r\n  }) async {\r\n    _assertAuthenticated();\r\n    try {\r\n      await _client.updateApplicationStatus(\r\n        applicationId: applicationId,\r\n        status: status,\r\n      );\r\n      await _pullServerState();\r\n    } catch (_) {\r\n      RecruitmentSyncStore.instance.companyUpdateApplicationStatus(\r\n        applicationId: applicationId,\r\n        nextStatus: status,\r\n      );\r\n    }\r\n  }\r\n\r\n  Future<void> sendBroadcast(String text) async {\r\n    _assertAuthenticated();\r\n    try {\r\n      await _client.sendMessage(text);\r\n      await _pullServerState();\r\n    } catch (_) {\r\n      RecruitmentSyncStore.instance.companySendMessage(text);\r\n    }\r\n  }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/graduationproject/lib/shared/services/recruitment_sync_service.dart b/graduationproject/lib/shared/services/recruitment_sync_service.dart
+--- a/graduationproject/lib/shared/services/recruitment_sync_service.dart	(revision 9a2095cfa431944a01862decd89cfba0f0ab2aab)
++++ b/graduationproject/lib/shared/services/recruitment_sync_service.dart	(date 1777751128843)
+@@ -145,9 +145,30 @@
+   Future<Map<String, dynamic>> updateProfile({
+     String? name,
+     String? photoUrl,
++    String? about,
++    String? employee,
++    String? industry,
++    String? location,
++    String? website,
++    List<String>? locations,
++    List<String>? techStack,
++    List<String>? benefits,
++    String? category,
+   }) async {
+     _assertAuthenticated();
+-    final user = await _client.updateProfile(name: name, photoUrl: photoUrl);
++    final user = await _client.updateProfile(
++      name: name,
++      photoUrl: photoUrl,
++      about: about,
++      employee: employee,
++      industry: industry,
++      location: location,
++      website: website,
++      locations: locations,
++      techStack: techStack,
++      benefits: benefits,
++      category: category,
++    );
+     
+     final String currentName = user['name']?.toString() ?? 'User';
+     RecruitmentSyncStore.instance.updateCurrentUser(
+Index: graduationproject/lib/data/api/company_api_client.dart
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import 'api_endpoints.dart';\r\nimport 'package:dio/dio.dart';\r\nimport 'package:flutter/foundation.dart';\r\n\r\nfinal class CompanyApiClient {\r\n  CompanyApiClient({\r\n    this.baseUrl = ApiEndpoints.baseUrl,\r\n  }) : _dio = Dio(\r\n          BaseOptions(\r\n            baseUrl: baseUrl,\r\n            connectTimeout: const Duration(seconds: 12),\r\n            receiveTimeout: const Duration(seconds: 12),\r\n            headers: const {'Content-Type': 'application/json'},\r\n          ),\r\n        ) {\r\n    _dio.interceptors.add(LogInterceptor(\r\n      requestBody: true,\r\n      responseBody: true,\r\n      logPrint: (o) => debugPrint(o.toString()),\r\n    ));\r\n  }\r\n\r\n  final String baseUrl;\r\n  final Dio _dio;\r\n  String? _accessToken;\r\n  bool get hasToken => _accessToken != null && _accessToken!.isNotEmpty;\r\n\r\n  void setToken(String token) {\r\n    _accessToken = token;\r\n  }\r\n\r\n  void clearToken() {\r\n    _accessToken = null;\r\n  }\r\n\r\n  Options get _authOptions => Options(\r\n        headers: _accessToken == null\r\n            ? null\r\n            : <String, dynamic>{'Authorization': 'Bearer $_accessToken'},\r\n      );\r\n\r\n  Future<Map<String, dynamic>> login({\r\n    required String email,\r\n    required String password,\r\n    String? role,\r\n  }) async {\r\n    final payload = <String, dynamic>{'email': email, 'password': password};\r\n    if (role != null && role.trim().isNotEmpty) {\r\n      payload['role'] = role.trim().toLowerCase();\r\n    }\r\n    final Response<dynamic> response = await _dio.post<dynamic>(\r\n      ApiEndpoints.login,\r\n      data: payload,\r\n    );\r\n    return Map<String, dynamic>.from(response.data as Map);\r\n  }\r\n\r\n  Future<Map<String, dynamic>> googleLogin({\r\n    required String idToken,\r\n  }) async {\r\n    final Response<dynamic> response = await _dio.post<dynamic>(\r\n      ApiEndpoints.googleLogin,\r\n      data: <String, dynamic>{'idToken': idToken},\r\n    );\r\n    return Map<String, dynamic>.from(response.data as Map);\r\n  }\r\n\r\n  Future<Map<String, dynamic>> register({\r\n    required String email,\r\n    required String password,\r\n    required String name,\r\n    required String role,\r\n  }) async {\r\n    final Response<dynamic> response = await _dio.post<dynamic>(\r\n      ApiEndpoints.register,\r\n      data: <String, dynamic>{\r\n        'email': email,\r\n        'password': password,\r\n        'name': name,\r\n        'role': role,\r\n      },\r\n    );\r\n    return Map<String, dynamic>.from(response.data as Map);\r\n  }\r\n\r\n  Future<Map<String, dynamic>> updateProfile({\r\n    String? name,\r\n    String? photoUrl,\r\n  }) async {\r\n    final Response<dynamic> response = await _dio.put<dynamic>(\r\n      '/api/auth/profile',\r\n      data: <String, dynamic>{\r\n        if (name != null) 'name': name,\r\n        if (photoUrl != null) 'photoUrl': photoUrl,\r\n      },\r\n      options: _authOptions,\r\n    );\r\n    return Map<String, dynamic>.from(response.data as Map);\r\n  }\r\n\r\n  Future<List<Map<String, dynamic>>> fetchJobs() async {\r\n    final Response<dynamic> response = await _dio.get<dynamic>(\r\n      ApiEndpoints.jobs,\r\n      options: _authOptions,\r\n    );\r\n    return (response.data as List<dynamic>)\r\n        .map((dynamic e) => Map<String, dynamic>.from(e as Map))\r\n        .toList();\r\n  }\r\n\r\n  Future<List<Map<String, dynamic>>> fetchApplications() async {\r\n    final Response<dynamic> response = await _dio.get<dynamic>(\r\n      ApiEndpoints.applications,\r\n      options: _authOptions,\r\n    );\r\n    return (response.data as List<dynamic>)\r\n        .map((dynamic e) => Map<String, dynamic>.from(e as Map))\r\n        .toList();\r\n  }\r\n\r\nFuture<Map<String, dynamic>> createJob({\r\n    required String title,\r\n    required String companyName,\r\n    required String location,\r\n    required String salaryRange,\r\n    required String type,\r\n    required List<String> tags,\r\n    required String category,\r\n    int requiredCount = 1,\r\n  }) async {\r\n    final Response<dynamic> response = await _dio.post<dynamic>(\r\n      ApiEndpoints.jobs,\r\n      data: <String, dynamic>{\r\n        'title': title,\r\n        'companyName': companyName,\r\n        'location': location,\r\n        'salaryRange': salaryRange,\r\n        'type': type,\r\n        'tags': tags,\r\n        'category': category,\r\n        'requiredCount': requiredCount,\r\n      },\r\n      options: _authOptions,\r\n    );\r\n    return Map<String, dynamic>.from(response.data as Map);\r\n  }\r\n\r\n  Future<Map<String, dynamic>> createApplication({\r\n    required String jobId,\r\n    required String userName,\r\n  }) async {\r\n    final Response<dynamic> response = await _dio.post<dynamic>(\r\n      ApiEndpoints.applications,\r\n      data: <String, dynamic>{'jobId': jobId, 'userName': userName},\r\n      options: _authOptions,\r\n    );\r\n    return Map<String, dynamic>.from(response.data as Map);\r\n  }\r\n\r\n  Future<Map<String, dynamic>> updateApplicationStatus({\r\n    required String applicationId,\r\n    required String status,\r\n  }) async {\r\n    final String path = ApiEndpoints.applicationStatus.replaceFirst(\r\n      '{id}',\r\n      applicationId,\r\n    );\r\n    final Response<dynamic> response = await _dio.patch<dynamic>(\r\n      path,\r\n      data: <String, dynamic>{'status': status},\r\n      options: _authOptions,\r\n    );\r\n    return Map<String, dynamic>.from(response.data as Map);\r\n  }\r\n\r\n  Future<List<Map<String, dynamic>>> fetchMessages() async {\r\n    final Response<dynamic> response = await _dio.get<dynamic>(\r\n      ApiEndpoints.messages,\r\n      options: _authOptions,\r\n    );\r\n    return (response.data as List<dynamic>)\r\n        .map((dynamic e) => Map<String, dynamic>.from(e as Map))\r\n        .toList();\r\n  }\r\n\r\n  Future<void> sendMessage(String text) async {\r\n    await _dio.post<dynamic>(\r\n      ApiEndpoints.messages,\r\n      data: <String, dynamic>{'text': text},\r\n      options: _authOptions,\r\n    );\r\n  }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/graduationproject/lib/data/api/company_api_client.dart b/graduationproject/lib/data/api/company_api_client.dart
+--- a/graduationproject/lib/data/api/company_api_client.dart	(revision 9a2095cfa431944a01862decd89cfba0f0ab2aab)
++++ b/graduationproject/lib/data/api/company_api_client.dart	(date 1777751128871)
+@@ -86,12 +86,30 @@
+   Future<Map<String, dynamic>> updateProfile({
+     String? name,
+     String? photoUrl,
++    String? about,
++    String? employee,
++    String? industry,
++    String? location,
++    String? website,
++    List<String>? locations,
++    List<String>? techStack,
++    List<String>? benefits,
++    String? category,
+   }) async {
+     final Response<dynamic> response = await _dio.put<dynamic>(
+       '/api/auth/profile',
+       data: <String, dynamic>{
+         if (name != null) 'name': name,
+         if (photoUrl != null) 'photoUrl': photoUrl,
++        if (about != null) 'about': about,
++        if (employee != null) 'employee': employee,
++        if (industry != null) 'industry': industry,
++        if (location != null) 'location': location,
++        if (website != null) 'website': website,
++        if (locations != null) 'locations': locations,
++        if (techStack != null) 'techStack': techStack,
++        if (benefits != null) 'benefits': benefits,
++        if (category != null) 'category': category,
+       },
+       options: _authOptions,
+     );
+Index: graduationproject/lib/screens/company/profile/company_profile_screen.dart
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>// Public-style company profile with tabs and store data.\r\n\r\nimport 'package:flutter/material.dart';\r\nimport 'package:url_launcher/url_launcher.dart';\r\n\r\nimport '../../../shared/l10n/app_localizations.dart';\r\nimport '../../../shared/state/company_store.dart';\r\nimport '../../../shared/widgets/app_scaffold.dart';\r\nimport '../../../shared/widgets/section_title.dart';\r\nimport '../widgets/company_app_bar_actions.dart';\r\nimport '../widgets/company_bottom_nav.dart';\r\n\r\nclass CompanyCompanyProfileScreen extends StatefulWidget {\r\n  const CompanyCompanyProfileScreen({super.key});\r\n\r\n  @override\r\n  State<CompanyCompanyProfileScreen> createState() =>\r\n      _CompanyCompanyProfileScreenState();\r\n}\r\n\r\nclass _CompanyCompanyProfileScreenState\r\n    extends State<CompanyCompanyProfileScreen> {\r\n  final _store = CompanyStore.instance;\r\n\r\n  @override\r\n  Widget build(BuildContext context) {\r\n    final t = AppLocalizations.of(context);\r\n    return AppScaffold(\r\n      title: t.profile,\r\n      showBack: false,\r\n      leading: const CompanyProfileLeading(),\r\n      actions: const [CompanyAppBarActions()],\r\n      showAppBarDivider: true,\r\n      body: AnimatedBuilder(\r\n        animation: _store,\r\n        builder: (context, _) {\r\n          return ListView(\r\n            padding: const EdgeInsets.all(16),\r\n            children: [\r\n              _CompanyStatsBar(\r\n                foundedDay: _store.foundedDay,\r\n                foundedMonth: _store.foundedMonth,\r\n                foundedYear: _store.foundedYear,\r\n                countriesCount: _store.locations.length,\r\n                employee: _store.employee,\r\n                industry: _store.industry,\r\n                category: _store.category,\r\n              ),\r\n              const SizedBox(height: 14),\r\n              Divider(\r\n                height: 1,\r\n                thickness: 1,\r\n                color: Theme.of(context).dividerColor.withOpacity(0.2),\r\n              ),\r\n              const SizedBox(height: 16),\r\n              SectionTitle(t.about),\r\n              const SizedBox(height: 10),\r\n              Text(\r\n                t.isAr\r\n                    ? (_store.companyAboutAr.trim().isNotEmpty\r\n                        ? _store.companyAboutAr\r\n                        : (_store.companyAboutEn.trim().isNotEmpty ? _store.companyAboutEn : t.notYet))\r\n                    : (_store.companyAboutEn.trim().isNotEmpty ? _store.companyAboutEn : t.notYet),\r\n                style: Theme.of(context).textTheme.bodyMedium?.copyWith(\r\n                  color: (_store.companyAboutAr.isEmpty && _store.companyAboutEn.isEmpty)\r\n                      ? Theme.of(context).colorScheme.onSurface.withOpacity(0.4)\r\n                      : null,\r\n                ),\r\n              ),\r\n              const SizedBox(height: 16),\r\n              const SizedBox(height: 16),\r\n              SectionTitle(t.benefits),\r\n              const SizedBox(height: 10),\r\n              _store.benefits.isEmpty\r\n                  ? Text(t.notYet, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)))\r\n                  : Wrap(\r\n                      spacing: 8,\r\n                      runSpacing: 8,\r\n                      children: _store.benefits.map((item) => Chip(\r\n                        label: Text(item, style: const TextStyle(fontSize: 12)),\r\n                        visualDensity: VisualDensity.compact,\r\n                        backgroundColor: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.3),\r\n                      )).toList(),\r\n                    ),\r\n              const SizedBox(height: 16),\r\n              if (_store.commercialRegister.isNotEmpty || _store.nationalNumber.isNotEmpty) ...[\r\n                SectionTitle(t.tr(en: 'Registration Info', ar: 'بيانات التسجيل')),\r\n                const SizedBox(height: 10),\r\n                if (_store.commercialRegister.isNotEmpty)\r\n                  _RegistrationInfoTile(\r\n                    icon: Icons.assignment_outlined,\r\n                    title: t.tr(en: 'Commercial Register', ar: 'السجل التجاري'),\r\n                    value: _store.commercialRegister,\r\n                  ),\r\n                if (_store.nationalNumber.isNotEmpty)\r\n                  _RegistrationInfoTile(\r\n                    icon: Icons.badge_outlined,\r\n                    title: t.tr(en: 'National Number', ar: 'الرقم القومي'),\r\n                    value: _store.nationalNumber,\r\n                  ),\r\n                const SizedBox(height: 16),\r\n              ],\r\n              if (_store.contacts.isNotEmpty) ...[\r\n                SectionTitle(t.contactSectionLabel),\r\n                const SizedBox(height: 10),\r\n                ..._store.contacts.asMap().entries.map(\r\n                  (entry) => _EditableLinkTile(\r\n                    icon: entry.value.name.toLowerCase().contains('email') \r\n                        ? Icons.email_outlined \r\n                        : Icons.link_outlined,\r\n                    title: entry.value.name,\r\n                    value: entry.value.value,\r\n                  ),\r\n                ),\r\n              ],\r\n            ],\r\n          );\r\n        },\r\n      ),\r\n      bottomNavigationBar: const CompanyBottomNav(\r\n        current: CompanyTab.profile,\r\n      ),\r\n    );\r\n  }\r\n}\r\n\r\nclass _EditableLinkTile extends StatelessWidget {\r\n  const _EditableLinkTile({\r\n    required this.icon,\r\n    required this.title,\r\n    required this.value,\r\n  });\r\n\r\n  final IconData icon;\r\n  final String title;\r\n  final String value;\r\n\r\n  Future<void> _launch() async {\r\n    String urlStr = value;\r\n    if (!urlStr.contains('://') && !urlStr.startsWith('mailto:')) {\r\n      if (urlStr.contains('@')) {\r\n        urlStr = 'mailto:$urlStr';\r\n      } else {\r\n        urlStr = 'https://$urlStr';\r\n      }\r\n    }\r\n    final uri = Uri.tryParse(urlStr);\r\n    if (uri != null) {\r\n      await launchUrl(uri);\r\n    }\r\n  }\r\n\r\n  @override\r\n  Widget build(BuildContext context) {\r\n    return Card(\r\n      margin: const EdgeInsets.only(bottom: 10),\r\n      child: ListTile(\r\n        leading: Icon(icon),\r\n        title: Text(title),\r\n        subtitle: Text(value),\r\n        onTap: _launch,\r\n      ),\r\n    );\r\n  }\r\n}\r\n\r\nclass _RegistrationInfoTile extends StatelessWidget {\r\n  const _RegistrationInfoTile({\r\n    required this.icon,\r\n    required this.title,\r\n    required this.value,\r\n  });\r\n\r\n  final IconData icon;\r\n  final String title;\r\n  final String value;\r\n\r\n  @override\r\n  Widget build(BuildContext context) {\r\n    return Card(\r\n      margin: const EdgeInsets.only(bottom: 10),\r\n      child: ListTile(\r\n        leading: Icon(icon),\r\n        title: Text(title),\r\n        subtitle: Text(value),\r\n      ),\r\n    );\r\n  }\r\n}\r\n\r\nclass _CompanyStatsBar extends StatelessWidget {\r\n  const _CompanyStatsBar({\r\n    required this.foundedDay,\r\n    required this.foundedMonth,\r\n    required this.foundedYear,\r\n    required this.countriesCount,\r\n    required this.employee,\r\n    required this.industry,\r\n    required this.category,\r\n  });\r\n\r\n  final int foundedDay;\r\n  final int foundedMonth;\r\n  final int foundedYear;\r\n  final int countriesCount;\r\n  final String employee;\r\n  final String industry;\r\n  final String category;\r\n\r\n  @override\r\n  Widget build(BuildContext context) {\r\n    final t = AppLocalizations.of(context);\r\n    final cs = Theme.of(context).colorScheme;\r\n    final labelColor = Theme.of(\r\n      context,\r\n    ).colorScheme.onSurface.withOpacity(0.65);\r\n    final iconColor = Theme.of(\r\n      context,\r\n    ).colorScheme.onSurface.withOpacity(0.9);\r\n\r\n    Widget item({\r\n      required IconData icon,\r\n      required String label,\r\n      required String value,\r\n    }) {\r\n      return Expanded(\r\n        child: Row(\r\n          children: [\r\n            Container(\r\n              width: 34,\r\n              height: 34,\r\n              decoration: BoxDecoration(\r\n                color: cs.primary.withOpacity(0.10),\r\n                shape: BoxShape.circle,\r\n              ),\r\n              child: Icon(icon, color: iconColor, size: 18),\r\n            ),\r\n            const SizedBox(width: 10),\r\n            Expanded(\r\n              child: Column(\r\n                mainAxisSize: MainAxisSize.min,\r\n                crossAxisAlignment: CrossAxisAlignment.start,\r\n                children: [\r\n                  Text(\r\n                    label,\r\n                    maxLines: 1,\r\n                    overflow: TextOverflow.ellipsis,\r\n                    style: Theme.of(context).textTheme.labelMedium?.copyWith(\r\n                      color: labelColor,\r\n                      fontWeight: FontWeight.w600,\r\n                    ),\r\n                  ),\r\n                  const SizedBox(height: 4),\r\n                  Text(\r\n                    value,\r\n                    maxLines: 1,\r\n                    overflow: TextOverflow.ellipsis,\r\n                    style: Theme.of(context).textTheme.labelLarge?.copyWith(\r\n                      color: Theme.of(context).colorScheme.onSurface,\r\n                      fontWeight: FontWeight.w800,\r\n                    ),\r\n                  ),\r\n                ],\r\n              ),\r\n            ),\r\n          ],\r\n        ),\r\n      );\r\n    }\r\n\r\n    return ClipRRect(\r\n      borderRadius: BorderRadius.circular(18),\r\n      child: Container(\r\n        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),\r\n        color: Colors.transparent,\r\n        child: Column(\r\n          mainAxisSize: MainAxisSize.min,\r\n          children: [\r\n            Row(\r\n              children: [\r\n                item(\r\n                  icon: Icons.local_fire_department_outlined,\r\n                  label: t.tr(en: 'Founded', ar: 'تاريخ التأسيس'),\r\n                  value: (foundedDay == 0 || foundedMonth == 0 || foundedYear == 0)\r\n                      ? t.notYet\r\n                      : t.tr(\r\n                          en: '$foundedMonth/$foundedDay/$foundedYear', \r\n                          ar: '$foundedYear/$foundedMonth/$foundedDay'.replaceAll('0', '٠').replaceAll('1', '١').replaceAll('2', '٢').replaceAll('3', '٣').replaceAll('4', '٤').replaceAll('5', '٥').replaceAll('6', '٦').replaceAll('7', '٧').replaceAll('8', '٨').replaceAll('9', '٩')\r\n                        ),\r\n                ),\r\n                const SizedBox(width: 14),\r\n                item(\r\n                  icon: Icons.location_on_outlined,\r\n                  label: t.locationInfo,\r\n                  value: countriesCount == 0 ? t.notYet : countriesCount.toString(),\r\n                ),\r\n              ],\r\n            ),\r\n            const SizedBox(height: 14),\r\n            Row(\r\n              children: [\r\n                item(\r\n                  icon: Icons.groups_outlined,\r\n                  label: t.employee,\r\n                  value: employee.isEmpty ? t.notYet : employee,\r\n                ),\r\n                const SizedBox(width: 14),\r\n                item(\r\n                  icon: Icons.category_outlined,\r\n                  label: t.categoryLabel,\r\n                  value: category.isEmpty ? t.notYet : (category == 'Technical' ? t.technical : t.nonTechnical),\r\n                ),\r\n              ],\r\n            ),\r\n          ],\r\n        ),\r\n      ),\r\n    );\r\n  }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/graduationproject/lib/screens/company/profile/company_profile_screen.dart b/graduationproject/lib/screens/company/profile/company_profile_screen.dart
+--- a/graduationproject/lib/screens/company/profile/company_profile_screen.dart	(revision 9a2095cfa431944a01862decd89cfba0f0ab2aab)
++++ b/graduationproject/lib/screens/company/profile/company_profile_screen.dart	(date 1777751128811)
+@@ -43,7 +43,7 @@
+                 foundedYear: _store.foundedYear,
+                 countriesCount: _store.locations.length,
+                 employee: _store.employee,
+-                industry: _store.industry,
++                // industry: _store.industry,
+                 category: _store.category,
+               ),
+               const SizedBox(height: 14),
+@@ -58,8 +58,8 @@
+               Text(
+                 t.isAr
+                     ? (_store.companyAboutAr.trim().isNotEmpty
+-                        ? _store.companyAboutAr
+-                        : (_store.companyAboutEn.trim().isNotEmpty ? _store.companyAboutEn : t.notYet))
++                    ? _store.companyAboutAr
++                    : (_store.companyAboutEn.trim().isNotEmpty ? _store.companyAboutEn : t.notYet))
+                     : (_store.companyAboutEn.trim().isNotEmpty ? _store.companyAboutEn : t.notYet),
+                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                   color: (_store.companyAboutAr.isEmpty && _store.companyAboutEn.isEmpty)
+@@ -74,14 +74,14 @@
+               _store.benefits.isEmpty
+                   ? Text(t.notYet, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)))
+                   : Wrap(
+-                      spacing: 8,
+-                      runSpacing: 8,
+-                      children: _store.benefits.map((item) => Chip(
+-                        label: Text(item, style: const TextStyle(fontSize: 12)),
+-                        visualDensity: VisualDensity.compact,
+-                        backgroundColor: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.3),
+-                      )).toList(),
+-                    ),
++                spacing: 8,
++                runSpacing: 8,
++                children: _store.benefits.map((item) => Chip(
++                  label: Text(item, style: const TextStyle(fontSize: 12)),
++                  visualDensity: VisualDensity.compact,
++                  backgroundColor: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.3),
++                )).toList(),
++              ),
+               const SizedBox(height: 16),
+               if (_store.commercialRegister.isNotEmpty || _store.nationalNumber.isNotEmpty) ...[
+                 SectionTitle(t.tr(en: 'Registration Info', ar: 'بيانات التسجيل')),
+@@ -104,9 +104,9 @@
+                 SectionTitle(t.contactSectionLabel),
+                 const SizedBox(height: 10),
+                 ..._store.contacts.asMap().entries.map(
+-                  (entry) => _EditableLinkTile(
+-                    icon: entry.value.name.toLowerCase().contains('email') 
+-                        ? Icons.email_outlined 
++                      (entry) => _EditableLinkTile(
++                    icon: entry.value.name.toLowerCase().contains('email')
++                        ? Icons.email_outlined
+                         : Icons.link_outlined,
+                     title: entry.value.name,
+                     value: entry.value.value,
+@@ -195,7 +195,7 @@
+     required this.foundedYear,
+     required this.countriesCount,
+     required this.employee,
+-    required this.industry,
++    // required this.industry,
+     required this.category,
+   });
+ 
+@@ -204,7 +204,7 @@
+   final int foundedYear;
+   final int countriesCount;
+   final String employee;
+-  final String industry;
++  // final String industry;
+   final String category;
+ 
+   @override
+@@ -284,9 +284,9 @@
+                   value: (foundedDay == 0 || foundedMonth == 0 || foundedYear == 0)
+                       ? t.notYet
+                       : t.tr(
+-                          en: '$foundedMonth/$foundedDay/$foundedYear', 
+-                          ar: '$foundedYear/$foundedMonth/$foundedDay'.replaceAll('0', '٠').replaceAll('1', '١').replaceAll('2', '٢').replaceAll('3', '٣').replaceAll('4', '٤').replaceAll('5', '٥').replaceAll('6', '٦').replaceAll('7', '٧').replaceAll('8', '٨').replaceAll('9', '٩')
+-                        ),
++                      en: '$foundedMonth/$foundedDay/$foundedYear',
++                      ar: '$foundedYear/$foundedMonth/$foundedDay'.replaceAll('0', '٠').replaceAll('1', '١').replaceAll('2', '٢').replaceAll('3', '٣').replaceAll('4', '٤').replaceAll('5', '٥').replaceAll('6', '٦').replaceAll('7', '٧').replaceAll('8', '٨').replaceAll('9', '٩')
++                  ),
+                 ),
+                 const SizedBox(width: 14),
+                 item(
+@@ -317,4 +317,4 @@
+       ),
+     );
+   }
+-}
++}
+\ No newline at end of file

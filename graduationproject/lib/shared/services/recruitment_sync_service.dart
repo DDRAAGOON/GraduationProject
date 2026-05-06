@@ -55,18 +55,27 @@ class RecruitmentSyncService {
       }
     }
 
-    await _handleLoginSuccess(user, token, email, role ?? '');
+    await _handleLoginSuccess(user, token, email, role);
     return user ?? {};
   }
 
-  Future<void> _handleLoginSuccess(Map<String, dynamic>? user, String? token, String email, String role) async {
+  Future<void> _handleLoginSuccess(
+    Map<String, dynamic>? user,
+    String? token,
+    String email,
+    String role,
+  ) async {
     if (user == null || token == null || token.isEmpty) return;
 
     _client.setToken(token);
     await SessionManager.saveToken(token);
-    
+
     final String name = user['name']?.toString() ?? 'User';
-    final String userId = user['id']?.toString() ?? '0';
+    final String userId =
+        user['id']?.toString() ??
+        user['_id']?.toString() ??
+        user['userId']?.toString() ??
+        '';
     _syncUserFromResponse(user);
 
     if (role.toLowerCase().trim() == 'company') {
@@ -80,8 +89,9 @@ class RecruitmentSyncService {
         companyName: name,
         email: email,
       );
-      final fullProfile = await SessionManager.getCompanyFullProfile();
-      await CompanyStore.instance.loadFromSession(fullProfile);
+      try {
+        await _pullProfileFromServer();
+      } catch (_) {}
     } else {
       await SessionManager.saveUserSession(email: email, name: name);
       await _pullProfileFromServer();
@@ -98,7 +108,12 @@ class RecruitmentSyncService {
       throw Exception('Google login response missing token');
     }
 
-    await _handleLoginSuccess(user, token, user?['email']?.toString() ?? '', user?['role']?.toString() ?? '');
+    await _handleLoginSuccess(
+      user,
+      token,
+      user?['email']?.toString() ?? '',
+      user?['role']?.toString() ?? '',
+    );
     return user ?? {};
   }
 
@@ -185,11 +200,16 @@ class RecruitmentSyncService {
     if (RecruitmentSyncStore.instance.userRole.toLowerCase() == 'company') {
       final String currentName = user['name']?.toString() ?? 'User';
       final apiPhoto = user['photoUrl']?.toString().trim();
-      final String? effectivePhoto = (apiPhoto != null && apiPhoto.isNotEmpty) ? apiPhoto : photoUrl;
-      
+      final String? effectivePhoto = (apiPhoto != null && apiPhoto.isNotEmpty)
+          ? apiPhoto
+          : photoUrl;
+
       CompanyStore.instance.setRegistrationData(
         companyName: currentName,
-        customProfileImage: (effectivePhoto != null && effectivePhoto.isNotEmpty) ? effectivePhoto : null,
+        customProfileImage:
+            (effectivePhoto != null && effectivePhoto.isNotEmpty)
+            ? effectivePhoto
+            : null,
       );
     }
 
@@ -199,18 +219,24 @@ class RecruitmentSyncService {
   void _syncUserFromResponse(Map<String, dynamic> user, {String? photoUrl}) {
     final String currentName = user['name']?.toString() ?? 'User';
     final apiPhoto = user['photoUrl']?.toString().trim();
-    final String? effectivePhoto = (apiPhoto != null && apiPhoto.isNotEmpty) ? apiPhoto : photoUrl;
+    final String? effectivePhoto = (apiPhoto != null && apiPhoto.isNotEmpty)
+        ? apiPhoto
+        : photoUrl;
 
     RecruitmentSyncStore.instance.updateCurrentUser(
       name: currentName,
       email: user['email']?.toString(),
       phone: user['phone']?.toString(),
       location: user['location']?.toString(),
-      photoUrl: (effectivePhoto != null && effectivePhoto.isNotEmpty) ? effectivePhoto : null,
+      photoUrl: (effectivePhoto != null && effectivePhoto.isNotEmpty)
+          ? effectivePhoto
+          : null,
     );
     RecruitmentSyncStore.instance.updateUserProfile(
       fullName: currentName,
-      title: user['title']?.toString() ?? RecruitmentSyncStore.instance.currentUserTitle,
+      title:
+          user['title']?.toString() ??
+          RecruitmentSyncStore.instance.currentUserTitle,
       email: user['email']?.toString(),
       phone: user['phone']?.toString(),
       location: user['address']?.toString() ?? user['location']?.toString(),
@@ -222,7 +248,11 @@ class RecruitmentSyncService {
       education: _decodeMapList(user['educationJson']?.toString()),
       experience: _decodeMapList(user['experienceJson']?.toString()),
       socialLinks: _decodeMapList(user['socialLinksJson']?.toString()),
-      portfolioImages: user['portfolioImagesJson'] != null ? List<String>.from(jsonDecode(user['portfolioImagesJson']?.toString() ?? '[]')) : null,
+      portfolioImages: user['portfolioImagesJson'] != null
+          ? List<String>.from(
+              jsonDecode(user['portfolioImagesJson']?.toString() ?? '[]'),
+            )
+          : null,
     );
 
     if (RecruitmentSyncStore.instance.userRole.toLowerCase() == 'company') {
@@ -233,10 +263,14 @@ class RecruitmentSyncService {
   Future<void> _pullProfileFromServer() async {
     try {
       await _ensureAuthenticated();
-      final user = await _client.updateProfile();
+      final user = await _client.fetchProfile();
       _syncUserFromResponse(user);
     } catch (e) {
-      // Ignore errors if profile fetch fails
+      // Keep backward compatibility with backends that don't expose GET profile.
+      try {
+        final user = await _client.updateProfile();
+        _syncUserFromResponse(user);
+      } catch (_) {}
     }
   }
 
@@ -251,7 +285,9 @@ class RecruitmentSyncService {
 
   Future<void> _ensureAuthenticated() async {
     await _hydrateTokenFromSession();
-    if (!isAuthenticated) throw Exception('Not authenticated. Please login first.');
+    if (!isAuthenticated) {
+      throw Exception('Not authenticated. Please login first.');
+    }
   }
 
   Future<void> _hydrateTokenFromSession() async {
@@ -275,6 +311,7 @@ class RecruitmentSyncService {
     try {
       await CompanyStore.instance.initFromSession();
     } catch (_) {}
+    await _pullProfileFromServer();
     await _pullServerState();
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 12), (_) async {
@@ -291,6 +328,7 @@ class RecruitmentSyncService {
     final RecruitmentSyncStore store = RecruitmentSyncStore.instance;
     try {
       await _ensureAuthenticated();
+      await _pullProfileFromServer();
       final jobs = await _client.fetchJobs();
       final applications = await _client.fetchApplications();
       final messages = await _client.fetchMessages();
@@ -300,16 +338,16 @@ class RecruitmentSyncService {
         messages: messages,
       );
 
-      // Also sync CompanyStore jobs if the user is a company
+      // Also sync CompanyStore jobs if the user is a company.
+      // Strictly filter by companyId — never fall back to showing all jobs.
       if (store.userRole.toLowerCase() == 'company') {
         final String companyId = CompanyStore.instance.companyId;
-        if (companyId.isNotEmpty) {
+        CompanyStore.instance.clearJobs();
+        if (companyId.trim().isNotEmpty) {
           final myJobs = jobs
-              .where((j) =>
-                  j['companyId']?.toString() == companyId)
+              .where((j) => _isMyCompanyJob(j, companyId))
               .toList();
-          CompanyStore.instance.clearJobs();
-          for (var j in myJobs) {
+          for (final j in myJobs) {
             CompanyStore.instance.saveJob(Job.fromMap(j));
           }
         }
@@ -423,6 +461,9 @@ class RecruitmentSyncService {
         applicationId: applicationId,
         status: status,
       );
+      if (status.toLowerCase().contains('hire')) {
+        await _autoCloseFilledJobs();
+      }
       await _pullServerState();
     } catch (e) {
       if (_isUnauthorizedError(e)) {
@@ -432,6 +473,94 @@ class RecruitmentSyncService {
       RecruitmentSyncStore.instance.companyUpdateApplicationStatus(
         applicationId: applicationId,
         nextStatus: status,
+      );
+      if (status.toLowerCase().contains('hire')) {
+        await _autoCloseFilledJobs();
+      }
+    }
+  }
+
+  Future<void> reopenJobAndResetAccepted(String jobId) async {
+    await _ensureAuthenticated();
+    final store = RecruitmentSyncStore.instance;
+    RecruitmentJob? job;
+    for (final item in store.jobs) {
+      if (item.id == jobId) {
+        job = item;
+        break;
+      }
+    }
+    if (job == null) return;
+
+    final hiredApps = store.applications
+        .where(
+          (a) => a.jobId == jobId && a.status.toLowerCase().contains('hire'),
+        )
+        .toList();
+
+    for (final app in hiredApps) {
+      await _client.updateApplicationStatus(
+        applicationId: app.id,
+        status: 'Applied',
+      );
+    }
+
+    await _client.updateJob(
+      jobId: job.id,
+      title: job.title,
+      companyName: job.companyName,
+      location: job.location,
+      salaryRange: job.salaryRange,
+      type: job.type,
+      description: job.description,
+      responsibilities: job.responsibilities,
+      qualifications: job.qualifications,
+      niceToHaves: job.niceToHaves,
+      benefits: job.benefits,
+      classification: job.classification,
+      tags: job.tags,
+      requiredCount: job.capacity,
+      status: 'Open',
+    );
+    await _pullServerState();
+  }
+
+  Future<void> _autoCloseFilledJobs() async {
+    final store = RecruitmentSyncStore.instance;
+    final jobsById = <String, RecruitmentJob>{
+      for (final job in store.jobs) job.id: job,
+    };
+    if (jobsById.isEmpty) return;
+
+    final hiredCountByJob = <String, int>{};
+    for (final app in store.applications) {
+      if (!app.status.toLowerCase().contains('hire')) continue;
+      hiredCountByJob.update(app.jobId, (value) => value + 1, ifAbsent: () => 1);
+    }
+
+    for (final entry in hiredCountByJob.entries) {
+      final job = jobsById[entry.key];
+      if (job == null) continue;
+      if (job.status.toLowerCase() == 'closed') continue;
+      final requiredCount = job.capacity > 0 ? job.capacity : 1;
+      if (entry.value < requiredCount) continue;
+
+      await _client.updateJob(
+        jobId: job.id,
+        title: job.title,
+        companyName: job.companyName,
+        location: job.location,
+        salaryRange: job.salaryRange,
+        type: job.type,
+        description: job.description,
+        responsibilities: job.responsibilities,
+        qualifications: job.qualifications,
+        niceToHaves: job.niceToHaves,
+        benefits: job.benefits,
+        classification: job.classification,
+        tags: job.tags,
+        requiredCount: job.capacity,
+        status: 'Closed',
       );
     }
   }
@@ -464,7 +593,8 @@ class RecruitmentSyncService {
       return error.response?.statusCode == 401;
     }
     final text = error.toString();
-    return text.contains('status code of 401') || text.contains('status code 401');
+    return text.contains('status code of 401') ||
+        text.contains('status code 401');
   }
 
   Future<void> _hydrateUserStateFromSession() async {
@@ -474,45 +604,83 @@ class RecruitmentSyncService {
     final String name = data['name']?.toString() ?? '';
     final String email = data['email']?.toString() ?? '';
     final String? photo = data['photo']?.toString();
-    final String role = full['role']?.toString() ?? RecruitmentSyncStore.instance.userRole;
-    final String title = full['title']?.toString() ?? RecruitmentSyncStore.instance.currentUserTitle;
+    final String role =
+        full['role']?.toString() ?? RecruitmentSyncStore.instance.userRole;
+    final String title =
+        full['title']?.toString() ??
+        RecruitmentSyncStore.instance.currentUserTitle;
 
-    if (name.isEmpty && email.isEmpty && (photo == null || photo.isEmpty) && title.isEmpty) {
+    if (name.isEmpty &&
+        email.isEmpty &&
+        (photo == null || photo.isEmpty) &&
+        title.isEmpty) {
       return;
     }
 
     RecruitmentSyncStore.instance.updateCurrentUser(
       name: name.isEmpty ? RecruitmentSyncStore.instance.currentUserName : name,
-      email: email.isEmpty ? RecruitmentSyncStore.instance.currentUserEmail : email,
+      email: email.isEmpty
+          ? RecruitmentSyncStore.instance.currentUserEmail
+          : email,
       phone: full['phone']?.toString(),
       location: full['location']?.toString(),
       photoUrl: (photo != null && photo.isNotEmpty) ? photo : null,
     );
     RecruitmentSyncStore.instance.updateUserProfile(
-      fullName: name.isEmpty ? RecruitmentSyncStore.instance.currentUserName : name,
+      fullName: name.isEmpty
+          ? RecruitmentSyncStore.instance.currentUserName
+          : name,
       title: title,
       about: full['about']?.toString(),
       role: role,
-      skills: List<String>.from(full['skills'] as List<dynamic>? ?? const <String>[]),
+      skills: List<String>.from(
+        full['skills'] as List<dynamic>? ?? const <String>[],
+      ),
       education: _decodeMapList(full['education']?.toString()),
       experience: _decodeMapList(full['experience']?.toString()),
       socialLinks: _decodeMapList(full['socialLinks']?.toString()),
-      portfolioImages: List<String>.from(full['portfolioImages'] as List<dynamic>? ?? const <String>[]),
+      portfolioImages: List<String>.from(
+        full['portfolioImages'] as List<dynamic>? ?? const <String>[],
+      ),
     );
   }
 
   List<Map<String, String>> _decodeMapList(String? jsonValue) {
-    if (jsonValue == null || jsonValue.trim().isEmpty) return <Map<String, String>>[];
+    if (jsonValue == null || jsonValue.trim().isEmpty) {
+      return <Map<String, String>>[];
+    }
     try {
       final dynamic decoded = jsonDecode(jsonValue);
       if (decoded is List) {
         return decoded
-            .map((dynamic item) => Map<String, String>.from((item as Map).map(
-                  (key, value) => MapEntry(key.toString(), value?.toString() ?? ''),
-                )))
+            .map(
+              (dynamic item) => Map<String, String>.from(
+                (item as Map).map(
+                  (key, value) =>
+                      MapEntry(key.toString(), value?.toString() ?? ''),
+                ),
+              ),
+            )
             .toList();
       }
     } catch (_) {}
     return <Map<String, String>>[];
+  }
+
+  bool _isMyCompanyJob(Map<String, dynamic> job, String companyId) {
+    if (companyId.trim().isEmpty) return false;
+    final candidates = <String>[
+      job['companyId']?.toString() ?? '',
+      job['company_id']?.toString() ?? '',
+      job['ownerId']?.toString() ?? '',
+      job['userId']?.toString() ?? '',
+      job['createdBy']?.toString() ?? '',
+      (job['company'] is Map)
+          ? (job['company']['id']?.toString() ??
+                job['company']['_id']?.toString() ??
+                '')
+          : '',
+    ];
+    return candidates.any((value) => value.trim() == companyId.trim());
   }
 }

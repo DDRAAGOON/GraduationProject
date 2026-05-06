@@ -68,6 +68,7 @@ class SessionManager {
     await prefs.remove('company_benefits');
     await prefs.remove('company_commercialRegister');
     await prefs.remove('company_nationalNumber');
+    await prefs.remove('company_website');
     await prefs.remove('company_contacts_json');
     await prefs.remove('auth_token');
   }
@@ -75,6 +76,7 @@ class SessionManager {
   static Future<void> saveCompanyFullProfile({
     required String staff,
     required String industry,
+    required String website,
     required String aboutEn,
     required String aboutAr,
     required List<String> locations,
@@ -90,6 +92,7 @@ class SessionManager {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('company_staff', staff);
     await prefs.setString('company_industry', industry);
+    await prefs.setString('company_website', website);
     await prefs.setString('company_aboutEn', aboutEn);
     await prefs.setString('company_aboutAr', aboutAr);
     await prefs.setStringList('company_locations', locations);
@@ -123,6 +126,7 @@ class SessionManager {
     return {
       'staff': prefs.getString('company_staff') ?? '',
       'industry': prefs.getString('company_industry') ?? '',
+      'website': prefs.getString('company_website') ?? '',
       'aboutEn': prefs.getString('company_aboutEn') ?? '',
       'aboutAr': prefs.getString('company_aboutAr') ?? '',
       'locations': prefs.getStringList('company_locations') ?? <String>[],

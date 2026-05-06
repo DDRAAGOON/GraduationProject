@@ -1,0 +1,160 @@
+Index: .idea/libraries/Dart_SDK.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><component name=\"libraryTable\">\r\n  <library name=\"Dart SDK\">\r\n    <CLASSES>\r\n      <root url=\"file://C:/Src/flutter/bin/cache/dart-sdk/lib/_internal\" />\r\n      <root url=\"file://C:/Src/flutter/bin/cache/dart-sdk/lib/async\" />\r\n      <root url=\"file://C:/Src/flutter/bin/cache/dart-sdk/lib/cli\" />\r\n      <root url=\"file://C:/Src/flutter/bin/cache/dart-sdk/lib/collection\" />\r\n      <root url=\"file://C:/Src/flutter/bin/cache/dart-sdk/lib/concurrent\" />\r\n      <root url=\"file://C:/Src/flutter/bin/cache/dart-sdk/lib/convert\" />\r\n      <root url=\"file://C:/Src/flutter/bin/cache/dart-sdk/lib/core\" />\r\n      <root url=\"file://C:/Src/flutter/bin/cache/dart-sdk/lib/developer\" />\r\n      <root url=\"file://C:/Src/flutter/bin/cache/dart-sdk/lib/ffi\" />\r\n      <root url=\"file://C:/Src/flutter/bin/cache/dart-sdk/lib/html\" />\r\n      <root url=\"file://C:/Src/flutter/bin/cache/dart-sdk/lib/indexed_db\" />\r\n      <root url=\"file://C:/Src/flutter/bin/cache/dart-sdk/lib/io\" />\r\n      <root url=\"file://C:/Src/flutter/bin/cache/dart-sdk/lib/isolate\" />\r\n      <root url=\"file://C:/Src/flutter/bin/cache/dart-sdk/lib/js\" />\r\n      <root url=\"file://C:/Src/flutter/bin/cache/dart-sdk/lib/js_interop\" />\r\n      <root url=\"file://C:/Src/flutter/bin/cache/dart-sdk/lib/js_interop_unsafe\" />\r\n      <root url=\"file://C:/Src/flutter/bin/cache/dart-sdk/lib/js_util\" />\r\n      <root url=\"file://C:/Src/flutter/bin/cache/dart-sdk/lib/math\" />\r\n      <root url=\"file://C:/Src/flutter/bin/cache/dart-sdk/lib/mirrors\" />\r\n      <root url=\"file://C:/Src/flutter/bin/cache/dart-sdk/lib/svg\" />\r\n      <root url=\"file://C:/Src/flutter/bin/cache/dart-sdk/lib/typed_data\" />\r\n      <root url=\"file://C:/Src/flutter/bin/cache/dart-sdk/lib/web_audio\" />\r\n      <root url=\"file://C:/Src/flutter/bin/cache/dart-sdk/lib/web_gl\" />\r\n    </CLASSES>\r\n    <JAVADOC />\r\n    <SOURCES />\r\n  </library>\r\n</component>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/libraries/Dart_SDK.xml b/.idea/libraries/Dart_SDK.xml
+--- a/.idea/libraries/Dart_SDK.xml	(revision 585b226510d1b8eed5b12e490441c35c825df365)
++++ b/.idea/libraries/Dart_SDK.xml	(date 1777729636195)
+@@ -1,29 +1,29 @@
+ <component name="libraryTable">
+   <library name="Dart SDK">
+     <CLASSES>
+-      <root url="file://C:/Src/flutter/bin/cache/dart-sdk/lib/_internal" />
+-      <root url="file://C:/Src/flutter/bin/cache/dart-sdk/lib/async" />
+-      <root url="file://C:/Src/flutter/bin/cache/dart-sdk/lib/cli" />
+-      <root url="file://C:/Src/flutter/bin/cache/dart-sdk/lib/collection" />
+-      <root url="file://C:/Src/flutter/bin/cache/dart-sdk/lib/concurrent" />
+-      <root url="file://C:/Src/flutter/bin/cache/dart-sdk/lib/convert" />
+-      <root url="file://C:/Src/flutter/bin/cache/dart-sdk/lib/core" />
+-      <root url="file://C:/Src/flutter/bin/cache/dart-sdk/lib/developer" />
+-      <root url="file://C:/Src/flutter/bin/cache/dart-sdk/lib/ffi" />
+-      <root url="file://C:/Src/flutter/bin/cache/dart-sdk/lib/html" />
+-      <root url="file://C:/Src/flutter/bin/cache/dart-sdk/lib/indexed_db" />
+-      <root url="file://C:/Src/flutter/bin/cache/dart-sdk/lib/io" />
+-      <root url="file://C:/Src/flutter/bin/cache/dart-sdk/lib/isolate" />
+-      <root url="file://C:/Src/flutter/bin/cache/dart-sdk/lib/js" />
+-      <root url="file://C:/Src/flutter/bin/cache/dart-sdk/lib/js_interop" />
+-      <root url="file://C:/Src/flutter/bin/cache/dart-sdk/lib/js_interop_unsafe" />
+-      <root url="file://C:/Src/flutter/bin/cache/dart-sdk/lib/js_util" />
+-      <root url="file://C:/Src/flutter/bin/cache/dart-sdk/lib/math" />
+-      <root url="file://C:/Src/flutter/bin/cache/dart-sdk/lib/mirrors" />
+-      <root url="file://C:/Src/flutter/bin/cache/dart-sdk/lib/svg" />
+-      <root url="file://C:/Src/flutter/bin/cache/dart-sdk/lib/typed_data" />
+-      <root url="file://C:/Src/flutter/bin/cache/dart-sdk/lib/web_audio" />
+-      <root url="file://C:/Src/flutter/bin/cache/dart-sdk/lib/web_gl" />
++      <root url="file://C:/flutter/bin/cache/dart-sdk/lib/_internal" />
++      <root url="file://C:/flutter/bin/cache/dart-sdk/lib/async" />
++      <root url="file://C:/flutter/bin/cache/dart-sdk/lib/cli" />
++      <root url="file://C:/flutter/bin/cache/dart-sdk/lib/collection" />
++      <root url="file://C:/flutter/bin/cache/dart-sdk/lib/concurrent" />
++      <root url="file://C:/flutter/bin/cache/dart-sdk/lib/convert" />
++      <root url="file://C:/flutter/bin/cache/dart-sdk/lib/core" />
++      <root url="file://C:/flutter/bin/cache/dart-sdk/lib/developer" />
++      <root url="file://C:/flutter/bin/cache/dart-sdk/lib/ffi" />
++      <root url="file://C:/flutter/bin/cache/dart-sdk/lib/html" />
++      <root url="file://C:/flutter/bin/cache/dart-sdk/lib/indexed_db" />
++      <root url="file://C:/flutter/bin/cache/dart-sdk/lib/io" />
++      <root url="file://C:/flutter/bin/cache/dart-sdk/lib/isolate" />
++      <root url="file://C:/flutter/bin/cache/dart-sdk/lib/js" />
++      <root url="file://C:/flutter/bin/cache/dart-sdk/lib/js_interop" />
++      <root url="file://C:/flutter/bin/cache/dart-sdk/lib/js_interop_unsafe" />
++      <root url="file://C:/flutter/bin/cache/dart-sdk/lib/js_util" />
++      <root url="file://C:/flutter/bin/cache/dart-sdk/lib/math" />
++      <root url="file://C:/flutter/bin/cache/dart-sdk/lib/mirrors" />
++      <root url="file://C:/flutter/bin/cache/dart-sdk/lib/svg" />
++      <root url="file://C:/flutter/bin/cache/dart-sdk/lib/typed_data" />
++      <root url="file://C:/flutter/bin/cache/dart-sdk/lib/web_audio" />
++      <root url="file://C:/flutter/bin/cache/dart-sdk/lib/web_gl" />
+     </CLASSES>
+     <JAVADOC />
+     <SOURCES />
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"AutoImportSettings\">\r\n    <option name=\"autoReloadType\" value=\"NONE\" />\r\n  </component>\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"89a40d2e-dee6-4edc-af06-e2e78f633ab0\" name=\"Changes\" comment=\"v2\">\r\n      <change afterPath=\"$PROJECT_DIR$/graduationproject/assets/company/Onboarding/Rectangle 2730 (Stroke).png\" afterDir=\"false\" />\r\n      <change afterPath=\"$PROJECT_DIR$/graduationproject/assets/company/Onboarding/Rectangle 2733.png\" afterDir=\"false\" />\r\n      <change afterPath=\"$PROJECT_DIR$/graduationproject/assets/company/Onboarding/Vector 2355.png\" afterDir=\"false\" />\r\n      <change afterPath=\"$PROJECT_DIR$/graduationproject/assets/company/Onboarding/image 42 1.png\" afterDir=\"false\" />\r\n      <change afterPath=\"$PROJECT_DIR$/graduationproject/assets/company/Onboarding/kkk.png\" afterDir=\"false\" />\r\n      <change afterPath=\"$PROJECT_DIR$/graduationproject/lib/screens/splash/splash_screen.dart\" afterDir=\"false\" />\r\n      <change afterPath=\"$PROJECT_DIR$/graduationproject/lib/screens/user/home/company_details_screen.dart\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/graduationproject/lib/app/app.dart\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/graduationproject/lib/app/app.dart\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/graduationproject/lib/app/router/app_router.dart\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/graduationproject/lib/app/router/app_router.dart\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/graduationproject/lib/screens/logo/logo_page.dart\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/graduationproject/lib/screens/logo/logo_page.dart\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/graduationproject/lib/screens/user/home/recruitment_user_shell_screen.dart\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/graduationproject/lib/screens/user/home/recruitment_user_shell_screen.dart\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/graduationproject/lib/screens/user/jobs/recruitment_application_timeline_screen.dart\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/graduationproject/lib/screens/user/jobs/recruitment_application_timeline_screen.dart\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/graduationproject/lib/screens/user/jobs/recruitment_job_application_screen.dart\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/graduationproject/lib/screens/user/jobs/recruitment_job_application_screen.dart\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/graduationproject/lib/screens/user/jobs/recruitment_job_details_screen.dart\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/graduationproject/lib/screens/user/jobs/recruitment_job_details_screen.dart\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/graduationproject/lib/screens/user/jobs/recruitment_job_filters_screen.dart\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/graduationproject/lib/screens/user/jobs/recruitment_job_filters_screen.dart\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/graduationproject/lib/screens/user/messages/chat_thread_screen.dart\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/graduationproject/lib/screens/user/messages/chat_thread_screen.dart\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/graduationproject/lib/screens/user/messages/messages_list_screen.dart\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/graduationproject/lib/screens/user/messages/messages_list_screen.dart\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/graduationproject/lib/screens/user/profile/edit_profile_screen.dart\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/graduationproject/lib/screens/user/profile/edit_profile_screen.dart\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/graduationproject/lib/screens/user/profile/profile_overview_screen.dart\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/graduationproject/lib/screens/user/profile/profile_overview_screen.dart\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/Tradesman_Messages/chat_tradesman.dart\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/Tradesman_Messages/chat_tradesman.dart\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/Tradesman_Messages/messages_list.dart\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/Tradesman_Messages/messages_list.dart\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/home/tradesman_job_details_screen.dart\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/home/tradesman_job_details_screen.dart\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/nav_Botton_bar/nav_bottom_bar.dart\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/nav_Botton_bar/nav_bottom_bar.dart\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/graduationproject/lib/shared/state/recruitment_sync_store.dart\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/graduationproject/lib/shared/state/recruitment_sync_store.dart\" afterDir=\"false\" />\r\n    </list>\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"ClangdSettings\">\r\n    <option name=\"formatViaClangd\" value=\"false\" />\r\n  </component>\r\n  <component name=\"FileTemplateManagerImpl\">\r\n    <option name=\"RECENT_TEMPLATES\">\r\n      <list>\r\n        <option value=\"Dart File\" />\r\n      </list>\r\n    </option>\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"RECENT_BRANCH_BY_REPOSITORY\">\r\n      <map>\r\n        <entry key=\"$PROJECT_DIR$\" value=\"new\" />\r\n      </map>\r\n    </option>\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"GitHubPullRequestSearchHistory\">{\r\n  &quot;lastFilter&quot;: {\r\n    &quot;state&quot;: &quot;OPEN&quot;,\r\n    &quot;assignee&quot;: &quot;karim4396&quot;\r\n  }\r\n}</component>\r\n  <component name=\"GithubPullRequestsUISettings\">{\r\n  &quot;selectedUrlAndAccountId&quot;: {\r\n    &quot;url&quot;: &quot;https://github.com/DDRAAGOON/GraduationProject.git&quot;,\r\n    &quot;accountId&quot;: &quot;6e555b60-5176-4b21-9477-f1f41e1faad9&quot;\r\n  }\r\n}</component>\r\n  <component name=\"ProjectColorInfo\">{\r\n  &quot;customColor&quot;: &quot;&quot;,\r\n  &quot;associatedIndex&quot;: 0\r\n}</component>\r\n  <component name=\"ProjectId\" id=\"3BASStJYxGiaJcu8FOMksOKGb9D\" />\r\n  <component name=\"ProjectLevelVcsManager\">\r\n    <ConfirmationsSetting value=\"2\" id=\"Add\" />\r\n  </component>\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\">{\r\n  &quot;keyToString&quot;: {\r\n    &quot;Flutter.GraduationProject.executor&quot;: &quot;Run&quot;,\r\n    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,\r\n    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,\r\n    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,\r\n    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,\r\n    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,\r\n    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,\r\n    &quot;SONARLINT_PRECOMMIT_ANALYSIS&quot;: &quot;true&quot;,\r\n    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,\r\n    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,\r\n    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,\r\n    &quot;git-widget-placeholder&quot;: &quot;final2&quot;,\r\n    &quot;io.flutter.project.isFirstOpen&quot;: &quot;true&quot;,\r\n    &quot;io.flutter.reload.alreadyRun&quot;: &quot;true&quot;,\r\n    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,\r\n    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,\r\n    &quot;show.migrate.to.gradle.popup&quot;: &quot;false&quot;\r\n  }\r\n}</component>\r\n  <component name=\"RecentsManager\">\r\n    <key name=\"MoveFile.RECENT_KEYS\">\r\n      <recent name=\"D:\\GraduationProject\\graduationproject\\assets\\company\\Onboarding\" />\r\n      <recent name=\"D:\\GraduationProject\\graduationproject\\assets\\company\\icon\" />\r\n    </key>\r\n  </component>\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\r\n      <changelist id=\"89a40d2e-dee6-4edc-af06-e2e78f633ab0\" name=\"Changes\" comment=\"\" />\r\n      <created>1773930386095</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1773930386095</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00001\" summary=\"2\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1776274061762</created>\r\n      <option name=\"number\" value=\"00001\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1776274061762</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00002\" summary=\"2\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1776274067658</created>\r\n      <option name=\"number\" value=\"00002\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00002\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1776274067658</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00003\" summary=\"2.\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1776727124091</created>\r\n      <option name=\"number\" value=\"00003\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00003\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1776727124091</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00004\" summary=\"2.\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1776727185863</created>\r\n      <option name=\"number\" value=\"00004\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00004\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1776727185863</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00005\" summary=\"2.9\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1776728579370</created>\r\n      <option name=\"number\" value=\"00005\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00005\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1776728579370</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00006\" summary=\"3\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1776730418840</created>\r\n      <option name=\"number\" value=\"00006\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00006\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1776730418840</updated>\r\n    </task>\r\n    <task id=\"LOCAL\u061C-٠٠٠٠٧\" summary=\"3user done\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1776825352144</created>\r\n      <option name=\"number\" value=\"٠٠٠٠٧\" />\r\n      <option name=\"presentableId\" value=\"LOCAL\u061C-٠٠٠٠٧\" />\r\n      <option name=\"project\" value=\"LOCAL\u061C\" />\r\n      <updated>1776825352146</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00008\" summary=\"v2\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1777055843847</created>\r\n      <option name=\"number\" value=\"00008\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00008\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1777055843847</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00009\" summary=\"v2\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1777058026249</created>\r\n      <option name=\"number\" value=\"00009\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00009\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1777058026249</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00010\" summary=\"v2\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1777125434895</created>\r\n      <option name=\"number\" value=\"00010\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00010\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1777125434895</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00011\" summary=\"v2\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1777125547958</created>\r\n      <option name=\"number\" value=\"00011\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00011\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1777125547958</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00012\" summary=\"v2.5\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1777155550582</created>\r\n      <option name=\"number\" value=\"00012\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00012\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1777155550582</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00013\" summary=\"v2.5\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1777170674444</created>\r\n      <option name=\"number\" value=\"00013\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00013\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1777170674445</updated>\r\n    </task>\r\n    <task id=\"LOCAL\u061C-٠٠٠١٤\" summary=\"v2.5&#10;kkk&#10;kkkkk\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1777249598856</created>\r\n      <option name=\"number\" value=\"٠٠٠١٤\" />\r\n      <option name=\"presentableId\" value=\"LOCAL\u061C-٠٠٠١٤\" />\r\n      <option name=\"project\" value=\"LOCAL\u061C\" />\r\n      <updated>1777249598857</updated>\r\n    </task>\r\n    <task id=\"LOCAL\u061C-٠٠٠١٥\" summary=\"v2.5&#10;kkk&#10;kkkkk&#10;vvvvvv\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1777253347832</created>\r\n      <option name=\"number\" value=\"٠٠٠١٥\" />\r\n      <option name=\"presentableId\" value=\"LOCAL\u061C-٠٠٠١٥\" />\r\n      <option name=\"project\" value=\"LOCAL\u061C\" />\r\n      <updated>1777253347832</updated>\r\n    </task>\r\n    <task id=\"LOCAL\u061C-٠٠٠١٦\" summary=\"v2.5&#10;kkk&#10;kkkkk&#10;vvvvvv\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1777255374860</created>\r\n      <option name=\"number\" value=\"٠٠٠١٦\" />\r\n      <option name=\"presentableId\" value=\"LOCAL\u061C-٠٠٠١٦\" />\r\n      <option name=\"project\" value=\"LOCAL\u061C\" />\r\n      <updated>1777255374860</updated>\r\n    </task>\r\n    <task id=\"LOCAL\u061C-٠٠٠١٧\" summary=\"v2.5&#10;kkk&#10;kkkkk&#10;vvvvvv&#10;التعديل رقم 5555\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1777261735716</created>\r\n      <option name=\"number\" value=\"٠٠٠١٧\" />\r\n      <option name=\"presentableId\" value=\"LOCAL\u061C-٠٠٠١٧\" />\r\n      <option name=\"project\" value=\"LOCAL\u061C\" />\r\n      <updated>1777261735716</updated>\r\n    </task>\r\n    <task id=\"LOCAL\u061C-٠٠٠١٨\" summary=\"v2\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1777678181919</created>\r\n      <option name=\"number\" value=\"٠٠٠١٨\" />\r\n      <option name=\"presentableId\" value=\"LOCAL\u061C-٠٠٠١٨\" />\r\n      <option name=\"project\" value=\"LOCAL\u061C\" />\r\n      <updated>1777678181921</updated>\r\n    </task>\r\n    <option name=\"localTasksCounter\" value=\"19\" />\r\n    <servers />\r\n  </component>\r\n  <component name=\"VcsManagerConfiguration\">\r\n    <MESSAGE value=\"2\" />\r\n    <MESSAGE value=\"2.\" />\r\n    <MESSAGE value=\"2.9\" />\r\n    <MESSAGE value=\"3\" />\r\n    <MESSAGE value=\"3user done\" />\r\n    <MESSAGE value=\"v2.5\" />\r\n    <MESSAGE value=\"v2.5&#10;kkk&#10;kkkkk\" />\r\n    <MESSAGE value=\"v2.5&#10;kkk&#10;kkkkk&#10;vvvvvv\" />\r\n    <MESSAGE value=\"v2.5&#10;kkk&#10;kkkkk&#10;vvvvvv&#10;التعديل رقم 5555\" />\r\n    <MESSAGE value=\"v2\" />\r\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"v2\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision 585b226510d1b8eed5b12e490441c35c825df365)
++++ b/.idea/workspace.xml	(date 1777730312849)
+@@ -4,32 +4,9 @@
+     <option name="autoReloadType" value="NONE" />
+   </component>
+   <component name="ChangeListManager">
+-    <list default="true" id="89a40d2e-dee6-4edc-af06-e2e78f633ab0" name="Changes" comment="v2">
+-      <change afterPath="$PROJECT_DIR$/graduationproject/assets/company/Onboarding/Rectangle 2730 (Stroke).png" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/graduationproject/assets/company/Onboarding/Rectangle 2733.png" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/graduationproject/assets/company/Onboarding/Vector 2355.png" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/graduationproject/assets/company/Onboarding/image 42 1.png" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/graduationproject/assets/company/Onboarding/kkk.png" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/graduationproject/lib/screens/splash/splash_screen.dart" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/home/company_details_screen.dart" afterDir="false" />
++    <list default="true" id="89a40d2e-dee6-4edc-af06-e2e78f633ab0" name="Changes" comment="v2.5&#10;kkk&#10;kkkkk&#10;vvvvvv&#10;التعديل رقم 5555">
++      <change beforePath="$PROJECT_DIR$/.idea/libraries/Dart_SDK.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Dart_SDK.xml" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/app/app.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/app/app.dart" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/app/router/app_router.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/app/router/app_router.dart" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/logo/logo_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/logo/logo_page.dart" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/home/recruitment_user_shell_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/home/recruitment_user_shell_screen.dart" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/jobs/recruitment_application_timeline_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/jobs/recruitment_application_timeline_screen.dart" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/jobs/recruitment_job_application_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/jobs/recruitment_job_application_screen.dart" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/jobs/recruitment_job_details_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/jobs/recruitment_job_details_screen.dart" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/jobs/recruitment_job_filters_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/jobs/recruitment_job_filters_screen.dart" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/messages/chat_thread_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/messages/chat_thread_screen.dart" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/messages/messages_list_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/messages/messages_list_screen.dart" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/profile/edit_profile_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/profile/edit_profile_screen.dart" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/profile/profile_overview_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/profile/profile_overview_screen.dart" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/Tradesman_Messages/chat_tradesman.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/Tradesman_Messages/chat_tradesman.dart" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/Tradesman_Messages/messages_list.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/Tradesman_Messages/messages_list.dart" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/home/tradesman_job_details_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/home/tradesman_job_details_screen.dart" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/nav_Botton_bar/nav_bottom_bar.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/nav_Botton_bar/nav_bottom_bar.dart" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/shared/state/recruitment_sync_store.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/shared/state/recruitment_sync_store.dart" afterDir="false" />
+     </list>
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+@@ -101,7 +78,6 @@
+ }</component>
+   <component name="RecentsManager">
+     <key name="MoveFile.RECENT_KEYS">
+-      <recent name="D:\GraduationProject\graduationproject\assets\company\Onboarding" />
+       <recent name="D:\GraduationProject\graduationproject\assets\company\icon" />
+     </key>
+   </component>
+@@ -249,28 +225,31 @@
+       <option name="project" value="LOCAL؜" />
+       <updated>1777261735716</updated>
+     </task>
+-    <task id="LOCAL؜-٠٠٠١٨" summary="v2">
+-      <option name="closed" value="true" />
+-      <created>1777678181919</created>
+-      <option name="number" value="٠٠٠١٨" />
+-      <option name="presentableId" value="LOCAL؜-٠٠٠١٨" />
+-      <option name="project" value="LOCAL؜" />
+-      <updated>1777678181921</updated>
+-    </task>
+-    <option name="localTasksCounter" value="19" />
++    <option name="localTasksCounter" value="18" />
+     <servers />
+   </component>
++  <component name="Vcs.Log.Tabs.Properties">
++    <option name="TAB_STATES">
++      <map>
++        <entry key="MAIN">
++          <value>
++            <State />
++          </value>
++        </entry>
++      </map>
++    </option>
++  </component>
+   <component name="VcsManagerConfiguration">
+     <MESSAGE value="2" />
+     <MESSAGE value="2." />
+     <MESSAGE value="2.9" />
+     <MESSAGE value="3" />
+     <MESSAGE value="3user done" />
++    <MESSAGE value="v2" />
+     <MESSAGE value="v2.5" />
+     <MESSAGE value="v2.5&#10;kkk&#10;kkkkk" />
+     <MESSAGE value="v2.5&#10;kkk&#10;kkkkk&#10;vvvvvv" />
+     <MESSAGE value="v2.5&#10;kkk&#10;kkkkk&#10;vvvvvv&#10;التعديل رقم 5555" />
+-    <MESSAGE value="v2" />
+-    <option name="LAST_COMMIT_MESSAGE" value="v2" />
++    <option name="LAST_COMMIT_MESSAGE" value="v2.5&#10;kkk&#10;kkkkk&#10;vvvvvv&#10;التعديل رقم 5555" />
+   </component>
+ </project>
+\ No newline at end of file

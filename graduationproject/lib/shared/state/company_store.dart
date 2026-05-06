@@ -149,14 +149,19 @@ class CompanyStore extends ChangeNotifier {
     if (data['name'] != null) _companyName = data['name']!;
     if (data['id'] != null) _companyId = data['id']!;
     if (data['photo'] != null) _customProfileImage = data['photo']!;
-    
-    final full = await SessionManager.getCompanyFullProfile();
-    await loadFromSession(full);
+    notifyListeners();
   }
 
   Future<void> syncFromMap(Map<String, dynamic> data) async {
+    if (data['id'] != null && data['id'].toString().trim().isNotEmpty) {
+      _companyId = data['id'].toString().trim();
+    } else if (data['_id'] != null &&
+        data['_id'].toString().trim().isNotEmpty) {
+      _companyId = data['_id'].toString().trim();
+    }
     if (data['staff'] != null) _staff = data['staff'].toString();
     if (data['industry'] != null) _industry = data['industry'].toString();
+    if (data['website'] != null) _website = data['website'].toString();
     
     // In the backend 'about' is a single field. For now we sync it to both locales 
     // unless the backend eventually returns separate fields.
@@ -209,6 +214,7 @@ class CompanyStore extends ChangeNotifier {
   Future<void> loadFromSession(Map<String, dynamic> data) async {
     _staff = data['staff'] as String? ?? '';
     _industry = data['industry'] as String? ?? '';
+    _website = data['website'] as String? ?? '';
     _aboutEn = data['aboutEn'] as String? ?? '';
     _aboutAr = data['aboutAr'] as String? ?? '';
     _locations = List<String>.from(data['locations'] as List? ?? []);
@@ -252,9 +258,21 @@ class CompanyStore extends ChangeNotifier {
   List<Job> get jobs => List<Job>.unmodifiable(_jobs);
   List<ContactEntry> get contacts => List<ContactEntry>.unmodifiable(_contacts);
 
-  /// Retrieves a specific job by its ID, returning a mock fallback if not found.
+  /// Retrieves a specific job by its ID and returns an empty placeholder if missing.
   Job jobById(String id) {
-    return _jobs.firstWhere((job) => job.id == id, orElse: Job.mock);
+    return _jobs.firstWhere(
+      (job) => job.id == id,
+      orElse: () => Job(
+        id: '',
+        companyId: '',
+        title: '',
+        companyName: '',
+        location: '',
+        employmentType: '',
+        classification: '',
+        salaryRange: '',
+      ),
+    );
   }
 
   /// Inserts a new job at the top of the list or updates an existing one if ID matches.

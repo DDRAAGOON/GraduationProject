@@ -14,7 +14,6 @@ import '../../../shared/state/locale_controller.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_scaffold.dart';
 import '../../../shared/widgets/app_text_field.dart';
-import '../../../shared/services/session_manager.dart';
 import '../../../shared/services/recruitment_sync_service.dart';
 
 import '../../../app/router/app_router.dart';
@@ -122,6 +121,9 @@ class _CompanyProfileSettingsOverviewScreenState
         benefits: _benefits,
         techStack: _techStack,
         industry: _industryController.text.trim(),
+        foundedDay: _selectedDay,
+        foundedMonth: _selectedMonth,
+        foundedYear: _selectedYear,
       );
 
       // Local persistence
@@ -139,22 +141,6 @@ class _CompanyProfileSettingsOverviewScreenState
         foundedYear: _selectedYear,
         benefits: _benefits,
         classification: _selectedClassification,
-        commercialRegister: store.commercialRegister,
-        nationalNumber: store.nationalNumber,
-      );
-
-      await SessionManager.saveCompanyFullProfile(
-        staff: _staffController.text.trim(),
-        industry: _industryController.text.trim(),
-        aboutEn: isAr ? store.companyAboutEn : _about.text.trim(),
-        aboutAr: isAr ? _about.text.trim() : store.companyAboutAr,
-        locations: _locations,
-        techStack: _techStack,
-        foundedDay: _selectedDay,
-        foundedMonth: _selectedMonth,
-        foundedYear: _selectedYear,
-        classification: _selectedClassification,
-        benefits: _benefits,
         commercialRegister: store.commercialRegister,
         nationalNumber: store.nationalNumber,
       );
@@ -457,9 +443,8 @@ class _CompanyProfileSettingsOverviewScreenState
         final bytes = await pickedFile.readAsBytes();
         final base64Image = 'data:image/jpeg;base64,${base64Encode(bytes)}';
 
-        // Update local store first for immediate feedback
+        // Update UI immediately, source of truth remains backend.
         CompanyStore.instance.setRegistrationData(customProfileImage: base64Image);
-        await SessionManager.saveCompanyPhoto(base64Image);
 
         // Sync with backend
         await RecruitmentSyncService.instance.updateProfile(photoUrl: base64Image);

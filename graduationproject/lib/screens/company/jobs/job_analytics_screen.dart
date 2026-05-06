@@ -81,9 +81,12 @@ class _AnalyticsBodyState extends State<_AnalyticsBody> {
         RecruitmentSyncStore.instance,
       ]),
       builder: (context, _) {
-        final companyJobs = RecruitmentSyncStore.instance.jobs
-            .where((j) => j.companyName == CompanyStore.instance.companyName)
-            .toList();
+        final companyId = CompanyStore.instance.companyId.trim();
+        final companyJobs = (companyId.isNotEmpty
+            ? RecruitmentSyncStore.instance.jobs
+                .where((j) => j.companyId.trim() == companyId)
+                .toList()
+            : <RecruitmentJob>[]);
         final openJobs = companyJobs
             .where((j) => j.status == 'Open')
             .length;
@@ -685,9 +688,12 @@ class _ApplicantsBreakdownCard extends StatelessWidget {
       ]),
       builder: (context, _) {
         final apps = RecruitmentSyncStore.instance.applications;
-        final companyJobs = RecruitmentSyncStore.instance.jobs
-            .where((j) => j.companyName == CompanyStore.instance.companyName)
-            .toList();
+        final cId = CompanyStore.instance.companyId.trim();
+        final companyJobs = (cId.isNotEmpty
+            ? RecruitmentSyncStore.instance.jobs
+                .where((j) => j.companyId.trim() == cId)
+                .toList()
+            : <RecruitmentJob>[]);
         
         // Calculate real breakdown by joining with Job data
         int fullTime = 0;

@@ -141,6 +141,14 @@ final class CompanyApiClient {
     return Map<String, dynamic>.from(response.data as Map);
   }
 
+  Future<Map<String, dynamic>> fetchProfile() async {
+    final Response<dynamic> response = await _dio.get<dynamic>(
+      ApiEndpoints.profile,
+      options: _authOptions,
+    );
+    return Map<String, dynamic>.from(response.data as Map);
+  }
+
   Future<List<Map<String, dynamic>>> fetchJobs() async {
     final Response<dynamic> response = await _dio.get<dynamic>(
       ApiEndpoints.jobs,
