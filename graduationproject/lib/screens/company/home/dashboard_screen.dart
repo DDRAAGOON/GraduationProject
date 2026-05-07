@@ -1,9 +1,10 @@
 // Company home: KPIs, shortcuts, and recent jobs.
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';
-import '../../../app/theme/app_colors.dart';
 import '../../../shared/l10n/app_localizations.dart';
 import '../../../shared/models/job.dart';
 import '../../../shared/state/company_store.dart';
@@ -11,7 +12,6 @@ import '../../../shared/services/recruitment_sync_service.dart';
 import '../../../shared/state/recruitment_sync_store.dart';
 import '../../../shared/widgets/app_scaffold.dart';
 import '../../../shared/widgets/section_title.dart';
-import '../widgets/company_app_bar_title.dart';
 import '../widgets/company_bottom_nav.dart';
 
 class CompanyDashboardScreen extends StatefulWidget {
@@ -39,7 +39,53 @@ class _CompanyDashboardScreenState extends State<CompanyDashboardScreen> {
       ]),
       builder: (context, _) {
         return AppScaffold(
-          titleWidget: const CompanyAppBarIdentity(),
+          titleWidget: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              InkWell(
+                onTap: () => Navigator.of(
+                  context,
+                ).pushNamed(AppRoutes.companyProfileOverview),
+                borderRadius: BorderRadius.circular(20),
+                child: ClipOval(
+                  child: companyStore.companyProfileImage == null
+                      ? Container(
+                          width: 40,
+                          height: 40,
+                          color: Theme.of(context).colorScheme.surfaceBright,
+                          child: Icon(
+                            Icons.business,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        )
+                      : companyStore.companyProfileImage!.startsWith('assets/')
+                      ? Image.asset(
+                          companyStore.companyProfileImage!,
+                          width: 40,
+                          height: 40,
+                          fit: BoxFit.cover,
+                        )
+                      : Image.file(
+                          File(companyStore.companyProfileImage!),
+                          width: 40,
+                          height: 40,
+                          fit: BoxFit.cover,
+                        ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Flexible(
+                child: Text(
+                  companyStore.companyName,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w900,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+              ),
+            ],
+          ),
           showBack: false,
           centerTitle: false,
           showAppBarDivider: true,
@@ -48,16 +94,59 @@ class _CompanyDashboardScreenState extends State<CompanyDashboardScreen> {
               constraints: const BoxConstraints(maxWidth: 980),
               child: LayoutBuilder(
                 builder: (context, constraints) {
-                  final companyId = companyStore.companyId.trim();
-                  final allRemoteJobs = RecruitmentSyncStore.instance.jobs.toList();
-                  // Strictly show only this company's jobs. Never fall back to all jobs.
-                  final allJobs = (companyId.isNotEmpty
-                          ? allRemoteJobs
-                              .where((j) => j.companyId.trim() == companyId)
-                              .toList()
-                          : <RecruitmentJob>[])
-                    ..sort((a, b) => b.publishedAt.compareTo(a.publishedAt));
+                  final jobs = RecruitmentSyncStore.instance.jobs
+                      .where((j) => j.companyName == companyStore.companyName)
+                      .toList();
                   final t = AppLocalizations.of(context);
+                  void onTapNewCandidates() {
+                    if (jobs.isEmpty) {
+                      Navigator.of(context).pushNamed(
+                        AppRoutes.companyApplicantsTable,
+                        arguments: Job.mock(),
+                      );
+                      return;
+                    }
+                    final firstJob = jobs.first;
+                    final appliedCount = RecruitmentSyncStore
+                        .instance
+                        .applications
+                        .where((a) => a.jobId == firstJob.id)
+                        .length;
+                    final hiredCount = RecruitmentSyncStore
+                        .instance
+                        .applications
+                        .where(
+                          (a) =>
+                              a.jobId == firstJob.id &&
+                              a.status.toLowerCase().contains('hire'),
+                        )
+                        .length;
+                    Navigator.of(context).pushNamed(
+                      AppRoutes.companyApplicantsTable,
+                      arguments: Job(
+                        id: firstJob.id,
+                        title: firstJob.title,
+                        companyName: firstJob.companyName,
+                        location: firstJob.location,
+                        employmentType: firstJob.type,
+                        category: firstJob.category,
+                        salaryRange: firstJob.salaryRange,
+                        description: firstJob.description,
+                        responsibilities: firstJob.responsibilities,
+                        niceToHaves: firstJob.niceToHaves,
+                        qualifications: firstJob.qualifications,
+                        benefits: firstJob.benefits
+                            .map((b) => JobBenefit(title: b, description: ''))
+                            .toList(),
+                        tags: firstJob.tags,
+                        appliedCount: appliedCount,
+                        requiredCount: firstJob.capacity,
+                        acceptedCount: hiredCount,
+                        status: firstJob.status,
+                        createdAt: firstJob.publishedAt,
+                      ),
+                    );
+                  }
 
                   return ListView(
                     padding: EdgeInsets.symmetric(
@@ -65,13 +154,19 @@ class _CompanyDashboardScreenState extends State<CompanyDashboardScreen> {
                       vertical: 16,
                     ),
                     children: [
+                      _StatsGrid(
+                        availableWidth: constraints.maxWidth,
+                        jobs: jobs,
+                        onTapNewCandidates: onTapNewCandidates,
+                      ),
+                      const SizedBox(height: 18),
                       SectionTitle(t.jobUpdates),
                       const SizedBox(height: 10),
-                      ...allJobs.map(
+                      ...jobs.map(
                         (j) =>
                             _JobUpdateCard(job: j, companyStore: companyStore),
                       ),
-                      if (allJobs.isEmpty)
+                      if (jobs.isEmpty)
                         Padding(
                           padding: const EdgeInsets.only(top: 14),
                           child: Text(
@@ -93,6 +188,132 @@ class _CompanyDashboardScreenState extends State<CompanyDashboardScreen> {
   }
 }
 
+class _StatsGrid extends StatelessWidget {
+  const _StatsGrid({
+    required this.onTapNewCandidates,
+    required this.availableWidth,
+    required this.jobs,
+  });
+
+  final VoidCallback onTapNewCandidates;
+  final double availableWidth;
+  final List<RecruitmentJob> jobs;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final t = AppLocalizations.of(context);
+
+    final int crossAxisCount = availableWidth < 360
+        ? 1
+        : availableWidth >= 700
+        ? 3
+        : 2;
+
+    final double aspectRatio = availableWidth < 360
+        ? 2.8
+        : availableWidth >= 700
+        ? 1.9
+        : 1.5;
+
+    final cards = [
+      _MetricCard(
+        title: t.newCandidates,
+        value: RecruitmentSyncStore.instance.applications
+            .where((app) => jobs.any((j) => j.id == app.jobId))
+            .length
+            .toString(),
+        color: cs.primary.withOpacity(0.2),
+        onTap: onTapNewCandidates,
+      ),
+      _MetricCard(
+        title: t.messagesReceived,
+        value: RecruitmentSyncStore.instance.messages.length.toString(),
+        color: Colors.orange.withOpacity(0.25),
+        onTap: () => Navigator.of(
+          context,
+        ).pushReplacementNamed(AppRoutes.companyMessagesList),
+      ),
+    ];
+
+    return GridView.count(
+      crossAxisCount: crossAxisCount,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      crossAxisSpacing: 12,
+      mainAxisSpacing: 12,
+      childAspectRatio: aspectRatio,
+      children: cards,
+    );
+  }
+}
+
+class _MetricCard extends StatelessWidget {
+  const _MetricCard({
+    required this.title,
+    required this.value,
+    required this.color,
+    required this.onTap,
+  });
+
+  final String title;
+  final String value;
+  final Color color;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(18),
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        title,
+                        style: Theme.of(context).textTheme.labelLarge,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
+                      ),
+                    ),
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: AlignmentDirectional.centerStart,
+                      child: Text(
+                        value,
+                        style: Theme.of(context).textTheme.headlineSmall
+                            ?.copyWith(fontWeight: FontWeight.w900),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                width: 38,
+                height: 38,
+                decoration: BoxDecoration(
+                  color: color,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(Icons.trending_up, size: 20),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _JobUpdateCard extends StatelessWidget {
   const _JobUpdateCard({required this.job, required this.companyStore});
 
@@ -102,35 +323,19 @@ class _JobUpdateCard extends StatelessWidget {
   Color _getJobTypeColor(String type) {
     switch (type.toLowerCase().trim()) {
       case 'full-time':
-        return AppColors.success;
+        return Colors.green;
       case 'part-time':
-        return AppColors.lightPrimary;
+        return Colors.blue;
       case 'remote':
-        return AppColors.info;
+        return Colors.purple;
       case 'freelance':
-        return AppColors.lightAccent;
+        return Colors.teal;
       case 'one-time':
-        return AppColors.warning;
+        return Colors.amber;
       case 'internship':
-        return const Color(0xFF8B5CF6);
+        return Colors.indigo;
       default:
-        return AppColors.lightMuted;
-    }
-  }
-
-  Color _getCategoryColor(String category) {
-    switch (category.toLowerCase()) {
-      case 'technical':
-      case 'تقني':
-        return const Color(0xFF3B82F6);
-      case 'non-technical':
-      case 'غير تقني':
-        return const Color(0xFFEC4899);
-      case 'services':
-      case 'خدمات':
-        return const Color(0xFF8B5CF6);
-      default:
-        return const Color(0xFF6B7280);
+        return Colors.grey;
     }
   }
 
@@ -155,12 +360,11 @@ class _JobUpdateCard extends StatelessWidget {
           AppRoutes.companyJobDetails,
           arguments: Job(
             id: job.id,
-            companyId: job.companyId,
             title: job.title,
             companyName: job.companyName,
             location: job.location,
             employmentType: job.type,
-            classification: job.classification,
+            category: job.category,
             salaryRange: job.salaryRange,
             description: job.description,
             responsibilities: job.responsibilities,
@@ -198,33 +402,19 @@ class _JobUpdateCard extends StatelessWidget {
                     Expanded(
                       child: Text(
                         job.title,
-                        style: Theme.of(context).textTheme.titleMedium
-                            ?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                            ),
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    PopupMenuButton<String>(
-                        icon: Icon(
-                          Icons.more_vert,
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.onSurface.withValues(alpha: 0.5),
-                        ),
+                    if (job.status == 'Open')
+                      PopupMenuButton<String>(
+                        icon: const Icon(Icons.more_vert, color: Colors.grey),
                         onSelected: (val) async {
-                          final newStatus = val == 'close' ? 'Closed' : 'Open';
-                          final msg = val == 'close'
-                              ? (t.isAr ? 'تم إغلاق الوظيفة' : 'Job closed')
-                              : (t.isAr
-                                    ? 'تم إعادة فتح الوظيفة'
-                                    : 'Job reopened');
-                          try {
-                            if (val == 'reopen') {
-                              await RecruitmentSyncService.instance
-                                  .reopenJobAndResetAccepted(job.id);
-                            } else {
+                          if (val == 'close') {
+                            try {
                               await RecruitmentSyncService.instance.updateJob(
                                 jobId: job.id,
                                 title: job.title,
@@ -237,69 +427,48 @@ class _JobUpdateCard extends StatelessWidget {
                                 qualifications: job.qualifications,
                                 niceToHaves: job.niceToHaves,
                                 benefits: job.benefits,
-                                classification: job.classification,
+                                category: job.category,
                                 tags: job.tags,
                                 requiredCount: job.capacity,
-                                status: newStatus,
+                                status: 'Closed',
                               );
-                            }
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(
-                                context,
-                              ).showSnackBar(SnackBar(content: Text(msg)));
-                            }
-                          } catch (e) {
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Error: $e')),
-                              );
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text(t.isAr ? 'تم إغلاق الوظيفة' : 'Job closed')),
+                                );
+                              }
+                            } catch (e) {
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('Error closing job: $e')),
+                                );
+                              }
                             }
                           }
                         },
                         itemBuilder: (context) => [
-                          if (job.status == 'Open')
-                            PopupMenuItem(
-                              value: 'close',
-                              child: Row(
-                                children: [
-                                  const Icon(
-                                    Icons.lock_outline,
-                                    size: 18,
-                                    color: Colors.red,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    t.isAr ? 'إغلاق الوظيفة' : 'Close Job',
-                                    style: const TextStyle(color: Colors.red),
-                                  ),
-                                ],
-                              ),
-                            )
-                          else
-                            PopupMenuItem(
-                              value: 'reopen',
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.lock_open_outlined,
-                                    size: 18,
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    t.isAr ? 'إعادة الفتح' : 'Reopen',
-                                    style: TextStyle(
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.primary,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
+                          PopupMenuItem(
+                            value: 'close',
+                            child: Text(t.isAr ? 'إغلاق' : 'Close'),
+                          ),
                         ],
                       ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    const Icon(Icons.business, size: 16, color: Colors.grey),
+                    const SizedBox(width: 6),
+                    Text(
+                      job.companyName,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withOpacity(0.7),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 12),
@@ -307,51 +476,54 @@ class _JobUpdateCard extends StatelessWidget {
                   spacing: 8,
                   runSpacing: 8,
                   children: [
-                    for (final tTrim in [
+                    // Deduplicate and clean tags
+                    ...[
                       ...job.type.split(RegExp(r'[•,;]')),
-                      job.classification,
                       ...job.tags
-                    ].map((t) => t.trim()).where((t) => t.isNotEmpty && t.toLowerCase() != 'general').toSet())
-                      Builder(
-                        builder: (context) {
-                          final color = _getJobTypeColor(tTrim);
-                          final isClassification = tTrim.toLowerCase() == job.classification.toLowerCase();
-                          return Container(
-                            margin: const EdgeInsets.only(right: 8, bottom: 8),
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                            decoration: BoxDecoration(
-                              color: isClassification ? _getCategoryColor(tTrim) : color,
-                              borderRadius: BorderRadius.circular(8),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: (isClassification ? _getCategoryColor(tTrim) : color).withOpacity(0.3),
-                                  blurRadius: 4,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
+                    ].map((t) => t.trim())
+                     .where((t) => t.isNotEmpty && t.toLowerCase() != 'general')
+                     .toSet() // Remove duplicates
+                     .toList()
+                     .map((tTrim) {
+                      final color = _getJobTypeColor(tTrim);
+                      return Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: color,
+                          borderRadius: BorderRadius.circular(8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: color.withOpacity(0.3),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
                             ),
-                            child: Text(
-                              tTrim,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 11,
-                              ),
-                            ),
-                          );
-                        },
-                      ),
+                          ],
+                        ),
+                        child: Text(
+                          tTrim,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 11,
+                          ),
+                        ),
+                      );
+                    }),
+
                   ],
                 ),
                 const SizedBox(height: 20),
                 ListenableBuilder(
                   listenable: syncStore,
                   builder: (context, _) {
-                    final currentHiredCount = syncStore.applications
-                        .where((a) => a.jobId == job.id && a.status.toLowerCase().contains('hire'))
-                        .length;
                     final requiredCount = job.capacity > 0 ? job.capacity : 1;
-                    final progress = (currentHiredCount / requiredCount).clamp(0.0, 1.0);
+                    final progress = (hiredCount / requiredCount).clamp(
+                      0.0,
+                      1.0,
+                    );
 
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -360,7 +532,7 @@ class _JobUpdateCard extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              t.hiredProgressMsg(currentHiredCount, requiredCount),
+                              t.hiredProgressMsg(hiredCount, requiredCount),
                               style: Theme.of(context).textTheme.labelMedium
                                   ?.copyWith(
                                     fontWeight: FontWeight.bold,

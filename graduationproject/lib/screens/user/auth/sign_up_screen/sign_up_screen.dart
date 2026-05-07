@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../../app/router/app_router.dart';
 import '../../../../shared/l10n/app_localizations.dart';
+import '../../../../shared/state/recruitment_sync_store.dart';
 import '../../../../shared/services/recruitment_sync_service.dart';
 import '../../../../shared/services/session_manager.dart';
 import '../../profile/user_data.dart';
@@ -30,12 +31,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _aboutMeController = TextEditingController();
   final TextEditingController _skillsController = TextEditingController();
   final TextEditingController _socialController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
-
-  bool _obscurePassword = true;
-  bool _obscureConfirmPassword = true;
-  bool _isLoading = false;
 
   // DOB Dropdowns
   String? _selectedDay;
@@ -44,8 +39,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final List<String> _days = List.generate(31, (i) => (i + 1).toString().padLeft(2, '0'));
   final List<String> _months = List.generate(12, (i) => (i + 1).toString().padLeft(2, '0'));
   final List<String> _years = List.generate(70, (i) => (DateTime.now().year - 10 - i).toString());
-
-  String? _selectedGender;
 
   // Education Controllers
   final TextEditingController _eduInstitutionController = TextEditingController();
@@ -62,6 +55,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final List<Map<String, String>> _educationList = [];
 
   String? _profileImagePath;
+  String? _selectedGender;
   final List<String> _platforms = ["LinkedIn", "GitHub", "Twitter", "Instagram", "Facebook", "Other"];
   String _selectedPlatform = "LinkedIn";
 
@@ -94,8 +88,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
     _eduDurationController.dispose();
     _expJobTitleController.dispose();
     _expDurationController.dispose();
-    _passwordController.dispose();
-    _confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -156,21 +148,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Please select gender")));
         return;
       }
-      if (_passwordController.text.length < 8) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Password must be at least 8 characters")));
-        return;
-      }
-      if (_passwordController.text != _confirmPasswordController.text) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Passwords do not match")));
-        return;
-      }
 
-      setState(() => _isLoading = true);
       try {
         final role = _selectedRole == "Tradesman" ? "tradesman" : "user";
         await RecruitmentSyncService.instance.register(
           email: _emailController.text.trim(),
-          password: _passwordController.text,
+          password: "12345678",
           name: _fullNameController.text.trim(),
           role: role,
         );
@@ -180,27 +163,27 @@ class _SignUpScreenState extends State<SignUpScreen> {
           name: _fullNameController.text.trim(),
         );
 
-        String? base64Image;
         if (_profileImagePath != null) {
           try {
             final bytes = await File(_profileImagePath!).readAsBytes();
-            base64Image = 'data:image/jpeg;base64,${base64Encode(bytes)}';
+            final base64Image = 'data:image/jpeg;base64,${base64Encode(bytes)}';
+            await RecruitmentSyncService.instance.updateProfile(photoUrl: base64Image);
+            _profileImagePath = base64Image;
           } catch (_) {}
         }
 
-        // Send all profile data to the backend
-        await RecruitmentSyncService.instance.updateProfile(
-          photoUrl: base64Image,
-          phone: _phoneController.text.trim(),
-          gender: _selectedGender,
-          dob: "$_selectedYear-$_selectedMonth-$_selectedDay",
-          address: _addressController.text.trim(),
-          about: _aboutMeController.text.trim(),
+        RecruitmentSyncStore.instance.updateUserProfile(
+          fullName: _fullNameController.text,
           title: _expJobTitleController.text.isNotEmpty ? _expJobTitleController.text : "User",
+          email: _emailController.text,
+          phone: "+20 ${_phoneController.text}",
+          location: _addressController.text,
+          about: _aboutMeController.text,
           skills: _skillsList,
-          educationJson: jsonEncode(_educationList),
-          experienceJson: jsonEncode(_experiencesList),
-          socialLinksJson: jsonEncode(_socialLinksList),
+          education: _educationList,
+          experience: _experiencesList,
+          role: _selectedRole,
+          socialLinks: _socialLinksList,
         );
 
         UserProfileData.fullName = _fullNameController.text;
@@ -216,13 +199,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
         UserProfileData.profileImage = _profileImagePath;
 
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Profile saved successfully!")));
-        setState(() => _isLoading = false);
         Navigator.of(context).pushNamedAndRemoveUntil(
           AppRoutes.userWorkspace,
           (route) => false,
         );
       } catch (e) {
-        setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Registration failed: ${e.toString()}")),
         );
@@ -324,27 +305,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   items: [t.tr(en: 'Male', ar: 'ذكر'), t.tr(en: 'Female', ar: 'أنثى')],
                   onChanged: (v) => setState(() => _selectedGender = v),
                   isRequired: true,
-                ),
-                const SizedBox(height: 20),
-
-                _buildTextField(
-                  _passwordController, 
-                  t.password, 
-                  Icons.lock_outline, 
-                  isRequired: true, 
-                  obscureText: _obscurePassword,
-                  suffixIcon: _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                  onSuffixTap: () => setState(() => _obscurePassword = !_obscurePassword),
-                ),
-                const SizedBox(height: 20),
-                _buildTextField(
-                  _confirmPasswordController, 
-                  t.confirmPassword, 
-                  Icons.lock_reset, 
-                  isRequired: true, 
-                  obscureText: _obscureConfirmPassword,
-                  suffixIcon: _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
-                  onSuffixTap: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
                 ),
                 const SizedBox(height: 20),
 
@@ -457,7 +417,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ..._socialLinksList.asMap().entries.map((entry) => Container(margin: const EdgeInsets.only(bottom: 8), padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.grey.shade300)), child: Row(children: [const Icon(Icons.link, color: Color(0xFF49769F), size: 18), const SizedBox(width: 12), Expanded(child: Text("${entry.value['platform']}: ${entry.value['url']}", style: const TextStyle(color: Colors.black87, fontSize: 11), maxLines: 1, overflow: TextOverflow.ellipsis)), IconButton(icon: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 20), onPressed: () => setState(() => _socialLinksList.removeAt(entry.key)))]))).toList(),
 
                 const SizedBox(height: 40),
-                SizedBox(width: double.infinity, height: 56, child: ElevatedButton(onPressed: _isLoading ? null : _saveProfile, style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF49769F), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))), child: _isLoading ? const CircularProgressIndicator(color: Colors.white) : Text(t.saveProfile, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)))),
+                SizedBox(width: double.infinity, height: 56, child: ElevatedButton(onPressed: _saveProfile, style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF49769F), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))), child: Text(t.saveProfile, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)))),
                 const SizedBox(height: 40),
               ],
             ),
@@ -507,11 +467,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String label, IconData icon, {String? hint, String? prefixText, int maxLines = 1, TextInputType keyboardType = TextInputType.text, bool isRequired = false, VoidCallback? onIconTap, IconData? suffixIcon, VoidCallback? onSuffixTap, List<TextInputFormatter>? inputFormatters, String? Function(String?)? validator, bool readOnly = false, bool obscureText = false}) {
+  Widget _buildTextField(TextEditingController controller, String label, IconData icon, {String? hint, String? prefixText, int maxLines = 1, TextInputType keyboardType = TextInputType.text, bool isRequired = false, VoidCallback? onIconTap, IconData? suffixIcon, VoidCallback? onSuffixTap, List<TextInputFormatter>? inputFormatters, String? Function(String?)? validator, bool readOnly = false}) {
     return TextFormField(
       controller: controller, maxLines: maxLines, keyboardType: keyboardType, inputFormatters: inputFormatters, 
       readOnly: readOnly,
-      obscureText: obscureText,
       style: const TextStyle(color: Colors.black87),
       validator: isRequired ? (validator ?? (value) => (value == null || value.isEmpty) ? "$label is required" : null) : null,
       decoration: InputDecoration(

@@ -111,7 +111,7 @@ class _CompanyPostJobStep3BenefitsScreenState
     final salaryRange = (data['salaryRange'] as String?)?.trim() ?? 'Competitive';
     final step1Description = (data['description'] as String?) ?? '';
     final descriptionPoints = (data['descriptionPoints'] as List<String>?) ?? [];
-    final classification = (data['classification'] as String?) ?? 'General';
+    final category = (data['category'] as String?) ?? 'General';
     final department = (data['department'] as String?) ?? '';
     final positions = (data['positions'] as int?) ?? 1;
     final responsibilities = (data['responsibilities'] as List<String>?) ?? [];
@@ -138,11 +138,11 @@ class _CompanyPostJobStep3BenefitsScreenState
           responsibilities: responsibilities,
           qualifications: qualifications,
           niceToHaves: niceToHaves,
-          benefits: _benefits.map((b) => b.description.isEmpty ? b.title : "${b.title}:::${b.description}").toList(),
-          classification: classification,
+          benefits: _benefits.map((b) => b.title).toList(),
+          category: category,
           companyName: CompanyStore.instance.companyName,
           type: employmentType,
-          tags: [classification, department].where((s) => s.isNotEmpty).toList(),
+          tags: [category, department].where((s) => s.isNotEmpty).toList(),
           requiredCount: positions,
           deadline: deadline,
         );
@@ -155,11 +155,11 @@ class _CompanyPostJobStep3BenefitsScreenState
           responsibilities: responsibilities,
           qualifications: qualifications,
           niceToHaves: niceToHaves,
-          benefits: _benefits.map((b) => b.description.isEmpty ? b.title : "${b.title}:::${b.description}").toList(),
-          classification: classification,
+          benefits: _benefits.map((b) => b.title).toList(),
+          category: category,
           companyName: CompanyStore.instance.companyName,
           type: employmentType,
-          tags: [classification, department].where((s) => s.isNotEmpty).toList(),
+          tags: [category, department].where((s) => s.isNotEmpty).toList(),
           requiredCount: positions,
           deadline: deadline,
         );

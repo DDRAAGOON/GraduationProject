@@ -53,6 +53,7 @@ class _CompanySignInScreenState extends State<CompanySignInScreen> {
   }
 
   Future<void> _handleGoogleSignIn() async {
+    final t = AppLocalizations.of(context);
     setState(() => _loading = true);
     try {
       final GoogleSignInAccount? googleUser = await _googleSignInInstance
@@ -74,6 +75,24 @@ class _CompanySignInScreenState extends State<CompanySignInScreen> {
         idToken,
       );
 
+      final companyName =
+          userData['name']?.toString() ??
+          googleUser.displayName ??
+          googleUser.email.split('@').first;
+      final userEmail = userData['email']?.toString() ?? googleUser.email;
+
+      await SessionManager.saveCompanySession(
+        email: userEmail,
+        name: companyName,
+      );
+
+      if (!mounted) return;
+
+      CompanyStore.instance.setRegistrationData(
+        companyName: companyName,
+        email: userEmail,
+      );
+
       setState(() => _loading = false);
       Navigator.of(
         context,
@@ -88,6 +107,7 @@ class _CompanySignInScreenState extends State<CompanySignInScreen> {
   }
 
   Future<void> _submit() async {
+    final t = AppLocalizations.of(context);
     if (!_validate()) return;
     setState(() => _loading = true);
 
@@ -96,6 +116,21 @@ class _CompanySignInScreenState extends State<CompanySignInScreen> {
         email: _email.text.trim(),
         password: _password.text,
         expectedRole: 'company',
+      );
+
+      final userName =
+          userData['name']?.toString() ?? _email.text.split('@').first;
+
+      await SessionManager.saveCompanySession(
+        email: _email.text.trim(),
+        name: userName,
+      );
+
+      if (!mounted) return;
+
+      CompanyStore.instance.setRegistrationData(
+        companyName: userName,
+        email: _email.text.trim(),
       );
 
       await RecruitmentSyncService.instance.startPolling();
@@ -107,7 +142,6 @@ class _CompanySignInScreenState extends State<CompanySignInScreen> {
     } catch (e) {
       if (!mounted) return;
       setState(() => _loading = false);
-      final t = AppLocalizations.of(context);
       String msg = t.isAr
           ? 'البريد الإلكتروني أو كلمة المرور غير صحيحة'
           : 'Invalid email or password.';

@@ -88,7 +88,7 @@ class _RecruitmentPostJobScreenState extends State<RecruitmentPostJobScreen> {
                 .map((e) => e.trim())
                 .where((e) => e.isNotEmpty)
                 .toList(),
-            classification: _departmentController.text.trim().isEmpty 
+            category: _departmentController.text.trim().isEmpty 
                 ? 'Engineering' 
                 : _departmentController.text.trim(),
             companyName: CompanyStore.instance.companyName.isEmpty 

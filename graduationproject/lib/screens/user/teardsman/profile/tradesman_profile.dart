@@ -28,12 +28,9 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
     
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: AnimatedBuilder(
-        animation: store,
-        builder: (context, _) {
-          return SingleChildScrollView(
-            child: Column(
-              children: [
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
             // Edge-to-edge Top Cover Section
             Stack(
               clipBehavior: Clip.none,
@@ -323,8 +320,6 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
             ),
           ],
         ),
-      );
-        },
       ),
     );
   }

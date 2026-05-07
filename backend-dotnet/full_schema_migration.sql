@@ -1,242 +1,156 @@
 -- =====================================================================
 --  Jobito - Full Schema Migration Script
 --  Database : db49878.databaseasp.net  (MSSQL)
---  Update Date: 2026-05-03 (Terminology Refactor: Staff & Classification)
 --  Run this script once; it is fully idempotent (safe to re-run).
 -- =====================================================================
 
--- ─────────────────────────────────────────────────────────────────────
+
+-- â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 -- TABLE: Users
--- ─────────────────────────────────────────────────────────────────────
+-- â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 IF OBJECT_ID(N'[Users]', N'U') IS NULL
 BEGIN
     CREATE TABLE [Users] (
-        [Id]        INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
-        [Email]     NVARCHAR(256)     NOT NULL,
-        [Password]  NVARCHAR(128)     NULL, -- Nullable for Google login
-        [Role]      NVARCHAR(32)      NOT NULL DEFAULT 'user',
-        [Name]      NVARCHAR(128)     NOT NULL DEFAULT '',
-        [GoogleId]  NVARCHAR(256)     NULL,
-        [PhotoUrl]  NVARCHAR(MAX)     NULL,
-        
-        -- User/Tradesman profile details
-        [Phone]                NVARCHAR(32)   NULL,
-        [Gender]               NVARCHAR(16)   NULL,
-        [Dob]                  NVARCHAR(32)   NULL,
-        [Address]              NVARCHAR(256)  NULL,
-        [Title]                NVARCHAR(128)  NULL,
-        [SkillsCsv]            NVARCHAR(MAX)  NULL,
-        [EducationJson]        NVARCHAR(MAX)  NULL,
-        [ExperienceJson]       NVARCHAR(MAX)  NULL,
-        [SocialLinksJson]      NVARCHAR(MAX)  NULL,
-        [PortfolioImagesJson]  NVARCHAR(MAX)  NULL,
-
-        -- Company specific details
-        [About]                NVARCHAR(MAX)  NULL,
-        [Staff]                NVARCHAR(64)   NULL, -- Replaces EmployeeCount/Stuff
-        [Classification]       NVARCHAR(128)  NULL, -- Replaces Category (Technical/Non-Technical)
-        [LocationHeadquarters] NVARCHAR(256)  NULL,
-        [LocationsCsv]         NVARCHAR(MAX)  NULL,
-        [BenefitsCsv]          NVARCHAR(MAX)  NULL,
-        [TechStackCsv]         NVARCHAR(MAX)  NULL,
-        [FoundedDay]           INT            NOT NULL DEFAULT 0,
-        [FoundedMonth]         INT            NOT NULL DEFAULT 0,
-        [FoundedYear]          INT            NOT NULL DEFAULT 0,
-        [Website]              NVARCHAR(256)  NULL,
-        [Industry]             NVARCHAR(128)  NULL,
-        [CommercialRegister]   NVARCHAR(128)  NULL,
-        [NationalNumber]       NVARCHAR(128)  NULL,
-        [ContactsJson]         NVARCHAR(MAX)  NULL
+        [Id]       INT           IDENTITY(1,1) NOT NULL PRIMARY KEY,
+        [Email]    NVARCHAR(256) NOT NULL,
+        [Password] NVARCHAR(128) NOT NULL,
+        [Role]     NVARCHAR(32)  NOT NULL,
+        [Name]     NVARCHAR(128) NOT NULL,
+        [GoogleId] NVARCHAR(256) NULL,
+        [PhotoUrl] NVARCHAR(512) NULL
     );
     CREATE UNIQUE INDEX [IX_Users_Email] ON [Users]([Email]);
     PRINT 'TABLE [Users] created.';
 END
 ELSE
 BEGIN
-    PRINT 'TABLE [Users] already exists – checking for missing columns...';
+    PRINT 'TABLE [Users] already exists â€“ checking for missing columns...';
 
     IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'[Users]') AND name = N'GoogleId')
+    BEGIN
         ALTER TABLE [Users] ADD [GoogleId] NVARCHAR(256) NULL;
+        PRINT '  + Column [GoogleId] added to [Users].';
+    END
 
     IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'[Users]') AND name = N'PhotoUrl')
-        ALTER TABLE [Users] ADD [PhotoUrl] NVARCHAR(MAX) NULL;
-    ELSE
-        ALTER TABLE [Users] ALTER COLUMN [PhotoUrl] NVARCHAR(MAX) NULL;
-
-    -- User/Tradesman Details
-    IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'[Users]') AND name = N'Phone')
-        ALTER TABLE [Users] ADD [Phone] NVARCHAR(32) NULL;
-    IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'[Users]') AND name = N'Gender')
-        ALTER TABLE [Users] ADD [Gender] NVARCHAR(16) NULL;
-    IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'[Users]') AND name = N'Dob')
-        ALTER TABLE [Users] ADD [Dob] NVARCHAR(32) NULL;
-    IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'[Users]') AND name = N'Address')
-        ALTER TABLE [Users] ADD [Address] NVARCHAR(256) NULL;
-    IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'[Users]') AND name = N'Title')
-        ALTER TABLE [Users] ADD [Title] NVARCHAR(128) NULL;
-    IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'[Users]') AND name = N'SkillsCsv')
-        ALTER TABLE [Users] ADD [SkillsCsv] NVARCHAR(MAX) NULL;
-    IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'[Users]') AND name = N'EducationJson')
-        ALTER TABLE [Users] ADD [EducationJson] NVARCHAR(MAX) NULL;
-    IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'[Users]') AND name = N'ExperienceJson')
-        ALTER TABLE [Users] ADD [ExperienceJson] NVARCHAR(MAX) NULL;
-    IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'[Users]') AND name = N'SocialLinksJson')
-        ALTER TABLE [Users] ADD [SocialLinksJson] NVARCHAR(MAX) NULL;
-    IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'[Users]') AND name = N'PortfolioImagesJson')
-        ALTER TABLE [Users] ADD [PortfolioImagesJson] NVARCHAR(MAX) NULL;
-
-    -- Company Details
-    IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'[Users]') AND name = N'About')
-        ALTER TABLE [Users] ADD [About] NVARCHAR(MAX) NULL;
-
-    IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'[Users]') AND name = N'LocationHeadquarters')
-        ALTER TABLE [Users] ADD [LocationHeadquarters] NVARCHAR(256) NULL;
-
-    IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'[Users]') AND name = N'LocationsCsv')
-        ALTER TABLE [Users] ADD [LocationsCsv] NVARCHAR(MAX) NULL;
-
-    IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'[Users]') AND name = N'BenefitsCsv')
-        ALTER TABLE [Users] ADD [BenefitsCsv] NVARCHAR(MAX) NULL;
-
-    IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'[Users]') AND name = N'TechStackCsv')
-        ALTER TABLE [Users] ADD [TechStackCsv] NVARCHAR(MAX) NULL;
-
-    IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'[Users]') AND name = N'FoundedDay')
-        ALTER TABLE [Users] ADD [FoundedDay] INT NOT NULL DEFAULT 0;
-
-    IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'[Users]') AND name = N'FoundedMonth')
-        ALTER TABLE [Users] ADD [FoundedMonth] INT NOT NULL DEFAULT 0;
-
-    IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'[Users]') AND name = N'FoundedYear')
-        ALTER TABLE [Users] ADD [FoundedYear] INT NOT NULL DEFAULT 0;
-
-    IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'[Users]') AND name = N'Website')
-        ALTER TABLE [Users] ADD [Website] NVARCHAR(256) NULL;
-
-    IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'[Users]') AND name = N'Industry')
-        ALTER TABLE [Users] ADD [Industry] NVARCHAR(128) NULL;
-
-    IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'[Users]') AND name = N'CommercialRegister')
-        ALTER TABLE [Users] ADD [CommercialRegister] NVARCHAR(128) NULL;
-
-    IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'[Users]') AND name = N'NationalNumber')
-        ALTER TABLE [Users] ADD [NationalNumber] NVARCHAR(128) NULL;
-
-    IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'[Users]') AND name = N'ContactsJson')
-        ALTER TABLE [Users] ADD [ContactsJson] NVARCHAR(MAX) NULL;
-
-    -- RENAMING LOGIC for Users
-    -- 1. Classification (Old name for employee count) -> Staff
-    IF COL_LENGTH('Users', 'Classification') IS NOT NULL AND COL_LENGTH('Users', 'Staff') IS NULL
-        EXEC sp_rename 'Users.Classification', 'Staff', 'COLUMN';
-    
-    -- 2. Stuff (Temporary name) -> Staff
-    IF COL_LENGTH('Users', 'Stuff') IS NOT NULL AND COL_LENGTH('Users', 'Staff') IS NULL
-        EXEC sp_rename 'Users.Stuff', 'Staff', 'COLUMN';
-
-    -- 3. Category (Old name for tech/non-tech) -> Classification
-    IF COL_LENGTH('Users', 'Category') IS NOT NULL AND COL_LENGTH('Users', 'Classification') IS NULL
-        EXEC sp_rename 'Users.Category', 'Classification', 'COLUMN';
-
-    -- Final safety check to add columns if they still don't exist
-    IF COL_LENGTH('Users', 'Staff') IS NULL
-        ALTER TABLE [Users] ADD [Staff] NVARCHAR(64) NULL;
-    
-    IF COL_LENGTH('Users', 'Classification') IS NULL
-        ALTER TABLE [Users] ADD [Classification] NVARCHAR(128) NULL;
+    BEGIN
+        ALTER TABLE [Users] ADD [PhotoUrl] NVARCHAR(512) NULL;
+        PRINT '  + Column [PhotoUrl] added to [Users].';
+    END
 END
 GO
 
 
--- ─────────────────────────────────────────────────────────────────────
+-- â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 -- TABLE: Jobs
--- ─────────────────────────────────────────────────────────────────────
+-- â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 IF OBJECT_ID(N'[Jobs]', N'U') IS NULL
 BEGIN
     CREATE TABLE [Jobs] (
         [Id]                   NVARCHAR(64)   NOT NULL PRIMARY KEY,
-        [CompanyId]            INT            NOT NULL DEFAULT 0,
+        [CompanyId]            INT            NOT NULL,
         [Title]                NVARCHAR(256)  NOT NULL,
         [CompanyName]          NVARCHAR(256)  NOT NULL,
-        [Location]             NVARCHAR(128)  NOT NULL DEFAULT 'Remote',
-        [SalaryRange]          NVARCHAR(128)  NOT NULL DEFAULT 'Negotiable',
-        [Type]                 NVARCHAR(64)   NOT NULL DEFAULT 'Full-time',
+        [Location]             NVARCHAR(128)  NOT NULL,
+        [SalaryRange]          NVARCHAR(128)  NOT NULL,
+        [Type]                 NVARCHAR(64)   NOT NULL,
         [Description]          NVARCHAR(MAX)  NOT NULL DEFAULT '',
         [ResponsibilitiesCsv]  NVARCHAR(MAX)  NOT NULL DEFAULT '',
         [QualificationsCsv]    NVARCHAR(MAX)  NOT NULL DEFAULT '',
         [NiceToHavesCsv]       NVARCHAR(MAX)  NOT NULL DEFAULT '',
         [BenefitsCsv]          NVARCHAR(MAX)  NOT NULL DEFAULT '',
-        [Classification]       NVARCHAR(128)  NOT NULL DEFAULT '', -- Replaces Category
+        [Category]             NVARCHAR(128)  NOT NULL DEFAULT '',
         [TagsCsv]              NVARCHAR(1000) NOT NULL DEFAULT '',
         [CreatedAt]            DATETIME2      NOT NULL DEFAULT GETUTCDATE(),
         [ApplicationCount]     INT            NOT NULL DEFAULT 0,
         [RequiredCount]        INT            NOT NULL DEFAULT 1,
         [AcceptedCount]        INT            NOT NULL DEFAULT 0,
         [Deadline]             DATETIME2      NULL,
-        [Status]               NVARCHAR(64)   NOT NULL DEFAULT 'Open',
-        [ViewsCount]           INT            NOT NULL DEFAULT 0
+        [Status]               NVARCHAR(64)   NOT NULL DEFAULT 'Open'
     );
     PRINT 'TABLE [Jobs] created.';
 END
 ELSE
 BEGIN
-    PRINT 'TABLE [Jobs] already exists – checking for missing columns...';
+    PRINT 'TABLE [Jobs] already exists â€“ checking for missing columns...';
 
     IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'[Jobs]') AND name = N'Description')
+    BEGIN
         ALTER TABLE [Jobs] ADD [Description] NVARCHAR(MAX) NOT NULL DEFAULT '';
+        PRINT '  + Column [Description] added to [Jobs].';
+    END
 
     IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'[Jobs]') AND name = N'ResponsibilitiesCsv')
+    BEGIN
         ALTER TABLE [Jobs] ADD [ResponsibilitiesCsv] NVARCHAR(MAX) NOT NULL DEFAULT '';
+        PRINT '  + Column [ResponsibilitiesCsv] added to [Jobs].';
+    END
 
     IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'[Jobs]') AND name = N'QualificationsCsv')
+    BEGIN
         ALTER TABLE [Jobs] ADD [QualificationsCsv] NVARCHAR(MAX) NOT NULL DEFAULT '';
+        PRINT '  + Column [QualificationsCsv] added to [Jobs].';
+    END
 
     IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'[Jobs]') AND name = N'NiceToHavesCsv')
+    BEGIN
         ALTER TABLE [Jobs] ADD [NiceToHavesCsv] NVARCHAR(MAX) NOT NULL DEFAULT '';
+        PRINT '  + Column [NiceToHavesCsv] added to [Jobs].';
+    END
 
     IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'[Jobs]') AND name = N'BenefitsCsv')
+    BEGIN
         ALTER TABLE [Jobs] ADD [BenefitsCsv] NVARCHAR(MAX) NOT NULL DEFAULT '';
+        PRINT '  + Column [BenefitsCsv] added to [Jobs].';
+    END
+
+    IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'[Jobs]') AND name = N'Category')
+    BEGIN
+        ALTER TABLE [Jobs] ADD [Category] NVARCHAR(128) NOT NULL DEFAULT '';
+        PRINT '  + Column [Category] added to [Jobs].';
+    END
 
     IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'[Jobs]') AND name = N'TagsCsv')
+    BEGIN
         ALTER TABLE [Jobs] ADD [TagsCsv] NVARCHAR(1000) NOT NULL DEFAULT '';
+        PRINT '  + Column [TagsCsv] added to [Jobs].';
+    END
 
     IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'[Jobs]') AND name = N'ApplicationCount')
+    BEGIN
         ALTER TABLE [Jobs] ADD [ApplicationCount] INT NOT NULL DEFAULT 0;
+        PRINT '  + Column [ApplicationCount] added to [Jobs].';
+    END
 
     IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'[Jobs]') AND name = N'RequiredCount')
+    BEGIN
         ALTER TABLE [Jobs] ADD [RequiredCount] INT NOT NULL DEFAULT 1;
+        PRINT '  + Column [RequiredCount] added to [Jobs].';
+    END
 
     IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'[Jobs]') AND name = N'AcceptedCount')
+    BEGIN
         ALTER TABLE [Jobs] ADD [AcceptedCount] INT NOT NULL DEFAULT 0;
+        PRINT '  + Column [AcceptedCount] added to [Jobs].';
+    END
 
     IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'[Jobs]') AND name = N'Status')
+    BEGIN
         ALTER TABLE [Jobs] ADD [Status] NVARCHAR(64) NOT NULL DEFAULT 'Open';
-    
-    IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'[Jobs]') AND name = N'Deadline')
-        ALTER TABLE [Jobs] ADD [Deadline] DATETIME2 NULL;
-
-    IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'[Jobs]') AND name = N'ViewsCount')
-        ALTER TABLE [Jobs] ADD [ViewsCount] INT NOT NULL DEFAULT 0;
-    
-    -- RENAMING LOGIC for Jobs
-    -- Category -> Classification
-    IF COL_LENGTH('Jobs', 'Category') IS NOT NULL AND COL_LENGTH('Jobs', 'Classification') IS NULL
-        EXEC sp_rename 'Jobs.Category', 'Classification', 'COLUMN';
-    
-    IF COL_LENGTH('Jobs', 'Classification') IS NULL
-        ALTER TABLE [Jobs] ADD [Classification] NVARCHAR(128) NOT NULL DEFAULT '';
+        PRINT '  + Column [Status] added to [Jobs].';
+    END
 END
 GO
 
 
--- ─────────────────────────────────────────────────────────────────────
+-- â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 -- TABLE: Applications
--- ─────────────────────────────────────────────────────────────────────
+-- â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 IF OBJECT_ID(N'[Applications]', N'U') IS NULL
 BEGIN
     CREATE TABLE [Applications] (
         [Id]        NVARCHAR(64)  NOT NULL PRIMARY KEY,
-        [UserId]    INT           NOT NULL DEFAULT 0,
+        [UserId]    INT           NOT NULL,
         [UserName]  NVARCHAR(128) NOT NULL,
         [JobId]     NVARCHAR(64)  NOT NULL,
         [Status]    NVARCHAR(64)  NOT NULL DEFAULT 'Applied',
@@ -244,12 +158,16 @@ BEGIN
     );
     PRINT 'TABLE [Applications] created.';
 END
+ELSE
+BEGIN
+    PRINT 'TABLE [Applications] already exists â€“ no new columns to add.';
+END
 GO
 
 
--- ─────────────────────────────────────────────────────────────────────
+-- â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 -- TABLE: Messages
--- ─────────────────────────────────────────────────────────────────────
+-- â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 IF OBJECT_ID(N'[Messages]', N'U') IS NULL
 BEGIN
     CREATE TABLE [Messages] (
@@ -260,12 +178,16 @@ BEGIN
     );
     PRINT 'TABLE [Messages] created.';
 END
+ELSE
+BEGIN
+    PRINT 'TABLE [Messages] already exists â€“ no new columns to add.';
+END
 GO
 
 
--- ─────────────────────────────────────────────────────────────────────
+-- â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 -- TABLE: Notifications
--- ─────────────────────────────────────────────────────────────────────
+-- â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 IF OBJECT_ID(N'[Notifications]', N'U') IS NULL
 BEGIN
     CREATE TABLE [Notifications] (
@@ -276,11 +198,88 @@ BEGIN
     );
     PRINT 'TABLE [Notifications] created.';
 END
+ELSE
+BEGIN
+    PRINT 'TABLE [Notifications] already exists â€“ no new columns to add.';
+END
 GO
 
 
 -- =====================================================================
---  Final validation – lists all tables and column counts.
+--  UPDATE 2026-04-29  â€“  Schema fixes discovered during deployment
+--  Safe to re-run (all checks are idempotent).
+-- =====================================================================
+
+-- â”€â”€â”€ [Users] Widen PhotoUrl from 512 â†’ 1024 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- Google profile picture URLs can be very long (512 was too short).
+IF EXISTS (
+    SELECT 1 FROM sys.columns
+    WHERE object_id = OBJECT_ID(N'[Users]')
+      AND name = N'PhotoUrl'
+      AND max_length < 2048   -- NVARCHAR(1024) uses max_length = 2048 bytes
+)
+BEGIN
+    ALTER TABLE [Users] ALTER COLUMN [PhotoUrl] NVARCHAR(1024) NULL;
+    PRINT '  ~ [Users].[PhotoUrl] widened to NVARCHAR(1024).';
+END
+ELSE
+BEGIN
+    PRINT '  [Users].[PhotoUrl] already 1024+ chars â€“ no change.';
+END
+GO
+
+-- â”€â”€â”€ [Users] Make Password nullable for Google-login users â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+IF EXISTS (
+    SELECT 1 FROM sys.columns
+    WHERE object_id = OBJECT_ID(N'[Users]')
+      AND name = N'Password'
+      AND is_nullable = 0
+)
+BEGIN
+    ALTER TABLE [Users] ALTER COLUMN [Password] NVARCHAR(128) NULL;
+    PRINT '  ~ [Users].[Password] changed to NULL (Google-login support).';
+END
+ELSE
+BEGIN
+    PRINT '  [Users].[Password] already nullable â€“ no change.';
+END
+GO
+
+-- â”€â”€â”€ [Jobs] Add DEFAULT 0 on CompanyId if missing â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+IF NOT EXISTS (
+    SELECT 1 FROM sys.default_constraints
+    WHERE parent_object_id = OBJECT_ID(N'[Jobs]')
+      AND COL_NAME(parent_object_id, parent_column_id) = 'CompanyId'
+)
+BEGIN
+    ALTER TABLE [Jobs] ADD CONSTRAINT [DF_Jobs_CompanyId] DEFAULT 0 FOR [CompanyId];
+    PRINT '  + DEFAULT(0) added to [Jobs].[CompanyId].';
+END
+ELSE
+BEGIN
+    PRINT '  [Jobs].[CompanyId] default already exists â€“ no change.';
+END
+GO
+
+-- â”€â”€â”€ [Applications] Add DEFAULT 0 on UserId if missing â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+IF NOT EXISTS (
+    SELECT 1 FROM sys.default_constraints
+    WHERE parent_object_id = OBJECT_ID(N'[Applications]')
+      AND COL_NAME(parent_object_id, parent_column_id) = 'UserId'
+)
+BEGIN
+    ALTER TABLE [Applications] ADD CONSTRAINT [DF_Applications_UserId] DEFAULT 0 FOR [UserId];
+    PRINT '  + DEFAULT(0) added to [Applications].[UserId].';
+END
+ELSE
+BEGIN
+    PRINT '  [Applications].[UserId] default already exists â€“ no change.';
+END
+GO
+
+
+-- =====================================================================
+--  Done. Final validation â€“ lists all tables and column counts.
 -- =====================================================================
 SELECT
     t.name             AS TableName,
@@ -291,3 +290,17 @@ WHERE t.name IN ('Users','Jobs','Applications','Messages','Notifications')
 GROUP BY t.name
 ORDER BY t.name;
 GO
+
+
+-- ─── [Jobs] Add Deadline if missing ──────────────────────────────────────────
+IF NOT EXISTS (
+    SELECT 1 FROM sys.columns 
+    WHERE object_id = OBJECT_ID(N'[Jobs]') 
+    AND name = N'Deadline'
+)
+BEGIN
+    ALTER TABLE [Jobs] ADD [Deadline] DATETIME2 NULL;
+    PRINT '  + Column [Deadline] added to [Jobs].';
+END
+GO
+

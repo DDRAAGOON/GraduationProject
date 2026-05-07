@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../shared/l10n/app_localizations.dart';
-import '../../../shared/state/recruitment_sync_store.dart';
-import '../../../shared/utils/image_helper.dart';
+import '../../../constants/app_images.dart';
 import 'user_data.dart';
 
 class ProfileMediaEditScreen extends StatefulWidget {
@@ -15,7 +14,6 @@ class _ProfileMediaEditScreenState extends State<ProfileMediaEditScreen> {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
-    final store = RecruitmentSyncStore.instance;
     return Scaffold(
       appBar: AppBar(
         title: Text(t.tr(en: "Edit Profile Media", ar: "تعديل صور الحساب")),
@@ -81,41 +79,35 @@ class _ProfileMediaEditScreenState extends State<ProfileMediaEditScreen> {
             ),
             const SizedBox(height: 12),
             Center(
-              child: ListenableBuilder(
-                listenable: store,
-                builder: (context, _) {
-                  final p = getAppImageProvider(store.profileImage);
-                  return Stack(
-                    children: [
-                      CircleAvatar(
-                        radius: 70,
-                        backgroundColor: Colors.grey.shade200,
-                        backgroundImage: p,
-                        child: p == null ? const Icon(Icons.person, size: 70, color: Colors.grey) : null,
-                      ),
-                      Positioned(
-                        bottom: 0,
-                        right: 0,
-                        child: GestureDetector(
-                          onTap: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(t.tr(en: "Image picker will open", ar: "سيفتح معرض الصور"))),
-                            );
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.primary,
-                              shape: BoxShape.circle,
-                              border: Border.all(color: Colors.white, width: 2),
-                            ),
-                            child: const Icon(Icons.edit, color: Colors.white, size: 20),
-                          ),
+              child: Stack(
+                children: [
+                  CircleAvatar(
+                    radius: 70,
+                    backgroundImage: UserProfileData.profileImage != null
+                        ? NetworkImage(UserProfileData.profileImage!)
+                        : const AssetImage(AppImages.companyProfile1) as ImageProvider,
+                  ),
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: GestureDetector(
+                      onTap: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(t.tr(en: "Image picker will open", ar: "سيفتح معرض الصور"))),
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.primary,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 2),
                         ),
+                        child: const Icon(Icons.edit, color: Colors.white, size: 20),
                       ),
-                    ],
-                  );
-                },
+                    ),
+                  ),
+                ],
               ),
             ),
 

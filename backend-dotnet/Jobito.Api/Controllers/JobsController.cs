@@ -35,14 +35,13 @@ public class JobsController(AppDbContext db) : ControllerBase
                 qualifications = job.QualificationsCsv.Split('|', StringSplitOptions.RemoveEmptyEntries),
                 niceToHaves = job.NiceToHavesCsv.Split('|', StringSplitOptions.RemoveEmptyEntries),
                 benefits = job.BenefitsCsv.Split('|', StringSplitOptions.RemoveEmptyEntries),
-                classification = job.Classification,
+                category = job.Category,
                 tags = job.TagsCsv.Split(',', StringSplitOptions.RemoveEmptyEntries),
                 createdAt = job.CreatedAt,
                 requiredCount = job.RequiredCount,
                 acceptedCount = job.AcceptedCount,
                 deadline = job.Deadline,
-                status = job.Status,
-                viewsCount = job.ViewsCount
+                status = job.Status
             })
             .ToListAsync();
         return Ok(items);
@@ -106,7 +105,7 @@ public class JobsController(AppDbContext db) : ControllerBase
             QualificationsCsv = request.Qualifications is { Length: > 0 } ? string.Join("|", request.Qualifications) : "",
             NiceToHavesCsv = request.NiceToHaves is { Length: > 0 } ? string.Join("|", request.NiceToHaves) : "",
             BenefitsCsv = request.Benefits is { Length: > 0 } ? string.Join("|", request.Benefits) : "",
-            Classification = request.Classification ?? "General",
+            Category = request.Category ?? "General",
             TagsCsv = request.Tags is { Length: > 0 } ? string.Join(",", request.Tags) : "",
             CreatedAt = DateTime.UtcNow,
             RequiredCount = request.RequiredCount ?? 1,
@@ -138,14 +137,13 @@ public class JobsController(AppDbContext db) : ControllerBase
             qualifications = entity.QualificationsCsv.Split('|', StringSplitOptions.RemoveEmptyEntries),
             niceToHaves = entity.NiceToHavesCsv.Split('|', StringSplitOptions.RemoveEmptyEntries),
             benefits = entity.BenefitsCsv.Split('|', StringSplitOptions.RemoveEmptyEntries),
-            classification = entity.Classification,
+            category = entity.Category,
             tags = entity.TagsCsv.Split(',', StringSplitOptions.RemoveEmptyEntries),
             createdAt = entity.CreatedAt,
             requiredCount = entity.RequiredCount,
             acceptedCount = entity.AcceptedCount,
             deadline = entity.Deadline,
-            status = entity.Status,
-            viewsCount = entity.ViewsCount
+            status = entity.Status
         });
     }
 
@@ -186,7 +184,7 @@ public class JobsController(AppDbContext db) : ControllerBase
         job.QualificationsCsv = request.Qualifications is { Length: > 0 } ? string.Join("|", request.Qualifications) : "";
         job.NiceToHavesCsv = request.NiceToHaves is { Length: > 0 } ? string.Join("|", request.NiceToHaves) : "";
         job.BenefitsCsv = request.Benefits is { Length: > 0 } ? string.Join("|", request.Benefits) : "";
-        job.Classification = request.Classification ?? "General";
+        job.Category = request.Category ?? "General";
         job.TagsCsv = request.Tags is { Length: > 0 } ? string.Join(",", request.Tags) : "";
         job.RequiredCount = request.RequiredCount ?? job.RequiredCount;
         job.Deadline = request.Deadline;
@@ -210,14 +208,13 @@ public class JobsController(AppDbContext db) : ControllerBase
             qualifications = job.QualificationsCsv.Split('|', StringSplitOptions.RemoveEmptyEntries),
             niceToHaves = job.NiceToHavesCsv.Split('|', StringSplitOptions.RemoveEmptyEntries),
             benefits = job.BenefitsCsv.Split('|', StringSplitOptions.RemoveEmptyEntries),
-            classification = job.Classification,
+            category = job.Category,
             tags = job.TagsCsv.Split(',', StringSplitOptions.RemoveEmptyEntries),
             createdAt = job.CreatedAt,
             requiredCount = job.RequiredCount,
             acceptedCount = job.AcceptedCount,
             deadline = job.Deadline,
-            status = job.Status,
-            viewsCount = job.ViewsCount
+            status = job.Status
         });
     }
 }
@@ -234,7 +231,7 @@ public class CreateJobRequest
     public string[]? Qualifications { get; set; }
     public string[]? NiceToHaves { get; set; }
     public string[]? Benefits { get; set; }
-    public string? Classification { get; set; }
+    public string? Category { get; set; }
     public string[]? Tags { get; set; }
     public int? RequiredCount { get; set; }
     public DateTime? Deadline { get; set; }

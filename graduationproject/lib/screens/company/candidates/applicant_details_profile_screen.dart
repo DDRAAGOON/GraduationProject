@@ -1,7 +1,6 @@
 // Read-only applicant profile details for recruiters.
 
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import 'package:graduationproject/app/router/app_router.dart';
 import 'package:graduationproject/shared/l10n/app_localizations.dart';
@@ -48,16 +47,7 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
 
         final job = companyStore.jobs.firstWhere(
           (j) => j.id == applicant.jobId,
-          orElse: () => Job(
-            id: '',
-            companyId: '',
-            title: '',
-            companyName: '',
-            location: '',
-            employmentType: '',
-            classification: '',
-            salaryRange: '',
-          ),
+          orElse: () => Job.mock(),
         );
 
         final acceptedCount = syncStore.applications
@@ -264,9 +254,7 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
                   ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 Text(
-                  application.jobTitle.trim().isEmpty
-                      ? applicant.role
-                      : application.jobTitle,
+                  applicant.role,
                   style: const TextStyle(color: Colors.grey),
                 ),
                 const SizedBox(height: 24),
@@ -344,9 +332,7 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      application.jobTitle.trim().isEmpty
-                          ? (isAr ? 'الوظيفة' : 'Job')
-                          : application.jobTitle,
+                      isAr ? 'نموت سيف' : 'Namoot Saif',
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     Container(
@@ -466,7 +452,7 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
                     },
                     icon: const Icon(Icons.description_outlined, size: 18),
                     label: Text(
-                      isAr ? 'عرض السيرة الذاتية' : 'View CV',
+                      isAr ? 'عرض الفيش والتشبيه' : 'View Criminal Record',
                     ),
                     style: OutlinedButton.styleFrom(
                       side: BorderSide(
@@ -479,17 +465,6 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                if ((applicant.cvUrl ?? '').trim().isNotEmpty) ...[
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    width: double.infinity,
-                    child: FilledButton.icon(
-                      onPressed: () => _openCvLink(context, applicant.cvUrl!),
-                      icon: const Icon(Icons.download_outlined, size: 18),
-                      label: Text(isAr ? 'تحميل السيرة الذاتية' : 'Download CV'),
-                    ),
-                  ),
-                ],
                 const SizedBox(height: 16),
                 Row(
                   children: [
@@ -618,17 +593,6 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
           content: Text('${t.hiredStatusUpdate} $newStatus'),
           behavior: SnackBarBehavior.floating,
         ),
-      );
-    }
-  }
-
-  Future<void> _openCvLink(BuildContext context, String url) async {
-    final uri = Uri.tryParse(url.trim());
-    if (uri == null) return;
-    final ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
-    if (!ok && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Could not open CV link')),
       );
     }
   }

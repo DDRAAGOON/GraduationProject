@@ -21,15 +21,13 @@ class CompanyAppearanceSettingsScreen extends StatefulWidget {
 }
 
 class _CompanyAppearanceSettingsScreenState
-    extends State<CompanyAppearanceSettingsScreen> with SingleTickerProviderStateMixin {
+    extends State<CompanyAppearanceSettingsScreen> {
   late String _theme = widget.initialTheme;
   late String _lang;
-  late final TabController _tabController;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this, initialIndex: 2);
     _theme = ThemeController.instance.themeMode.value == ThemeMode.light
         ? 'Light'
         : 'Dark';
@@ -39,55 +37,17 @@ class _CompanyAppearanceSettingsScreenState
   }
 
   @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     return AppScaffold(
-      title: t.profileSettings,
-      showBack: true,
-      body: Column(
-        children: [
-          const Divider(height: 1, thickness: 1),
-          Material(
-            color: Theme.of(context).scaffoldBackgroundColor,
-            child: TabBar(
-              controller: _tabController,
-              onTap: (index) {
-                if (index == 0) {
-                  Navigator.pop(context);
-                } else if (index == 1) {
-                  Navigator.pushReplacementNamed(context, '/company/settings/account_security');
-                }
-              },
-              labelColor: Theme.of(context).colorScheme.primary,
-              unselectedLabelColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
-              indicatorColor: Theme.of(context).colorScheme.primary,
-              indicatorWeight: 3,
-              indicatorSize: TabBarIndicatorSize.tab,
-              dividerColor: Colors.transparent,
-              labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-              unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w400, fontSize: 13),
-              tabs: [
-                Tab(text: t.profileSettings),
-                Tab(text: t.accountSecurity),
-                Tab(text: t.tr(en: "Appearance", ar: "المظهر")),
-              ],
-            ),
-          ),
-          const Divider(height: 1, thickness: 0.5),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(t.tr(en: 'Theme', ar: 'المظهر العام'),
-                      style: Theme.of(context).textTheme.titleSmall),
+      title: t.tr(en: 'Appearance', ar: 'المظهر'),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(t.tr(en: 'Theme', ar: 'المظهر العام'),
+                style: Theme.of(context).textTheme.titleSmall),
             const SizedBox(height: 10),
             SegmentedButton<String>(
               segments: const [
@@ -136,9 +96,6 @@ class _CompanyAppearanceSettingsScreenState
           ],
         ),
       ),
-    ),
-  ],
-),
-);
+    );
   }
 }

@@ -161,7 +161,7 @@ class RecruitmentJobDetailsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 12),
           ],
-          if (job.classification.toLowerCase() != 'services' && job.classification.toLowerCase() != 'service') ...[
+          if (job.category.toLowerCase() != 'services' && job.category.toLowerCase() != 'service') ...[
             Text(isAr ? 'الراتب: ${job.salaryRange}' : 'Salary: ${job.salaryRange}'),
           ],
           const SizedBox(height: 24),
@@ -220,43 +220,19 @@ class RecruitmentJobDetailsScreen extends StatelessWidget {
               style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            ...job.benefits.map((item) {
-              final parts = item.split(':::');
-              final title = parts[0];
-              final desc = parts.length > 1 ? parts[1] : '';
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('• ', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.green)),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            title,
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                          ),
-                          if (desc.isNotEmpty) ...[
-                            const SizedBox(height: 2),
-                            Text(
-                              desc,
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                  ],
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: job.benefits.map((item) => Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.green.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
                 ),
-              );
-            }).toList(),
-            const SizedBox(height: 12),
+                child: Text(item, style: const TextStyle(color: Colors.green, fontWeight: FontWeight.w600)),
+              )).toList(),
+            ),
+            const SizedBox(height: 24),
           ],
           const SizedBox(height: 18),
           AppButton(

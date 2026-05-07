@@ -1,5 +1,3 @@
-import 'dart:io';
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:graduationproject/screens/user/profile/user_data.dart';
@@ -32,12 +30,6 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
   final TextEditingController _aboutMeController = TextEditingController();
   final TextEditingController _serviceController = TextEditingController();
   final TextEditingController _skillsController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
-
-  bool _obscurePassword = true;
-  bool _obscureConfirmPassword = true;
-  bool _isLoading = false;
   
   // Education Controllers
   final TextEditingController _eduInstitutionController = TextEditingController();
@@ -115,8 +107,6 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
     _eduDurationController.dispose();
     _instagramController.dispose();
     _facebookController.dispose();
-    _passwordController.dispose();
-    _confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -159,20 +149,11 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Criminal Record is required")));
         return;
       }
-      if (_passwordController.text.length < 8) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Password must be at least 8 characters")));
-        return;
-      }
-      if (_passwordController.text != _confirmPasswordController.text) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Passwords do not match")));
-        return;
-      }
 
-      setState(() => _isLoading = true);
       try {
         await RecruitmentSyncService.instance.register(
           email: _emailController.text.trim(),
-          password: _passwordController.text,
+          password: "12345678",
           name: _fullNameController.text.trim(),
           role: "tradesman",
         );
@@ -182,29 +163,20 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
           name: _fullNameController.text.trim(),
         );
 
-        String? base64Image;
-        if (_profileImagePath != null) {
-          try {
-            final bytes = await File(_profileImagePath!).readAsBytes();
-            base64Image = 'data:image/jpeg;base64,${base64Encode(bytes)}';
-          } catch (_) {}
-        }
-
-        // Send all profile data to the backend
-        await RecruitmentSyncService.instance.updateProfile(
-          photoUrl: base64Image,
-          phone: _phoneController.text.trim(),
-          gender: _selectedGender,
-          dob: "$_selectedYear-$_selectedMonth-$_selectedDay",
-          address: _addressController.text.trim(),
-          about: _aboutMeController.text.trim(),
+        RecruitmentSyncStore.instance.updateUserProfile(
+          fullName: _fullNameController.text,
           title: _serviceController.text.isNotEmpty ? _serviceController.text : "Tradesman",
+          email: _emailController.text,
+          phone: "+20 ${_phoneController.text}",
+          location: _addressController.text,
+          about: _aboutMeController.text,
           skills: _skillsList,
-          educationJson: jsonEncode(_educationList),
-          socialLinksJson: jsonEncode([
+          education: _educationList,
+          role: "Tradesman",
+          socialLinks: [
             if (_instagramController.text.isNotEmpty) {"platform": "Instagram", "url": _instagramController.text},
             if (_facebookController.text.isNotEmpty) {"platform": "Facebook", "url": _facebookController.text},
-          ]),
+          ],
         );
 
         TradesmanProfileData.fullName = _fullNameController.text;
@@ -227,14 +199,12 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
         UserProfileData.cvName = _criminalRecordPath != null ? "Criminal_Record_Certificate" : null;
 
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Tradesman Profile saved successfully!")));
-        setState(() => _isLoading = false);
         
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) => const Navbotton()),
           (route) => false,
         );
       } catch (e) {
-        setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Registration failed: ${e.toString()}")),
         );
@@ -347,27 +317,7 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
                   onChanged: (v) => setState(() => _selectedGender = v),
                   isRequired: true,
                 ),
-                const SizedBox(height: 20),
                 
-                _buildTextField(
-                  _passwordController, 
-                  t.password, 
-                  Icons.lock_outline, 
-                  isRequired: true, 
-                  obscureText: _obscurePassword,
-                  suffixIcon: _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                  onSuffixTap: () => setState(() => _obscurePassword = !_obscurePassword),
-                ),
-                const SizedBox(height: 20),
-                _buildTextField(
-                  _confirmPasswordController, 
-                  t.confirmPassword, 
-                  Icons.lock_reset, 
-                  isRequired: true, 
-                  obscureText: _obscureConfirmPassword,
-                  suffixIcon: _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
-                  onSuffixTap: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
-                ),
                 const SizedBox(height: 20),
                 
                 // Date of Birth Dropdowns
@@ -528,12 +478,12 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
                   width: double.infinity,
                   height: 56,
                   child: ElevatedButton(
-                    onPressed: _isLoading ? null : _saveTradesmanProfile,
+                    onPressed: _saveTradesmanProfile,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF49769F),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                     ),
-                    child: _isLoading ? const CircularProgressIndicator(color: Colors.white) : Text(t.saveProfile, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                    child: Text(t.saveProfile, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
                   ),
                 ),
                 const SizedBox(height: 40),
@@ -596,11 +546,10 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String label, IconData? icon, {String? hint, String? prefixText, int maxLines = 1, TextInputType keyboardType = TextInputType.text, bool isRequired = false, VoidCallback? onIconTap, IconData? suffixIcon, VoidCallback? onSuffixTap, List<TextInputFormatter>? inputFormatters, String? Function(String?)? validator, bool obscureText = false}) {
+  Widget _buildTextField(TextEditingController controller, String label, IconData? icon, {String? hint, String? prefixText, int maxLines = 1, TextInputType keyboardType = TextInputType.text, bool isRequired = false, VoidCallback? onIconTap, IconData? suffixIcon, VoidCallback? onSuffixTap, List<TextInputFormatter>? inputFormatters, String? Function(String?)? validator}) {
     return TextFormField(
       controller: controller, maxLines: maxLines, keyboardType: keyboardType, inputFormatters: inputFormatters, 
       style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14),
-      obscureText: obscureText,
       validator: isRequired ? (validator ?? (value) => (value == null || value.isEmpty) ? "$label is required" : null) : null,
       decoration: InputDecoration(
         prefixText: prefixText, prefixStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold),

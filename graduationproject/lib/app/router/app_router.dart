@@ -154,7 +154,6 @@ final class AppRouter {
         ? RecruitmentSyncStore.instance.jobs.first
         : RecruitmentJob(
             id: 'fallback',
-            companyId: 'fallback',
             title: 'No Job',
             companyName: 'Company',
             location: 'N/A',
@@ -163,7 +162,7 @@ final class AppRouter {
             status: 'Open',
             tags: const <String>[],
             publishedAt: DateTime.now(),
-            classification: 'N/A',
+            category: 'N/A',
             benefits: const <String>[],
           );
 
@@ -289,43 +288,13 @@ final class AppRouter {
       case AppRoutes.companyJobsHub:
         page = const CompanyJobsHubScreen();
       case AppRoutes.companyApplicantsTable:
-        final emptyJob = Job(
-          id: '',
-          companyId: '',
-          title: '',
-          companyName: '',
-          location: '',
-          employmentType: '',
-          classification: '',
-          salaryRange: '',
-        );
         page = CompanyJobApplicantsTableViewScreen(
-          job: args is Job ? args : emptyJob,
+          job: args is Job ? args : Job.mock(),
         );
       case AppRoutes.companyJobDetails:
-        final emptyJob = Job(
-          id: '',
-          companyId: '',
-          title: '',
-          companyName: '',
-          location: '',
-          employmentType: '',
-          classification: '',
-          salaryRange: '',
-        );
-        page = CompanyJobDetailsScreen(job: args is Job ? args : emptyJob);
+        page = CompanyJobDetailsScreen(job: args is Job ? args : Job.mock());
       case AppRoutes.companyJobAnalytics:
-        final emptyJob = Job(
-          id: '',
-          companyId: '',
-          title: '',
-          companyName: '',
-          location: '',
-          employmentType: '',
-          classification: '',
-          salaryRange: '',
-        );
-        page = CompanyJobAnalyticsScreen(job: args is Job ? args : emptyJob);
+        page = CompanyJobAnalyticsScreen(job: args is Job ? args : Job.mock());
       case AppRoutes.companyPostJobStep1:
         page = const CompanyPostJobStep1InformationScreen();
       case AppRoutes.companyPostJobStep2:
@@ -333,18 +302,8 @@ final class AppRouter {
       case AppRoutes.companyPostJobStep3:
         page = const CompanyPostJobStep3BenefitsScreen();
       case AppRoutes.companyJobApplicants:
-        final emptyJob = Job(
-          id: '',
-          companyId: '',
-          title: '',
-          companyName: '',
-          location: '',
-          employmentType: '',
-          classification: '',
-          salaryRange: '',
-        );
         page = CompanyJobApplicantsTableViewScreen(
-          job: args is Job ? args : emptyJob,
+          job: args is Job ? args : Job.mock(),
         );
       case AppRoutes.companyApplicantDetailsProfile:
         page = CompanyApplicantDetailsProfileScreen(

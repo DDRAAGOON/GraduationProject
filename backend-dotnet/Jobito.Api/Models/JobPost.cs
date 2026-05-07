@@ -14,7 +14,7 @@ public class JobPost
     public string QualificationsCsv { get; set; } = "";
     public string NiceToHavesCsv { get; set; } = "";
     public string BenefitsCsv { get; set; } = "";
-    public string Classification { get; set; } = "";
+    public string Category { get; set; } = "";
     public string TagsCsv { get; set; } = "";
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public int ApplicationCount { get; set; } = 0;
@@ -22,5 +22,4 @@ public class JobPost
     public int AcceptedCount { get; set; } = 0;
     public DateTime? Deadline { get; set; }
     public string Status { get; set; } = "Open";
-    public int ViewsCount { get; set; } = 0;
 }

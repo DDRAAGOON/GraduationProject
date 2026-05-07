@@ -55,7 +55,7 @@ class _PostJobState extends State<PostJob> {
           location: store.currentUserLocation,
           salaryRange: "Negotiable", // Default to Negotiable since price is removed
           type: 'one-time',
-          classification: 'Service',
+          category: 'Service',
           tags: _selectedDays.toList(),
           description: _descriptionController.text,
           responsibilities: [],

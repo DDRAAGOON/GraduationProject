@@ -27,7 +27,7 @@ class _CompanyPostJobStep1InformationScreenState
   final _positions = TextEditingController();
   final _department = TextEditingController();
   DateTime? _deadline = DateTime.now().add(const Duration(days: 30));
-  String _classification = 'Technical'; // Technical, Non-Technical, Service
+  String _category = 'Technical'; // Technical, Non-Technical, Service
   final Set<String> _types = {'Full-Time'};
   final List<String> _skills = [];
   bool _loading = false;
@@ -48,7 +48,7 @@ class _CompanyPostJobStep1InformationScreenState
         _jobDescription.text = args.description;
         _positions.text = args.requiredCount.toString();
         _department.text = args.department;
-        _classification = args.classification;
+        _category = args.category;
         
         _types.clear();
         _types.add(args.employmentType);
@@ -115,7 +115,7 @@ class _CompanyPostJobStep1InformationScreenState
         'salaryRange': _salaryController.text.trim().isEmpty ? 'Competitive' : _salaryController.text.trim(),
         'description': _jobDescription.text.trim(),
         'positions': int.tryParse(_positions.text) ?? 1,
-        'classification': _classification,
+        'category': _category,
         'department': _department.text.trim(),
         'skills': _skills,
         'deadline': _deadline,
@@ -308,12 +308,12 @@ class _CompanyPostJobStep1InformationScreenState
           ),
           const Divider(height: 48),
 
-          // Classification
+          // Category
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                t.tr(en: "Classification", ar: "التصنيف"),
+                t.tr(en: "Category", ar: "التصنيف"),
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w900, fontSize: 15),
               ),
               const SizedBox(height: 12),
@@ -395,10 +395,10 @@ class _CompanyPostJobStep1InformationScreenState
   }
 
   Widget _buildRadioChip(String label, String value) {
-    final selected = _classification == value;
+    final selected = _category == value;
     final color = selected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface.withOpacity(0.1);
     return InkWell(
-      onTap: () => setState(() => _classification = value),
+      onTap: () => setState(() => _category = value),
       borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),

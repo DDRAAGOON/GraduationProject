@@ -1,7 +1,7 @@
 // Public-style company profile with tabs and store data.
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../shared/l10n/app_localizations.dart';
 import '../../../shared/state/company_store.dart';
@@ -42,8 +42,9 @@ class _CompanyCompanyProfileScreenState
                 foundedMonth: _store.foundedMonth,
                 foundedYear: _store.foundedYear,
                 countriesCount: _store.locations.length,
-                staff: _store.staff,
+                employee: _store.employee,
                 industry: _store.industry,
+                category: _store.category,
               ),
               const SizedBox(height: 14),
               Divider(
@@ -57,8 +58,8 @@ class _CompanyCompanyProfileScreenState
               Text(
                 t.isAr
                     ? (_store.companyAboutAr.trim().isNotEmpty
-                    ? _store.companyAboutAr
-                    : (_store.companyAboutEn.trim().isNotEmpty ? _store.companyAboutEn : t.notYet))
+                        ? _store.companyAboutAr
+                        : (_store.companyAboutEn.trim().isNotEmpty ? _store.companyAboutEn : t.notYet))
                     : (_store.companyAboutEn.trim().isNotEmpty ? _store.companyAboutEn : t.notYet),
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: (_store.companyAboutAr.isEmpty && _store.companyAboutEn.isEmpty)
@@ -72,44 +73,15 @@ class _CompanyCompanyProfileScreenState
               const SizedBox(height: 10),
               _store.benefits.isEmpty
                   ? Text(t.notYet, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)))
-                  : Column(
-                children: _store.benefits.map((item) {
-                  final parts = item.split(':::');
-                  final title = parts[0];
-                  final desc = parts.length > 1 ? parts[1] : '';
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Icon(Icons.check_circle_outline, size: 20, color: Theme.of(context).colorScheme.primary),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                title,
-                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                              ),
-                              if (desc.isNotEmpty) ...[
-                                const SizedBox(height: 2),
-                                Text(
-                                  desc,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-                                  ),
-                                ),
-                              ],
-                            ],
-                          ),
-                        ),
-                      ],
+                  : Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: _store.benefits.map((item) => Chip(
+                        label: Text(item, style: const TextStyle(fontSize: 12)),
+                        visualDensity: VisualDensity.compact,
+                        backgroundColor: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.3),
+                      )).toList(),
                     ),
-                  );
-                }).toList(),
-              ),
               const SizedBox(height: 16),
               if (_store.commercialRegister.isNotEmpty || _store.nationalNumber.isNotEmpty) ...[
                 SectionTitle(t.tr(en: 'Registration Info', ar: 'بيانات التسجيل')),
@@ -132,9 +104,9 @@ class _CompanyCompanyProfileScreenState
                 SectionTitle(t.contactSectionLabel),
                 const SizedBox(height: 10),
                 ..._store.contacts.asMap().entries.map(
-                      (entry) => _EditableLinkTile(
-                    icon: entry.value.name.toLowerCase().contains('email')
-                        ? Icons.email_outlined
+                  (entry) => _EditableLinkTile(
+                    icon: entry.value.name.toLowerCase().contains('email') 
+                        ? Icons.email_outlined 
                         : Icons.link_outlined,
                     title: entry.value.name,
                     value: entry.value.value,
@@ -163,13 +135,19 @@ class _EditableLinkTile extends StatelessWidget {
   final String title;
   final String value;
 
-  Future<void> _copy(BuildContext context) async {
-    final t = AppLocalizations.of(context);
-    await Clipboard.setData(ClipboardData(text: value));
-    if (!context.mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(t.isAr ? 'تم نسخ الرابط' : 'Copied to clipboard')),
-    );
+  Future<void> _launch() async {
+    String urlStr = value;
+    if (!urlStr.contains('://') && !urlStr.startsWith('mailto:')) {
+      if (urlStr.contains('@')) {
+        urlStr = 'mailto:$urlStr';
+      } else {
+        urlStr = 'https://$urlStr';
+      }
+    }
+    final uri = Uri.tryParse(urlStr);
+    if (uri != null) {
+      await launchUrl(uri);
+    }
   }
 
   @override
@@ -180,7 +158,7 @@ class _EditableLinkTile extends StatelessWidget {
         leading: Icon(icon),
         title: Text(title),
         subtitle: Text(value),
-        onTap: () => _copy(context),
+        onTap: _launch,
       ),
     );
   }
@@ -205,14 +183,6 @@ class _RegistrationInfoTile extends StatelessWidget {
         leading: Icon(icon),
         title: Text(title),
         subtitle: Text(value),
-        onTap: () async {
-          final t = AppLocalizations.of(context);
-          await Clipboard.setData(ClipboardData(text: value));
-          if (!context.mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(t.isAr ? 'تم النسخ' : 'Copied to clipboard')),
-          );
-        },
       ),
     );
   }
@@ -224,16 +194,18 @@ class _CompanyStatsBar extends StatelessWidget {
     required this.foundedMonth,
     required this.foundedYear,
     required this.countriesCount,
-    required this.staff,
+    required this.employee,
     required this.industry,
+    required this.category,
   });
 
   final int foundedDay;
   final int foundedMonth;
   final int foundedYear;
   final int countriesCount;
-  final String staff;
+  final String employee;
   final String industry;
+  final String category;
 
   @override
   Widget build(BuildContext context) {
@@ -312,9 +284,9 @@ class _CompanyStatsBar extends StatelessWidget {
                   value: (foundedDay == 0 || foundedMonth == 0 || foundedYear == 0)
                       ? t.notYet
                       : t.tr(
-                      en: '$foundedMonth/$foundedDay/$foundedYear',
-                      ar: '$foundedYear/$foundedMonth/$foundedDay'.replaceAll('0', '٠').replaceAll('1', '١').replaceAll('2', '٢').replaceAll('3', '٣').replaceAll('4', '٤').replaceAll('5', '٥').replaceAll('6', '٦').replaceAll('7', '٧').replaceAll('8', '٨').replaceAll('9', '٩')
-                  ),
+                          en: '$foundedMonth/$foundedDay/$foundedYear', 
+                          ar: '$foundedYear/$foundedMonth/$foundedDay'.replaceAll('0', '٠').replaceAll('1', '١').replaceAll('2', '٢').replaceAll('3', '٣').replaceAll('4', '٤').replaceAll('5', '٥').replaceAll('6', '٦').replaceAll('7', '٧').replaceAll('8', '٨').replaceAll('9', '٩')
+                        ),
                 ),
                 const SizedBox(width: 14),
                 item(
@@ -329,14 +301,14 @@ class _CompanyStatsBar extends StatelessWidget {
               children: [
                 item(
                   icon: Icons.groups_outlined,
-                  label: t.classification,
-                  value: staff.isEmpty ? t.notYet : staff,
+                  label: t.employee,
+                  value: employee.isEmpty ? t.notYet : employee,
                 ),
                 const SizedBox(width: 14),
                 item(
                   icon: Icons.category_outlined,
                   label: t.categoryLabel,
-                  value: industry.isEmpty ? t.notYet : industry,
+                  value: category.isEmpty ? t.notYet : (category == 'Technical' ? t.technical : t.nonTechnical),
                 ),
               ],
             ),

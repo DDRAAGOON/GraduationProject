@@ -2,53 +2,10 @@ import 'package:flutter/material.dart';
 import '../../app/router/app_router.dart';
 import '../../shared/l10n/app_localizations.dart';
 import '../../shared/state/locale_controller.dart';
-import '../../shared/services/recruitment_sync_service.dart';
-import '../../shared/services/session_manager.dart';
 
 /// First launch: choose Job seeker (User) or Recruiter (Company), then each flow’s onboarding.
-class LogoPage extends StatefulWidget {
+class LogoPage extends StatelessWidget {
   const LogoPage({super.key});
-
-  @override
-  State<LogoPage> createState() => _LogoPageState();
-}
-
-class _LogoPageState extends State<LogoPage> {
-  @override
-  void initState() {
-    super.initState();
-    _checkSession();
-  }
-
-  Future<void> _checkSession() async {
-    final isCompany = await SessionManager.isCompanyLoggedIn();
-    final isUser = await SessionManager.isUserLoggedIn();
-    final token = await SessionManager.getToken();
-
-    if (token != null && token.isNotEmpty) {
-      RecruitmentSyncService.instance.setTokenManually(token);
-      if (isCompany) {
-        if (mounted) {
-          Navigator.of(context).pushReplacementNamed(AppRoutes.companyDashboard);
-          RecruitmentSyncService.instance.startPolling();
-        }
-        return;
-      }
-      if (isUser) {
-        if (mounted) {
-          Navigator.of(context).pushReplacementNamed(AppRoutes.userWorkspace);
-          RecruitmentSyncService.instance.startPolling();
-        }
-        return;
-      }
-    }
-
-    // Stale local flags with no JWT should be cleared to avoid ghost sessions.
-    if (isCompany || isUser) {
-      await SessionManager.logoutCompany();
-      await SessionManager.logoutUser();
-    }
-  }
 
   @override
   Widget build(BuildContext context) {

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../shared/l10n/app_localizations.dart';
 import '../../../shared/state/recruitment_sync_store.dart';
 import '../../../shared/widgets/app_button.dart';
 
@@ -33,12 +32,47 @@ class _RecruitmentJobFiltersScreenState
     return items.isNotEmpty ? items.first : 'All';
   }
 
+  String _translateLabel(String label, bool isAr) {
+    if (!isAr) return label;
+    final low = label.trim().toLowerCase();
+    switch (low) {
+      case 'all':
+        return 'الكل';
+      case 'full-time':
+      case 'full time':
+        return 'دوام كامل';
+      case 'part-time':
+      case 'part time':
+        return 'دوام جزئي';
+      case 'remote':
+        return 'عن بعد';
+      case 'technical':
+        return 'تقني';
+      case 'non-technical':
+        return 'غير تقني';
+      case 'service':
+      case 'services':
+        return 'خدمة';
+      case 'tradesman':
+        return 'حرفي';
+      case 'negotiable':
+        return 'قابل للتفاوض';
+      default:
+        // Handle salary ranges if needed, e.g., '10k - 20k' stays same or format it
+        return label;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: Text('Advanced Filters', style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
+        title: Text(
+          isAr ? 'فلاتر متقدمة' : 'Advanced Filters', 
+          style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
+        ),
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
@@ -49,39 +83,42 @@ class _RecruitmentJobFiltersScreenState
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildFilterLabel('Employment Type'),
+              _buildFilterLabel(isAr ? 'نوع التوظيف' : 'Employment Type'),
               const SizedBox(height: 10),
               _buildDropdown(
                 value: _selectedType,
                 items: ['All', 'Full-time', 'Part-time', 'Remote'],
+                isAr: isAr,
                 onChanged: (value) => setState(() => _selectedType = value ?? 'All'),
               ),
               const SizedBox(height: 24),
               
-              _buildFilterLabel('Salary Range'),
+              _buildFilterLabel(isAr ? 'نطاق الراتب' : 'Salary Range'),
               const SizedBox(height: 10),
               _buildDropdown(
                 value: _selectedSalary,
                 items: RecruitmentSyncStore.salaryRanges,
+                isAr: isAr,
                 onChanged: (value) => setState(() => _selectedSalary = value ?? 'All'),
               ),
               const SizedBox(height: 24),
               
-              _buildFilterLabel(AppLocalizations.of(context).categoryLabel),
+              _buildFilterLabel(isAr ? 'التصنيفات' : 'Categories'),
               const SizedBox(height: 10),
               _buildDropdown(
                 value: _selectedCategory,
                 items: RecruitmentSyncStore.categories,
+                isAr: isAr,
                 onChanged: (value) => setState(() => _selectedCategory = value ?? 'All'),
               ),
               
               const SizedBox(height: 48),
               AppButton(
-                label: 'Apply Filters',
+                label: isAr ? 'تطبيق الفلاتر' : 'Apply Filters',
                 onPressed: () {
                   RecruitmentSyncStore.instance.updateFilters(
                     type: _selectedType,
-                    classification: _selectedCategory,
+                    category: _selectedCategory,
                     salaryRange: _selectedSalary,
                   );
                   Navigator.of(context).pop();
@@ -98,7 +135,10 @@ class _RecruitmentJobFiltersScreenState
                       _selectedSalary = 'All';
                     });
                   },
-                  child: Text('Reset All', style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.w600)),
+                  child: Text(
+                    isAr ? 'إعادة ضبط الكل' : 'Reset All', 
+                    style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.w600),
+                  ),
                 ),
               ),
             ],
@@ -118,13 +158,14 @@ class _RecruitmentJobFiltersScreenState
   Widget _buildDropdown({
     required String value,
     required List<String> items,
+    required bool isAr,
     required ValueChanged<String?> onChanged,
   }) {
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [BoxShadow(color: Theme.of(context).dividerColor.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 4))],
+        boxShadow: [BoxShadow(color: Theme.of(context).dividerColor.withValues(alpha: 0.1), blurRadius: 10, offset: const Offset(0, 4))],
       ),
       child: DropdownButtonFormField<String>(
         value: items.contains(value) ? value : items.first,
@@ -137,7 +178,13 @@ class _RecruitmentJobFiltersScreenState
         style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14),
         icon: Icon(Icons.keyboard_arrow_down, color: Theme.of(context).colorScheme.outline),
         dropdownColor: Theme.of(context).colorScheme.surface,
-        items: items.map((e) => DropdownMenuItem(value: e, child: Text(e, style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurface)))).toList(),
+        items: items.map((e) => DropdownMenuItem(
+          value: e, 
+          child: Text(
+            _translateLabel(e, isAr), // ترجمة النص الظاهر في القائمة
+            style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurface),
+          ),
+        )).toList(),
         onChanged: onChanged,
       ),
     );

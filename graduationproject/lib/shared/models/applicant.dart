@@ -20,8 +20,6 @@ final class Applicant {
     this.education,
     this.skills = const [],
     this.hasCv = false,
-    this.cvUrl,
-    this.cvFileName,
     required this.jobId,
   });
 
@@ -44,8 +42,6 @@ final class Applicant {
   final String? education;
   final List<String> skills;
   final bool hasCv;
-  final String? cvUrl;
-  final String? cvFileName;
   final String jobId;
 
   /// Generates a static mock [Applicant] to populate the UI templates.
@@ -67,8 +63,6 @@ final class Applicant {
         education: 'غير متوفر',
         skills: [],
         hasCv: false,
-        cvUrl: null,
-        cvFileName: null,
         jobId: 'job_1',
       );
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../shared/l10n/app_localizations.dart';
 import '../../../shared/widgets/app_button.dart';
@@ -12,14 +13,7 @@ class CompanyAccountSecurityScreen extends StatefulWidget {
   State<CompanyAccountSecurityScreen> createState() => _CompanyAccountSecurityScreenState();
 }
 
-class _CompanyAccountSecurityScreenState extends State<CompanyAccountSecurityScreen> with SingleTickerProviderStateMixin {
-  late final TabController _tabController;
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 3, vsync: this, initialIndex: 1);
-  }
+class _CompanyAccountSecurityScreenState extends State<CompanyAccountSecurityScreen> {
   final _emailController = TextEditingController();
   final _currentPasswordController = TextEditingController();
   final _newPasswordController = TextEditingController();
@@ -28,10 +22,11 @@ class _CompanyAccountSecurityScreenState extends State<CompanyAccountSecurityScr
   // فصل الـ Loading عن بعض
   bool _isEmailLoading = false;
   bool _isPasswordLoading = false;
+  bool _isGoogleLoading = false;
+  bool _isGoogleLinked = false;
 
   @override
   void dispose() {
-    _tabController.dispose();
     _emailController.dispose();
     _currentPasswordController.dispose();
     _newPasswordController.dispose();
@@ -106,49 +101,33 @@ class _CompanyAccountSecurityScreenState extends State<CompanyAccountSecurityScr
     }
   }
 
-
+  Future<void> _linkGoogleAccount() async {
+    final t = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    setState(() => _isGoogleLoading = true);
+    try {
+      // TODO: ضع كود google_sign_in هنا
+      await Future.delayed(const Duration(milliseconds: 800));
+      if (!mounted) return;
+      setState(() => _isGoogleLinked = true);
+      messenger.showSnackBar(
+        SnackBar(content: Text (t.tr(en: 'Linked successfully', ar: 'تم الربط بنجاح'))),
+      );
+    } finally {
+      if (mounted) setState(() => _isGoogleLoading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     return AppScaffold(
-      title: t.profileSettings, // Match title of profile settings
+      title: t.accountSecurity,
       showBack: true,
-      body: Column(
+      body: ListView(
+        padding: const EdgeInsets.all(20),
         children: [
-          const Divider(height: 1, thickness: 1),
-          Material(
-            color: Theme.of(context).scaffoldBackgroundColor,
-            child: TabBar(
-              controller: _tabController,
-              onTap: (index) {
-                if (index == 0) {
-                  Navigator.pop(context);
-                } else if (index == 2) {
-                  Navigator.pushReplacementNamed(context, '/company/settings/appearance_light');
-                }
-              },
-              labelColor: Theme.of(context).colorScheme.primary,
-              unselectedLabelColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
-              indicatorColor: Theme.of(context).colorScheme.primary,
-              indicatorWeight: 3,
-              indicatorSize: TabBarIndicatorSize.tab,
-              dividerColor: Colors.transparent,
-              labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-              unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w400, fontSize: 13),
-              tabs: [
-                Tab(text: t.profileSettings),
-                Tab(text: t.accountSecurity),
-                Tab(text: t.tr(en: "Appearance", ar: "المظهر")),
-              ],
-            ),
-          ),
-          const Divider(height: 1, thickness: 0.5),
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.all(20),
-              children: [
-                _sectionTitle(t.tr(en: 'Email Address', ar: 'البريد الإلكتروني')),
+          _sectionTitle(t.tr(en: 'Email Address', ar: 'البريد الإلكتروني')),
           const SizedBox(height: 10),
           AppTextField(
             label: '',
@@ -192,10 +171,19 @@ class _CompanyAccountSecurityScreenState extends State<CompanyAccountSecurityScr
             onPressed: _updatePassword,
             loading: _isPasswordLoading,
           ),
-
-              ],
+          const SizedBox(height: 32),
+          const Divider(),
+          const SizedBox(height: 24),
+          _sectionTitle(t.linkGoogleAccount),
+          const SizedBox(height: 8),
+          Text(
+            t.linkGoogleDesc,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
             ),
           ),
+          const SizedBox(height: 16),
+          _buildGoogleCard(context, t),
         ],
       ),
     );
@@ -208,5 +196,53 @@ class _CompanyAccountSecurityScreenState extends State<CompanyAccountSecurityScr
     );
   }
 
-
+  Widget _buildGoogleCard(BuildContext context, AppLocalizations t) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                _isGoogleLinked ? Icons.link : Icons.link_off,
+                color: _isGoogleLinked ? Colors.green : Theme.of(context).colorScheme.error,
+              ),
+              const SizedBox(width: 12),
+              Text(
+                _isGoogleLinked ? t.tr(en: 'Linked successfully', ar: 'تم الربط بنجاح') : t.accountNotLinked,
+                style: TextStyle(
+                  color: _isGoogleLinked ? Colors.green : Theme.of(context).colorScheme.error,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          if (!_isGoogleLinked) ...[
+            const SizedBox(height: 16),
+            OutlinedButton.icon(
+              onPressed: _linkGoogleAccount,
+              style: OutlinedButton.styleFrom(
+                minimumSize: const Size(double.infinity, 48),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              icon: _isGoogleLoading 
+                ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
+                : SvgPicture.asset(
+                    'assets/company/icon/google_g.svg',
+                    width: 18,
+                    height: 18,
+                  ),
+              label: Text(t.continueWithGoogle),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
 }

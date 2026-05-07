@@ -172,47 +172,22 @@ class TradesmanJobDetailsScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 12),
-                ...job.benefits.map((item) {
-                  final parts = item.split(':::');
-                  final title = parts[0];
-                  final desc = parts.length > 1 ? parts[1] : '';
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text('• ', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.green)),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                title,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15,
-                                  color: Theme.of(context).colorScheme.onSurface,
-                                ),
-                              ),
-                              if (desc.isNotEmpty) ...[
-                                const SizedBox(height: 2),
-                                Text(
-                                  desc,
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                                  ),
-                                ),
-                              ],
-                            ],
-                          ),
-                        ),
-                      ],
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
+                  children: job.benefits.map((item) => Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.green.withValues(alpha: 0.05),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.green.withValues(alpha: 0.1)),
                     ),
-                  );
-                }).toList(),
-                const SizedBox(height: 12),
+                    child: Text(
+                      item,
+                      style: const TextStyle(color: Colors.green, fontSize: 13, fontWeight: FontWeight.w600),
+                    ),
+                  )).toList(),
+                ),
                 const SizedBox(height: 24),
               ],
 
