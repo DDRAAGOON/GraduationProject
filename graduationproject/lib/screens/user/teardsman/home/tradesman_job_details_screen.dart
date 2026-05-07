@@ -27,7 +27,6 @@ class TradesmanJobDetailsScreen extends StatelessWidget {
       body: AnimatedBuilder(
         animation: store,
         builder: (context, _) {
-          final isSaved = store.savedJobIds.contains(job.id);
           return ListView(
             padding: const EdgeInsets.all(24),
             children: [
@@ -222,39 +221,17 @@ class TradesmanJobDetailsScreen extends StatelessWidget {
               const SizedBox(height: 40),
 
               // Action Buttons
-              Row(
-                children: [
-                  Expanded(
-                    child: AppButton(
-                      label: t.tr(en: 'Apply Now', ar: 'قدّم الآن'),
-                      backgroundColor: const Color(0xFF4A6ED1),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => TradesmanApplyJobScreen(job: job),
-                          ),
-                        );
-                      },
+              AppButton(
+                label: t.tr(en: 'Apply Now', ar: 'قدّم الآن'),
+                backgroundColor: const Color(0xFF4A6ED1),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => TradesmanApplyJobScreen(job: job),
                     ),
-                  ),
-                  const SizedBox(width: 16),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).cardColor,
-                      borderRadius: BorderRadius.circular(15),
-                      border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.12)),
-                    ),
-                    child: IconButton(
-                      onPressed: () => store.toggleSaveJob(job.id),
-                      icon: Icon(
-                        isSaved ? Icons.bookmark : Icons.bookmark_border,
-                        color: Theme.of(context).colorScheme.primary,
-                        size: 30,
-                      ),
-                    ),
-                  ),
-                ],
+                  );
+                },
               ),
               const SizedBox(height: 20),
             ],

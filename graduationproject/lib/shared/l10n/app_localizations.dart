@@ -88,6 +88,7 @@ class AppLocalizations {
   String get upload => userTr('common.upload', fallbackEn: 'Upload', fallbackAr: 'رفع');
   String get required => userTr('common.required', fallbackEn: 'Required', fallbackAr: 'مطلوب');
   String get notYet => userTr('common.notYet', fallbackEn: 'not yet', fallbackAr: 'ليس بعد');
+  String get seeAll => userTr('common.seeAll', fallbackEn: 'See All', fallbackAr: 'عرض الكل');
 
   // ── Validation ─────────────────────────────────────────────────────────────
   String get enterValidEmail => userTr('validation.enterValidEmail', fallbackEn: 'Enter a valid email', fallbackAr: 'أدخل بريدًا إلكترونيًا صحيحًا');
@@ -308,6 +309,22 @@ class AppLocalizations {
   String get quickActions => userTr('candidates.quickActions', fallbackEn: 'Quick Actions', fallbackAr: 'الإجراءات السريعة');
   String get resumeLabel => userTr('candidates.resumeLabel', fallbackEn: 'Resume', fallbackAr: 'السيرة الذاتية');
   String get lastUsed => userTr('candidates.lastUsed', fallbackEn: 'Last Used', fallbackAr: 'آخر استخدام');
+
+  // ── Tradesman Home ──────────────────────────────────────────────────────────
+  String get findNextJob => userTr('tradesman.findNextJob', fallbackEn: 'Find your next job', fallbackAr: 'ابحث عن عملك التالي');
+  String get skillTodayHint => userTr('tradesman.skillTodayHint', fallbackEn: 'What is your skill today?', fallbackAr: 'ما هي مهارتك اليوم؟');
+  String get featuredOpportunities => userTr('tradesman.featuredOpportunities', fallbackEn: 'Featured Opportunities', fallbackAr: 'فرص عمل مميزة');
+  String get featuredOpportunitiesSub => userTr('tradesman.featuredOpportunitiesSub', fallbackEn: 'Discover the latest tasks and jobs available for you as a professional tradesman.', fallbackAr: 'اكتشف أحدث المهام والوظائف المتاحة لك كصنايعي محترف.');
+  String get suggestedJobs => userTr('tradesman.suggestedJobs', fallbackEn: 'Suggested Jobs', fallbackAr: 'وظائف مقترحة');
+  String get noJobsAvailable => userTr('tradesman.noJobsAvailable', fallbackEn: 'No jobs available currently', fallbackAr: 'لا توجد وظائف متاحة حالياً');
+
+  // ── Translation Helpers ─────────────────────────────────────────────────────
+  String translateLocation(String loc) => userTr('location.$loc', fallbackEn: loc, fallbackAr: loc);
+  String translateSalary(String s) => userTr('salary.$s', fallbackEn: s, fallbackAr: s);
+  String translateJobTitle(String t) => userTr('jobTitle.$t', fallbackEn: t, fallbackAr: t);
+  String translateCompanyName(String c) => userTr('companyName.$c', fallbackEn: c, fallbackAr: c);
+  String translateJobType(String type) => userTr('jobType.$type', fallbackEn: type, fallbackAr: type);
+  String translateCategory(String cat) => userTr('category.$cat', fallbackEn: cat, fallbackAr: cat);
 
   String get technical => tr(en: 'Technical', ar: 'تقني');
   String get nonTechnical => tr(en: 'Non-Technical', ar: 'غير تقني');

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:graduationproject/shared/l10n/app_localizations.dart';
 import 'package:graduationproject/shared/state/recruitment_sync_store.dart';
+import 'package:graduationproject/shared/services/recruitment_sync_service.dart';
 import '../Tradesman_Messages/chat_tradesman.dart';
 
 class JobApplicantsScreen extends StatefulWidget {
@@ -38,7 +39,6 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
     super.initState();
     final store = RecruitmentSyncStore.instance;
     
-    // Try to find the real job data if jobId is provided but initial data is missing
     RecruitmentJob? existingJob;
     if (widget.jobId != null && widget.jobId!.isNotEmpty) {
       try {
@@ -59,6 +59,30 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
     _titleController.dispose();
     _descController.dispose();
     super.dispose();
+  }
+
+  Future<void> _updateApplicationStatus(String applicationId, String status) async {
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
+    try {
+      await RecruitmentSyncService.instance.updateStatus(
+        applicationId: applicationId,
+        status: status,
+      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(isAr ? "تم تحديث الحالة إلى $status" : "Status updated to $status"),
+            backgroundColor: status == 'Accepted' ? Colors.green : Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(isAr ? "فشل تحديث الحالة" : "Failed to update status")),
+        );
+      }
+    }
   }
 
   void _toggleEdit() {
@@ -107,122 +131,126 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    // Real applicants filtered by jobId
-    final realApplicants = store.applications.where((app) => app.jobId == widget.jobId).toList();
-
-    return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppBar(
-        backgroundColor: theme.scaffoldBackgroundColor,
-        elevation: 0,
-        surfaceTintColor: Colors.transparent,
-        leading: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Container(
-            decoration: BoxDecoration(
-              color: theme.cardColor,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: theme.dividerColor.withValues(alpha: 0.1)),
-            ),
-            child: IconButton(
-              icon: Icon(Icons.arrow_back, color: colorScheme.onSurface, size: 20),
-              onPressed: () => Navigator.pop(context),
-            ),
-          ),
-        ),
-        actions: [
-          if (_activeTabIndex == 1) ...[
-            if (_isEditing)
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.red.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: IconButton(
-                    icon: const Icon(Icons.delete_outline, color: Colors.red, size: 20),
-                    onPressed: _showDeleteDialog,
-                  ),
-                ),
-              ),
-            Padding(
+    return ListenableBuilder(
+      listenable: store,
+      builder: (context, child) {
+        final realApplicants = store.applications.where((app) => app.jobId == widget.jobId).toList();
+        
+        return Scaffold(
+          backgroundColor: theme.scaffoldBackgroundColor,
+          appBar: AppBar(
+            backgroundColor: theme.scaffoldBackgroundColor,
+            elevation: 0,
+            surfaceTintColor: Colors.transparent,
+            leading: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Container(
                 decoration: BoxDecoration(
-                  color: _isEditing ? Colors.green.withValues(alpha: 0.1) : theme.cardColor,
+                  color: theme.cardColor,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: theme.dividerColor.withValues(alpha: 0.1)),
                 ),
                 child: IconButton(
-                  icon: Icon(_isEditing ? Icons.check : Icons.edit_outlined, 
-                      color: _isEditing ? Colors.green : colorScheme.onSurface, size: 20),
-                  onPressed: _toggleEdit,
+                  icon: Icon(Icons.arrow_back, color: colorScheme.onSurface, size: 20),
+                  onPressed: () => Navigator.pop(context),
                 ),
               ),
             ),
-          ],
-          const SizedBox(width: 8),
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _isEditing && _activeTabIndex == 1
-                  ? TextField(
-                      controller: _titleController,
-                      style: TextStyle(color: colorScheme.primary, fontSize: 24, fontWeight: FontWeight.w900),
-                      decoration: InputDecoration(
-                        border: InputBorder.none, 
-                        hintText: "Job Title",
-                        hintStyle: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.38)),
+            actions: [
+              if (_activeTabIndex == 1) ...[
+                if (_isEditing)
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.red.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                    )
-                  : Text(
-                    _titleController.text.isEmpty ? (isAr ? "بدون عنوان" : "Untitled") : _titleController.text,
-                    style: TextStyle(
-                      color: colorScheme.primary,
-                      fontSize: 28,
-                      fontWeight: FontWeight.w900,
+                      child: IconButton(
+                        icon: const Icon(Icons.delete_outline, color: Colors.red, size: 20),
+                        onPressed: _showDeleteDialog,
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    isAr ? 'عام • لمرة واحدة • ${realApplicants.length} متقدمين' : 'General • one-time • ${realApplicants.length} applicants',
-                    style: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 14, fontWeight: FontWeight.w500),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: _isEditing ? Colors.green.withValues(alpha: 0.1) : theme.cardColor,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: theme.dividerColor.withValues(alpha: 0.1)),
+                    ),
+                    child: IconButton(
+                      icon: Icon(_isEditing ? Icons.check : Icons.edit_outlined, 
+                          color: _isEditing ? Colors.green : colorScheme.onSurface, size: 20),
+                      onPressed: _toggleEdit,
+                    ),
                   ),
-                ],
-              ),
-            ),
-            
-            const SizedBox(height: 10),
-            
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Row(
-                children: [
-                  _buildTab(t.tr(en: "Applicants", ar: "المتقدمين"), 0),
-                  const SizedBox(width: 32),
-                  _buildTab(t.tr(en: "Job Details", ar: "تفاصيل العمل"), 1),
-                ],
-              ),
-            ),
-            Divider(height: 1, thickness: 1, color: theme.dividerColor.withValues(alpha: 0.1)),
-            
-            const SizedBox(height: 30),
+                ),
+              ],
+              const SizedBox(width: 8),
+            ],
+          ),
+          body: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _isEditing && _activeTabIndex == 1
+                      ? TextField(
+                          controller: _titleController,
+                          style: TextStyle(color: colorScheme.primary, fontSize: 24, fontWeight: FontWeight.w900),
+                          decoration: InputDecoration(
+                            border: InputBorder.none, 
+                            hintText: "Job Title",
+                            hintStyle: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.38)),
+                          ),
+                        )
+                      : Text(
+                        _titleController.text.isEmpty ? (isAr ? "بدون عنوان" : "Untitled") : _titleController.text,
+                        style: TextStyle(
+                          color: colorScheme.primary,
+                          fontSize: 28,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        isAr ? 'عام • لمرة واحدة • ${realApplicants.length} متقدمين' : 'General • one-time • ${realApplicants.length} applicants',
+                        style: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 14, fontWeight: FontWeight.w500),
+                      ),
+                    ],
+                  ),
+                ),
+                
+                const SizedBox(height: 10),
+                
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Row(
+                    children: [
+                      _buildTab(t.tr(en: "Applicants", ar: "المتقدمين"), 0),
+                      const SizedBox(width: 32),
+                      _buildTab(t.tr(en: "Job Details", ar: "تفاصيل العمل"), 1),
+                    ],
+                  ),
+                ),
+                Divider(height: 1, thickness: 1, color: theme.dividerColor.withValues(alpha: 0.1)),
+                
+                const SizedBox(height: 30),
 
-            _activeTabIndex == 0 ? _buildApplicantsView(isAr, t, realApplicants) : _buildJobDetailsView(isAr, t),
-            
-            const SizedBox(height: 100),
-          ],
-        ),
-      ),
+                _activeTabIndex == 0 ? _buildApplicantsView(isAr, t, realApplicants) : _buildJobDetailsView(isAr, t),
+                
+                const SizedBox(height: 100),
+              ],
+            ),
+          ),
+        );
+      }
     );
   }
 
@@ -359,12 +387,16 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 4),
                         decoration: BoxDecoration(
-                          color: Colors.blue.withValues(alpha: 0.1),
+                          color: (app.status == 'Accepted' ? Colors.green : (app.status == 'Rejected' ? Colors.red : Colors.blue)).withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
                           app.status,
-                          style: const TextStyle(color: Colors.blue, fontSize: 10, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            color: app.status == 'Accepted' ? Colors.green : (app.status == 'Rejected' ? Colors.red : Colors.blue), 
+                            fontSize: 10, 
+                            fontWeight: FontWeight.bold
+                          ),
                           textAlign: TextAlign.center,
                         ),
                       ),
@@ -373,14 +405,27 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          IconButton(
-                            icon: const Icon(Icons.phone_outlined, color: Colors.green, size: 20),
-                            onPressed: () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text("${t.tr(en: 'Phone Number:', ar: 'رقم الهاتف:')} ${app.phone ?? 'N/A'}")),
-                              );
-                            },
-                          ),
+                          if (app.status == 'Applied') ...[
+                            IconButton(
+                              icon: const Icon(Icons.check_circle_outline, color: Colors.green, size: 22),
+                              tooltip: isAr ? 'قبول' : 'Accept',
+                              onPressed: () => _updateApplicationStatus(app.id, 'Accepted'),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.cancel_outlined, color: Colors.red, size: 22),
+                              tooltip: isAr ? 'رفض' : 'Reject',
+                              onPressed: () => _updateApplicationStatus(app.id, 'Rejected'),
+                            ),
+                          ] else ...[
+                            IconButton(
+                              icon: const Icon(Icons.phone_outlined, color: Colors.blue, size: 20),
+                              onPressed: () {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text("${t.tr(en: 'Phone Number:', ar: 'رقم الهاتف:')} ${app.phone ?? 'N/A'}")),
+                                );
+                              },
+                            ),
+                          ],
                         ],
                       ),
                     ),

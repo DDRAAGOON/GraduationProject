@@ -10,6 +10,8 @@ import '../messages/chat_thread_screen.dart';
 import '../teardsman/nav_Botton_bar/nav_bottom_bar.dart';
 import '../../../shared/utils/image_helper.dart';
 import '../../../constants/app_images.dart';
+import '../notifications/notifications_screen.dart';
+import '../../company/help/help_center_screen.dart';
 
 // Comprehensive Translation Helper
 String _translateValue(String? value, bool isAr) {
@@ -77,6 +79,8 @@ String _translateValue(String? value, bool isAr) {
   if (low.contains('doctor')) return 'طبيب';
   if (low.contains('assistant')) return 'مساعد';
   if (low.contains('specialist')) return 'أخصائي';
+  if (low.contains('programmer')) return 'مطور برمجيات';
+  if (low == 'مبرمج') return 'مطور';
 
   // Status
   if (low.contains('hire')) return 'تم التوظيف';
@@ -89,6 +93,37 @@ String _translateValue(String? value, bool isAr) {
   return value;
 }
 
+Widget _buildCompanyLogo(BuildContext context, String? logoUrl) {
+  final provider = getAppImageProvider(logoUrl);
+  return Container(
+    width: 44,
+    height: 44,
+    decoration: BoxDecoration(
+      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
+      borderRadius: BorderRadius.circular(10),
+    ),
+    child: provider == null
+        ? const Icon(Icons.business, size: 24, color: Color(0xFF49769F))
+        : ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: Image(image: provider, fit: BoxFit.cover),
+          ),
+  );
+}
+
+Color _getJobTypeColor(String type) {
+  switch (type.toLowerCase()) {
+    case 'full-time': return Colors.green;
+    case 'part-time': return Colors.blue;
+    case 'remote': return Colors.purple;
+    case 'freelance':
+    case 'freelancer': return Colors.teal;
+    case 'one-time': return Colors.amber;
+    case 'internship': return Colors.indigo;
+    default: return Colors.grey;
+  }
+}
+
 class RecruitmentUserShellScreen extends StatefulWidget {
   const RecruitmentUserShellScreen({super.key});
 
@@ -99,6 +134,7 @@ class RecruitmentUserShellScreen extends StatefulWidget {
 class _RecruitmentUserShellScreenState extends State<RecruitmentUserShellScreen> {
   int _tab = 0;
   bool get _isAr => Localizations.localeOf(context).languageCode == 'ar';
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -133,37 +169,30 @@ class _RecruitmentUserShellScreenState extends State<RecruitmentUserShellScreen>
       animation: store,
       builder: (context, _) {
         return Scaffold(
+          key: _scaffoldKey,
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          drawer: _buildDrawer(context, store),
           appBar: AppBar(
-            leading: Padding(
-              padding: const EdgeInsets.only(left: 16, top: 8, bottom: 8),
-              child: CircleAvatar(
-                radius: 18,
-                backgroundColor: Theme.of(context).cardColor,
-                backgroundImage: getAppImageProvider(store.profileImage),
-                child: store.profileImage == null ? const Icon(Icons.person, size: 20) : null,
-              ),
+            leading: IconButton(
+              icon: Icon(Icons.menu, color: Theme.of(context).colorScheme.onSurface),
+              onPressed: () => _scaffoldKey.currentState?.openDrawer(),
             ),
-            title: Text(
-              _tab == 0 ? (_isAr ? 'الرئيسية' : 'Home')
-              : _tab == 1 
-                ? (store.currentUserName.isNotEmpty ? store.currentUserName : (_isAr ? 'اكتشف الوظائف' : 'Discover Jobs'))
-                : _tab == 2 ? (_isAr ? 'تقديماتي' : 'My Apps') 
-                : _tab == 3 ? (_isAr ? 'الشركات' : 'Browse Companies') 
-                : _tab == 4 ? (_isAr ? 'الرسائل' : 'Messages') 
-                : (_isAr ? 'الملف الشخصي' : 'Profile'),
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-            ),
+            title: _tab == 5 
+              ? Text(
+                  _isAr ? 'الملف الشخصي' : 'Profile',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                )
+              : Image.asset(AppImages.jobito, height: 200),
             backgroundColor: Theme.of(context).scaffoldBackgroundColor,
             surfaceTintColor: Colors.transparent,
-            centerTitle: false,
+            centerTitle: true,
             actions: [
               IconButton(
-                onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => const Settings())), 
-                icon: Icon(Icons.settings_outlined, color: Theme.of(context).colorScheme.onSurface),
+                onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => const NotificationsScreen())), 
+                icon: Icon(Icons.notifications_outlined, color: Theme.of(context).colorScheme.onSurface),
               ),
               const SizedBox(width: 8),
             ],
@@ -247,6 +276,167 @@ class _RecruitmentUserShellScreenState extends State<RecruitmentUserShellScreen>
       },
     );
   }
+
+  Widget _buildDrawer(BuildContext context, RecruitmentSyncStore store) {
+    final isAr = _isAr;
+    return Drawer(
+      child: Column(
+        children: [
+          UserAccountsDrawerHeader(
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            currentAccountPicture: CircleAvatar(
+              backgroundColor: Colors.white,
+              backgroundImage: getAppImageProvider(store.profileImage),
+              child: store.profileImage == null
+                  ? Icon(Icons.person, size: 40, color: Theme.of(context).colorScheme.primary)
+                  : null,
+            ),
+            accountName: Text(
+              store.currentUserName.isNotEmpty ? store.currentUserName : (isAr ? 'مستخدم' : 'User'),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ),
+            accountEmail: Text(store.currentUserEmail),
+          ),
+          ListTile(
+            leading: const Icon(Icons.swap_horiz, color: Color(0xFFFF7A2A)),
+            title: Text(isAr ? 'التبديل لوضع الصنايعي' : 'Switch to Tradesman Mode'),
+            onTap: () {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(isAr ? "التبديل إلى وضع الصنايعي..." : "Switching to Tradesman Mode..."),
+                  backgroundColor: const Color(0xFFFF7A2A),
+                  duration: const Duration(seconds: 1),
+                ),
+              );
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Navbotton()));
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.settings_outlined),
+            title: Text(isAr ? 'الإعدادات' : 'Settings'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.of(context).push(MaterialPageRoute(builder: (context) => const Settings()));
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.help_outline),
+            title: Text(isAr ? 'المساعدة' : 'Help'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.of(context).push(MaterialPageRoute(builder: (context) => const CompanyHelpCenterScreen()));
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.info_outline),
+            title: Text(isAr ? 'عن التطبيق' : 'About'),
+            onTap: () {
+              Navigator.pop(context);
+              _showAboutDialog(context, isAr);
+            },
+          ),
+          const Spacer(),
+          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.logout, color: Colors.red),
+            title: Text(
+              isAr ? 'تسجيل الخروج' : 'Logout',
+              style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+            ),
+            onTap: () {
+              Navigator.pop(context); // Close drawer
+              _showLogoutDialog(context, isAr);
+            },
+          ),
+          const SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
+
+  void _showHelpDialog(BuildContext context, bool isAr) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(isAr ? 'المساعدة' : 'Help'),
+        content: Text(
+          isAr 
+            ? 'إذا كنت تواجه أي مشكلة، يرجى التواصل معنا عبر البريد الإلكتروني: support@jobito.com'
+            : 'If you are facing any issues, please contact us via email: support@jobito.com',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(isAr ? 'إغلاق' : 'Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showAboutDialog(BuildContext context, bool isAr) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(isAr ? 'عن جوبيتو' : 'About Jobito'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset(AppImages.jobito, height: 60),
+            const SizedBox(height: 16),
+            Text(
+              isAr 
+                ? 'جوبيتو هو منصتك المثالية للبحث عن وظائف وتوظيف المحترفين في مصر.'
+                : 'Jobito is your ideal platform for job searching and professional recruitment in Egypt.',
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            const Text('Version 1.0.0'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(isAr ? 'رائع' : 'Cool'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showLogoutDialog(BuildContext context, bool isAr) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(isAr ? 'تسجيل الخروج' : 'Logout'),
+        content: Text(
+          isAr 
+            ? 'هل أنت متأكد من أنك تريد تسجيل الخروج؟'
+            : 'Are you sure you want to log out?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(isAr ? 'إلغاء' : 'Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context); // Close dialog
+              RecruitmentSyncService.instance.logout();
+              Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.userSignInNew, (route) => false);
+            },
+            child: Text(
+              isAr ? 'تسجيل الخروج' : 'Logout',
+              style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _HomeTab extends StatelessWidget {
@@ -270,6 +460,22 @@ class _HomeTab extends StatelessWidget {
         'ar': 'السويدي إليكتريك',
         'logo': 'assets/company/profile/elswedy.webp',
       },
+      {
+        'en': 'El Araby Group',
+        'ar': 'مجموعة العربي',
+        'logo': 'assets/company/profile/EL_Araby.png',
+      },
+      {
+        'en': 'TMG Holding',
+        'ar': 'مجموعة طلعت مستفى',
+        'logo': 'assets/company/profile/TMG.png',
+      },
+      {
+        'en': 'Sico Egypt',
+        'ar': 'سيكو مصر',
+        'logo': 'assets/company/profile/Sico.png',
+      },
+  
     ];
 
     return SingleChildScrollView(
@@ -467,6 +673,43 @@ class _HomeTab extends StatelessWidget {
                     ),
                   ),
                 ),
+                const SizedBox(height: 32),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      isAr ? 'وظائف مقترحة' : 'Suggested Jobs',
+                      style: TextStyle(
+                        fontSize: 18, 
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onSurface,
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () => onTabChange(1),
+                      child: Text(
+                        isAr ? 'عرض الكل' : 'See All',
+                        style: TextStyle(
+                          color: colorScheme.primary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                if (store.jobs.isEmpty)
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Text(
+                        isAr ? 'لا توجد وظائف متاحة حالياً' : 'No jobs available currently',
+                        style: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.5)),
+                      ),
+                    ),
+                  )
+                else
+                  ...store.jobs.take(2).map((job) => _buildFeaturedJobCard(context, job, isAr)),
                 const SizedBox(height: 100),
               ],
             ),
@@ -475,41 +718,144 @@ class _HomeTab extends StatelessWidget {
       ),
     );
   }
+
+  Widget _buildFeaturedJobCard(BuildContext context, RecruitmentJob job, bool isAr) {
+    final String experience = job.tags.firstWhere(
+      (t) => t.toLowerCase().contains('year') || t.contains('سنة'), 
+      orElse: () => isAr ? '1-3 سنوات خبرة' : '1-3 years exp'
+    );
+    
+    // Replace "مبرمج" or "Programmer" with "مطور" or "Developer" in the title display
+    final String displayTitle = job.title.replaceAll('مبرمج', 'مطور').replaceAll('Programmer', 'Developer');
+
+    return Card(
+      color: Theme.of(context).cardColor,
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.08)),
+      ),
+      margin: const EdgeInsets.only(bottom: 16),
+      child: InkWell(
+        onTap: () => Navigator.of(context).pushNamed(AppRoutes.userJobDetails, arguments: job),
+        borderRadius: BorderRadius.circular(20),
+        child: Padding(
+          padding: const EdgeInsets.all(18),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  _buildCompanyLogo(context, job.companyLogoUrl),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          displayTitle,
+                          style: TextStyle(
+                            fontWeight: FontWeight.w900,
+                            fontSize: 17,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          job.companyName,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Icon(
+                    Icons.arrow_forward_ios,
+                    size: 14,
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              if (job.description.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: Text(
+                    job.description,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                      height: 1.5,
+                    ),
+                  ),
+                ),
+              Wrap(
+                spacing: 12,
+                runSpacing: 8,
+                children: [
+                  _buildIconText(context, Icons.location_on_outlined, _translateValue(job.location, isAr), Theme.of(context).colorScheme.primary),
+                  _buildIconText(context, Icons.work_outline, _translateValue(job.type, isAr), Theme.of(context).colorScheme.secondary),
+                  _buildIconText(context, Icons.history, _translateValue(experience, isAr), Colors.orange),
+                ],
+              ),
+              const SizedBox(height: 16),
+              if (job.tags.isNotEmpty)
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: job.tags.take(3).where((tag) => !tag.toLowerCase().contains('year')).map((tag) {
+                    return Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1)),
+                      ),
+                      child: Text(
+                        _translateValue(tag, isAr),
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildIconText(BuildContext context, IconData icon, String text, Color color) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 16, color: color),
+        const SizedBox(width: 6),
+        Text(
+          text,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 class _DiscoverTab extends StatelessWidget {
   const _DiscoverTab();
-
-  Widget _buildCompanyLogo(BuildContext context, String? logoUrl) {
-    final provider = getAppImageProvider(logoUrl);
-    return Container(
-      width: 44,
-      height: 44,
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: provider == null
-          ? const Icon(Icons.business, size: 24, color: Color(0xFF49769F))
-          : ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: Image(image: provider, fit: BoxFit.cover),
-            ),
-    );
-  }
-
-  Color _getJobTypeColor(String type) {
-    switch (type.toLowerCase()) {
-      case 'full-time': return Colors.green;
-      case 'part-time': return Colors.blue;
-      case 'remote': return Colors.purple;
-      case 'freelance':
-      case 'freelancer': return Colors.teal;
-      case 'one-time': return Colors.amber;
-      case 'internship': return Colors.indigo;
-      default: return Colors.grey;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -552,13 +898,22 @@ class _DiscoverTab extends StatelessWidget {
                 );
               }
               final job = jobs[index - 1];
+              final String experience = job.tags.firstWhere(
+                (t) => t.toLowerCase().contains('year') || t.contains('سنة'), 
+                orElse: () => isAr ? '1-3 سنوات خبرة' : '1-3 years exp'
+              );
+              final String displayTitle = job.title.replaceAll('مبرمج', 'مطور').replaceAll('Programmer', 'Developer');
+
               return Card(
-                color: Theme.of(context).cardColor, elevation: 0, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.1))), margin: const EdgeInsets.only(bottom: 12),
+                color: Theme.of(context).cardColor, 
+                elevation: 0, 
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20), side: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.1))), 
+                margin: const EdgeInsets.only(bottom: 16),
                 child: InkWell(
                   onTap: () => Navigator.of(context).pushNamed(AppRoutes.userJobDetails, arguments: job),
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(20),
                   child: Padding(
-                    padding: const EdgeInsets.all(14),
+                    padding: const EdgeInsets.all(16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
@@ -579,10 +934,10 @@ class _DiscoverTab extends StatelessWidget {
                                     ),
                                   ),
                                   Text(
-                                    job.title,
+                                    displayTitle,
                                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                          fontWeight: FontWeight.w800,
-                                          fontSize: 16,
+                                          fontWeight: FontWeight.w900,
+                                          fontSize: 17,
                                           color: Theme.of(context).colorScheme.onSurface,
                                         ),
                                   ),
@@ -591,55 +946,72 @@ class _DiscoverTab extends StatelessWidget {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 16),
                         Wrap(
-                          spacing: 8, runSpacing: 8,
-                          children: job.type.split(RegExp(r'[•,;]')).map((t) {
-                            final type = t.trim();
-                            if (type.isEmpty) return const SizedBox.shrink();
-                            final color = _getJobTypeColor(type);
-                            return Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(8), boxShadow: [BoxShadow(color: color.withValues(alpha: 0.3), blurRadius: 4, offset: const Offset(0, 2))]), child: Text(_translateValue(type, isAr), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)));
-                          }).toList(),
+                          spacing: 12,
+                          runSpacing: 8,
+                          children: [
+                            _buildIconText(context, Icons.location_on_outlined, _translateValue(job.location, isAr), Theme.of(context).colorScheme.primary),
+                            _buildIconText(context, Icons.work_outline, _translateValue(job.type, isAr), Theme.of(context).colorScheme.secondary),
+                            _buildIconText(context, Icons.history, _translateValue(experience, isAr), Colors.orange),
+                          ],
                         ),
-                        if (job.category.isNotEmpty && job.category != 'General' && job.category != 'All' && job.category.toLowerCase() != 'services' && job.category.toLowerCase() != 'service') ...[
+                        const SizedBox(height: 16),
+                        if (job.category.isNotEmpty && job.category != 'General' && job.category != 'All') ...[
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6), 
+                            decoration: BoxDecoration(color: const Color(0xFF8B5CF6).withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8)), 
+                            child: Text(_translateValue(job.category, isAr), style: const TextStyle(color: Color(0xFF8B5CF6), fontWeight: FontWeight.bold, fontSize: 11))
+                          ),
                           const SizedBox(height: 8),
-                          Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), decoration: BoxDecoration(color: const Color(0xFF8B5CF6), borderRadius: BorderRadius.circular(8)), child: Text(_translateValue(job.category, isAr), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12))),
                         ],
-                        const SizedBox(height: 8),
-                        Wrap(spacing: 8, runSpacing: 8, children: job.tags.where((tag) => tag.trim().toLowerCase() != 'technical').map((String tag) => Chip(label: Text(_translateValue(tag, isAr)), backgroundColor: Theme.of(context).scaffoldBackgroundColor, side: BorderSide.none, padding: const EdgeInsets.symmetric(horizontal: 4))).toList()),
+                        if (job.tags.isNotEmpty)
+                          Wrap(
+                            spacing: 8, 
+                            runSpacing: 8, 
+                            children: job.tags.take(4).where((tag) => !tag.toLowerCase().contains('year') && tag.trim().toLowerCase() != 'technical').map((String tag) {
+                              return Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  _translateValue(tag, isAr),
+                                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.primary),
+                                ),
+                              );
+                            }).toList()
+                          ),
                         if (job.capacity > 0) ...[
-                          const SizedBox(height: 12),
-                          Text(isAr ? 'مطلوب ${job.capacity} أشخاص' : 'Hiring ${job.capacity} people', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Theme.of(context).colorScheme.primary)),
-                          const SizedBox(height: 6),
-                          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(isAr ? 'تم القبول: ${job.acceptedCount} / المطلوب: ${job.capacity}' : 'Accepted: ${job.acceptedCount} / Required: ${job.capacity}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: job.acceptedCount >= job.capacity ? Colors.green.shade700 : Colors.blue.shade700)), Text('${((job.acceptedCount / job.capacity) * 100).toInt()}%', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: job.acceptedCount >= job.capacity ? Colors.green : Colors.blue))]),
-                          const SizedBox(height: 6),
+                          const SizedBox(height: 16),
+                          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(isAr ? 'تم القبول: ${job.acceptedCount} / المطلوب: ${job.capacity}' : 'Accepted: ${job.acceptedCount} / Required: ${job.capacity}', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6))), Text('${((job.acceptedCount / job.capacity) * 100).toInt()}%', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary))]),
+                          const SizedBox(height: 8),
                           ClipRRect(borderRadius: BorderRadius.circular(10), child: LinearProgressIndicator(value: (job.acceptedCount / job.capacity).clamp(0.0, 1.0), backgroundColor: Theme.of(context).dividerColor.withValues(alpha: 0.1), color: job.acceptedCount >= job.capacity ? Colors.green : Theme.of(context).colorScheme.primary, minHeight: 6)),
                         ],
-                        const SizedBox(height: 16),
-                        Column(
+                        const SizedBox(height: 20),
+                        Row(
                           children: [
-                            SizedBox(
-                              width: double.infinity,
-                              height: 56,
+                            Expanded(
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color(0xFFFF7A2A),
                                   foregroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                   elevation: 0,
+                                  padding: const EdgeInsets.symmetric(vertical: 14),
                                 ),
                                 onPressed: () => Navigator.of(context).pushNamed(AppRoutes.userJobDetails, arguments: job),
-                                child: Text(
-                                  isAr ? 'عرض التفاصيل' : 'View Details',
-                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                                ),
+                                child: Text(isAr ? 'عرض التفاصيل' : 'View Details', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                               ),
                             ),
-                            const SizedBox(height: 12),
-                            AppButton(
-                                label: isAr ? 'قدّم الآن' : 'Apply Now',
-                                backgroundColor: const Color(0xFF4A6ED1),
-                                onPressed: () => Navigator.of(context).pushNamed(AppRoutes.userJobApplication, arguments: job)
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: AppButton(
+                                  label: isAr ? 'قدّم الآن' : 'Apply Now',
+                                  backgroundColor: const Color(0xFF4A6ED1),
+                                  onPressed: () => Navigator.of(context).pushNamed(AppRoutes.userJobApplication, arguments: job)
+                              ),
                             ),
                           ],
                         ),
@@ -652,6 +1024,24 @@ class _DiscoverTab extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildIconText(BuildContext context, IconData icon, String text, Color color) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 16, color: color),
+        const SizedBox(width: 6),
+        Text(
+          text,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -781,7 +1171,9 @@ class _CompaniesTabState extends State<_CompaniesTab> {
         };
       } else {
         companiesMap[key]!['vacancies'] = (companiesMap[key]!['vacancies'] as int) + openVacancies;
-        if ((companiesMap[key]!['logoUrl'] == null || (companiesMap[key]!['logoUrl'] as String).isEmpty) && (job.companyLogoUrl != null && job.companyLogoUrl!.isNotEmpty)) companiesMap[key]!['logoUrl'] = job.companyLogoUrl;
+        if ((companiesMap[key]!['logoUrl'] == null || (companiesMap[key]!['logoUrl'] as String).isEmpty) && (job.companyLogoUrl != null && job.companyLogoUrl!.isNotEmpty)) {
+           companiesMap[key]!['logoUrl'] = job.companyLogoUrl;
+        }
         (companiesMap[key]!['locations'] as Set<String>).add(job.location);
       }
     }
@@ -951,8 +1343,6 @@ class _ProfileTabState extends State<_ProfileTab> {
                       ],
                     ),
                     const SizedBox(height: 30),
-                    GestureDetector(onTap: () { ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.tr(en: "Switching to Tradesman Mode...", ar: "التبديل إلى وضع الصنايعي...")), backgroundColor: Theme.of(context).colorScheme.secondary, duration: const Duration(seconds: 1))); Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Navbotton())); }, child: Container(width: double.infinity, padding: const EdgeInsets.symmetric(vertical: 16), decoration: BoxDecoration(color: Theme.of(context).colorScheme.secondary, borderRadius: BorderRadius.circular(16), boxShadow: [BoxShadow(color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.3), blurRadius: 10, offset: const Offset(0, 4))]), child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [const Icon(Icons.swap_horiz, color: Colors.white), const SizedBox(width: 10), Text(t.tr(en: "Switch to Tradesman", ar: "التبديل إلى وضع الصنايعي"), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold))]))),
-                    const SizedBox(height: 30),
                     Container(
                       width: double.infinity, padding: const EdgeInsets.all(24), decoration: BoxDecoration(color: Theme.of(context).cardColor, borderRadius: BorderRadius.circular(24), border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 10, offset: const Offset(0, 4))]),
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -1021,4 +1411,22 @@ class _ProfileTabState extends State<_ProfileTab> {
       ],
     );
   }
+}
+
+Widget _buildIconText(BuildContext context, IconData icon, String text, Color color) {
+  return Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Icon(icon, size: 16, color: color),
+      const SizedBox(width: 6),
+      Text(
+        text,
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w500,
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+        ),
+      ),
+    ],
+  );
 }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../setting/settings.dart';
 import '../../../../shared/state/recruitment_sync_store.dart';
 import '../../../../shared/state/company_store.dart';
 import '../../../../shared/utils/image_helper.dart';
@@ -29,48 +28,6 @@ class _TradesmanBrowseCompaniesScreenState extends State<TradesmanBrowseCompanie
   void dispose() {
     _searchController.dispose();
     super.dispose();
-  }
-
-  void _showProfileImage(BuildContext context, ImageProvider? provider) {
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        backgroundColor: Colors.transparent,
-        insetPadding: const EdgeInsets.all(20),
-        child: Stack(
-          alignment: Alignment.topRight,
-          children: [
-            if (provider != null)
-              ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: Image(image: provider, fit: BoxFit.contain),
-              )
-            else
-              Container(
-                width: 280,
-                height: 280,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).cardColor,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: const Icon(Icons.person, size: 120, color: Colors.grey),
-              ),
-            Positioned(
-              right: 8,
-              top: 8,
-              child: GestureDetector(
-                onTap: () => Navigator.pop(context),
-                child: const CircleAvatar(
-                  backgroundColor: Colors.black54,
-                  radius: 15,
-                  child: Icon(Icons.close, color: Colors.white, size: 18),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 
   List<_CompanyData> _getCompanies() {
@@ -131,46 +88,7 @@ class _TradesmanBrowseCompaniesScreenState extends State<TradesmanBrowseCompanie
 
         return Scaffold(
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          appBar: AppBar(
-            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-            elevation: 0,
-            surfaceTintColor: Colors.transparent,
-            leadingWidth: 70,
-            leading: Padding(
-              padding: const EdgeInsets.only(left: 16),
-              child: Center(
-                child: GestureDetector(
-                  onTap: () => _showProfileImage(context, getAppImageProvider(store.profileImage)),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 2),
-                      boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 4)],
-                    ),
-                    child: CircleAvatar(
-                      radius: 18,
-                      backgroundColor: Theme.of(context).cardColor,
-                      backgroundImage: getAppImageProvider(store.profileImage),
-                      child: store.profileImage == null
-                          ? Icon(Icons.person, size: 20, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38))
-                          : null,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            title: Text(
-              isAr ? 'تصفح الشركات' : 'Browse Companies',
-              style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w800, fontSize: 22),
-            ),
-            actions: [
-              IconButton(
-                onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const Settings())),
-                icon: Icon(Icons.settings_outlined, color: Theme.of(context).colorScheme.onSurface),
-              ),
-              const SizedBox(width: 8),
-            ],
-          ),
+          // تم حذف الـ AppBar من هنا ليعتمد التطبيق على الـ AppBar الرئيسي الموحد
           body: ListView(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             children: [

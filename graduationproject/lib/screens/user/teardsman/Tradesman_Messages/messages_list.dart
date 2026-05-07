@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import '../../../../shared/l10n/app_localizations.dart';
 import '../../../../shared/state/recruitment_sync_store.dart';
 import '../../messages/new_chat_screen.dart';
-import '../post/post_job.dart';
-import '../setting/settings.dart';
 import '../../../../shared/utils/image_helper.dart';
 import 'chat_tradesman.dart';
 
@@ -32,48 +30,6 @@ class _MessagesListState extends State<MessagesList> {
     super.dispose();
   }
 
-  void _showProfileImage(BuildContext context, ImageProvider? provider) {
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        backgroundColor: Colors.transparent,
-        insetPadding: const EdgeInsets.all(20),
-        child: Stack(
-          alignment: Alignment.topRight,
-          children: [
-            if (provider != null)
-              ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: Image(image: provider, fit: BoxFit.contain),
-              )
-            else
-              Container(
-                width: 280,
-                height: 280,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).cardColor,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: const Icon(Icons.person, size: 120, color: Colors.grey),
-              ),
-            Positioned(
-              right: 8,
-              top: 8,
-              child: GestureDetector(
-                onTap: () => Navigator.pop(context),
-                child: const CircleAvatar(
-                  backgroundColor: Colors.black54,
-                  radius: 15,
-                  child: Icon(Icons.close, color: Colors.white, size: 18),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
@@ -92,43 +48,7 @@ class _MessagesListState extends State<MessagesList> {
             elevation: 6,
             child: Icon(Icons.add, color: Theme.of(context).colorScheme.primary, size: 28),
           ),
-          appBar: AppBar(
-            leading: Padding(
-              padding: const EdgeInsets.only(left: 16, top: 8, bottom: 8),
-              child: GestureDetector(
-                onTap: () {
-                  final provider = getAppImageProvider(store.profileImage);
-                  _showProfileImage(context, provider);
-                },
-                child: CircleAvatar(
-                  radius: 18,
-                  backgroundColor: Theme.of(context).colorScheme.surface,
-                  backgroundImage: getAppImageProvider(store.profileImage),
-                  child: store.profileImage == null
-                      ? const Icon(Icons.person, size: 20)
-                      : null,
-                ),
-              ),
-            ),
-            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-            elevation: 0,
-            surfaceTintColor: Colors.transparent,
-            title: Text(
-              t.tr(en: "Messages", ar: "الرسائل"),
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-            centerTitle: false,
-            actions: [
-              _buildIconButton(Icons.add_circle_outline, onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const PostJob()));
-              }),
-              const SizedBox(width: 8),
-              _buildIconButton(Icons.settings_outlined, onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const Settings()));
-              }),
-              const SizedBox(width: 24),
-            ],
-          ),
+          // تم حذف الـ AppBar من هنا ليعتمد التطبيق على الـ AppBar الرئيسي في Navbotton
           body: SafeArea(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -192,22 +112,6 @@ class _MessagesListState extends State<MessagesList> {
             style: const TextStyle(color: Colors.black54, fontSize: 16),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildIconButton(IconData icon, {VoidCallback? onTap}) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          color: Theme.of(context).cardColor,
-          shape: BoxShape.circle,
-          border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
-        ),
-        child: Icon(icon, color: Theme.of(context).colorScheme.onSurface, size: 20),
       ),
     );
   }

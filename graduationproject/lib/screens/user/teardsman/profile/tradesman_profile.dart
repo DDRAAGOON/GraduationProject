@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:graduationproject/shared/utils/image_helper.dart';
 import 'package:graduationproject/shared/l10n/app_localizations.dart';
-import 'package:graduationproject/screens/user/teardsman/setting/settings.dart';
-import 'package:graduationproject/screens/user/home/recruitment_user_shell_screen.dart';
 import 'package:graduationproject/shared/state/recruitment_sync_store.dart';
 
 class TradesmanProfile extends StatefulWidget {
@@ -43,29 +41,6 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
                       colors: [Color(0xFF011931), Color(0xFF49769F)],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
-                    ),
-                  ),
-                ),
-                // App Bar Icons
-                SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const SizedBox(width: 40), // Placeholder
-                        Text(
-                          t.tr(en: "Profile", ar: "الملف الشخصي"), // Updated Arabic translation
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),
-                        ),
-                        IconButton(
-                          onPressed: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => const Settings()),
-                          ),
-                          icon: const Icon(Icons.settings_outlined, color: Colors.white, size: 28),
-                        ),
-                      ],
                     ),
                   ),
                 ),
@@ -136,34 +111,6 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 children: [
-                  // Mode Switch Button
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(t.tr(en: "Switching Mode...", ar: "جاري التبديل...")),
-                          backgroundColor: const Color(0xFFFF7A2A),
-                        ),
-                      );
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => const RecruitmentUserShellScreen()),
-                      );
-                    },
-                    icon: const Icon(Icons.swap_horiz, color: Colors.white),
-                    label: Text(t.tr(en: "Switch to Job Seeker", ar: "التبديل إلى وضع الباحث عن عمل")),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFFF7A2A),
-                      foregroundColor: Colors.white,
-                      minimumSize: const Size(double.infinity, 56),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                      elevation: 5,
-                      shadowColor: const Color(0xFFFF7A2A).withValues(alpha: 0.4),
-                    ),
-                  ),
-                  
-                  const SizedBox(height: 30),
-
                   // About Me Card
                   _buildFullWidthCard(
                     child: Column(

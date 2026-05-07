@@ -46,3 +46,5 @@ flutter:
     - assets/company/icon/
     - assets/company/forget/
     - assets/company/profile/
+    - assets/tradesman/
+    - assets/l10n/

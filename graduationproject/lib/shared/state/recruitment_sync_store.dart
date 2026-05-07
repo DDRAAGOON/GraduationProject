@@ -80,7 +80,9 @@ class ServiceRequestPost {
 }
 
 class RecruitmentSyncStore extends ChangeNotifier {
-  RecruitmentSyncStore._();
+  RecruitmentSyncStore._() {
+    _addMockTradesmanJobs();
+  }
   static final RecruitmentSyncStore instance = RecruitmentSyncStore._();
 
   static const List<String> categories = [
@@ -168,6 +170,75 @@ class RecruitmentSyncStore extends ChangeNotifier {
     }).toList();
   }
 
+  void _addMockTradesmanJobs() {
+    _jobs.addAll([
+      RecruitmentJob(
+        id: 'mock_t1',
+        title: 'سباك محترف لتأسيس فيلا',
+        companyName: 'المارودي للمقاولات',
+        location: 'Cairo',
+        salaryRange: 'Negotiable',
+        type: 'One-time',
+        status: 'Open',
+        category: 'Tradesman',
+        tags: ['Plumbing'],
+        publishedAt: DateTime.now().subtract(const Duration(hours: 2)),
+        benefits: [],
+        acceptedCount: 0,
+        capacity: 1,
+        logoIcon: Icons.plumbing,
+      ),
+      RecruitmentJob(
+        id: 'mock_t2',
+        title: 'كهربائي منازل خبير',
+        companyName: 'تشطيبات النيل',
+        location: 'Giza',
+        salaryRange: 'Negotiable',
+        type: 'One-time',
+        status: 'Open',
+        category: 'Tradesman',
+        tags: ['Electrical'],
+        publishedAt: DateTime.now().subtract(const Duration(days: 1)),
+        benefits: [],
+        acceptedCount: 0,
+        capacity: 1,
+        logoIcon: Icons.electric_bolt,
+      ),
+      RecruitmentJob(
+        id: 'mock_t3',
+        title: 'نجار موبيليا وتصنيع',
+        companyName: 'أثاث المودرن',
+        location: 'Alexandria',
+        salaryRange: '10k - 15k',
+        type: 'Full-time',
+        status: 'Open',
+        category: 'Tradesman',
+        tags: ['Carpentry'],
+        publishedAt: DateTime.now().subtract(const Duration(days: 2)),
+        benefits: ['Insurance'],
+        acceptedCount: 0,
+        capacity: 5,
+        logoIcon: Icons.carpenter,
+      ),
+      RecruitmentJob(
+        id: 'mock_t4',
+        title: 'فني تكييف وصيانة',
+        companyName: 'كول سيرفيس',
+        location: 'Cairo',
+        salaryRange: '8k - 12k',
+        type: 'Full-time',
+        status: 'Open',
+        category: 'Tradesman',
+        tags: ['HVAC'],
+        publishedAt: DateTime.now().subtract(const Duration(hours: 5)),
+        benefits: ['Bonus'],
+        acceptedCount: 0,
+        capacity: 3,
+        logoIcon: Icons.ac_unit,
+      ),
+    ]);
+  }
+
   void toggleSaveJob(String jobId) {
     if (_savedJobIds.contains(jobId)) {
       _savedJobIds.remove(jobId);
@@ -233,6 +304,7 @@ class RecruitmentSyncStore extends ChangeNotifier {
 
   void replaceFromRemote({required List<Map<String, dynamic>> jobs, required List<Map<String, dynamic>> applications, required List<Map<String, dynamic>> messages}) {
     _jobs.clear();
+    _addMockTradesmanJobs(); // Keep mock jobs
     for (var item in jobs) {
       _jobs.add(RecruitmentJob(
         id: item['id']?.toString() ?? '',

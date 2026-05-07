@@ -66,181 +66,279 @@ class RecruitmentJobDetailsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
     return Scaffold(
-      appBar: AppBar(title: Text(isAr ? 'تفاصيل الوظيفة' : 'Job Details')),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          Text(
-            job.title,
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.w800,
-                ),
-          ),
-          const SizedBox(height: 6),
-          Row(
-            children: [
-              CircleAvatar(
-                radius: 12,
-                backgroundImage: job.companyLogoUrl != null ? getAppImageProvider(job.companyLogoUrl!) : null,
-                child: job.companyLogoUrl == null
-                    ? const Icon(Icons.business, size: 14)
-                    : null,
-              ),
-              const SizedBox(width: 8),
-              Expanded(child: Text(job.companyName)),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                isAr ? 'مطلوب ${job.capacity} أشخاص' : 'Hiring ${job.capacity} people',
-                style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary),
-              ),
-              Text(
-                isAr 
-                  ? 'تم قبول ${job.acceptedCount} من ${job.capacity}' 
-                  : '${job.acceptedCount} / ${job.capacity} Accepted',
-                style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: LinearProgressIndicator(
-              value: job.capacity > 0 ? (job.acceptedCount / job.capacity).clamp(0.0, 1.0) : 0,
-              backgroundColor: Theme.of(context).dividerColor.withValues(alpha: 0.1),
-              color: job.acceptedCount >= job.capacity ? Colors.green : Theme.of(context).colorScheme.primary,
-              minHeight: 8,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              ...job.type.split(RegExp(r'[•,;]')).map((t) {
-                final type = t.trim();
-                if (type.isEmpty) return const SizedBox.shrink();
-                final color = _getJobTypeColor(type);
-                return Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: color,
-                    borderRadius: BorderRadius.circular(8),
-                    boxShadow: [
-                      BoxShadow(
-                        color: color.withValues(alpha: 0.3),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
+      appBar: AppBar(
+        title: Text(isAr ? 'تفاصيل الوظيفة' : 'Job Details'),
+        centerTitle: true,
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            // Header Card
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Theme.of(context).cardColor,
+                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(32)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
                   ),
-                  child: Text(
-                    _translateLabel(type, isAr),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
+                ],
+              ),
+              child: Column(
+                children: [
+                  CircleAvatar(
+                    radius: 40,
+                    backgroundColor: Theme.of(context).primaryColor.withValues(alpha: 0.1),
+                    backgroundImage: job.companyLogoUrl != null ? getAppImageProvider(job.companyLogoUrl!) : null,
+                    child: job.companyLogoUrl == null
+                        ? Icon(Icons.business, size: 40, color: Theme.of(context).primaryColor)
+                        : null,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    job.title,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.w900,
+                        ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    job.companyName,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
-                );
-              }),
-            ],
+                  const SizedBox(height: 16),
+                  Wrap(
+                    spacing: 8,
+                    alignment: WrapAlignment.center,
+                    children: [
+                      _buildHeaderTag(context, Icons.location_on_outlined, job.location),
+                      _buildHeaderTag(context, Icons.work_outline, _translateLabel(job.type, isAr)),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Progress & Capacity
+                  _buildSectionTitle(context, isAr ? 'نظرة عامة على التقديم' : 'Application Overview'),
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).primaryColor.withValues(alpha: 0.05),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              isAr ? 'المقاعد المطلوبة: ${job.capacity}' : 'Required Capacity: ${job.capacity}',
+                              style: const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            Text(
+                              isAr 
+                                ? 'المقبولون: ${job.acceptedCount}' 
+                                : 'Accepted: ${job.acceptedCount}',
+                              style: TextStyle(color: Theme.of(context).primaryColor, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: LinearProgressIndicator(
+                            value: job.capacity > 0 ? (job.acceptedCount / job.capacity).clamp(0.0, 1.0) : 0,
+                            backgroundColor: Theme.of(context).dividerColor.withValues(alpha: 0.1),
+                            color: job.acceptedCount >= job.capacity ? Colors.green : Theme.of(context).primaryColor,
+                            minHeight: 10,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Salary
+                  if (job.salaryRange.isNotEmpty && job.salaryRange.toLowerCase() != 'all') ...[
+                    _buildDetailRow(context, Icons.payments_outlined, isAr ? 'الراتب المتوقع' : 'Expected Salary', job.salaryRange),
+                    const SizedBox(height: 24),
+                  ],
+
+                  // Description
+                  if (job.description.trim().isNotEmpty) ...[
+                    _buildSectionTitle(context, isAr ? 'وصف الوظيفة' : 'Job Description'),
+                    const SizedBox(height: 8),
+                    Text(
+                      job.description,
+                      style: TextStyle(
+                        fontSize: 15,
+                        height: 1.6,
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                  ],
+
+                  // Tags / Skills
+                  if (job.tags.isNotEmpty) ...[
+                    _buildSectionTitle(context, isAr ? 'المهارات المطلوبة' : 'Required Skills'),
+                    const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: job.tags.map((tag) => Chip(
+                        label: Text(_translateLabel(tag, isAr)),
+                        backgroundColor: Theme.of(context).primaryColor.withValues(alpha: 0.1),
+                        side: BorderSide.none,
+                        labelStyle: TextStyle(color: Theme.of(context).primaryColor, fontWeight: FontWeight.bold),
+                      )).toList(),
+                    ),
+                    const SizedBox(height: 24),
+                  ],
+
+                  // Responsibilities
+                  if (job.responsibilities.isNotEmpty) ...[
+                    _buildSectionTitle(context, isAr ? 'المسؤوليات المهنية' : 'Key Responsibilities'),
+                    const SizedBox(height: 12),
+                    ...job.responsibilities.map((item) => _buildBulletPoint(context, item)),
+                    const SizedBox(height: 24),
+                  ],
+
+                  // Qualifications
+                  if (job.qualifications.isNotEmpty) ...[
+                    _buildSectionTitle(context, isAr ? 'المؤهلات المطلوبة' : 'Required Qualifications'),
+                    const SizedBox(height: 12),
+                    ...job.qualifications.map((item) => _buildBulletPoint(context, item)),
+                    const SizedBox(height: 24),
+                  ],
+
+                  // Benefits
+                  if (job.benefits.isNotEmpty) ...[
+                    _buildSectionTitle(context, isAr ? 'المزايا والفوائد' : 'Perks & Benefits'),
+                    const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 10,
+                      runSpacing: 10,
+                      children: job.benefits.map((item) => Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.green.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.green.withValues(alpha: 0.2)),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.check_circle, size: 16, color: Colors.green),
+                            const SizedBox(width: 8),
+                            Text(item, style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
+                          ],
+                        ),
+                      )).toList(),
+                    ),
+                    const SizedBox(height: 32),
+                  ],
+
+                  AppButton(
+                    label: isAr ? 'قدّم طلبك الآن' : 'Apply for this Job',
+                    backgroundColor: const Color(0xFF4A6ED1),
+                    onPressed: () => Navigator.of(context).pushNamed(
+                      AppRoutes.userJobApplication,
+                      arguments: job,
+                    ),
+                  ),
+                  const SizedBox(height: 40),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeaderTag(BuildContext context, IconData icon, String label) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: Theme.of(context).dividerColor.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: Colors.grey),
+          const SizedBox(width: 4),
+          Text(label, style: const TextStyle(fontSize: 13, color: Colors.grey)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(BuildContext context, String title) {
+    return Text(
+      title,
+      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.primary,
           ),
-          const SizedBox(height: 12),
-          if (job.tags.isNotEmpty) ...[
-            Wrap(
-              spacing: 8,
-              children: job.tags
-                  .where((tag) => tag.trim().toLowerCase() != 'technical')
-                  .map((e) => Chip(label: Text(_translateLabel(e, isAr))))
-                  .toList(),
-            ),
-            const SizedBox(height: 12),
-          ],
-          if (job.category.toLowerCase() != 'services' && job.category.toLowerCase() != 'service') ...[
-            Text(isAr ? 'الراتب: ${job.salaryRange}' : 'Salary: ${job.salaryRange}'),
-          ],
-          const SizedBox(height: 24),
+    );
+  }
 
-          if (job.description.trim().isNotEmpty) ...[
-            Text(
-              isAr ? 'نظرة عامة' : 'Role Overview',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            Text(job.description),
-            const SizedBox(height: 24),
+  Widget _buildDetailRow(BuildContext context, IconData icon, String title, String value) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(icon, color: Theme.of(context).primaryColor),
+        ),
+        const SizedBox(width: 16),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title, style: TextStyle(color: Colors.grey[600], fontSize: 13)),
+            Text(value, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           ],
+        ),
+      ],
+    );
+  }
 
-          if (job.responsibilities.isNotEmpty) ...[
-            Text(
-              isAr ? 'المسؤوليات' : 'Responsibilities',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            ...job.responsibilities.map((item) => Padding(
-              padding: const EdgeInsets.only(bottom: 6),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('• ', style: TextStyle(fontWeight: FontWeight.bold)),
-                  Expanded(child: Text(item)),
-                ],
-              ),
-            )),
-            const SizedBox(height: 24),
-          ],
-
-          if (job.qualifications.isNotEmpty) ...[
-            Text(
-              isAr ? 'المؤهلات' : 'Qualifications',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            ...job.qualifications.map((item) => Padding(
-              padding: const EdgeInsets.only(bottom: 6),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('• ', style: TextStyle(fontWeight: FontWeight.bold)),
-                  Expanded(child: Text(item)),
-                ],
-              ),
-            )),
-            const SizedBox(height: 24),
-          ],
-
-          if (job.benefits.isNotEmpty) ...[
-            Text(
-              isAr ? 'المميزات' : 'Benefits',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: job.benefits.map((item) => Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: Colors.green.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(item, style: const TextStyle(color: Colors.green, fontWeight: FontWeight.w600)),
-              )).toList(),
-            ),
-            const SizedBox(height: 24),
-          ],
-          const SizedBox(height: 18),
-          AppButton(
-            label: isAr ? 'قدّم الآن' : 'Apply',
-            backgroundColor: const Color(0xFF4A6ED1),
-            onPressed: () => Navigator.of(context).pushNamed(
-              AppRoutes.userJobApplication,
-              arguments: job,
+  Widget _buildBulletPoint(BuildContext context, String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 6),
+            child: Icon(Icons.circle, size: 6, color: Theme.of(context).primaryColor),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(fontSize: 15, height: 1.4),
             ),
           ),
         ],

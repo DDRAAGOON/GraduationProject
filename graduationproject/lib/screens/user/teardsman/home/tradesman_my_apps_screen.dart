@@ -12,25 +12,22 @@ class TradesmanMyAppsScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        elevation: 0,
-        surfaceTintColor: Colors.transparent,
-        title: Text(
-          t.tr(en: 'My Applications', ar: 'قائمة الأعمال'),
-          style: TextStyle(
-            color: Theme.of(context).colorScheme.onSurface, 
-            fontWeight: FontWeight.w900,
-            fontSize: 22,
-          ),
-        ),
-        centerTitle: false,
-      ),
+      // تم حذف الـ AppBar من هنا ليعتمد التطبيق على الـ AppBar الرئيسي الموحد
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const SizedBox(height: 10),
+            Text(
+              t.tr(en: 'My Applications', ar: 'قائمة الأعمال'),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface, 
+                fontWeight: FontWeight.w900,
+                fontSize: 22,
+              ),
+            ),
+            const SizedBox(height: 8),
             Text(
               isAr ? 'شاهد حالة أعمالك المنشورة وإحصائيات المتقدمين' : 'View the status of your posted works and applicant stats',
               style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 13, height: 1.5),
