@@ -14,6 +14,7 @@ class TradesmanJobDetailsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     final store = RecruitmentSyncStore.instance;
+    const orangeColor = Color(0xFFFF7A2A);
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -207,13 +208,13 @@ class TradesmanJobDetailsScreen extends StatelessWidget {
                   children: job.tags.where((tag) => tag.trim().toLowerCase() != 'technical').map((tag) => Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
+                      color: orangeColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1)),
+                      border: Border.all(color: orangeColor.withValues(alpha: 0.2)),
                     ),
                     child: Text(
                       tag,
-                      style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.w600),
+                      style: const TextStyle(color: orangeColor, fontWeight: FontWeight.w600),
                     ),
                   )).toList(),
                 ),

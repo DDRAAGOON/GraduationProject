@@ -13,6 +13,7 @@ dependencies:
   cupertino_icons: ^1.0.9
   font_awesome_flutter: ^11.0.0
   dio: ^5.9.2
+  http: ^1.2.1
   country_picker: ^2.0.27
   flutter_bloc: ^9.1.1
   bloc: ^9.2.0

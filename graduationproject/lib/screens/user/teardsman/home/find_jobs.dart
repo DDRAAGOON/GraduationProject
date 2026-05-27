@@ -17,7 +17,7 @@ class _FindJobsState extends State<FindJobs> {
   final TextEditingController _searchController = TextEditingController();
   String _selectedLocation = "All";
 
-  final List<String> _egyptGovernorates = [
+  final List<String> _governorates = [
     "Cairo", "Giza", "Alexandria", "Dakahlia", "Red Sea", "Beheira", "Fayoum", 
     "Gharbia", "Ismailia", "Monufia", "Minya", "Qalyubia", "New Valley", 
     "Sharqia", "Suez", "Aswan", "Assiut", "Beni Suef", "Port Said", 
@@ -42,9 +42,9 @@ class _FindJobsState extends State<FindJobs> {
             ),
             Expanded(
               child: ListView.builder(
-                itemCount: _egyptGovernorates.length + 1,
+                itemCount: _governorates.length + 1,
                 itemBuilder: (context, index) {
-                  final loc = index == 0 ? "All" : _egyptGovernorates[index - 1];
+                  final loc = index == 0 ? "All" : _governorates[index - 1];
                   final displayText = index == 0 ? (t.isAr ? "الكل" : "All") : t.translateLocation(loc);
                   return ListTile(
                     title: Text(displayText, style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
@@ -69,7 +69,6 @@ class _FindJobsState extends State<FindJobs> {
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     final store = RecruitmentSyncStore.instance;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return AnimatedBuilder(
       animation: store,
@@ -86,49 +85,100 @@ class _FindJobsState extends State<FindJobs> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 10),
+                      // Header with Image and Search Bar
                       Container(
-                        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(24),
                         decoration: BoxDecoration(
-                          color: Theme.of(context).cardColor,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.1)),
-                          boxShadow: isDark ? [] : [
+                          borderRadius: BorderRadius.circular(24),
+                          image: const DecorationImage(
+                            image: AssetImage('assets/tradesman/Screenshot 2026-05-27 032314.png'),
+                            fit: BoxFit.cover,
+                          ),
+                          boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
+                              color: Colors.black.withOpacity(0.1),
                               blurRadius: 10,
                               offset: const Offset(0, 4),
                             ),
                           ],
                         ),
-                        child: Row(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Icon(Icons.search, color: Theme.of(context).colorScheme.primary, size: 20),
-                            Expanded(
-                              child: TextField(
-                                controller: _searchController,
-                                onChanged: (val) => store.updateFilters(searchQuery: val),
-                                style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 13),
-                                decoration: InputDecoration(
-                                  hintText: t.tr(en: "Search jobs", ar: "البحث عن وظائف"),
-                                  hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.38)),
-                                  border: InputBorder.none,
-                                  contentPadding: const EdgeInsets.symmetric(horizontal: 10),
-                                ),
+                            Text(
+                              t.tr(en: "Search for jobs", ar: "ابحث عن وظائف"),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
-                            Container(height: 24, width: 1, color: Theme.of(context).dividerColor.withOpacity(0.2)),
-                            const SizedBox(width: 12),
-                            GestureDetector(
-                              onTap: () => _showLocationPicker(t),
+                            const SizedBox(height: 4),
+                            Text(
+                              t.tr(
+                                en: "Discover thousands of job opportunities and start your career",
+                                ar: "اكتشف الاف الفرص الوظيفيه و ابدا مسيرتك المهنيه",
+                              ),
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.8),
+                                fontSize: 13,
+                                fontWeight: FontWeight.w300,
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                            Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).cardColor.withOpacity(0.9),
+                                borderRadius: BorderRadius.circular(100),
+                                border: Border.all(color: Colors.white.withOpacity(0.2)),
+                              ),
                               child: Row(
                                 children: [
-                                  Icon(Icons.location_on_outlined, color: Theme.of(context).colorScheme.primary, size: 18),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    _selectedLocation == "All" ? (t.isAr ? "الكل" : "All") : t.translateLocation(_selectedLocation), 
-                                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 13, fontWeight: FontWeight.w500)
+                                  const Padding(padding: EdgeInsets.only(left: 12), child: Icon(Icons.search, color: Colors.grey, size: 20)),
+                                  Expanded(
+                                    child: TextField(
+                                      controller: _searchController,
+                                      onChanged: (val) => store.updateFilters(searchQuery: val),
+                                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 13),
+                                      decoration: InputDecoration(
+                                        hintText: t.tr(en: "Search jobs", ar: "البحث عن وظائف"),
+                                        hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.38)),
+                                        border: InputBorder.none,
+                                        contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+                                      ),
+                                    ),
                                   ),
-                                  Icon(Icons.keyboard_arrow_down, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.38), size: 18),
+                                  Container(height: 24, width: 1, color: Theme.of(context).dividerColor.withOpacity(0.2)),
+                                  const SizedBox(width: 8),
+                                  GestureDetector(
+                                    onTap: () => _showLocationPicker(t),
+                                    child: Row(
+                                      children: [
+                                        Icon(Icons.location_on_outlined, color: Theme.of(context).colorScheme.primary, size: 18),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          _selectedLocation == "All" ? (t.isAr ? "الكل" : "All") : t.translateLocation(_selectedLocation), 
+                                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 13, fontWeight: FontWeight.w500)
+                                        ),
+                                        Icon(Icons.keyboard_arrow_down, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.38), size: 18),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Container(
+                                    decoration: const BoxDecoration(
+                                      color: Color(0xFFFF7A2A),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: IconButton(
+                                      onPressed: () {},
+                                      icon: const Icon(Icons.search, color: Colors.white, size: 20),
+                                      constraints: const BoxConstraints(),
+                                      padding: const EdgeInsets.all(12),
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
@@ -136,14 +186,31 @@ class _FindJobsState extends State<FindJobs> {
                         ),
                       ),
                       const SizedBox(height: 35),
-                      RichText(
-                        text: TextSpan(
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
-                          children: [
-                            TextSpan(text: t.tr(en: "All ", ar: "جميع ")),
-                            TextSpan(text: t.job, style: TextStyle(color: Theme.of(context).colorScheme.primary)),
-                          ],
-                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          RichText(
+                            text: TextSpan(
+                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
+                              children: [
+                                TextSpan(text: t.tr(en: "All ", ar: "جميع ")),
+                                TextSpan(text: t.job, style: TextStyle(color: Theme.of(context).colorScheme.primary)),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: IconButton(
+                              onPressed: () {},
+                              icon: Icon(Icons.tune, color: Theme.of(context).colorScheme.primary, size: 20),
+                              constraints: const BoxConstraints(),
+                              padding: const EdgeInsets.all(10),
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 25),
                       jobs.isEmpty 
@@ -187,6 +254,8 @@ class _FindJobsState extends State<FindJobs> {
 
   Widget _buildJobCard(RecruitmentJob job, AppLocalizations t) {
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
+    final store = RecruitmentSyncStore.instance;
+    final applicantCount = store.applications.where((a) => a.jobId == job.id).length;
 
     return Card(
       color: Theme.of(context).cardColor,
@@ -258,74 +327,35 @@ class _FindJobsState extends State<FindJobs> {
               }).toList(),
             ),
             const SizedBox(height: 16),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            Row(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      t.tr(en: '${job.acceptedCount} of ${job.capacity} hired', ar: 'تم قبول ${job.acceptedCount} من أصل ${job.capacity}'),
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-                      ),
-                    ),
-                    Text(
-                      '${((job.acceptedCount / job.capacity) * 100).toInt()}%',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: job.acceptedCount >= job.capacity ? Colors.green : Colors.blue,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: LinearProgressIndicator(
-                    value: (job.acceptedCount / job.capacity).clamp(0.0, 1.0),
-                    backgroundColor: Theme.of(context).dividerColor.withOpacity(0.05),
-                    color: job.acceptedCount >= job.capacity ? Colors.green : const Color(0xFF00D2B4),
-                    minHeight: 6,
+                Icon(Icons.people_outline, size: 16, color: Theme.of(context).colorScheme.primary),
+                const SizedBox(width: 6),
+                Text(
+                  t.tr(en: 'Applicants: $applicantCount', ar: 'عدد المتقدمين: $applicantCount'),
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 16),
-            Column(
-              children: [
-                AppButton(
-                  label: isAr ? 'عرض التفاصيل' : 'View Details',
-                  backgroundColor: const Color(0xFFFF7A2A),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => TradesmanJobDetailsScreen(job: job),
-                      ),
-                    );
-                  },
-                ),
-                const SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  child: AppButton(
-                    label: isAr ? 'قدّم الآن' : 'Apply Now', 
-                    backgroundColor: const Color(0xFF4A6ED1), 
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => TradesmanApplyJobScreen(job: job),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ],
+            SizedBox(
+              width: double.infinity,
+              child: AppButton(
+                label: isAr ? 'قدّم الآن' : 'Apply Now', 
+                backgroundColor: const Color(0xFF4A6ED1), 
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => TradesmanApplyJobScreen(job: job),
+                    ),
+                  );
+                },
+              ),
             ),
           ],
         ),

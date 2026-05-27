@@ -322,7 +322,7 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 500),
           curve: Curves.easeInOutQuart,
-          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 8),
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
           decoration: BoxDecoration(
             color: isSelected ? activeColor : (Theme.of(context).brightness == Brightness.dark ? Theme.of(context).cardColor : Colors.black.withValues(alpha: 0.05)),
             borderRadius: BorderRadius.circular(15),
@@ -336,22 +336,25 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
               )
             ] : [],
           ),
-          child: Column(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
                 icon,
                 color: isSelected ? Colors.white : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-                size: 28,
+                size: 20,
               ),
-              const SizedBox(height: 15),
-              Text(
-                label,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: isSelected ? Colors.white : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                  fontSize: 10,
+              const SizedBox(width: 8),
+              Flexible(
+                child: Text(
+                  label,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: isSelected ? Colors.white : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                    fontSize: 10,
+                  ),
                 ),
               ),
             ],
@@ -490,12 +493,18 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(title, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold, fontSize: 15)),
-                Text("$company • $location", style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 12)),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Text(company, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), fontSize: 12, fontWeight: FontWeight.w500)),
+                    Text(" • ", style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38))),
+                    Text(location, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 12)),
+                  ],
+                ),
                 const SizedBox(height: 12),
                 Row(
                   children: [
                     _buildTag("Full-Time"),
-                    // Removed Technical tag if it existed as dark badge
                   ],
                 ),
               ],
