@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../constants/app_images.dart';
 import '../../../../shared/state/recruitment_sync_store.dart';
 import '../../../../shared/state/company_store.dart';
 import '../../../../shared/utils/image_helper.dart';
@@ -88,130 +89,167 @@ class _TradesmanBrowseCompaniesScreenState extends State<TradesmanBrowseCompanie
 
         return Scaffold(
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          // تم حذف الـ AppBar من هنا ليعتمد التطبيق على الـ AppBar الرئيسي الموحد
           body: ListView(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
+            padding: EdgeInsets.zero,
             children: [
-              const SizedBox(height: 24),
-              Text(
-                isAr ? 'ابحث عن شركات أحلامك' : 'Search for companies you dream of',
-                style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900, color: Theme.of(context).colorScheme.onSurface, height: 1.1),
-                textAlign: TextAlign.center,
+              // Header with Background Image
+              Stack(
+                children: [
+                  Container(
+                    height: 280,
+                    width: double.infinity,
+                    decoration: const BoxDecoration(
+                      image: DecorationImage(
+                        image: AssetImage(AppImages.companiesBackground),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    height: 280,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.black.withValues(alpha: 0.3),
+                          Colors.black.withValues(alpha: 0.1),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Positioned.fill(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const SizedBox(height: 40),
+                          Text(
+                            isAr ? 'تصفح الشركات' : 'Browse Companies',
+                            style: const TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.w900,
+                              color: Colors.white,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            isAr
+                                ? 'اكتشف أفضل الشركات وابحث عن فرصتك المثالية.'
+                                : 'Discover the best companies and find your ideal opportunity.',
+                            style: TextStyle(
+                              fontSize: 15,
+                              color: Colors.white.withValues(alpha: 0.8),
+                              fontWeight: FontWeight.w300,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 24),
+                          // Search Bar
+                          Container(
+                            padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.1),
+                                  blurRadius: 15,
+                                  offset: const Offset(0, 8),
+                                )
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(Icons.search, color: Theme.of(context).colorScheme.primary, size: 22),
+                                Expanded(
+                                  child: TextField(
+                                    controller: _searchController,
+                                    style: const TextStyle(color: Colors.black, fontSize: 14),
+                                    decoration: InputDecoration(
+                                      hintText: isAr ? 'اسم الشركة أو المجال...' : 'Company or industry...',
+                                      hintStyle: TextStyle(fontSize: 14, color: Colors.black.withValues(alpha: 0.4)),
+                                      border: InputBorder.none,
+                                      contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 12),
-              Text(
-                isAr
-                    ? 'اكتشف أفضل الشركات وبيئات العمل المثالية لمستقبلك المهني'
-                    : 'Discover the best companies and ideal work environments for your professional future',
-                style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), height: 1.5),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 32),
-              // Search & Filter Bar
-              Container(
-                padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).cardColor,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
-                  boxShadow: isDark ? [] : [
-                    BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4))
-                  ],
-                ),
-                child: Row(
+              
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(Icons.search, color: Theme.of(context).colorScheme.primary, size: 20),
-                    Expanded(
-                      flex: 3,
-                      child: TextField(
-                        controller: _searchController,
-                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 13),
-                        decoration: InputDecoration(
-                          hintText: isAr ? 'اسم الشركة أو المجال...' : 'Company or industry...',
-                          hintStyle: TextStyle(fontSize: 13, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)),
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 10),
-                        ),
-                      ),
+                    const SizedBox(height: 32),
+                    Text(isAr ? 'التصنيف' : 'Classification',
+                        style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: Theme.of(context).colorScheme.onSurface)),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(child: _buildTypeButton(isAr ? 'تقني' : 'Technical', _isTechnical, () => setState(() => _isTechnical = !_isTechnical))),
+                        const SizedBox(width: 12),
+                        Expanded(child: _buildTypeButton(isAr ? 'غير تقني' : 'Non-Technical', _isNonTechnical, () => setState(() => _isNonTechnical = !_isNonTechnical))),
+                      ],
                     ),
-                    Container(height: 24, width: 1, color: Theme.of(context).dividerColor.withValues(alpha: 0.2)),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      flex: 2,
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButton<String>(
-                          value: _selectedLocation,
-                          isExpanded: true,
-                          dropdownColor: Theme.of(context).cardColor,
-                          icon: Icon(Icons.keyboard_arrow_down, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), size: 18),
-                          items: RecruitmentSyncStore.egyptGovernorates.map((String gov) {
-                            return DropdownMenuItem<String>(
-                              value: gov,
-                              child: Text(gov, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: Theme.of(context).colorScheme.onSurface)),
-                            );
-                          }).toList(),
-                          onChanged: (val) { if (val != null) setState(() => _selectedLocation = val); },
+                    const SizedBox(height: 32),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(isAr ? 'جميع الشركات' : 'All Companies',
+                                style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20, color: Theme.of(context).colorScheme.onSurface)),
+                            Text(
+                              isAr ? 'إجمالي الشركات المدرجة: ${companies.length}' : 'Total listed companies: ${companies.length}',
+                              style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 12, fontWeight: FontWeight.w500),
+                            ),
+                          ],
                         ),
-                      ),
+                      ],
                     ),
+                    const SizedBox(height: 20),
+                    if (companies.isEmpty)
+                      Container(
+                        margin: const EdgeInsets.only(top: 20),
+                        padding: const EdgeInsets.all(40),
+                        decoration: BoxDecoration(color: Theme.of(context).cardColor, borderRadius: BorderRadius.circular(20)),
+                        child: Column(
+                          children: [
+                            Icon(Icons.business_outlined, size: 60, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12)),
+                            const SizedBox(height: 16),
+                            Text(
+                              isAr ? 'لا توجد شركات حالياً' : 'No companies found',
+                              style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 15, fontWeight: FontWeight.w600),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              isAr ? 'سيتم عرض الشركات بعد نشر الوظائف' : 'Companies will appear once they post jobs',
+                              style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.26), fontSize: 13),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      )
+                    else
+                      ...companies.map((c) => _buildCompanyCard(context, c, isAr)),
+                    const SizedBox(height: 100),
                   ],
                 ),
               ),
-              const SizedBox(height: 32),
-              Text(isAr ? 'التصنيف' : 'Classification',
-                  style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: Theme.of(context).colorScheme.onSurface)),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(child: _buildTypeButton(isAr ? 'تقني' : 'Technical', _isTechnical, () => setState(() => _isTechnical = !_isTechnical))),
-                  const SizedBox(width: 12),
-                  Expanded(child: _buildTypeButton(isAr ? 'غير تقني' : 'Non-Technical', _isNonTechnical, () => setState(() => _isNonTechnical = !_isNonTechnical))),
-                ],
-              ),
-              const SizedBox(height: 32),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(isAr ? 'جميع الشركات' : 'All Companies',
-                          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20, color: Theme.of(context).colorScheme.onSurface)),
-                      Text(
-                        isAr ? 'إجمالي الشركات المدرجة: ${companies.length}' : 'Total listed companies: ${companies.length}',
-                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 12, fontWeight: FontWeight.w500),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              if (companies.isEmpty)
-                Container(
-                  margin: const EdgeInsets.only(top: 20),
-                  padding: const EdgeInsets.all(40),
-                  decoration: BoxDecoration(color: Theme.of(context).cardColor, borderRadius: BorderRadius.circular(20)),
-                  child: Column(
-                    children: [
-                      Icon(Icons.business_outlined, size: 60, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12)),
-                      const SizedBox(height: 16),
-                      Text(
-                        isAr ? 'لا توجد شركات حالياً' : 'No companies found',
-                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 15, fontWeight: FontWeight.w600),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        isAr ? 'سيتم عرض الشركات بعد نشر الوظائف' : 'Companies will appear once they post jobs',
-                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.26), fontSize: 13),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
-                )
-              else
-                ...companies.map((c) => _buildCompanyCard(context, c, isAr)),
-              const SizedBox(height: 100),
             ],
           ),
         );
