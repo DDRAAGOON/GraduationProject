@@ -20,11 +20,22 @@ class _RecruitmentJobFiltersScreenState
   void initState() {
     super.initState();
     final store = RecruitmentSyncStore.instance;
-    
+
     // Safely initialize values
-    _selectedType = _ensureValueExists(store.filterType, ['All', 'Full-time', 'Part-time', 'Remote']);
-    _selectedCategory = _ensureValueExists(store.filterCategory, RecruitmentSyncStore.categories);
-    _selectedSalary = _ensureValueExists(store.filterSalaryRange, RecruitmentSyncStore.salaryRanges);
+    _selectedType = _ensureValueExists(store.filterType, [
+      'All',
+      'Full-time',
+      'Part-time',
+      'Remote',
+    ]);
+    _selectedCategory = _ensureValueExists(
+      store.filterCategory,
+      RecruitmentSyncStore.categories,
+    );
+    _selectedSalary = _ensureValueExists(
+      store.filterSalaryRange,
+      RecruitmentSyncStore.salaryRanges,
+    );
   }
 
   String _ensureValueExists(String value, List<String> items) {
@@ -70,8 +81,11 @@ class _RecruitmentJobFiltersScreenState
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(
-          isAr ? 'فلاتر متقدمة' : 'Advanced Filters', 
-          style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
+          isAr ? 'فلاتر متقدمة' : 'Advanced Filters',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
         ),
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
@@ -89,29 +103,32 @@ class _RecruitmentJobFiltersScreenState
                 value: _selectedType,
                 items: ['All', 'Full-time', 'Part-time', 'Remote'],
                 isAr: isAr,
-                onChanged: (value) => setState(() => _selectedType = value ?? 'All'),
+                onChanged: (value) =>
+                    setState(() => _selectedType = value ?? 'All'),
               ),
               const SizedBox(height: 24),
-              
+
               _buildFilterLabel(isAr ? 'نطاق الراتب' : 'Salary Range'),
               const SizedBox(height: 10),
               _buildDropdown(
                 value: _selectedSalary,
                 items: RecruitmentSyncStore.salaryRanges,
                 isAr: isAr,
-                onChanged: (value) => setState(() => _selectedSalary = value ?? 'All'),
+                onChanged: (value) =>
+                    setState(() => _selectedSalary = value ?? 'All'),
               ),
               const SizedBox(height: 24),
-              
+
               _buildFilterLabel(isAr ? 'التصنيفات' : 'Categories'),
               const SizedBox(height: 10),
               _buildDropdown(
                 value: _selectedCategory,
                 items: RecruitmentSyncStore.categories,
                 isAr: isAr,
-                onChanged: (value) => setState(() => _selectedCategory = value ?? 'All'),
+                onChanged: (value) =>
+                    setState(() => _selectedCategory = value ?? 'All'),
               ),
-              
+
               const SizedBox(height: 48),
               AppButton(
                 label: isAr ? 'تطبيق الفلاتر' : 'Apply Filters',
@@ -136,8 +153,11 @@ class _RecruitmentJobFiltersScreenState
                     });
                   },
                   child: Text(
-                    isAr ? 'إعادة ضبط الكل' : 'Reset All', 
-                    style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.w600),
+                    isAr ? 'إعادة ضبط الكل' : 'Reset All',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ),
@@ -151,7 +171,11 @@ class _RecruitmentJobFiltersScreenState
   Widget _buildFilterLabel(String label) {
     return Text(
       label,
-      style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: Theme.of(context).colorScheme.onSurface),
+      style: TextStyle(
+        fontWeight: FontWeight.w800,
+        fontSize: 15,
+        color: Theme.of(context).colorScheme.onSurface,
+      ),
     );
   }
 
@@ -165,26 +189,51 @@ class _RecruitmentJobFiltersScreenState
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [BoxShadow(color: Theme.of(context).dividerColor.withValues(alpha: 0.1), blurRadius: 10, offset: const Offset(0, 4))],
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: DropdownButtonFormField<String>(
-        value: items.contains(value) ? value : items.first,
+        initialValue: items.contains(value) ? value : items.first,
         decoration: InputDecoration(
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 4,
+          ),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none,
+          ),
           filled: true,
           fillColor: Theme.of(context).colorScheme.surface,
         ),
-        style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14),
-        icon: Icon(Icons.keyboard_arrow_down, color: Theme.of(context).colorScheme.outline),
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.onSurface,
+          fontSize: 14,
+        ),
+        icon: Icon(
+          Icons.keyboard_arrow_down,
+          color: Theme.of(context).colorScheme.outline,
+        ),
         dropdownColor: Theme.of(context).colorScheme.surface,
-        items: items.map((e) => DropdownMenuItem(
-          value: e, 
-          child: Text(
-            _translateLabel(e, isAr), // ترجمة النص الظاهر في القائمة
-            style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurface),
-          ),
-        )).toList(),
+        items: items
+            .map(
+              (e) => DropdownMenuItem(
+                value: e,
+                child: Text(
+                  _translateLabel(e, isAr), // ترجمة النص الظاهر في القائمة
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+              ),
+            )
+            .toList(),
         onChanged: onChanged,
       ),
     );

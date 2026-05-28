@@ -41,7 +41,7 @@ class _AnalyticsBody extends StatefulWidget {
 
 class _AnalyticsBodyState extends State<_AnalyticsBody> {
   int _selectedPeriod = 0; // 0: Day, 1: Month, 2: Year
-  int _selectedTab = 0;    // 0: Overview, 1: Job Views, 2: Applications
+  int _selectedTab = 0; // 0: Overview, 1: Job Views, 2: Applications
 
   // --- Mock data per period (7 data points each) ---
   // Day view: last 7 hours
@@ -60,8 +60,8 @@ class _AnalyticsBodyState extends State<_AnalyticsBody> {
   // X-axis labels per period
   static const _labelsEn = {
     0: ['9am', '10am', '11am', '12pm', '1pm', '2pm', '3pm'], // day
-    1: ['W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'W7'],          // month
-    2: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],    // year
+    1: ['W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'W7'], // month
+    2: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'], // year
   };
   static const _labelsAr = {
     0: ['9ص', '10ص', '11ص', '12م', '1م', '2م', '3م'],
@@ -84,16 +84,14 @@ class _AnalyticsBodyState extends State<_AnalyticsBody> {
         final companyJobs = RecruitmentSyncStore.instance.jobs
             .where((j) => j.companyName == CompanyStore.instance.companyName)
             .toList();
-        final openJobs = companyJobs
-            .where((j) => j.status == 'Open')
-            .length;
+        final openJobs = companyJobs.where((j) => j.status == 'Open').length;
         final totalApplicants = RecruitmentSyncStore.instance.applications
             .where((app) => companyJobs.any((j) => j.id == app.jobId))
             .length;
 
         final views = List<double>.from(_viewsData[_selectedPeriod]!);
         final apps = List<double>.from(_appsData[_selectedPeriod]!);
-        
+
         // Make stats reflect real data for the current period (simplified for MVP)
         // We update the last point in the chart to reflect the current real-time totals
         if (apps.isNotEmpty) {
@@ -109,216 +107,261 @@ class _AnalyticsBodyState extends State<_AnalyticsBody> {
             : ['Overview', 'Views', 'Applications'];
 
         return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
-      children: [
-        // ── KPI chips row ─────────────────────────────────────────
-        Row(
+          padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
           children: [
-            Expanded(
-              child: _KpiChip(
-                label: isAr ? 'وظائف مفتوحة' : 'Open Jobs',
-                value: '$openJobs',
-                icon: Icons.work_outline_rounded,
-                color: const Color(0xFF4A80D8),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _KpiChip(
-                label: isAr ? 'إجمالي المتقدمين' : 'Total Applicants',
-                value: '$totalApplicants',
-                icon: Icons.people_outline_rounded,
-                color: const Color(0xFF34D399),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 20),
-
-        // ── Main chart card ────────────────────────────────────────
-        Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: cs.outlineVariant.withValues(alpha: 0.4)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.04),
-                blurRadius: 16,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      isAr ? 'إحصائيات الوظائف' : 'Job Statistics',
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: -0.5,
-                      ),
-                    ),
-                    // Period toggle
-                    Container(
-                      height: 36,
-                      decoration: BoxDecoration(
-                        color: cs.surfaceContainerHighest.withValues(alpha: 0.5),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: List.generate(periods.length, (i) {
-                          final sel = _selectedPeriod == i;
-                          return GestureDetector(
-                            onTap: () => setState(() => _selectedPeriod = i),
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
-                              padding: const EdgeInsets.symmetric(horizontal: 14),
-                              decoration: BoxDecoration(
-                                color: sel ? const Color(0xFF4A80D8) : Colors.transparent,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              alignment: Alignment.center,
-                              child: Text(
-                                periods[i],
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w700,
-                                  color: sel ? Colors.white : cs.onSurface.withValues(alpha: 0.6),
-                                ),
-                              ),
-                            ),
-                          );
-                        }),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 4),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Text(
-                  isAr
-                      ? 'عرض نظرة عامة لـ ${_selectedPeriod == 0 ? 'اليوم' : _selectedPeriod == 1 ? 'الشهر' : 'السنة'}'
-                      : 'Overview for this ${_selectedPeriod == 0 ? 'day' : _selectedPeriod == 1 ? 'month' : 'year'}',
-                  style: TextStyle(fontSize: 12, color: cs.onSurface.withValues(alpha: 0.55)),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Tabs
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Row(
-                  children: List.generate(tabs.length, (i) {
-                    final sel = _selectedTab == i;
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 24),
-                      child: GestureDetector(
-                        onTap: () => setState(() => _selectedTab = i),
-                        child: Column(
-                          children: [
-                            Text(
-                              tabs[i],
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: sel ? FontWeight.w700 : FontWeight.w500,
-                                color: sel ? const Color(0xFF4A80D8) : cs.onSurface.withValues(alpha: 0.5),
-                              ),
-                            ),
-                            const SizedBox(height: 6),
-                            AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
-                              height: 3,
-                              width: sel ? 32 : 0,
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF4A80D8),
-                                borderRadius: BorderRadius.circular(99),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  }),
-                ),
-              ),
-              Divider(height: 1, color: cs.outlineVariant.withValues(alpha: 0.3)),
-              const SizedBox(height: 20),
-
-              // Inline mini-stats
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  children: [
-                    _InlineStat(
-                      label: isAr ? 'مشاهدات الوظائف' : 'Job Views',
-                      value: '$totalViews',
-                      delta: '+6.4%',
-                      color: Colors.orange,
-                      icon: Icons.visibility_outlined,
-                    ),
-                    const SizedBox(height: 12),
-                    _InlineStat(
-                      label: isAr ? 'طلبات التقديم' : 'Applications',
-                      value: '$totalApps',
-                      delta: '+12.4%',
-                      color: const Color(0xFF4A80D8),
-                      icon: Icons.assignment_outlined,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              // Bar Chart
-              Padding(
-                padding: const EdgeInsets.only(left: 8, right: 20, bottom: 8),
-                child: SizedBox(
-                  height: 200,
-                  child: _AnalyticsBarChart(
-                    views: views,
-                    apps: apps,
-                    isAr: isAr,
-                    xLabels: isAr
-                        ? _labelsAr[_selectedPeriod]!
-                        : _labelsEn[_selectedPeriod]!,
-                    maxY: (_viewsData[_selectedPeriod]!.reduce((a, b) => a > b ? a : b) +
-                            _appsData[_selectedPeriod]!.reduce((a, b) => a > b ? a : b))
-                        .clamp(4.0, double.infinity) + 2,
+            // ── KPI chips row ─────────────────────────────────────────
+            Row(
+              children: [
+                Expanded(
+                  child: _KpiChip(
+                    label: isAr ? 'وظائف مفتوحة' : 'Open Jobs',
+                    value: '$openJobs',
+                    icon: Icons.work_outline_rounded,
+                    color: const Color(0xFF4A80D8),
                   ),
                 ),
-              ),
-              const SizedBox(height: 12),
-
-              // Legend
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-                child: Row(
-                  children: [
-                    _LegendDot(color: Colors.orange, label: isAr ? 'مشاهدات الوظائف' : 'Job Views'),
-                    const SizedBox(width: 20),
-                    _LegendDot(color: const Color(0xFF4A80D8), label: isAr ? 'طلبات التقديم' : 'Applications'),
-                  ],
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _KpiChip(
+                    label: isAr ? 'إجمالي المتقدمين' : 'Total Applicants',
+                    value: '$totalApplicants',
+                    icon: Icons.people_outline_rounded,
+                    color: const Color(0xFF34D399),
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 20),
+              ],
+            ),
+            const SizedBox(height: 20),
 
-        // ── Applicants Breakdown card ──────────────────────────────
-        _ApplicantsBreakdownCard(isAr: isAr, isDark: isDark, cs: cs),
-      ],
+            // ── Main chart card ────────────────────────────────────────
+            Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).cardColor,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: cs.outlineVariant.withValues(alpha: 0.4),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.04),
+                    blurRadius: 16,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Header
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          isAr ? 'إحصائيات الوظائف' : 'Job Statistics',
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: -0.5,
+                          ),
+                        ),
+                        // Period toggle
+                        Container(
+                          height: 36,
+                          decoration: BoxDecoration(
+                            color: cs.surfaceContainerHighest.withValues(
+                              alpha: 0.5,
+                            ),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: List.generate(periods.length, (i) {
+                              final sel = _selectedPeriod == i;
+                              return GestureDetector(
+                                onTap: () =>
+                                    setState(() => _selectedPeriod = i),
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 200),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 14,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: sel
+                                        ? const Color(0xFF4A80D8)
+                                        : Colors.transparent,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    periods[i],
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w700,
+                                      color: sel
+                                          ? Colors.white
+                                          : cs.onSurface.withValues(alpha: 0.6),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Text(
+                      isAr
+                          ? 'عرض نظرة عامة لـ ${_selectedPeriod == 0
+                                ? 'اليوم'
+                                : _selectedPeriod == 1
+                                ? 'الشهر'
+                                : 'السنة'}'
+                          : 'Overview for this ${_selectedPeriod == 0
+                                ? 'day'
+                                : _selectedPeriod == 1
+                                ? 'month'
+                                : 'year'}',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: cs.onSurface.withValues(alpha: 0.55),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Tabs
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Row(
+                      children: List.generate(tabs.length, (i) {
+                        final sel = _selectedTab == i;
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 24),
+                          child: GestureDetector(
+                            onTap: () => setState(() => _selectedTab = i),
+                            child: Column(
+                              children: [
+                                Text(
+                                  tabs[i],
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: sel
+                                        ? FontWeight.w700
+                                        : FontWeight.w500,
+                                    color: sel
+                                        ? const Color(0xFF4A80D8)
+                                        : cs.onSurface.withValues(alpha: 0.5),
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                AnimatedContainer(
+                                  duration: const Duration(milliseconds: 200),
+                                  height: 3,
+                                  width: sel ? 32 : 0,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF4A80D8),
+                                    borderRadius: BorderRadius.circular(99),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }),
+                    ),
+                  ),
+                  Divider(
+                    height: 1,
+                    color: cs.outlineVariant.withValues(alpha: 0.3),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Inline mini-stats
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Column(
+                      children: [
+                        _InlineStat(
+                          label: isAr ? 'مشاهدات الوظائف' : 'Job Views',
+                          value: '$totalViews',
+                          delta: '+6.4%',
+                          color: Colors.orange,
+                          icon: Icons.visibility_outlined,
+                        ),
+                        const SizedBox(height: 12),
+                        _InlineStat(
+                          label: isAr ? 'طلبات التقديم' : 'Applications',
+                          value: '$totalApps',
+                          delta: '+12.4%',
+                          color: const Color(0xFF4A80D8),
+                          icon: Icons.assignment_outlined,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Bar Chart
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      left: 8,
+                      right: 20,
+                      bottom: 8,
+                    ),
+                    child: SizedBox(
+                      height: 200,
+                      child: _AnalyticsBarChart(
+                        views: views,
+                        apps: apps,
+                        isAr: isAr,
+                        xLabels: isAr
+                            ? _labelsAr[_selectedPeriod]!
+                            : _labelsEn[_selectedPeriod]!,
+                        maxY:
+                            (_viewsData[_selectedPeriod]!.reduce(
+                                      (a, b) => a > b ? a : b,
+                                    ) +
+                                    _appsData[_selectedPeriod]!.reduce(
+                                      (a, b) => a > b ? a : b,
+                                    ))
+                                .clamp(4.0, double.infinity) +
+                            2,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Legend
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                    child: Row(
+                      children: [
+                        _LegendDot(
+                          color: Colors.orange,
+                          label: isAr ? 'مشاهدات الوظائف' : 'Job Views',
+                        ),
+                        const SizedBox(width: 20),
+                        _LegendDot(
+                          color: const Color(0xFF4A80D8),
+                          label: isAr ? 'طلبات التقديم' : 'Applications',
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // ── Applicants Breakdown card ──────────────────────────────
+            _ApplicantsBreakdownCard(isAr: isAr, isDark: isDark, cs: cs),
+          ],
         );
       },
     );
@@ -379,7 +422,9 @@ class _KpiChip extends StatelessWidget {
             label,
             style: TextStyle(
               fontSize: 11,
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.6),
               fontWeight: FontWeight.w500,
             ),
             maxLines: 1,
@@ -495,7 +540,9 @@ class _LegendDot extends StatelessWidget {
           label,
           style: TextStyle(
             fontSize: 12,
-            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.65),
+            color: Theme.of(
+              context,
+            ).colorScheme.onSurface.withValues(alpha: 0.65),
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -558,7 +605,8 @@ class _AnalyticsBarChart extends StatelessWidget {
               reservedSize: 28,
               getTitlesWidget: (value, _) {
                 final idx = value.toInt();
-                if (idx < 0 || idx >= xLabels.length) return const SizedBox.shrink();
+                if (idx < 0 || idx >= xLabels.length)
+                  return const SizedBox.shrink();
                 return Padding(
                   padding: const EdgeInsets.only(top: 6),
                   child: Text(
@@ -589,8 +637,12 @@ class _AnalyticsBarChart extends StatelessWidget {
               },
             ),
           ),
-          topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          topTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+          rightTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
         ),
         gridData: FlGridData(
           show: true,
@@ -612,13 +664,17 @@ class _AnalyticsBarChart extends StatelessWidget {
                 toY: apps[i],
                 color: const Color(0xFF4A80D8),
                 width: 10,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(4),
+                ),
               ),
               BarChartRodData(
                 toY: views[i],
                 color: Colors.orange.shade400,
                 width: 10,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(4),
+                ),
               ),
             ],
           );
@@ -656,7 +712,7 @@ class _ApplicantsBreakdownCard extends StatelessWidget {
         final companyJobs = RecruitmentSyncStore.instance.jobs
             .where((j) => j.companyName == CompanyStore.instance.companyName)
             .toList();
-        
+
         // Calculate real breakdown by joining with Job data
         int fullTime = 0;
         int partTime = 0;
@@ -666,144 +722,154 @@ class _ApplicantsBreakdownCard extends StatelessWidget {
         for (final app in apps) {
           // Find the job to get its employment type
           final job = companyJobs.where((j) => j.id == app.jobId).firstOrNull;
-          
+
           final type = job?.type.toLowerCase() ?? '';
           final loc = job?.location.toLowerCase() ?? '';
 
-          if (type.contains('full')) fullTime++;
-          else if (type.contains('part')) partTime++;
-          else if (type.contains('intern')) internship++;
-          
+          if (type.contains('full')) {
+            fullTime++;
+          } else if (type.contains('part'))
+            partTime++;
+          else if (type.contains('intern'))
+            internship++;
+
           if (loc.contains('remote')) remote++;
         }
 
         final types = [
-          ('Full-time',   const Color(0xFF4A80D8), fullTime),
-          ('Part-time',   const Color(0xFF34D399), partTime),
-          ('Remote',      const Color(0xFF3B61A4), remote),
-          ('Internship',  const Color(0xFFFBBF24), internship),
+          ('Full-time', const Color(0xFF4A80D8), fullTime),
+          ('Part-time', const Color(0xFF34D399), partTime),
+          ('Remote', const Color(0xFF3B61A4), remote),
+          ('Internship', const Color(0xFFFBBF24), internship),
         ];
 
         final total = types.fold<int>(0, (sum, t) => sum + t.$3);
 
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: isDark ? cs.surfaceContainerLow : Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: cs.outlineVariant.withValues(alpha: 0.4)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 16,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            isAr ? 'ملخص المتقدمين' : 'Applicants Summary',
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
-          ),
-          const SizedBox(height: 20),
-
-          // Big number + stacked bar
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                '$total',
-                style: TextStyle(
-                  fontSize: 48,
-                  fontWeight: FontWeight.w900,
-                  color: const Color(0xFF4A80D8),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: Text(
-                  isAr ? 'متقدم' : total == 1 ? 'Applicant' : 'Applicants',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: cs.onSurface.withValues(alpha: 0.6),
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
+        return Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: isDark ? cs.surfaceContainerLow : Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: cs.outlineVariant.withValues(alpha: 0.4)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.04),
+                blurRadius: 16,
+                offset: const Offset(0, 4),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                isAr ? 'ملخص المتقدمين' : 'Applicants Summary',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: 20),
 
-          // Segmented progress bar
-          ClipRRect(
-            borderRadius: BorderRadius.circular(6),
-            child: SizedBox(
-              height: 10,
-              child: Row(
+              // Big number + stacked bar
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    '$total',
+                    style: TextStyle(
+                      fontSize: 48,
+                      fontWeight: FontWeight.w900,
+                      color: const Color(0xFF4A80D8),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Text(
+                      isAr
+                          ? 'متقدم'
+                          : total == 1
+                          ? 'Applicant'
+                          : 'Applicants',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: cs.onSurface.withValues(alpha: 0.6),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+
+              // Segmented progress bar
+              ClipRRect(
+                borderRadius: BorderRadius.circular(6),
+                child: SizedBox(
+                  height: 10,
+                  child: Row(
+                    children: types.map((t) {
+                      final frac = total == 0 ? 0.0 : t.$3 / total;
+                      return Flexible(
+                        flex: (frac * 1000).toInt().clamp(0, 1000),
+                        child: Container(color: t.$2),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // Employment type rows
+              Column(
                 children: types.map((t) {
-                  final frac = total == 0 ? 0.0 : t.$3 / total;
-                  return Flexible(
-                    flex: (frac * 1000).toInt().clamp(0, 1000),
-                    child: Container(color: t.$2),
+                  final arLabels = {
+                    'Full-time': 'دوام كامل',
+                    'Part-time': 'دوام جزئي',
+                    'Remote': 'عن بعد',
+                    'Internship': 'تدريب',
+                    'Contract': 'عقد',
+                  };
+                  final label = isAr ? arLabels[t.$1]! : t.$1;
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 10,
+                          height: 10,
+                          decoration: BoxDecoration(
+                            color: t.$2,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            label,
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                              color: cs.onSurface.withValues(alpha: 0.8),
+                            ),
+                          ),
+                        ),
+                        Text(
+                          '${t.$3}',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w800,
+                            color: cs.onSurface,
+                          ),
+                        ),
+                      ],
+                    ),
                   );
                 }).toList(),
               ),
-            ),
+            ],
           ),
-          const SizedBox(height: 20),
-
-          // Employment type rows
-          Column(
-            children: types.map((t) {
-              final arLabels = {
-                'Full-time': 'دوام كامل',
-                'Part-time': 'دوام جزئي',
-                'Remote': 'عن بعد',
-                'Internship': 'تدريب',
-                'Contract': 'عقد',
-              };
-              final label = isAr ? arLabels[t.$1]! : t.$1;
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 10,
-                      height: 10,
-                      decoration: BoxDecoration(
-                        color: t.$2,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        label,
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                          color: cs.onSurface.withValues(alpha: 0.8),
-                        ),
-                      ),
-                    ),
-                    Text(
-                      '${t.$3}',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w800,
-                        color: cs.onSurface,
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            }).toList(),
-          ),
-        ],
-      ),
         );
       },
     );

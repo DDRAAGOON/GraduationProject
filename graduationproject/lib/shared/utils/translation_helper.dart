@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 class TranslationHelper {
   static String translate(String? value, bool isAr) {
     if (value == null || value.isEmpty || !isAr) return value ?? "";

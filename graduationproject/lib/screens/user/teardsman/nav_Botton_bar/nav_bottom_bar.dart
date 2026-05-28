@@ -4,7 +4,6 @@ import 'package:graduationproject/screens/user/teardsman/home/find_jobs.dart';
 import 'package:graduationproject/screens/user/teardsman/home/tradesman_my_apps_screen.dart';
 import 'package:graduationproject/screens/user/teardsman/home/tradesman_browse_companies_screen.dart';
 import 'package:graduationproject/screens/user/teardsman/profile/tradesman_profile.dart';
-import 'package:graduationproject/screens/user/messages/chat_thread_screen.dart';
 import 'package:graduationproject/constants/app_images.dart';
 import 'package:graduationproject/screens/user/home/recruitment_user_shell_screen.dart';
 import 'package:graduationproject/shared/state/recruitment_sync_store.dart';
@@ -31,12 +30,14 @@ class _NavbottonState extends State<Navbotton> {
   bool get _isAr => Localizations.localeOf(context).languageCode == 'ar';
 
   late final List<Widget> _pages = [
-    TradesmanHomeScreen(onTabChange: (index) => setState(() => _selectedIndex = index)),
-    const FindJobs(), 
+    TradesmanHomeScreen(
+      onTabChange: (index) => setState(() => _selectedIndex = index),
+    ),
+    const FindJobs(),
     const TradesmanMyAppsScreen(),
     const TradesmanBrowseCompaniesScreen(),
-    const MessagesList(), 
-    const TradesmanProfile(), 
+    const MessagesList(),
+    const TradesmanProfile(),
   ];
 
   @override
@@ -50,10 +51,14 @@ class _NavbottonState extends State<Navbotton> {
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         leading: IconButton(
-          icon: Icon(Icons.menu, color: Theme.of(context).colorScheme.onSurface, size: 28),
+          icon: Icon(
+            Icons.menu,
+            color: Theme.of(context).colorScheme.onSurface,
+            size: 28,
+          ),
           onPressed: () => _scaffoldKey.currentState?.openDrawer(),
         ),
-        title: _selectedIndex == 5 
+        title: _selectedIndex == 5
             ? Text(
                 _isAr ? 'الملف الشخصي' : 'Profile',
                 style: TextStyle(
@@ -70,36 +75,49 @@ class _NavbottonState extends State<Navbotton> {
               context,
               MaterialPageRoute(builder: (context) => const PostJob()),
             ),
-            icon: Icon(Icons.add_box_outlined, color: Theme.of(context).colorScheme.onSurface, size: 26),
+            icon: Icon(
+              Icons.add_box_outlined,
+              color: Theme.of(context).colorScheme.onSurface,
+              size: 26,
+            ),
             tooltip: _isAr ? 'نشر وظيفة' : 'Post Job',
           ),
           IconButton(
             onPressed: () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const NotificationsScreen()),
+              MaterialPageRoute(
+                builder: (context) => const NotificationsScreen(),
+              ),
             ),
-            icon: Icon(Icons.notifications_outlined, color: Theme.of(context).colorScheme.onSurface, size: 26),
+            icon: Icon(
+              Icons.notifications_outlined,
+              color: Theme.of(context).colorScheme.onSurface,
+              size: 26,
+            ),
           ),
           const SizedBox(width: 8),
         ],
       ),
       drawer: _buildTradesmanDrawer(context, store),
       body: _pages[_selectedIndex],
-      floatingActionButton: null, // Removed Chatbot icon from all pages for Tradesman
+      floatingActionButton:
+          null, // Removed Chatbot icon from all pages for Tradesman
       bottomNavigationBar: NavigationBarTheme(
         data: NavigationBarThemeData(
           labelTextStyle: WidgetStateProperty.resolveWith((states) {
             if (states.contains(WidgetState.selected)) {
               return TextStyle(
-                fontSize: 12, 
+                fontSize: 12,
                 fontWeight: FontWeight.bold,
                 color: Theme.of(context).colorScheme.primary,
               );
             }
             return TextStyle(
-              fontSize: 11, 
+              fontSize: 11,
               fontWeight: FontWeight.w500,
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.6),
             );
           }),
         ),
@@ -144,7 +162,10 @@ class _NavbottonState extends State<Navbotton> {
     );
   }
 
-  Widget _buildTradesmanDrawer(BuildContext context, RecruitmentSyncStore store) {
+  Widget _buildTradesmanDrawer(
+    BuildContext context,
+    RecruitmentSyncStore store,
+  ) {
     final isAr = _isAr;
     return Drawer(
       child: Column(
@@ -159,18 +180,24 @@ class _NavbottonState extends State<Navbotton> {
                   : null,
             ),
             accountName: Text(
-              store.currentUserName.isNotEmpty ? store.currentUserName : (isAr ? 'صنايعي' : 'Tradesman'),
+              store.currentUserName.isNotEmpty
+                  ? store.currentUserName
+                  : (isAr ? 'صنايعي' : 'Tradesman'),
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
             ),
             accountEmail: Text(store.currentUserEmail),
           ),
           ListTile(
             leading: const Icon(Icons.swap_horiz, color: Color(0xFFFF7A2A)),
-            title: Text(isAr ? 'التبديل لوضع الباحث عن عمل' : 'Switch to Job Seeker Mode'),
+            title: Text(
+              isAr ? 'التبديل لوضع الباحث عن عمل' : 'Switch to Job Seeker Mode',
+            ),
             onTap: () {
               Navigator.pushReplacement(
-                context, 
-                MaterialPageRoute(builder: (context) => const RecruitmentUserShellScreen())
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const RecruitmentUserShellScreen(),
+                ),
               );
             },
           ),
@@ -179,7 +206,9 @@ class _NavbottonState extends State<Navbotton> {
             title: Text(isAr ? 'الإعدادات' : 'Settings'),
             onTap: () {
               Navigator.pop(context);
-              Navigator.of(context).push(MaterialPageRoute(builder: (context) => const Settings()));
+              Navigator.of(
+                context,
+              ).push(MaterialPageRoute(builder: (context) => const Settings()));
             },
           ),
           ListTile(
@@ -187,7 +216,11 @@ class _NavbottonState extends State<Navbotton> {
             title: Text(isAr ? 'مركز المساعدة' : 'Help Center'),
             onTap: () {
               Navigator.pop(context);
-              Navigator.of(context).push(MaterialPageRoute(builder: (context) => const CompanyHelpCenterScreen()));
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const CompanyHelpCenterScreen(),
+                ),
+              );
             },
           ),
           ListTile(
@@ -204,7 +237,10 @@ class _NavbottonState extends State<Navbotton> {
             leading: const Icon(Icons.logout, color: Colors.red),
             title: Text(
               isAr ? 'تسجيل الخروج' : 'Logout',
-              style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                color: Colors.red,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             onTap: () {
               Navigator.pop(context);
@@ -228,9 +264,9 @@ class _NavbottonState extends State<Navbotton> {
             Image.asset(AppImages.jobito, height: 60),
             const SizedBox(height: 16),
             Text(
-              isAr 
-                ? 'جوبيتو هو منصتك المثالية للبحث عن وظائف وتوظيف المحترفين في مصر.'
-                : 'Jobito is your ideal platform for job searching and professional recruitment in Egypt.',
+              isAr
+                  ? 'جوبيتو هو منصتك المثالية للبحث عن وظائف وتوظيف المحترفين في مصر.'
+                  : 'Jobito is your ideal platform for job searching and professional recruitment in Egypt.',
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
@@ -253,9 +289,9 @@ class _NavbottonState extends State<Navbotton> {
       builder: (context) => AlertDialog(
         title: Text(isAr ? 'تسجيل الخروج' : 'Logout'),
         content: Text(
-          isAr 
-            ? 'هل أنت متأكد من أنك تريد تسجيل الخروج؟'
-            : 'Are you sure you want to log out?',
+          isAr
+              ? 'هل أنت متأكد من أنك تريد تسجيل الخروج؟'
+              : 'Are you sure you want to log out?',
         ),
         actions: [
           TextButton(
@@ -266,11 +302,17 @@ class _NavbottonState extends State<Navbotton> {
             onPressed: () async {
               Navigator.pop(context);
               RecruitmentSyncService.instance.logout();
-              Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.userSignInNew, (route) => false);
+              Navigator.of(context).pushNamedAndRemoveUntil(
+                AppRoutes.userSignInNew,
+                (route) => false,
+              );
             },
             child: Text(
               isAr ? 'تسجيل الخروج' : 'Logout',
-              style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                color: Colors.red,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ],

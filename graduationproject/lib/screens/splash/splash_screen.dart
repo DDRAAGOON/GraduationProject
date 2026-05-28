@@ -27,7 +27,7 @@ class SplashScreen extends StatelessWidget {
             ),
           ),
 
-        //  const SizedBox(height: 0),
+          //  const SizedBox(height: 0),
 
           // النصوص التوضيحية والعناصر الزخرفية
           Expanded(
@@ -43,7 +43,7 @@ class SplashScreen extends StatelessWidget {
                     child: Image.asset(
                       'assets/company/Onboarding/Vector 2355.png',
                       width: 150,
-                      errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                      errorBuilder: (_, _, _) => const SizedBox.shrink(),
                     ),
                   ),
                   Positioned(
@@ -52,7 +52,7 @@ class SplashScreen extends StatelessWidget {
                     child: Image.asset(
                       'assets/company/Onboarding/Rectangle 2730 (Stroke).png',
                       width: 180,
-                      errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                      errorBuilder: (_, _, _) => const SizedBox.shrink(),
                     ),
                   ),
                   Positioned(
@@ -61,7 +61,7 @@ class SplashScreen extends StatelessWidget {
                     child: Image.asset(
                       'assets/company/Onboarding/Rectangle 2733.png',
                       width: 240,
-                      errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                      errorBuilder: (_, _, _) => const SizedBox.shrink(),
                     ),
                   ),
 
@@ -122,7 +122,9 @@ class SplashScreen extends StatelessWidget {
             child: AppButton(
               label: 'Get Started',
               onPressed: () {
-                Navigator.of(context).pushReplacementNamed(AppRoutes.roleSelection);
+                Navigator.of(
+                  context,
+                ).pushReplacementNamed(AppRoutes.roleSelection);
               },
             ),
           ),

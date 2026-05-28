@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
-import '../../../app/router/app_router.dart';
 import '../../../constants/app_images.dart';
 import '../../../shared/services/recruitment_sync_service.dart';
 import '../../../shared/state/recruitment_sync_store.dart';
 import '../../../shared/utils/image_helper.dart';
 import '../notifications/notifications_screen.dart';
 import '../settings/setting_screen.dart';
+import '../jobs/recruitment_job_application_screen.dart';
 import '../../../shared/l10n/app_localizations.dart';
 
 class TechnicalScreen extends StatefulWidget {
@@ -25,12 +25,11 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
   final TextEditingController _searchController = TextEditingController();
 
   final List<String> _egyptGovernorates = [
-    "Cairo", "Giza", "Alexandria", "Dakahlia", "Red Sea", "Beheira", "Fayoum", 
-    "Gharbia", "Ismailia", "Monufia", "Minya", "Qalyubia", "New Valley", 
-    "Sharqia", "Suez", "Aswan", "Assiut", "Beni Suef", "Port Said", 
+    "Cairo", "Giza", "Alexandria", "Dakahlia", "Red Sea", "Beheira", "Fayoum",
+    "Gharbia", "Ismailia", "Monufia", "Minya", "Qalyubia", "New Valley",
+    "Sharqia", "Suez", "Aswan", "Assiut", "Beni Suef", "Port Said",
     "Damietta", "South Sinai", "Kafr El Sheikh", "Matrouh", "Luxor", "Qena", "Sohag", "North Sinai"
   ];
-
 
   final Map<String, bool> _selectedFilters = {
     "Full-time (3)": true, "Part-Time (5)": false, "Remote (2)": false,
@@ -105,65 +104,73 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
       animation: store,
       builder: (context, _) {
         return Scaffold(
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          backgroundColor: const Color(0xFFF9F9F9),
           body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 10),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildTopBar(store),
-              const SizedBox(height: 25),
-              _buildSearchSection(),
-              const SizedBox(height: 15),
-              Text("${t.tr(en: "Popular", ar: "شائع")} : UI Designer, UX Researcher, Android", 
-                style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 11)),
-              const SizedBox(height: 25),
-
-              Row(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 10),
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: _buildFilterSection(
-                      title: "Type of Employment",
-                      isExpanded: _isEmploymentExpanded,
-                      onToggle: () => setState(() => _isEmploymentExpanded = !_isEmploymentExpanded),
-                      items: ["Full-time (3)", "Part-Time (5)", "Remote (2)", "Internship (24)", "Contract (3)"],
+                  _buildTopBar(store),
+                  const SizedBox(height: 25),
+                  _buildSearchSection(),
+                  const SizedBox(height: 15),
+                  Text("${t.tr(en: "Popular", ar: "شائع")} : UI Designer, UX Researcher, Android",
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 11)),
+                  const SizedBox(height: 25),
+
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: _buildFilterSection(
+                          title: "Type of Employment",
+                          isExpanded: _isEmploymentExpanded,
+                          onToggle: () => setState(() => _isEmploymentExpanded = !_isEmploymentExpanded),
+                          items: ["Full-time (3)", "Part-Time (5)", "Remote (2)", "Internship (24)", "Contract (3)"],
+                        ),
+                      ),
+                      const SizedBox(width: 15),
+                      Expanded(
+                        child: _buildFilterSection(
+                          title: "Salary Range",
+                          isExpanded: _isSalaryExpanded,
+                          onToggle: () => setState(() => _isSalaryExpanded = !_isSalaryExpanded),
+                          items: ["\$700 - \$1000 (4)", "\$1000 - \$1500 (8)", "\$1500 - \$2000 (10)", "\$3000 or above (4)"],
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 30),
+                  Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 1),
+                  const SizedBox(height: 25),
+
+                  // Explore By Categories Header
+                  RichText(
+                    text: TextSpan(
+                      style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                      children: [
+                        TextSpan(text: t.tr(en: "Explore By ", ar: "استكشف حسب "), style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+                        TextSpan(text: t.categoryLabel, style: const TextStyle(color: Color(0xFF578BC7))),
+                      ],
                     ),
                   ),
-                  const SizedBox(width: 15),
-                  Expanded(
-                    child: _buildFilterSection(
-                      title: "Salary Range",
-                      isExpanded: _isSalaryExpanded,
-                      onToggle: () => setState(() => _isSalaryExpanded = !_isSalaryExpanded),
-                      items: ["\$700 - \$1000 (4)", "\$1000 - \$1500 (8)", "\$1500 - \$2000 (10)", "\$3000 or above (4)"],
-                    ),
-                  ),
+                  const SizedBox(height: 20),
+                  _buildCategoryTabs(),
+
+                  const SizedBox(height: 35),
+
+                  // Exceptional Jobs Section (Matching the Image)
+                  _buildExceptionalJobsSection(t, store),
+
+                  const SizedBox(height: 35),
+                  _buildDynamicJobSection(t),
+                  const SizedBox(height: 100),
                 ],
               ),
-
-              const SizedBox(height: 30),
-              Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 1),
-              const SizedBox(height: 25),
-              RichText(
-                text: TextSpan(
-                  style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                  children: [
-                    TextSpan(text: t.tr(en: "Explore By ", ar: "استكشف حسب "), style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
-                    TextSpan(text: t.categoryLabel, style: const TextStyle(color: Color(0xFF578BC7))),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-              _buildCategoryTabs(),
-              const SizedBox(height: 25),
-              _buildDynamicJobSection(t),
-              const SizedBox(height: 100),
-            ],
+            ),
           ),
-        ),
-      ),
         );
       },
     );
@@ -185,11 +192,11 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
         ),
         Row(
           children: [
-            _buildTopIconButton(Icons.notifications_none, 
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const NotificationsScreen()))),
+            _buildTopIconButton(Icons.notifications_none,
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const NotificationsScreen()))),
             const SizedBox(width: 12),
-            _buildTopIconButton(Icons.settings_outlined, 
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingScreen()))),
+            _buildTopIconButton(Icons.settings_outlined,
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingScreen()))),
           ],
         ),
       ],
@@ -202,11 +209,12 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
       child: Container(
         width: 44, height: 44,
         decoration: BoxDecoration(
-          color: Theme.of(context).brightness == Brightness.dark 
-              ? const Color(0xFF0D2D4D) 
-              : Theme.of(context).colorScheme.primary.withValues(alpha: 0.1), 
-          shape: BoxShape.circle, 
-          border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.12))
+            color: Theme.of(context).brightness == Brightness.dark
+                ? const Color(0xFF0D2D4D)
+                : Colors.white,
+            shape: BoxShape.circle,
+            border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.12)),
+            boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 4)]
         ),
         child: Icon(icon, color: Theme.of(context).colorScheme.onSurface, size: 22),
       ),
@@ -217,84 +225,34 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-          color: Theme.of(context).cardColor,
+          color: Colors.white,
           borderRadius: BorderRadius.circular(30),
-          border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1))
+          border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
+          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10)]
       ),
       child: Row(
         children: [
           const SizedBox(width: 12),
           Icon(Icons.search, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), size: 18),
           Expanded(
-            child: TextField(
-              controller: _searchController,
-              onChanged: (value) => setState(() {}),
-              style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 13), 
-              decoration: InputDecoration(
-                hintText: AppLocalizations.of(context).tr(en: "Search jobs", ar: "البحث عن وظائف"), 
-                hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)), 
-                border: InputBorder.none
+              child: TextField(
+                  controller: _searchController,
+                  onChanged: (value) => setState(() {}),
+                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 13),
+                  decoration: InputDecoration(
+                      hintText: AppLocalizations.of(context).tr(en: "Search jobs", ar: "البحث عن وظائف"),
+                      hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)),
+                      border: InputBorder.none
+                  )
               )
-            )
           ),
-          Container(height: 20, width: 1, color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
-          const SizedBox(width: 12),
-          GestureDetector(
-            onTap: _showLocationPicker,
-            behavior: HitTestBehavior.opaque,
-            child: Row(
-              children: [
-                Icon(Icons.location_on_outlined, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), size: 18),
-                const SizedBox(width: 4),
-                Text(_selectedLocation, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 12)),
-                Icon(Icons.keyboard_arrow_down, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), size: 18),
-              ],
-            ),
-          ),
-          const SizedBox(width: 8),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8), 
-            decoration: BoxDecoration(color: const Color(0xFF4A6ED1), borderRadius: BorderRadius.circular(20)), 
-            child: Text(AppLocalizations.of(context).tr(en: "Search", ar: "بحث"), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13))
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(color: const Color(0xFF4A6ED1), borderRadius: BorderRadius.circular(20)),
+              child: Text(AppLocalizations.of(context).tr(en: "Search", ar: "بحث"), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13))
           ),
         ],
       ),
-    );
-  }
-
-  void _showLocationPicker() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) {
-        return Column(
-          children: [
-            const SizedBox(height: 10),
-            Container(width: 40, height: 4, decoration: BoxDecoration(color: Theme.of(context).dividerColor.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(2))),
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Text("Select Governorate", style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 18, fontWeight: FontWeight.bold)),
-            ),
-            Expanded(
-              child: ListView.builder(
-                itemCount: _egyptGovernorates.length,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text(_egyptGovernorates[index], style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
-                    onTap: () {
-                      setState(() => _selectedLocation = _egyptGovernorates[index]);
-                      Navigator.pop(context);
-                    },
-                  );
-                },
-              ),
-            ),
-          ],
-        );
-      },
     );
   }
 
@@ -315,50 +273,143 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
     bool isSelected = _selectedCategory == value;
     return GestureDetector(
       onTap: () => setState(() => _selectedCategory = value),
-      child: AnimatedScale(
-        scale: isSelected ? 1.05 : 1.0,
-        duration: const Duration(milliseconds: 500),
-        curve: Curves.easeOutBack,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 500),
-          curve: Curves.easeInOutQuart,
-          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
-          decoration: BoxDecoration(
-            color: isSelected ? activeColor : (Theme.of(context).brightness == Brightness.dark ? Theme.of(context).cardColor : Colors.black.withValues(alpha: 0.05)),
-            borderRadius: BorderRadius.circular(15),
-            border: Border.all(color: isSelected ? Colors.white.withValues(alpha: 0.6) : Theme.of(context).dividerColor.withValues(alpha: 0.1)),
-            boxShadow: isSelected ? [
-              BoxShadow(
-                color: activeColor.withValues(alpha: 0.4),
-                blurRadius: 12,
-                spreadRadius: 2,
-                offset: const Offset(0, 4),
-              )
-            ] : [],
-          ),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? activeColor : Colors.white,
+          borderRadius: BorderRadius.circular(15),
+          border: Border.all(color: isSelected ? Colors.transparent : Theme.of(context).dividerColor.withValues(alpha: 0.1)),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: isSelected ? Colors.white : Colors.grey, size: 18),
+            const SizedBox(width: 8),
+            Text(label, style: TextStyle(color: isSelected ? Colors.white : Colors.grey, fontWeight: FontWeight.bold, fontSize: 11)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildExceptionalJobsSection(AppLocalizations t, RecruitmentSyncStore store) {
+    final nexoraJobs = store.jobs.where((j) => j.companyName == "Nexora Solutions").toList();
+    final jobsToShow = nexoraJobs.isEmpty ? store.jobs.take(4).toList() : nexoraJobs;
+
+    return Column(
+      children: [
+        Directionality(
+          textDirection: TextDirection.rtl,
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Icon(
-                icon,
-                color: isSelected ? Colors.white : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-                size: 20,
+              Text(
+                t.tr(en: "Exceptional Jobs", ar: "استثنائية فرص العمل"),
+                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black87),
               ),
-              const SizedBox(width: 8),
-              Flexible(
-                child: Text(
-                  label,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: isSelected ? Colors.white : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                    fontSize: 10,
-                  ),
+              GestureDetector(
+                onTap: () {},
+                child: const Row(
+                  children: [
+                    Text(
+                      "عرض كل الوظائف",
+                      style: TextStyle(color: Color(0xFF5E5EDD), fontSize: 13, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(width: 4),
+                    Text(" — ", style: TextStyle(color: Color(0xFF5E5EDD), fontWeight: FontWeight.bold, fontSize: 18)),
+                  ],
                 ),
               ),
             ],
           ),
+        ),
+        const SizedBox(height: 20),
+        SizedBox(
+          height: 270,
+          child: Directionality(
+            textDirection: TextDirection.rtl,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              itemCount: jobsToShow.length,
+              separatorBuilder: (context, index) => const SizedBox(width: 15),
+              itemBuilder: (context, index) {
+                return _buildExceptionalJobCard(jobsToShow[index], index == 0);
+              },
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildExceptionalJobCard(RecruitmentJob job, bool isSelected) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(context, MaterialPageRoute(builder: (context) => RecruitmentJobApplicationScreen(job: job)));
+      },
+      child: Container(
+        width: 270,
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected ? const Color(0xFF6C63FF) : Colors.transparent,
+            width: isSelected ? 2 : 0,
+          ),
+          boxShadow: [
+            BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4))
+          ],
+        ),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: const Color(0xFF6C63FF).withValues(alpha: 0.3)),
+                  ),
+                  child: Text(
+                    job.type.contains("/") ? job.type : (job.id.contains("remote") ? "عن بعد" : job.type),
+                    style: const TextStyle(color: Color(0xFF6C63FF), fontSize: 10, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                const Icon(Icons.grid_view_rounded, color: Color(0xFF2D4990), size: 40),
+              ],
+            ),
+            const SizedBox(height: 25),
+            Text(
+              job.title,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, height: 1.3, color: Colors.black87),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              "${job.companyName} • عن بعد",
+              style: const TextStyle(color: Colors.grey, fontSize: 11),
+            ),
+            const Spacer(),
+            Align(
+              alignment: Alignment.bottomRight,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF5F5F5),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  job.specialTag ?? "عام",
+                  style: const TextStyle(color: Colors.black54, fontSize: 10, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -414,32 +465,20 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
   Widget _buildDynamicJobSection(AppLocalizations t) {
     final store = RecruitmentSyncStore.instance;
     final String query = _searchController.text.toLowerCase();
-    
+
     final List<RecruitmentJob> categoryJobs = store.jobs
-        .where((job) => job.category.toLowerCase() == _selectedCategory.toLowerCase() && 
-                job.title.toLowerCase().contains(query))
+        .where((job) => job.companyName != "Nexora Solutions")
+        .where((job) => job.category.toLowerCase() == _selectedCategory.toLowerCase() &&
+        job.title.toLowerCase().contains(query))
         .toList();
 
-    if (categoryJobs.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 40),
-          child: Text(t.tr(en: "No jobs found matching your search", ar: "لم يتم العثور على وظائف تطابق بحثك"), style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 14)),
-        ),
-      );
-    }
+    if (categoryJobs.isEmpty) return const SizedBox();
 
     return Column(
       children: [
         _buildSectionHeader("All jobs"),
         const SizedBox(height: 15),
-        ...categoryJobs.map((job) => _buildJobCard(
-          title: job.title,
-          company: job.companyName,
-          location: job.location,
-          applied: job.acceptedCount,
-          capacity: job.capacity,
-        )),
+        ...categoryJobs.map((job) => _buildJobCard(job)),
       ],
     );
   }
@@ -470,7 +509,7 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
     );
   }
 
-  Widget _buildJobCard({required String title, required String company, required String location, required int applied, required int capacity}) {
+  Widget _buildJobCard(RecruitmentJob job) {
     final t = AppLocalizations.of(context);
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
@@ -492,35 +531,27 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold, fontSize: 15)),
+                Text(job.title, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold, fontSize: 15)),
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    Text(company, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), fontSize: 12, fontWeight: FontWeight.w500)),
+                    Text(job.companyName, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), fontSize: 12, fontWeight: FontWeight.w500)),
                     Text(" • ", style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38))),
-                    Text(location, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 12)),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    _buildTag("Full-Time"),
+                    Text(job.location, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 12)),
                   ],
                 ),
               ],
             ),
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-                decoration: BoxDecoration(color: const Color(0xFF4A6ED1), borderRadius: BorderRadius.circular(20)),
-                child: Text(t.tr(en: "Apply", ar: "تقديم"), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
-              ),
-              const SizedBox(height: 10),
-              Text("$applied ${t.tr(en: 'applied', ar: 'متقدم')}", style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 11)),
-            ],
+          GestureDetector(
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => RecruitmentJobApplicationScreen(job: job)));
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+              decoration: BoxDecoration(color: const Color(0xFF4A6ED1), borderRadius: BorderRadius.circular(20)),
+              child: Text(t.tr(en: "Apply", ar: "تقديم"), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+            ),
           ),
         ],
       ),

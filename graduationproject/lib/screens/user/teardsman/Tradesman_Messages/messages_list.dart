@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../../../shared/l10n/app_localizations.dart';
 import '../../../../shared/state/recruitment_sync_store.dart';
 import '../../messages/new_chat_screen.dart';
-import '../../../../shared/utils/image_helper.dart';
 import 'chat_tradesman.dart';
 
 class MessagesList extends StatefulWidget {
@@ -42,11 +41,20 @@ class _MessagesListState extends State<MessagesList> {
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           floatingActionButton: FloatingActionButton(
             onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const NewChatScreen()));
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const NewChatScreen()),
+              );
             },
-            backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+            backgroundColor: Theme.of(
+              context,
+            ).colorScheme.primary.withValues(alpha: 0.1),
             elevation: 6,
-            child: Icon(Icons.add, color: Theme.of(context).colorScheme.primary, size: 28),
+            child: Icon(
+              Icons.add,
+              color: Theme.of(context).colorScheme.primary,
+              size: 28,
+            ),
           ),
           // تم حذف الـ AppBar من هنا ليعتمد التطبيق على الـ AppBar الرئيسي في Navbotton
           body: SafeArea(
@@ -55,16 +63,23 @@ class _MessagesListState extends State<MessagesList> {
               children: [
                 const SizedBox(height: 10),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
                   child: _buildSearchBar(context, t),
                 ),
                 const SizedBox(height: 10),
                 Expanded(
                   child: Builder(
                     builder: (context) {
-                      final threads = store.tradesmanChatThreads.where((thread) =>
-                          thread.name.toLowerCase().contains(_searchQuery)
-                      ).toList();
+                      final threads = store.tradesmanChatThreads
+                          .where(
+                            (thread) => thread.name.toLowerCase().contains(
+                              _searchQuery,
+                            ),
+                          )
+                          .toList();
 
                       if (threads.isEmpty) {
                         return _buildEmptyState(t);
@@ -76,7 +91,12 @@ class _MessagesListState extends State<MessagesList> {
                         itemCount: threads.length,
                         separatorBuilder: (context, index) => Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.1), height: 1),
+                          child: Divider(
+                            color: Theme.of(
+                              context,
+                            ).dividerColor.withValues(alpha: 0.1),
+                            height: 1,
+                          ),
                         ),
                         itemBuilder: (context, index) {
                           final thread = threads[index];
@@ -105,7 +125,11 @@ class _MessagesListState extends State<MessagesList> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.chat_bubble_outline, size: 60, color: Colors.grey.withValues(alpha: 0.2)),
+          Icon(
+            Icons.chat_bubble_outline,
+            size: 60,
+            color: Colors.grey.withValues(alpha: 0.2),
+          ),
           const SizedBox(height: 16),
           Text(
             t.tr(en: "No messages yet", ar: "لا توجد رسائل بعد"),
@@ -135,9 +159,19 @@ class _MessagesListState extends State<MessagesList> {
         controller: _searchController,
         style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
         decoration: InputDecoration(
-          prefixIcon: Icon(Icons.search, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
+          prefixIcon: Icon(
+            Icons.search,
+            color: Theme.of(
+              context,
+            ).colorScheme.onSurface.withValues(alpha: 0.5),
+          ),
           hintText: t.tr(en: "Search messages", ar: "البحث في الرسائل"),
-          hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.35), fontSize: 15),
+          hintStyle: TextStyle(
+            color: Theme.of(
+              context,
+            ).colorScheme.onSurface.withValues(alpha: 0.35),
+            fontSize: 15,
+          ),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(vertical: 15),
         ),
@@ -146,21 +180,18 @@ class _MessagesListState extends State<MessagesList> {
   }
 
   Widget _buildMessageItem(
-      BuildContext context, {
-        required String name,
-        required String message,
-        required String time,
-        required String image,
-      }) {
+    BuildContext context, {
+    required String name,
+    required String message,
+    required String time,
+    required String image,
+  }) {
     return InkWell(
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ChatTradesman(
-              name: name,
-              image: image,
-            ),
+            builder: (context) => ChatTradesman(name: name, image: image),
           ),
         );
       },
@@ -170,11 +201,11 @@ class _MessagesListState extends State<MessagesList> {
         child: Row(
           children: [
             CircleAvatar(
-              radius: 30, 
+              radius: 30,
               backgroundColor: Colors.grey.shade200,
-              backgroundImage: image.startsWith('http') 
-                ? NetworkImage(image) 
-                : AssetImage(image) as ImageProvider,
+              backgroundImage: image.startsWith('http')
+                  ? NetworkImage(image)
+                  : AssetImage(image) as ImageProvider,
             ),
             const SizedBox(width: 15),
             Expanded(
@@ -199,7 +230,9 @@ class _MessagesListState extends State<MessagesList> {
                       Text(
                         time,
                         style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withValues(alpha: 0.4),
                           fontSize: 12,
                         ),
                       ),
@@ -211,7 +244,9 @@ class _MessagesListState extends State<MessagesList> {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.6),
                       fontSize: 14,
                     ),
                   ),

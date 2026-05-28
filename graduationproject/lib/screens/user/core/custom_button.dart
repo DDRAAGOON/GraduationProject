@@ -1,16 +1,11 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 
 class Bottom extends StatelessWidget {
   final bool isLoading;
   final VoidCallback onPressed;
 
-  const Bottom({
-    super.key,
-    required this.isLoading,
-    required this.onPressed,
-  });
-  
+  const Bottom({super.key, required this.isLoading, required this.onPressed});
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -49,21 +44,21 @@ class Bottom extends StatelessWidget {
         ),
         child: isLoading
             ? const SizedBox(
-          height: 20,
-          width: 20,
-          child: CircularProgressIndicator(
-            color: Colors.white,
-            strokeWidth: 2,
-          ),
-        )
+                height: 20,
+                width: 20,
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 2,
+                ),
+              )
             : const Text(
-          "Continue",
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+                "Continue",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
       ),
     );
   }

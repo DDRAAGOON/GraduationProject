@@ -96,9 +96,11 @@ class CompanyPublicProfileScreen extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(18),
                                 child: company.logoUrl != null
                                     ? Image(
-                                        image: getAppImageProvider(company.logoUrl)!,
+                                        image: getAppImageProvider(
+                                          company.logoUrl,
+                                        )!,
                                         fit: BoxFit.cover,
-                                        errorBuilder: (_, __, ___) => const Icon(
+                                        errorBuilder: (_, _, _) => const Icon(
                                           Icons.business_rounded,
                                           size: 36,
                                           color: Color(0xFF49769F),
@@ -161,11 +163,13 @@ class CompanyPublicProfileScreen extends StatelessWidget {
                           label: company.employee,
                           color: const Color(0xFF49769F),
                         ),
-                      if (company.employee.isNotEmpty) const SizedBox(width: 10),
+                      if (company.employee.isNotEmpty)
+                        const SizedBox(width: 10),
                       if (company.foundedYear > 0)
                         _buildStatChip(
                           icon: Icons.calendar_today_outlined,
-                          label: '${isAr ? 'تأسست' : 'Est.'} ${company.foundedYear}',
+                          label:
+                              '${isAr ? 'تأسست' : 'Est.'} ${company.foundedYear}',
                           color: const Color(0xFF49769F),
                         ),
                       if (company.foundedYear > 0) const SizedBox(width: 10),
@@ -189,7 +193,9 @@ class CompanyPublicProfileScreen extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: Colors.grey.withOpacity(0.08)),
+                        border: Border.all(
+                          color: Colors.grey.withOpacity(0.08),
+                        ),
                       ),
                       child: Text(
                         about,
@@ -211,12 +217,14 @@ class CompanyPublicProfileScreen extends StatelessWidget {
                       spacing: 8,
                       runSpacing: 8,
                       children: company.locations
-                          .map((loc) => _buildTag(
-                                label: loc,
-                                icon: Icons.location_on_outlined,
-                                bgColor: const Color(0xFFF0F7FF),
-                                textColor: const Color(0xFF49769F),
-                              ))
+                          .map(
+                            (loc) => _buildTag(
+                              label: loc,
+                              icon: Icons.location_on_outlined,
+                              bgColor: const Color(0xFFF0F7FF),
+                              textColor: const Color(0xFF49769F),
+                            ),
+                          )
                           .toList(),
                     ),
                   ],
@@ -224,18 +232,22 @@ class CompanyPublicProfileScreen extends StatelessWidget {
                   // Tech Stack
                   if (company.techStack.isNotEmpty) ...[
                     const SizedBox(height: 24),
-                    _buildSectionTitle(isAr ? 'التقنيات المستخدمة' : 'Tech Stack'),
+                    _buildSectionTitle(
+                      isAr ? 'التقنيات المستخدمة' : 'Tech Stack',
+                    ),
                     const SizedBox(height: 12),
                     Wrap(
                       spacing: 8,
                       runSpacing: 8,
                       children: company.techStack
-                          .map((tech) => _buildTag(
-                                label: tech,
-                                icon: Icons.code,
-                                bgColor: const Color(0xFFF0FFF4),
-                                textColor: Colors.green.shade700,
-                              ))
+                          .map(
+                            (tech) => _buildTag(
+                              label: tech,
+                              icon: Icons.code,
+                              bgColor: const Color(0xFFF0FFF4),
+                              textColor: Colors.green.shade700,
+                            ),
+                          )
                           .toList(),
                     ),
                   ],
@@ -286,7 +298,9 @@ class CompanyPublicProfileScreen extends StatelessWidget {
                     ),
                   ] else ...[
                     const SizedBox(height: 28),
-                    _buildSectionTitle(isAr ? 'الوظائف المتاحة' : 'Open Positions'),
+                    _buildSectionTitle(
+                      isAr ? 'الوظائف المتاحة' : 'Open Positions',
+                    ),
                     const SizedBox(height: 12),
                     Container(
                       width: double.infinity,
@@ -297,12 +311,20 @@ class CompanyPublicProfileScreen extends StatelessWidget {
                       ),
                       child: Column(
                         children: [
-                          Icon(Icons.work_off_outlined,
-                              size: 48, color: Colors.grey.shade300),
+                          Icon(
+                            Icons.work_off_outlined,
+                            size: 48,
+                            color: Colors.grey.shade300,
+                          ),
                           const SizedBox(height: 12),
                           Text(
-                            isAr ? 'لا توجد وظائف متاحة حالياً' : 'No open positions at the moment',
-                            style: TextStyle(color: Colors.grey.shade500, fontSize: 14),
+                            isAr
+                                ? 'لا توجد وظائف متاحة حالياً'
+                                : 'No open positions at the moment',
+                            style: TextStyle(
+                              color: Colors.grey.shade500,
+                              fontSize: 14,
+                            ),
                           ),
                         ],
                       ),
@@ -319,7 +341,11 @@ class CompanyPublicProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStatChip({required IconData icon, required String label, required Color color}) {
+  Widget _buildStatChip({
+    required IconData icon,
+    required String label,
+    required Color color,
+  }) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
@@ -331,7 +357,14 @@ class CompanyPublicProfileScreen extends StatelessWidget {
         children: [
           Icon(icon, size: 14, color: color),
           const SizedBox(width: 6),
-          Text(label, style: TextStyle(fontSize: 12, color: color, fontWeight: FontWeight.w600)),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              color: color,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ],
       ),
     );
@@ -348,7 +381,12 @@ class CompanyPublicProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTag({required String label, required IconData icon, required Color bgColor, required Color textColor}) {
+  Widget _buildTag({
+    required String label,
+    required IconData icon,
+    required Color bgColor,
+    required Color textColor,
+  }) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
       decoration: BoxDecoration(
@@ -360,7 +398,14 @@ class CompanyPublicProfileScreen extends StatelessWidget {
         children: [
           Icon(icon, size: 13, color: textColor),
           const SizedBox(width: 6),
-          Text(label, style: TextStyle(fontSize: 12, color: textColor, fontWeight: FontWeight.w600)),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              color: textColor,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ],
       ),
     );
@@ -410,14 +455,30 @@ class CompanyPublicProfileScreen extends StatelessWidget {
             Wrap(
               spacing: 6,
               runSpacing: 6,
-              children: job.tags.where((tag) => tag.trim().toLowerCase() != 'technical').take(3).map((tag) => Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF0F3FF),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(tag, style: const TextStyle(fontSize: 11, color: Color(0xFF49769F), fontWeight: FontWeight.w600)),
-              )).toList(),
+              children: job.tags
+                  .where((tag) => tag.trim().toLowerCase() != 'technical')
+                  .take(3)
+                  .map(
+                    (tag) => Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF0F3FF),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        tag,
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: Color(0xFF49769F),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  )
+                  .toList(),
             ),
           ],
         ],
@@ -431,7 +492,10 @@ class CompanyPublicProfileScreen extends StatelessWidget {
       children: [
         Icon(icon, size: 13, color: Colors.black45),
         const SizedBox(width: 4),
-        Text(label, style: const TextStyle(fontSize: 12, color: Colors.black54)),
+        Text(
+          label,
+          style: const TextStyle(fontSize: 12, color: Colors.black54),
+        ),
       ],
     );
   }

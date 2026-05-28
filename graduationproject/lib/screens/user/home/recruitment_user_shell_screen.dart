@@ -440,6 +440,7 @@ class _HomeTab extends StatelessWidget {
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
     final store = RecruitmentSyncStore.instance;
     final colorScheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context);
 
     final List<Map<String, String>> topCompanies = [
       {
@@ -592,7 +593,7 @@ class _HomeTab extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      isAr ? 'وظائف مقترحة' : 'Suggested Jobs',
+                      l10n.suggestedJobs,
                       style: TextStyle(
                         fontSize: 18, 
                         fontWeight: FontWeight.bold,
@@ -612,19 +613,163 @@ class _HomeTab extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 16),
-                if (store.jobs.isEmpty)
-                  Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Text(
-                        isAr ? 'لا توجد وظائف متاحة حالياً' : 'No jobs available currently',
-                        style: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.5)),
+                (() {
+                  final allJobs = store.jobs;
+
+                  if (allJobs.isEmpty) {
+                    return Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Text(
+                          l10n.noJobsAvailable,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.5)),
+                        ),
+                      ),
+                    );
+                  }
+
+                  return Column(
+                    children: allJobs
+                        .take(2)
+                        .map((job) => _buildFeaturedJobCard(context, job, isAr))
+                        .toList(),
+                  );
+                })(),
+                const SizedBox(height: 32),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      isAr ? 'استكشف حسب الفئات' : 'Explore by Categories',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onSurface,
                       ),
                     ),
-                  )
-                else
-                  ...store.jobs.take(2).map((job) => _buildFeaturedJobCard(context, job, isAr)),
+                    TextButton(
+                      onPressed: () => onTabChange(1),
+                      child: Row(
+                        children: [
+                          Text(
+                            isAr ? 'عرض كل الوظائف' : 'View all jobs',
+                            style: TextStyle(
+                              color: colorScheme.onSurface.withValues(alpha: 0.5),
+                              fontSize: 12,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          Icon(isAr ? Icons.west : Icons.east, size: 14, color: colorScheme.onSurface.withValues(alpha: 0.5)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                SizedBox(
+                  height: 90,
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          store.updateFilters(category: 'Technical');
+                          onTabChange(1);
+                        },
+                        child: _buildCategoryCard(
+                          context,
+                          isAr ? 'تقني' : 'Technical',
+                          store.jobs.where((j) => j.category.toLowerCase() == 'technical').length,
+                          Icons.memory,
+                          const Color(0xFFF0EFFF),
+                          const Color(0xFF6366F1),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      InkWell(
+                        onTap: () {
+                          store.updateFilters(category: 'Non-Technical');
+                          onTabChange(1);
+                        },
+                        child: _buildCategoryCard(
+                          context,
+                          isAr ? 'غير تقني' : 'Non-Technical',
+                          store.jobs.where((j) => j.category.toLowerCase() == 'non-technical').length,
+                          Icons.people_outline,
+                          const Color(0xFFFFF7ED),
+                          const Color(0xFFF97316),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      InkWell(
+                        onTap: () {
+                          store.updateFilters(category: 'Service');
+                          onTabChange(1);
+                        },
+                        child: _buildCategoryCard(
+                          context,
+                          isAr ? 'خدمات' : 'Services',
+                          store.jobs.where((j) => j.category.toLowerCase() == 'service' || j.category.toLowerCase() == 'tradesman').length,
+                          Icons.build_outlined,
+                          const Color(0xFFFEF2F2),
+                          const Color(0xFFEF4444),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
                 const SizedBox(height: 100),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCategoryCard(BuildContext context, String title, int count, IconData icon, Color boxColor, Color iconColor) {
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
+    return Container(
+      width: 160,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.08)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: boxColor,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: iconColor, size: 22),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  isAr ? '$count وظيفة متاحة' : '$count jobs available',
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                  ),
+                ),
               ],
             ),
           ),

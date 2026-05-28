@@ -315,8 +315,8 @@ class AppLocalizations {
   String get skillTodayHint => userTr('tradesman.skillTodayHint', fallbackEn: 'What is your skill today?', fallbackAr: 'ما هي مهارتك اليوم؟');
   String get featuredOpportunities => userTr('tradesman.featuredOpportunities', fallbackEn: 'Featured Opportunities', fallbackAr: 'فرص عمل مميزة');
   String get featuredOpportunitiesSub => userTr('tradesman.featuredOpportunitiesSub', fallbackEn: 'Discover the latest tasks and jobs available for you as a professional tradesman.', fallbackAr: 'اكتشف أحدث المهام والوظائف المتاحة لك كصنايعي محترف.');
-  String get suggestedJobs => userTr('tradesman.suggestedJobs', fallbackEn: 'Suggested Jobs', fallbackAr: 'وظائف مقترحة');
-  String get noJobsAvailable => userTr('tradesman.noJobsAvailable', fallbackEn: 'No jobs available currently', fallbackAr: 'لا توجد وظائف متاحة حالياً');
+  String get suggestedJobs => userTr('tradesman.suggestedJobs', fallbackEn: 'Available Jobs Today', fallbackAr: 'الوظائف المتاحة اليوم');
+  String get noJobsAvailable => userTr('tradesman.noJobsAvailable', fallbackEn: 'No new jobs published on this day yet', fallbackAr: 'لا توجد وظائف جديدة تم نشرها في هذا اليوم بعد');
 
   // ── Translation Helpers ─────────────────────────────────────────────────────
   String translateLocation(String loc) => userTr('location.$loc', fallbackEn: loc, fallbackAr: loc);
@@ -352,7 +352,7 @@ class AppLocalizations {
   String hiredProgressMsg(int count, int total) => isAr ? '$count تم قبولهم من أصل $total' : '$count hired of $total capacity';
 
   // ── Unknown route ──────────────────────────────────────────────────────────
-  String get unknownRoute => userTr('common.unknownRoute', fallbackEn: 'Unknown route', fallbackAr: 'مسار غير معروف');
+  String get unknownRoute => userTr('common.unknownRoute', fallbackEn: 'Unknown route', fallbackAr: 'المشار غير معروف');
 }
 
 class _AppLocalizationsDelegate

@@ -224,18 +224,32 @@ class TradesmanHomeScreen extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 16),
-                if (store.jobs.isEmpty)
-                  Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Text(
-                        l10n.noJobsAvailable,
-                        style: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.5)),
+                (() {
+                  final tradesmanJobs = store.jobs.where((job) {
+                    return job.category.toLowerCase() == 'tradesman' || 
+                           job.category.toLowerCase() == 'service';
+                  }).toList();
+
+                  if (tradesmanJobs.isEmpty) {
+                    return Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Text(
+                          l10n.noJobsAvailable,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.5)),
+                        ),
                       ),
-                    ),
-                  )
-                else
-                  ...store.jobs.where((j) => j.category.toLowerCase() == 'tradesman' || j.category.toLowerCase() == 'service').take(3).map((job) => _buildFeaturedJobCard(context, job, l10n)),
+                    );
+                  }
+
+                  return Column(
+                    children: tradesmanJobs
+                        .take(3)
+                        .map((job) => _buildFeaturedJobCard(context, job, l10n))
+                        .toList(),
+                  );
+                })(),
                 const SizedBox(height: 100),
               ],
             ),

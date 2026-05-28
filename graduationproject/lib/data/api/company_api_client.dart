@@ -88,10 +88,7 @@ final class CompanyApiClient {
   }) async {
     final Response<dynamic> response = await _dio.put<dynamic>(
       '/api/auth/profile',
-      data: <String, dynamic>{
-        if (name != null) 'name': name,
-        if (photoUrl != null) 'photoUrl': photoUrl,
-      },
+      data: <String, dynamic>{'name': ?name, 'photoUrl': ?photoUrl},
       options: _authOptions,
     );
     return Map<String, dynamic>.from(response.data as Map);
@@ -189,7 +186,7 @@ final class CompanyApiClient {
       'tags': tags,
       'requiredCount': requiredCount,
       if (deadline != null) 'deadline': deadline.toUtc().toIso8601String(),
-      if (status != null) 'status': status,
+      'status': ?status,
     };
 
     final res = await _dio.put<dynamic>(
