@@ -605,8 +605,9 @@ class _AnalyticsBarChart extends StatelessWidget {
               reservedSize: 28,
               getTitlesWidget: (value, _) {
                 final idx = value.toInt();
-                if (idx < 0 || idx >= xLabels.length)
+                if (idx < 0 || idx >= xLabels.length) {
                   return const SizedBox.shrink();
+                }
                 return Padding(
                   padding: const EdgeInsets.only(top: 6),
                   child: Text(

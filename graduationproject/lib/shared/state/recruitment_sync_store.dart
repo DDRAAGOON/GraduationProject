@@ -58,7 +58,7 @@ class RecruitmentJob {
       status: map['status']?.toString() ?? 'Open',
       category: map['category']?.toString() ?? '',
       tags: List<String>.from(map['tags'] ?? []),
-      publishedAt: map['publishedAt'] != null 
+      publishedAt: map['publishedAt'] != null
           ? DateTime.tryParse(map['publishedAt'].toString()) ?? DateTime.now()
           : DateTime.now(),
       description: map['description']?.toString() ?? '',
@@ -145,7 +145,7 @@ class RecruitmentApplication {
       companyName: map['companyName']?.toString() ?? '',
       userName: map['userName']?.toString() ?? '',
       status: map['status']?.toString() ?? 'Pending',
-      updatedAt: map['updatedAt'] != null 
+      updatedAt: map['updatedAt'] != null
           ? DateTime.tryParse(map['updatedAt'].toString()) ?? DateTime.now()
           : DateTime.now(),
       email: map['email']?.toString(),
@@ -172,7 +172,7 @@ class RecruitmentMessage {
       id: map['id']?.toString() ?? '',
       fromCompany: map['fromCompany'] == true,
       text: map['text']?.toString() ?? '',
-      createdAt: map['createdAt'] != null 
+      createdAt: map['createdAt'] != null
           ? DateTime.tryParse(map['createdAt'].toString()) ?? DateTime.now()
           : DateTime.now(),
     );
@@ -215,9 +215,51 @@ class RecruitmentSyncStore extends ChangeNotifier {
   }
   static final RecruitmentSyncStore instance = RecruitmentSyncStore._();
 
-  static const List<String> categories = ['All', 'Technical', 'Non-Technical', 'Service', 'Tradesman'];
-  static const List<String> salaryRanges = ['All', '10k - 20k', '20k - 30k', '30k - 45k', 'Negotiable'];
-  static const List<String> egyptGovernorates = ['All', 'Cairo', 'Giza', 'Alexandria', 'Dakahlia', 'Red Sea', 'Beheira', 'Fayoum', 'Gharbia', 'Ismailia', 'Monufia', 'Minya', 'Qalyubia', 'New Valley', 'Sharqia', 'Suez', 'Aswan', 'Assiut', 'Beni Suef', 'Port Said', 'Damietta', 'South Sinai', 'Kafr El Sheikh', 'Matrouh', 'Luxor', 'Qena', 'Sohag', 'North Sinai', 'Remote'];
+  static const List<String> categories = [
+    'All',
+    'Technical',
+    'Non-Technical',
+    'Service',
+    'Tradesman',
+  ];
+  static const List<String> salaryRanges = [
+    'All',
+    '10k - 20k',
+    '20k - 30k',
+    '30k - 45k',
+    'Negotiable',
+  ];
+  static const List<String> egyptGovernorates = [
+    'All',
+    'Cairo',
+    'Giza',
+    'Alexandria',
+    'Dakahlia',
+    'Red Sea',
+    'Beheira',
+    'Fayoum',
+    'Gharbia',
+    'Ismailia',
+    'Monufia',
+    'Minya',
+    'Qalyubia',
+    'New Valley',
+    'Sharqia',
+    'Suez',
+    'Aswan',
+    'Assiut',
+    'Beni Suef',
+    'Port Said',
+    'Damietta',
+    'South Sinai',
+    'Kafr El Sheikh',
+    'Matrouh',
+    'Luxor',
+    'Qena',
+    'Sohag',
+    'North Sinai',
+    'Remote',
+  ];
 
   final List<RecruitmentJob> _jobs = <RecruitmentJob>[];
   final List<RecruitmentApplication> _applications = <RecruitmentApplication>[];
@@ -247,11 +289,14 @@ class RecruitmentSyncStore extends ChangeNotifier {
   List<String> _portfolioImages = [];
 
   List<RecruitmentJob> get jobs => List.unmodifiable(_jobs);
-  List<RecruitmentApplication> get applications => List.unmodifiable(_applications);
+  List<RecruitmentApplication> get applications =>
+      List.unmodifiable(_applications);
   List<RecruitmentMessage> get messages => List.unmodifiable(_messages);
-  List<ChatThread> get tradesmanChatThreads => List.unmodifiable(_tradesmanChatThreads);
+  List<ChatThread> get tradesmanChatThreads =>
+      List.unmodifiable(_tradesmanChatThreads);
   Set<String> get savedJobIds => Set.unmodifiable(_savedJobIds);
-  List<ServiceRequestPost> get serviceRequests => List.unmodifiable(_serviceRequests);
+  List<ServiceRequestPost> get serviceRequests =>
+      List.unmodifiable(_serviceRequests);
 
   String get currentUserName => _currentUserName;
   String get currentUserEmail => _currentUserEmail;
@@ -272,21 +317,43 @@ class RecruitmentSyncStore extends ChangeNotifier {
   List<Map<String, String>> get socialLinks => _socialLinks;
   List<String> get portfolioImages => _portfolioImages;
 
-  List<RecruitmentJob> get savedJobs => _jobs.where((item) => _savedJobIds.contains(item.id)).toList();
+  List<RecruitmentJob> get savedJobs =>
+      _jobs.where((item) => _savedJobIds.contains(item.id)).toList();
 
   List<RecruitmentJob> get filteredJobs {
     final query = _searchQuery.toLowerCase();
     return _jobs.where((job) {
-      final matchesQuery = query.isEmpty || job.title.toLowerCase().contains(query) || job.companyName.toLowerCase().contains(query);
-      final matchesLocation = _filterLocation == 'All' || job.location.toLowerCase() == _filterLocation.toLowerCase();
-      final matchesCategory = _filterCategory == 'All' || job.category.toLowerCase() == _filterCategory.toLowerCase();
-      final matchesType = _filterType == 'All' || job.type.toLowerCase() == _filterType.toLowerCase();
-      final matchesSalary = _filterSalaryRange == 'All' || job.salaryRange.toLowerCase() == _filterSalaryRange.toLowerCase();
-      return matchesQuery && matchesLocation && matchesCategory && matchesType && matchesSalary;
+      final matchesQuery =
+          query.isEmpty ||
+          job.title.toLowerCase().contains(query) ||
+          job.companyName.toLowerCase().contains(query);
+      final matchesLocation =
+          _filterLocation == 'All' ||
+          job.location.toLowerCase() == _filterLocation.toLowerCase();
+      final matchesCategory =
+          _filterCategory == 'All' ||
+          job.category.toLowerCase() == _filterCategory.toLowerCase();
+      final matchesType =
+          _filterType == 'All' ||
+          job.type.toLowerCase() == _filterType.toLowerCase();
+      final matchesSalary =
+          _filterSalaryRange == 'All' ||
+          job.salaryRange.toLowerCase() == _filterSalaryRange.toLowerCase();
+      return matchesQuery &&
+          matchesLocation &&
+          matchesCategory &&
+          matchesType &&
+          matchesSalary;
     }).toList();
   }
 
-  void updateFilters({String? type, String? category, String? salaryRange, String? location, String? searchQuery}) {
+  void updateFilters({
+    String? type,
+    String? category,
+    String? salaryRange,
+    String? location,
+    String? searchQuery,
+  }) {
     if (type != null) _filterType = type;
     if (category != null) _filterCategory = category;
     if (salaryRange != null) _filterSalaryRange = salaryRange;
@@ -328,20 +395,38 @@ class RecruitmentSyncStore extends ChangeNotifier {
     notifyListeners();
   }
 
-  void replaceFromRemote({required List<dynamic> jobs, required List<dynamic> applications, required List<dynamic> messages}) {
+  void replaceFromRemote({
+    required List<dynamic> jobs,
+    required List<dynamic> applications,
+    required List<dynamic> messages,
+  }) {
     _jobs.clear();
-    for (final item in jobs) if (item is Map<String, dynamic>) _jobs.add(RecruitmentJob.fromMap(item));
+    for (final item in jobs) {
+      if (item is Map<String, dynamic>) _jobs.add(RecruitmentJob.fromMap(item));
+    }
     _applications.clear();
-    for (final item in applications) if (item is Map<String, dynamic>) _applications.add(RecruitmentApplication.fromMap(item));
+    for (final item in applications) {
+      if (item is Map<String, dynamic>)
+        _applications.add(RecruitmentApplication.fromMap(item));
+    }
     _messages.clear();
-    for (final item in messages) if (item is Map<String, dynamic>) _messages.add(RecruitmentMessage.fromMap(item));
+    for (final item in messages) {
+      if (item is Map<String, dynamic>)
+        _messages.add(RecruitmentMessage.fromMap(item));
+    }
     notifyListeners();
   }
 
-  void companyUpdateApplicationStatus({required String applicationId, required String nextStatus}) {
+  void companyUpdateApplicationStatus({
+    required String applicationId,
+    required String nextStatus,
+  }) {
     final idx = _applications.indexWhere((a) => a.id == applicationId);
     if (idx != -1) {
-      _applications[idx] = _applications[idx].copyWith(status: nextStatus, updatedAt: DateTime.now());
+      _applications[idx] = _applications[idx].copyWith(
+        status: nextStatus,
+        updatedAt: DateTime.now(),
+      );
       notifyListeners();
     }
   }
@@ -353,7 +438,12 @@ class RecruitmentSyncStore extends ChangeNotifier {
   }
 
   void companySendMessage(String text) {
-    final newMessage = RecruitmentMessage(id: DateTime.now().millisecondsSinceEpoch.toString(), fromCompany: true, text: text, createdAt: DateTime.now());
+    final newMessage = RecruitmentMessage(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      fromCompany: true,
+      text: text,
+      createdAt: DateTime.now(),
+    );
     _messages.add(newMessage);
     notifyListeners();
   }
@@ -451,12 +541,21 @@ class RecruitmentSyncStore extends ChangeNotifier {
   }
 
   void toggleSaveJob(String jobId) {
-    if (_savedJobIds.contains(jobId)) _savedJobIds.remove(jobId);
-    else _savedJobIds.add(jobId);
+    if (_savedJobIds.contains(jobId)) {
+      _savedJobIds.remove(jobId);
+    } else {
+      _savedJobIds.add(jobId);
+    }
     notifyListeners();
   }
 
-  void updateCurrentUser({String? name, String? email, String? phone, String? location, String? photoUrl}) {
+  void updateCurrentUser({
+    String? name,
+    String? email,
+    String? phone,
+    String? location,
+    String? photoUrl,
+  }) {
     if (name != null) _currentUserName = name;
     if (email != null) _currentUserEmail = email;
     if (phone != null) _currentUserPhone = phone;

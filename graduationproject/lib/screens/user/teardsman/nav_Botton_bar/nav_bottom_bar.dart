@@ -43,122 +43,123 @@ class _NavbottonState extends State<Navbotton> {
   @override
   Widget build(BuildContext context) {
     final store = RecruitmentSyncStore.instance;
-    return Scaffold(
-      key: _scaffoldKey,
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        elevation: 0,
-        surfaceTintColor: Colors.transparent,
-        leading: IconButton(
-          icon: Icon(
-            Icons.menu,
-            color: Theme.of(context).colorScheme.onSurface,
-            size: 28,
-          ),
-          onPressed: () => _scaffoldKey.currentState?.openDrawer(),
-        ),
-        title: _selectedIndex == 5
-            ? Text(
-                _isAr ? 'الملف الشخصي' : 'Profile',
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                ),
-              )
-            : Image.asset(AppImages.jobito, height: 180),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const PostJob()),
-            ),
-            icon: Icon(
-              Icons.add_box_outlined,
-              color: Theme.of(context).colorScheme.onSurface,
-              size: 26,
-            ),
-            tooltip: _isAr ? 'نشر وظيفة' : 'Post Job',
-          ),
-          IconButton(
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const NotificationsScreen(),
+    return AnimatedBuilder(
+      animation: store,
+      builder: (context, _) {
+        return Scaffold(
+          key: _scaffoldKey,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          drawer: _buildTradesmanDrawer(context, store),
+          appBar: AppBar(
+            leading: IconButton(
+              icon: Icon(
+                Icons.menu,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
+              onPressed: () => _scaffoldKey.currentState?.openDrawer(),
             ),
-            icon: Icon(
-              Icons.notifications_outlined,
-              color: Theme.of(context).colorScheme.onSurface,
-              size: 26,
+            title: _selectedIndex == 5
+                ? Text(
+                    _isAr ? 'الملف الشخصي' : 'Profile',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  )
+                : Image.asset(AppImages.jobito, height: 200),
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            surfaceTintColor: Colors.transparent,
+            centerTitle: true,
+            actions: [
+              IconButton(
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const PostJob()),
+                ),
+                icon: Icon(
+                  Icons.add_box_outlined,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+                tooltip: _isAr ? 'نشر وظيفة' : 'Post Job',
+              ),
+              IconButton(
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const NotificationsScreen(),
+                  ),
+                ),
+                icon: Icon(
+                  Icons.notifications_outlined,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
+              const SizedBox(width: 8),
+            ],
+          ),
+          body: _pages[_selectedIndex],
+          floatingActionButton:
+              null, // Removed Chatbot icon from all pages for Tradesman
+          bottomNavigationBar: NavigationBarTheme(
+            data: NavigationBarThemeData(
+              labelTextStyle: WidgetStateProperty.resolveWith((states) {
+                if (states.contains(WidgetState.selected)) {
+                  return TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.primary,
+                  );
+                }
+                return TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.6),
+                );
+              }),
+            ),
+            child: NavigationBar(
+              selectedIndex: _selectedIndex,
+              onDestinationSelected: (int index) {
+                setState(() {
+                  _selectedIndex = index;
+                });
+              },
+              backgroundColor: Theme.of(context).cardColor,
+              labelBehavior:
+                  NavigationDestinationLabelBehavior.onlyShowSelected,
+              destinations: <NavigationDestination>[
+                NavigationDestination(
+                  icon: const Icon(Icons.home_outlined),
+                  selectedIcon: const Icon(Icons.home),
+                  label: _isAr ? 'الرئيسية' : 'Home',
+                ),
+                NavigationDestination(
+                  icon: const Icon(Icons.search),
+                  label: _isAr ? 'اكتشف' : 'Discover',
+                ),
+                NavigationDestination(
+                  icon: const Icon(Icons.fact_check),
+                  label: _isAr ? 'تقديماتي' : 'My Apps',
+                ),
+                NavigationDestination(
+                  icon: const Icon(Icons.business),
+                  label: _isAr ? 'الشركات' : 'Companies',
+                ),
+                NavigationDestination(
+                  icon: const Icon(Icons.chat_bubble),
+                  label: _isAr ? 'الرسائل' : 'Messages',
+                ),
+                NavigationDestination(
+                  icon: const Icon(Icons.person),
+                  label: _isAr ? 'الملف الشخصي' : 'Profile',
+                ),
+              ],
             ),
           ),
-          const SizedBox(width: 8),
-        ],
-      ),
-      drawer: _buildTradesmanDrawer(context, store),
-      body: _pages[_selectedIndex],
-      floatingActionButton:
-          null, // Removed Chatbot icon from all pages for Tradesman
-      bottomNavigationBar: NavigationBarTheme(
-        data: NavigationBarThemeData(
-          labelTextStyle: WidgetStateProperty.resolveWith((states) {
-            if (states.contains(WidgetState.selected)) {
-              return TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.primary,
-              );
-            }
-            return TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w500,
-              color: Theme.of(
-                context,
-              ).colorScheme.onSurface.withValues(alpha: 0.6),
-            );
-          }),
-        ),
-        child: NavigationBar(
-          selectedIndex: _selectedIndex,
-          onDestinationSelected: (int index) {
-            setState(() {
-              _selectedIndex = index;
-            });
-          },
-          backgroundColor: Theme.of(context).cardColor,
-          labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
-          destinations: <NavigationDestination>[
-            NavigationDestination(
-              icon: const Icon(Icons.home_outlined),
-              selectedIcon: const Icon(Icons.home),
-              label: _isAr ? 'الرئيسية' : 'Home',
-            ),
-            NavigationDestination(
-              icon: const Icon(Icons.search),
-              label: _isAr ? 'اكتشف' : 'Discover',
-            ),
-            NavigationDestination(
-              icon: const Icon(Icons.fact_check),
-              label: _isAr ? 'تقديماتي' : 'My Apps',
-            ),
-            NavigationDestination(
-              icon: const Icon(Icons.business),
-              label: _isAr ? 'الشركات' : 'Companies',
-            ),
-            NavigationDestination(
-              icon: const Icon(Icons.chat_bubble),
-              label: _isAr ? 'الرسائل' : 'Messages',
-            ),
-            NavigationDestination(
-              icon: const Icon(Icons.person),
-              label: _isAr ? 'الملف الشخصي' : 'Profile',
-            ),
-          ],
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -171,12 +172,18 @@ class _NavbottonState extends State<Navbotton> {
       child: Column(
         children: [
           UserAccountsDrawerHeader(
-            decoration: const BoxDecoration(color: Color(0xFF011931)),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primary,
+            ),
             currentAccountPicture: CircleAvatar(
               backgroundColor: Colors.white,
               backgroundImage: getAppImageProvider(store.profileImage),
               child: store.profileImage == null
-                  ? const Icon(Icons.person, size: 40, color: Color(0xFF011931))
+                  ? Icon(
+                      Icons.person,
+                      size: 40,
+                      color: Theme.of(context).colorScheme.primary,
+                    )
                   : null,
             ),
             accountName: Text(

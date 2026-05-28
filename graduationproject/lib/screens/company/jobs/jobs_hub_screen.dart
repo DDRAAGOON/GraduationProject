@@ -265,8 +265,9 @@ class _CompanyJobsHubScreenState extends State<CompanyJobsHubScreen> {
                                           .split(RegExp(r'[•,;]'))
                                           .map((t) {
                                             final type = t.trim();
-                                            if (type.isEmpty)
+                                            if (type.isEmpty) {
                                               return const SizedBox.shrink();
+                                            }
                                             final color = _getJobTypeColor(
                                               type,
                                             );

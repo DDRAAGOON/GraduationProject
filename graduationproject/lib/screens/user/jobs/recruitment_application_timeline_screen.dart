@@ -50,10 +50,14 @@ class _RecruitmentApplicationTimelineScreenState
   Color _getStatusColor(String status) {
     final low = status.toLowerCase();
     if (low.contains('hire') || status == 'تم التوظيف') return Colors.green;
-    if (low.contains('reject') || low.contains('decline') || status == 'مرفوض')
+    if (low.contains('reject') ||
+        low.contains('decline') ||
+        status == 'مرفوض') {
       return Colors.red;
-    if (low.contains('review') || status == 'قيد المراجعة')
+    }
+    if (low.contains('review') || status == 'قيد المراجعة') {
       return Colors.orange;
+    }
     if (low.contains('interview')) return Colors.purple;
     return Colors.blue;
   }
