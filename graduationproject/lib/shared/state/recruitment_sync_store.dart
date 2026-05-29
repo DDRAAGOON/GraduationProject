@@ -298,6 +298,7 @@ class RecruitmentSyncStore extends ChangeNotifier {
       ),
     ]);
   }
+
   static final RecruitmentSyncStore instance = RecruitmentSyncStore._();
 
   static const List<String> categories = [
@@ -361,7 +362,8 @@ class RecruitmentSyncStore extends ChangeNotifier {
   String _district = '';
   List<String> _languages = <String>[];
   List<String> _tradesmanServices = <String>[];
-  final List<TradesmanRatingEntry> _ratingsFromClients = <TradesmanRatingEntry>[];
+  final List<TradesmanRatingEntry> _ratingsFromClients =
+      <TradesmanRatingEntry>[];
   final List<TradesmanRatingEntry> _ratingsGivenByTradesman =
       <TradesmanRatingEntry>[];
   final Set<String> _savedJobIds = <String>{};
@@ -459,7 +461,8 @@ class RecruitmentSyncStore extends ChangeNotifier {
           job.location.toLowerCase() == _filterLocation.toLowerCase();
       final jobCat = job.category.toLowerCase();
       final filterCat = _filterCategory.toLowerCase();
-      final matchesCategory = _filterCategory == 'All' ||
+      final matchesCategory =
+          _filterCategory == 'All' ||
           jobCat == filterCat ||
           (filterCat == 'service' &&
               (jobCat == 'service' || jobCat == 'tradesman'));
@@ -655,14 +658,18 @@ class RecruitmentSyncStore extends ChangeNotifier {
 
   PendingTradesmanRating? consumeDueTradesmanRating() {
     final now = DateTime.now();
-    final index = _pendingTradesmanRatings.indexWhere((r) => !r.showAt.isAfter(now));
+    final index = _pendingTradesmanRatings.indexWhere(
+      (r) => !r.showAt.isAfter(now),
+    );
     if (index == -1) return null;
     final rating = _pendingTradesmanRatings.removeAt(index);
     notifyListeners();
     return rating;
   }
 
-  List<TradesmanPostedWorkRow> getTradesmanPostedWorksPreview({bool isAr = true}) {
+  List<TradesmanPostedWorkRow> getTradesmanPostedWorksPreview({
+    bool isAr = true,
+  }) {
     return [
       TradesmanPostedWorkRow(
         id: 'mock-work-1',
@@ -701,6 +708,249 @@ class RecruitmentSyncStore extends ChangeNotifier {
 
   void _addInitialMockJobs() {
     _jobs.addAll([
+      // ========== وظائف الصنايعية (Tradesman) ==========
+      RecruitmentJob(
+        id: 'trade_plumber_1',
+        title: 'سباك محترف لتأسيس فيلا',
+        companyName: 'المارودي للمقاولات',
+        location: 'Cairo',
+        salaryRange: '5000 - 8000 ج.م',
+        type: 'One-time',
+        status: 'Open',
+        category: 'Tradesman',
+        tags: ['Plumbing', 'تأسيس'],
+        publishedAt: DateTime.now().subtract(const Duration(hours: 2)),
+        logoIcon: Icons.plumbing,
+        description:
+            'مطلوب سباك محترف لتأسيس سباكة فيلا جديدة بالكامل - مواسير تغذية وصرف صحي.',
+        responsibilities: [
+          'تأسيس مواسير المياه الساخنة والباردة',
+          'تركيب سخانات وخلاطات',
+          'تمديد مواسير الصرف الصحي',
+        ],
+        qualifications: ['خبرة 5 سنوات على الأقل', 'معرفة بجودة الخامات'],
+        acceptedCount: 3,
+        capacity: 8,
+        specialTag: 'مطلوب urgently',
+      ),
+      RecruitmentJob(
+        id: 'trade_electrician_1',
+        title: 'كهربائي منازل لتمديد أسلاك فيلا',
+        companyName: 'مؤسسة النور للكهرباء',
+        location: 'Giza',
+        salaryRange: '4000 - 6000 ج.م',
+        type: 'One-time',
+        status: 'Open',
+        category: 'Tradesman',
+        tags: ['Electrical', 'تمديدات'],
+        publishedAt: DateTime.now().subtract(const Duration(hours: 5)),
+        logoIcon: Icons.electrical_services,
+        description:
+            'مطلوب كهربائي ذو خبرة لتمديد الأسلاك الكهربائية وتركيب اللوحات والفيش في فيلا بالدقي.',
+        responsibilities: [
+          'تمديد الأسلاك داخل الجدران',
+          'تركيب اللوحات الكهربائية والفيش واللمبات',
+          'اختبار الدوائر والتأكد من السلامة',
+        ],
+        qualifications: ['خبرة 7 سنوات', 'شهادة مزاولة مهنة'],
+        acceptedCount: 5,
+        capacity: 10,
+        specialTag: 'خبرة',
+      ),
+      RecruitmentJob(
+        id: 'trade_carpenter_1',
+        title: 'نجار كبس لتركيب غرف نوم ومطابخ',
+        companyName: 'معرض الأثاث العصري',
+        location: 'Alexandria',
+        salaryRange: '6000 - 9000 ج.م',
+        type: 'One-time',
+        status: 'Open',
+        category: 'Tradesman',
+        tags: ['Carpentry', 'أثاث'],
+        publishedAt: DateTime.now().subtract(const Duration(hours: 8)),
+        logoIcon: Icons.handyman,
+        description:
+            'مطلوب نجار كبس محترف لتركيب غرف نوم ومطابخ وأثاث مكتبي لشقة جديدة.',
+        responsibilities: [
+          'تركيب غرف النوم والمطابخ',
+          'فك وتركيب الأثاث في الموقع',
+          'تعديل المقاسات حسب المساحات المتاحة',
+        ],
+        qualifications: ['خبرة 3 سنوات في الكبس', 'امتلاك أدوات العمل'],
+        acceptedCount: 2,
+        capacity: 5,
+        specialTag: 'محترف',
+      ),
+      RecruitmentJob(
+        id: 'trade_painter_1',
+        title: 'دهان ديكورات وشقق سكنية',
+        companyName: 'شركة الألوان الذهبية',
+        location: 'Cairo',
+        salaryRange: '3500 - 5500 ج.م',
+        type: 'One-time',
+        status: 'Open',
+        category: 'Tradesman',
+        tags: ['Painting', 'ديكور'],
+        publishedAt: DateTime.now().subtract(const Duration(hours: 12)),
+        logoIcon: Icons.format_paint,
+        description:
+            'نحتاج دهان ديكورات داخلي لشقة 200 متر مربع - دهانات عادية وإسباني وجرافياتو.',
+        responsibilities: [
+          'دهان الحوائط والأسقف',
+          'تنفيذ ديكورات جرافياتو وإسباني',
+          'تهيئة الجدران قبل الدهان',
+        ],
+        qualifications: ['خبرة 4 سنوات', 'معرفة بأنواع الدهانات'],
+        acceptedCount: 6,
+        capacity: 12,
+        specialTag: 'ديكورات',
+      ),
+      RecruitmentJob(
+        id: 'trade_ac_1',
+        title: 'فني تكييف وتبريد للصيانة والتركيب',
+        companyName: 'مجموعة تكييف مصر',
+        location: 'Giza',
+        salaryRange: '4500 - 7000 ج.م',
+        type: 'دوام كامل',
+        status: 'Open',
+        category: 'Tradesman',
+        tags: ['AC', 'تكييف'],
+        publishedAt: DateTime.now().subtract(const Duration(hours: 3)),
+        logoIcon: Icons.ac_unit,
+        description:
+            'مطلوب فني تكييف متخصص لتركيب وصيانة أجهزة التكييف السبلت والمركزي لشركة كبرى.',
+        responsibilities: [
+          'تركيب وحدات التكييف السبلت',
+          'صيانة وإصلاح أعطال التبريد',
+          'فحص ضغط الفريون وتنظيف الفلاتر',
+        ],
+        qualifications: ['خبرة 3 سنوات', 'رخصة قيادة'],
+        acceptedCount: 4,
+        capacity: 7,
+        specialTag: 'دوام كامل',
+      ),
+      RecruitmentJob(
+        id: 'trade_tiler_1',
+        title: 'سيراميك وبلاط محترف لتركيب وتوريد',
+        companyName: 'مكتب السعدني للمقاولات',
+        location: 'Cairo',
+        salaryRange: '5500 - 8000 ج.م',
+        type: 'One-time',
+        status: 'Open',
+        category: 'Tradesman',
+        tags: ['Tiling', 'سيراميك'],
+        publishedAt: DateTime.now().subtract(const Duration(hours: 6)),
+        logoIcon: Icons.grid_view,
+        description:
+            'مطلوب فني سيراميك وبلاط لتركيب سيراميك أرضيات وحوائط وجميع أنحاء فيلا كبيرة.',
+        responsibilities: [
+          'تركيب سيراميك الأرضيات والحوائط',
+          'قص البورسلين والجرانيت',
+          'تسوية الأرضيات وعزل الحمامات',
+        ],
+        qualifications: ['خبرة 6 سنوات', 'دقة في القياس'],
+        acceptedCount: 1,
+        capacity: 4,
+        specialTag: 'دقة عالية',
+      ),
+      RecruitmentJob(
+        id: 'trade_welder_1',
+        title: 'حداد ولحام كريتال وأبواب حديد',
+        companyName: 'ورشة ابو العز للحدادة',
+        location: 'Alexandria',
+        salaryRange: '5000 - 7500 ج.م',
+        type: 'دوام كامل',
+        status: 'Open',
+        category: 'Tradesman',
+        tags: ['Welding', 'حدادة'],
+        publishedAt: DateTime.now().subtract(const Duration(days: 1)),
+        logoIcon: Icons.fireplace,
+        description:
+            'نبحث عن حداد كريتال ولحام لعمل أبواب وشبابيك حديد في مشروع تجاري كبير.',
+        responsibilities: [
+          'لحام الحديد والاستانلس',
+          'تصنيع أبواب وشبابيك كريتال',
+          'دهان وتجهيز المنتجات النهائية',
+        ],
+        qualifications: ['خبرة 5 سنوات', 'معرفة باللحام الكهربائي'],
+        acceptedCount: 8,
+        capacity: 15,
+        specialTag: 'مشروع كبير',
+      ),
+      RecruitmentJob(
+        id: 'trade_plaster_1',
+        title: 'مبيض محارة للتشطيب الداخلي',
+        companyName: 'مقاولات التشطيب السريع',
+        location: 'Cairo',
+        salaryRange: '4000 - 6000 ج.م',
+        type: 'One-time',
+        status: 'Open',
+        category: 'Tradesman',
+        tags: ['Plaster', 'محارة'],
+        publishedAt: DateTime.now().subtract(const Duration(days: 1)),
+        logoIcon: Icons.brush,
+        description:
+            'مطلوب مبيض محارة لإنهاء تشطيب شقتين في مدينة نصر - محارة حوائط وأسقف.',
+        responsibilities: [
+          'بياض محارة للحوائط والأسقف',
+          'تسوية الزوايا والبروز',
+          'تحضير السطح للدهان',
+        ],
+        qualifications: ['خبرة 4 سنوات', 'سرعة في الإنجاز'],
+        acceptedCount: 3,
+        capacity: 6,
+        specialTag: 'مشروعين',
+      ),
+      RecruitmentJob(
+        id: 'trade_marble_1',
+        title: 'فني رخام وجرانيت للواجهات',
+        companyName: 'شركة الجرانيت الملكي',
+        location: 'Giza',
+        salaryRange: '7000 - 10000 ج.م',
+        type: 'One-time',
+        status: 'Open',
+        category: 'Tradesman',
+        tags: ['Marble', 'Granite', 'رخام'],
+        publishedAt: DateTime.now().subtract(const Duration(days: 2)),
+        logoIcon: Icons.diamond,
+        description:
+            'نحن بصدد تنفيذ واجهة فيلا بالرخام والجرانيت - نبحث عن فني تركيب متخصص.',
+        responsibilities: [
+          'تركيب ألواح الرخام والجرانيت',
+          'تقطيع وتشطيب الأحجار',
+          'تثبيت الواجهات بالطريقة الصحيحة',
+        ],
+        qualifications: ['خبرة 8 سنوات', 'فريق عمل متكامل'],
+        acceptedCount: 2,
+        capacity: 5,
+        specialTag: 'فاخر',
+      ),
+      RecruitmentJob(
+        id: 'trade_glass_1',
+        title: 'فني زجاج وواجهات الوميتال',
+        companyName: 'شركة الألمنيوم الحديث',
+        location: 'Cairo',
+        salaryRange: '4500 - 6500 ج.م',
+        type: 'دوام كامل',
+        status: 'Open',
+        category: 'Tradesman',
+        tags: ['Glass', 'Aluminum', 'زجاج'],
+        publishedAt: DateTime.now().subtract(const Duration(days: 1)),
+        logoIcon: Icons.window,
+        description:
+            'مطلوب فني زجاج وألوميتال لتركيب واجهات زجاجية وشبابيك ألوميتال لمشروع تجاري ضخم.',
+        responsibilities: [
+          'تركيب واجهات الألوميتال والزجاج',
+          'تثبيت زجاج السيكوريت',
+          'تشطيب الواجهات بدقة',
+        ],
+        qualifications: ['خبرة 5 سنوات', 'معرفة بمقاسات الألوميتال'],
+        acceptedCount: 6,
+        capacity: 10,
+        specialTag: 'مشروع تجاري',
+      ),
+
+      // ========== وظائف Technical ==========
       RecruitmentJob(
         id: 'nexora_be',
         title: 'مطور Back-End مسؤول عن بناء وإدارة قواعد البيانات',
@@ -748,45 +998,6 @@ class RecruitmentSyncStore extends ChangeNotifier {
         logoIcon: Icons.account_tree_rounded,
         description: 'الرد على استفسارات العملاء وتقديم الدعم الفني.',
         responsibilities: ['الرد على المكالمات', 'متابعة الشكاوى'],
-      ),
-      RecruitmentJob(
-        id: 'nexora_clean',
-        title: 'عامل نظافة وخدمات مساعدة للمباني',
-        companyName: 'Nexora Solutions',
-        location: 'Remote',
-        salaryRange: 'Negotiable',
-        type: 'دوام جزئي',
-        status: 'Open',
-        category: 'Service',
-        specialTag: 'عام',
-        publishedAt: DateTime.now(),
-        logoIcon: Icons.account_tree_rounded,
-        description: 'المحافظة على نظافة المباني وتقديم الخدمات المساعدة.',
-      ),
-      RecruitmentJob(
-        id: 'mock_t1',
-        title: 'سباك محترف لتأسيس فيلا',
-        companyName: 'المارودي للمقاولات',
-        location: 'Cairo',
-        salaryRange: 'Negotiable',
-        type: 'One-time',
-        status: 'Open',
-        category: 'Tradesman',
-        tags: ['Plumbing'],
-        publishedAt: DateTime.now().subtract(const Duration(hours: 2)),
-        logoIcon: Icons.plumbing,
-      ),
-      RecruitmentJob(
-        id: 'mock_tech1',
-        title: 'Senior Flutter Developer',
-        companyName: 'Tech Solutions',
-        location: 'Cairo',
-        salaryRange: '30k - 45k',
-        type: 'Full-time',
-        status: 'Open',
-        category: 'Technical',
-        tags: ['Flutter', 'Dart'],
-        publishedAt: DateTime.now().subtract(const Duration(days: 1)),
       ),
     ]);
   }
