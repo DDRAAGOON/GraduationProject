@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:graduationproject/screens/company/candidates/applicant_details_profile_screen.dart';
+import 'package:graduationproject/screens/company/widgets/company_applicant_avatar.dart';
 import 'package:graduationproject/shared/l10n/app_localizations.dart';
 import 'package:graduationproject/shared/models/applicant.dart';
 import 'package:graduationproject/shared/state/recruitment_sync_store.dart';
@@ -256,9 +257,9 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
     );
   }
 
-  void _confirmDeleteApplicant(RecruitmentApplication app) {
+  Future<bool> _confirmDeleteApplicant(RecruitmentApplication app) async {
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
-    showDialog(
+    final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(isAr ? 'حذف المتقدم' : 'Delete applicant'),
@@ -269,25 +270,27 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(context, false),
             child: Text(isAr ? 'إلغاء' : 'Cancel'),
           ),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: Colors.redAccent),
-            onPressed: () {
-              Navigator.pop(context);
-              RecruitmentSyncStore.instance.removeApplication(app.id);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(isAr ? 'تم حذف المتقدم' : 'Applicant removed'),
-                ),
-              );
-            },
+            onPressed: () => Navigator.pop(context, true),
             child: Text(isAr ? 'حذف' : 'Delete'),
           ),
         ],
       ),
     );
+    if (confirmed == true && mounted) {
+      RecruitmentSyncStore.instance.removeApplication(app.id);
+      setState(() {});
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(isAr ? 'تم حذف المتقدم' : 'Applicant removed'),
+        ),
+      );
+    }
+    return confirmed ?? false;
   }
 
   void _showDeleteDialog() {
@@ -702,263 +705,210 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
             itemCount: filteredApplicants.length,
             itemBuilder: (context, index) {
               final app = filteredApplicants[index];
-              final statusColor = app.status == 'Accepted'
-                  ? Colors.green
-                  : app.status == 'Rejected'
-                  ? Colors.red
-                  : Colors.blue;
-
-              return Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 8,
-                ),
-                child: Material(
-                  color: theme.cardColor,
-                  borderRadius: BorderRadius.circular(18),
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(18),
-                    onTap: () => _openApplicantProfile(app),
-                    child: Container(
-                      padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(
-                        color: theme.cardColor,
-                        borderRadius: BorderRadius.circular(18),
-                        border: Border.all(
-                          color: theme.dividerColor.withValues(alpha: 0.08),
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.03),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          CircleAvatar(
-                            radius: 19,
-                            backgroundColor: colorScheme.primary.withValues(
-                              alpha: 0.12,
-                            ),
-                            child: Text(
-                              app.userName.isNotEmpty
-                                  ? app.userName[0].toUpperCase()
-                                  : 'A',
-                              style: TextStyle(
-                                color: colorScheme.primary,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        app.userName,
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 14.5,
-                                          color: colorScheme.onSurface,
-                                        ),
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                        vertical: 4,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: statusColor.withValues(
-                                          alpha: 0.12,
-                                        ),
-                                        borderRadius: BorderRadius.circular(
-                                          999,
-                                        ),
-                                      ),
-                                      child: Text(
-                                        app.status,
-                                        style: TextStyle(
-                                          color: statusColor,
-                                          fontSize: 9.5,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  app.jobTitle,
-                                  style: TextStyle(
-                                    fontSize: 11.5,
-                                    fontWeight: FontWeight.w700,
-                                    color: colorScheme.primary,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                const SizedBox(height: 3),
-                                Text(
-                                  app.location ?? '',
-                                  style: TextStyle(
-                                    fontSize: 10.5,
-                                    color: colorScheme.onSurface.withValues(
-                                      alpha: 0.56,
-                                    ),
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                const SizedBox(height: 8),
-                                Wrap(
-                                  spacing: 6,
-                                  runSpacing: 6,
-                                  children: [
-                                    if (app.skills.isNotEmpty)
-                                      ...app.skills
-                                          .take(2)
-                                          .map(
-                                            (skill) => Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                    horizontal: 8,
-                                                    vertical: 4,
-                                                  ),
-                                              decoration: BoxDecoration(
-                                                color: colorScheme.primary
-                                                    .withValues(alpha: 0.08),
-                                                borderRadius:
-                                                    BorderRadius.circular(999),
-                                              ),
-                                              child: Text(
-                                                skill,
-                                                style: TextStyle(
-                                                  color: colorScheme.primary,
-                                                  fontSize: 9,
-                                                  fontWeight: FontWeight.w700,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(
-                                icon: Icon(
-                                  Icons.phone_outlined,
-                                  color: Colors.blue,
-                                  size: 17,
-                                ),
-                                tooltip: isAr ? 'اتصال' : 'Call',
-                                padding: EdgeInsets.zero,
-                                constraints: const BoxConstraints(),
-                                onPressed: () {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        "${t.tr(en: 'Phone Number:', ar: 'رقم الهاتف:')} ${app.phone ?? 'N/A'}",
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ],
-                          ),
-                          const SizedBox(width: 8),
-                          Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(
-                                icon: Icon(
-                                  Icons.chat_bubble_outline,
-                                  color: colorScheme.primary,
-                                  size: 17,
-                                ),
-                                tooltip: isAr ? 'المحادثة' : 'Chat',
-                                padding: EdgeInsets.zero,
-                                constraints: const BoxConstraints(),
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => ChatTradesman(
-                                        name: app.userName,
-                                        image:
-                                            "https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg",
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                              const SizedBox(height: 4),
-                              TextButton.icon(
-                                onPressed: () => _openApplicantProfile(app),
-                                icon: Icon(
-                                  Icons.open_in_new,
-                                  size: 12,
-                                  color: colorScheme.primary,
-                                ),
-                                label: Text(
-                                  isAr ? 'التفاصيل' : 'Details',
-                                  style: TextStyle(
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.bold,
-                                    color: colorScheme.primary,
-                                  ),
-                                ),
-                                style: TextButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 7,
-                                    vertical: 3,
-                                  ),
-                                  minimumSize: const Size(0, 0),
-                                  tapTargetSize:
-                                      MaterialTapTargetSize.shrinkWrap,
-                                  backgroundColor: colorScheme.primary
-                                      .withValues(alpha: 0.08),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              IconButton(
-                                icon: Icon(
-                                  Icons.delete_outline,
-                                  color: Colors.redAccent,
-                                  size: 17,
-                                ),
-                                tooltip: isAr ? 'حذف' : 'Delete',
-                                padding: EdgeInsets.zero,
-                                constraints: const BoxConstraints(),
-                                onPressed: () => _confirmDeleteApplicant(app),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
+              return _buildApplicantCard(
+                app: app,
+                isAr: isAr,
+                t: t,
+                theme: theme,
+                colorScheme: colorScheme,
               );
             },
           ),
       ],
+    );
+  }
+
+  Widget _buildApplicantCard({
+    required RecruitmentApplication app,
+    required bool isAr,
+    required AppLocalizations t,
+    required ThemeData theme,
+    required ColorScheme colorScheme,
+  }) {
+    final statusColor = app.status == 'Accepted'
+        ? Colors.green
+        : app.status == 'Rejected'
+        ? Colors.red
+        : Colors.blue;
+    final primarySkill = app.skills.isNotEmpty
+        ? app.skills.first
+        : (app.location ?? '').trim();
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+      child: Dismissible(
+        key: ValueKey(app.id),
+        direction: DismissDirection.endToStart,
+        background: Container(
+          alignment: Alignment.centerRight,
+          padding: const EdgeInsets.only(right: 28),
+          decoration: BoxDecoration(
+            color: Colors.redAccent,
+            borderRadius: BorderRadius.circular(18),
+          ),
+          child: const Icon(
+            Icons.delete_outline,
+            color: Colors.white,
+            size: 28,
+          ),
+        ),
+        confirmDismiss: (_) => _confirmDeleteApplicant(app),
+        child: Material(
+          color: theme.cardColor,
+          borderRadius: BorderRadius.circular(18),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(18),
+            onTap: () => _openApplicantProfile(app),
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: theme.cardColor,
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(
+                  color: theme.dividerColor.withValues(alpha: 0.08),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.03),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      CompanyApplicantAvatar(seed: app.id, radius: 26),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          app.userName,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: colorScheme.onSurface,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: statusColor.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        child: Text(
+                          app.status,
+                          style: TextStyle(
+                            color: statusColor,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    app.jobTitle,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: colorScheme.primary,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  if (primarySkill.isNotEmpty) ...[
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.handyman_outlined,
+                          size: 15,
+                          color: colorScheme.onSurface.withValues(alpha: 0.5),
+                        ),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            primarySkill,
+                            style: TextStyle(
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.w600,
+                              color: colorScheme.onSurface.withValues(
+                                alpha: 0.65,
+                              ),
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                  const SizedBox(height: 14),
+                  Divider(
+                    height: 1,
+                    color: theme.dividerColor.withValues(alpha: 0.1),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _buildApplicantActionButton(
+                        icon: Icons.phone_outlined,
+                        color: Colors.blue,
+                        tooltip: isAr ? 'اتصال' : 'Call',
+                        onPressed: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                "${t.tr(en: 'Phone Number:', ar: 'رقم الهاتف:')} ${app.phone ?? 'N/A'}",
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      _buildApplicantActionButton(
+                        icon: Icons.chat_bubble_outline,
+                        color: colorScheme.primary,
+                        tooltip: isAr ? 'المحادثة' : 'Chat',
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ChatTradesman(
+                                name: app.userName,
+                                image:
+                                    "https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg",
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      _buildApplicantActionButton(
+                        icon: Icons.person_outline,
+                        color: colorScheme.primary,
+                        tooltip: isAr ? 'التفاصيل' : 'Details',
+                        onPressed: () => _openApplicantProfile(app),
+                      ),
+                      _buildApplicantActionButton(
+                        icon: Icons.delete_outline,
+                        color: Colors.redAccent,
+                        tooltip: isAr ? 'حذف' : 'Delete',
+                        onPressed: () => _confirmDeleteApplicant(app),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 
