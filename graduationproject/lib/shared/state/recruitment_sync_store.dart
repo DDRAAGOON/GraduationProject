@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 class RecruitmentJob {
@@ -192,6 +194,52 @@ class ChatThread {
   });
 }
 
+class PendingTradesmanRating {
+  PendingTradesmanRating({
+    required this.personName,
+    required this.applicationId,
+    required this.showAt,
+  });
+
+  final String personName;
+  final String applicationId;
+  final DateTime showAt;
+}
+
+class TradesmanRatingEntry {
+  const TradesmanRatingEntry({
+    required this.personName,
+    required this.rating,
+    required this.comment,
+    required this.date,
+    this.subtitle,
+  });
+
+  final String personName;
+  final double rating;
+  final String comment;
+  final DateTime date;
+  final String? subtitle;
+}
+
+class TradesmanPostedWorkRow {
+  const TradesmanPostedWorkRow({
+    required this.id,
+    required this.title,
+    required this.rate,
+    required this.status,
+    required this.applicantsCount,
+    required this.postedAt,
+  });
+
+  final String id;
+  final String title;
+  final String rate;
+  final String status;
+  final int applicantsCount;
+  final DateTime postedAt;
+}
+
 class ServiceRequestPost {
   const ServiceRequestPost({
     required this.id,
@@ -212,6 +260,43 @@ class ServiceRequestPost {
 class RecruitmentSyncStore extends ChangeNotifier {
   RecruitmentSyncStore._() {
     _addInitialMockJobs();
+    _seedTradesmanRatingsPreview();
+  }
+
+  void _seedTradesmanRatingsPreview() {
+    if (_ratingsFromClients.isNotEmpty) return;
+    _ratingsFromClients.addAll([
+      TradesmanRatingEntry(
+        personName: 'أحمد المصري',
+        rating: 4.8,
+        comment: 'شغل ممتاز وفي الميعاد.',
+        date: DateTime.now().subtract(const Duration(days: 3)),
+        subtitle: 'عميل',
+      ),
+      TradesmanRatingEntry(
+        personName: 'منى حسن',
+        rating: 4.5,
+        comment: 'محترف ومتعاون جداً.',
+        date: DateTime.now().subtract(const Duration(days: 8)),
+        subtitle: 'عميل',
+      ),
+    ]);
+    _ratingsGivenByTradesman.addAll([
+      TradesmanRatingEntry(
+        personName: 'يوسف عبد الله',
+        rating: 5,
+        comment: 'تعامل محترم ووصف واضح للمشكلة.',
+        date: DateTime.now().subtract(const Duration(days: 2)),
+        subtitle: 'طالب خدمة',
+      ),
+      TradesmanRatingEntry(
+        personName: 'سارة علي',
+        rating: 4,
+        comment: 'التزام جيد بالمواعيد.',
+        date: DateTime.now().subtract(const Duration(days: 6)),
+        subtitle: 'طالب خدمة',
+      ),
+    ]);
   }
   static final RecruitmentSyncStore instance = RecruitmentSyncStore._();
 
@@ -265,6 +350,20 @@ class RecruitmentSyncStore extends ChangeNotifier {
   final List<RecruitmentApplication> _applications = <RecruitmentApplication>[];
   final List<RecruitmentMessage> _messages = <RecruitmentMessage>[];
   final List<ChatThread> _tradesmanChatThreads = <ChatThread>[];
+  final List<PendingTradesmanRating> _pendingTradesmanRatings =
+      <PendingTradesmanRating>[];
+  final Map<String, String> _tradesmanJobStatusOverrides = <String, String>{};
+
+  String? _backgroundImage;
+  String _birthDate = '';
+  String _gender = '';
+  String _governorate = '';
+  String _district = '';
+  List<String> _languages = <String>[];
+  List<String> _tradesmanServices = <String>[];
+  final List<TradesmanRatingEntry> _ratingsFromClients = <TradesmanRatingEntry>[];
+  final List<TradesmanRatingEntry> _ratingsGivenByTradesman =
+      <TradesmanRatingEntry>[];
   final Set<String> _savedJobIds = <String>{};
   final List<ServiceRequestPost> _serviceRequests = <ServiceRequestPost>[];
 
@@ -294,6 +393,8 @@ class RecruitmentSyncStore extends ChangeNotifier {
   List<RecruitmentMessage> get messages => List.unmodifiable(_messages);
   List<ChatThread> get tradesmanChatThreads =>
       List.unmodifiable(_tradesmanChatThreads);
+  List<PendingTradesmanRating> get pendingTradesmanRatings =>
+      List.unmodifiable(_pendingTradesmanRatings);
   Set<String> get savedJobIds => Set.unmodifiable(_savedJobIds);
   List<ServiceRequestPost> get serviceRequests =>
       List.unmodifiable(_serviceRequests);
@@ -316,6 +417,32 @@ class RecruitmentSyncStore extends ChangeNotifier {
   List<Map<String, String>> get currentUserExperience => _currentUserExperience;
   List<Map<String, String>> get socialLinks => _socialLinks;
   List<String> get portfolioImages => _portfolioImages;
+  String? get backgroundImage => _backgroundImage;
+  String get birthDate => _birthDate;
+  String get gender => _gender;
+  String get governorate => _governorate;
+  String get district => _district;
+  List<String> get languages => _languages;
+  List<String> get tradesmanServices => _tradesmanServices;
+  List<TradesmanRatingEntry> get ratingsFromClients =>
+      List.unmodifiable(_ratingsFromClients);
+  List<TradesmanRatingEntry> get ratingsGivenByTradesman =>
+      List.unmodifiable(_ratingsGivenByTradesman);
+
+  static const Map<String, List<String>> tradesmanGovernorateAreas = {
+    'القاهرة': ['عين شمس', 'مدينة نصر', 'المعادي', 'مصر الجديدة', 'حلوان'],
+    'الجيزة': ['الدقي', 'المهندسين', 'الهرم', '6 أكتوبر', 'فيصل'],
+    'الإسكندرية': ['سيدي جابر', 'سموحة', 'المندرة', 'ميامي'],
+    'القليوبية': ['شبرا الخيمة', 'الخانكة', 'بنها'],
+  };
+
+  static const List<String> tradesmanDefaultServices = [
+    'نجار',
+    'فني تكييف',
+    'كهربائي',
+    'سباك',
+    'دهان',
+  ];
 
   List<RecruitmentJob> get savedJobs =>
       _jobs.where((item) => _savedJobIds.contains(item.id)).toList();
@@ -330,9 +457,12 @@ class RecruitmentSyncStore extends ChangeNotifier {
       final matchesLocation =
           _filterLocation == 'All' ||
           job.location.toLowerCase() == _filterLocation.toLowerCase();
-      final matchesCategory =
-          _filterCategory == 'All' ||
-          job.category.toLowerCase() == _filterCategory.toLowerCase();
+      final jobCat = job.category.toLowerCase();
+      final filterCat = _filterCategory.toLowerCase();
+      final matchesCategory = _filterCategory == 'All' ||
+          jobCat == filterCat ||
+          (filterCat == 'service' &&
+              (jobCat == 'service' || jobCat == 'tradesman'));
       final matchesType =
           _filterType == 'All' ||
           job.type.toLowerCase() == _filterType.toLowerCase();
@@ -362,7 +492,14 @@ class RecruitmentSyncStore extends ChangeNotifier {
     notifyListeners();
   }
 
-  void applyToJob(RecruitmentJob job) {
+  void applyToJob(
+    RecruitmentJob job, {
+    String? about,
+    String? location,
+    String? email,
+    String? phone,
+    bool hasCv = false,
+  }) {
     final alreadyApplied = _applications.any((a) => a.jobId == job.id);
     if (!alreadyApplied) {
       final newApp = RecruitmentApplication(
@@ -371,8 +508,13 @@ class RecruitmentSyncStore extends ChangeNotifier {
         jobTitle: job.title,
         companyName: job.companyName,
         userName: _currentUserName,
-        status: 'Pending',
+        status: 'Applied',
         updatedAt: DateTime.now(),
+        about: about,
+        location: location,
+        email: email ?? _currentUserEmail,
+        phone: phone ?? _currentUserPhone,
+        hasCv: hasCv,
       );
       _applications.add(newApp);
       notifyListeners();
@@ -406,13 +548,15 @@ class RecruitmentSyncStore extends ChangeNotifier {
     }
     _applications.clear();
     for (final item in applications) {
-      if (item is Map<String, dynamic>)
+      if (item is Map<String, dynamic>) {
         _applications.add(RecruitmentApplication.fromMap(item));
+      }
     }
     _messages.clear();
     for (final item in messages) {
-      if (item is Map<String, dynamic>)
+      if (item is Map<String, dynamic>) {
         _messages.add(RecruitmentMessage.fromMap(item));
+      }
     }
     notifyListeners();
   }
@@ -451,6 +595,108 @@ class RecruitmentSyncStore extends ChangeNotifier {
     );
     _messages.add(newMessage);
     notifyListeners();
+  }
+
+  void upsertTradesmanChatThread({
+    required String name,
+    required String image,
+    required String lastMessage,
+    String? time,
+  }) {
+    final now = time ?? _formatChatTime(DateTime.now());
+    final index = _tradesmanChatThreads.indexWhere((t) => t.name == name);
+    if (index >= 0) {
+      _tradesmanChatThreads[index].lastMessage = lastMessage;
+      _tradesmanChatThreads[index].time = now;
+      final thread = _tradesmanChatThreads.removeAt(index);
+      _tradesmanChatThreads.insert(0, thread);
+    } else {
+      _tradesmanChatThreads.insert(
+        0,
+        ChatThread(
+          name: name,
+          image: image,
+          lastMessage: lastMessage,
+          time: now,
+        ),
+      );
+    }
+    notifyListeners();
+  }
+
+  String _formatChatTime(DateTime dateTime) {
+    final hour = dateTime.hour;
+    final minute = dateTime.minute.toString().padLeft(2, '0');
+    final h12 = hour > 12 ? hour - 12 : (hour == 0 ? 12 : hour);
+    final period = hour >= 12 ? 'PM' : 'AM';
+    return '$h12:$minute $period';
+  }
+
+  void scheduleTradesmanRatingPrompt({
+    required String personName,
+    required String applicationId,
+  }) {
+    _pendingTradesmanRatings.removeWhere(
+      (r) => r.applicationId == applicationId,
+    );
+    final random = Random();
+    final maxSeconds = 24 * 60 * 60;
+    final randomSeconds = max(8, random.nextInt(maxSeconds));
+    final showAt = DateTime.now().add(Duration(seconds: randomSeconds));
+    _pendingTradesmanRatings.add(
+      PendingTradesmanRating(
+        personName: personName,
+        applicationId: applicationId,
+        showAt: showAt,
+      ),
+    );
+    notifyListeners();
+  }
+
+  PendingTradesmanRating? consumeDueTradesmanRating() {
+    final now = DateTime.now();
+    final index = _pendingTradesmanRatings.indexWhere((r) => !r.showAt.isAfter(now));
+    if (index == -1) return null;
+    final rating = _pendingTradesmanRatings.removeAt(index);
+    notifyListeners();
+    return rating;
+  }
+
+  List<TradesmanPostedWorkRow> getTradesmanPostedWorksPreview({bool isAr = true}) {
+    return [
+      TradesmanPostedWorkRow(
+        id: 'mock-work-1',
+        title: isAr ? 'إصلاح تسريب مياه' : 'Water leak repair',
+        rate: '4.8',
+        status: isAr ? 'نشط' : 'Active',
+        applicantsCount: 5,
+        postedAt: DateTime.now().subtract(const Duration(days: 2)),
+      ),
+      TradesmanPostedWorkRow(
+        id: 'mock-work-2',
+        title: isAr ? 'تركيب تكييف' : 'AC installation',
+        rate: '4.5',
+        status: isAr ? 'قيد المراجعة' : 'In review',
+        applicantsCount: 3,
+        postedAt: DateTime.now().subtract(const Duration(days: 5)),
+      ),
+      TradesmanPostedWorkRow(
+        id: 'mock-work-3',
+        title: isAr ? 'صيانة كهرباء منزلية' : 'Home electrical maintenance',
+        rate: '4.9',
+        status: isAr ? 'مكتمل' : 'Completed',
+        applicantsCount: 8,
+        postedAt: DateTime.now().subtract(const Duration(days: 9)),
+      ),
+      TradesmanPostedWorkRow(
+        id: 'mock-work-4',
+        title: isAr ? 'دهان غرفة معيشة' : 'Living room painting',
+        rate: '4.2',
+        status: isAr ? 'نشط' : 'Active',
+        applicantsCount: 2,
+        postedAt: DateTime.now().subtract(const Duration(days: 12)),
+      ),
+    ];
   }
 
   void _addInitialMockJobs() {
@@ -582,6 +828,14 @@ class RecruitmentSyncStore extends ChangeNotifier {
     List<Map<String, String>>? socialLinks,
     String? role,
     List<String>? portfolioImages,
+    String? backgroundImage,
+    String? birthDate,
+    String? gender,
+    String? governorate,
+    String? district,
+    List<String>? languages,
+    List<String>? tradesmanServices,
+    String? profileImage,
   }) {
     _currentUserName = fullName;
     _currentUserTitle = title;
@@ -595,6 +849,63 @@ class RecruitmentSyncStore extends ChangeNotifier {
     if (socialLinks != null) _socialLinks = socialLinks;
     if (role != null) _userRole = role;
     if (portfolioImages != null) _portfolioImages = portfolioImages;
+    if (backgroundImage != null) _backgroundImage = backgroundImage;
+    if (birthDate != null) _birthDate = birthDate;
+    if (gender != null) _gender = gender;
+    if (governorate != null) _governorate = governorate;
+    if (district != null) _district = district;
+    if (languages != null) _languages = languages;
+    if (tradesmanServices != null) _tradesmanServices = tradesmanServices;
+    if (profileImage != null) _profileImage = profileImage;
     notifyListeners();
+  }
+
+  String tradesmanJobStatus(String jobId, String fallback) {
+    return _tradesmanJobStatusOverrides[jobId] ?? fallback;
+  }
+
+  void setTradesmanJobStatus(String jobId, String status) {
+    _tradesmanJobStatusOverrides[jobId] = status;
+    final index = _jobs.indexWhere((j) => j.id == jobId);
+    if (index != -1) {
+      final old = _jobs[index];
+      _jobs[index] = RecruitmentJob(
+        id: old.id,
+        title: old.title,
+        companyName: old.companyName,
+        location: old.location,
+        salaryRange: old.salaryRange,
+        type: old.type,
+        status: status,
+        category: old.category,
+        tags: old.tags,
+        publishedAt: old.publishedAt,
+        description: old.description,
+        responsibilities: old.responsibilities,
+        qualifications: old.qualifications,
+        niceToHaves: old.niceToHaves,
+        benefits: old.benefits,
+        acceptedCount: old.acceptedCount,
+        capacity: old.capacity,
+        logoIcon: old.logoIcon,
+        companyLogoUrl: old.companyLogoUrl,
+        deadline: old.deadline,
+        specialTag: old.specialTag,
+      );
+    }
+    notifyListeners();
+  }
+
+  String translateTradesmanWorkStatus(String status, bool isAr) {
+    final low = status.toLowerCase();
+    if (low.contains('close') || low.contains('مغلق')) {
+      return isAr ? 'مغلق' : 'Closed';
+    }
+    if (low.contains('inactive') ||
+        low.contains('غير') ||
+        low.contains('pause')) {
+      return isAr ? 'غير نشط' : 'Inactive';
+    }
+    return isAr ? 'نشط' : 'Active';
   }
 }

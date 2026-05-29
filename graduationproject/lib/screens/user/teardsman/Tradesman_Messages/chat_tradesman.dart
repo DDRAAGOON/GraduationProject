@@ -1,5 +1,6 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import '../../../../shared/l10n/app_localizations.dart';
+import '../../../../shared/state/recruitment_sync_store.dart';
 
 class ChatTradesman extends StatefulWidget {
   final String name;
@@ -26,16 +27,23 @@ class _ChatTradesmanState extends State<ChatTradesman> {
   }
 
   void _sendMessage() {
-    if (_messageController.text.trim().isNotEmpty) {
-      setState(() {
-        _messages.add({
-          "isMe": true,
-          "text": _messageController.text.trim(),
-          "time": _getCurrentTime(),
-        });
-        _messageController.clear();
+    final text = _messageController.text.trim();
+    if (text.isEmpty) return;
+    final time = _getCurrentTime();
+    setState(() {
+      _messages.add({
+        "isMe": true,
+        "text": text,
+        "time": time,
       });
-    }
+      _messageController.clear();
+    });
+    RecruitmentSyncStore.instance.upsertTradesmanChatThread(
+      name: widget.name,
+      image: widget.image,
+      lastMessage: text,
+      time: time,
+    );
   }
 
   String _getCurrentTime() {
@@ -188,9 +196,6 @@ class _ChatTradesmanState extends State<ChatTradesman> {
         ),
         child: Row(
           children: [
-            IconButton(
-                icon: const Icon(Icons.add, color: Colors.blueAccent),
-                onPressed: () {}),
             Expanded(
               child: TextField(
                 controller: _messageController,

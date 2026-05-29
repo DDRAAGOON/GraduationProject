@@ -1,10 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:graduationproject/screens/company/candidates/applicant_details_profile_screen.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:graduationproject/screens/company/widgets/company_applicant_avatar.dart';
 import 'package:graduationproject/shared/l10n/app_localizations.dart';
-import 'package:graduationproject/shared/models/applicant.dart';
-import 'package:graduationproject/shared/state/recruitment_sync_store.dart';
 import 'package:graduationproject/shared/services/recruitment_sync_service.dart';
+import 'package:graduationproject/shared/state/recruitment_sync_store.dart';
+import 'tradesman_service_requester_profile_screen.dart';
 import '../Tradesman_Messages/chat_tradesman.dart';
 
 class JobApplicantsScreen extends StatefulWidget {
@@ -34,7 +36,13 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
   late TextEditingController _titleController;
   late TextEditingController _descController;
   late TextEditingController _deadlineController;
+  late TextEditingController _locationController;
+  late TextEditingController _skillInputController;
   late List<String> _selectedDays;
+  late List<String> _editableSkills;
+  late String _postedDateLabel;
+  late String _workStatus;
+  RecruitmentJob? _existingJob;
 
   final List<String> _allDays = [
     "Saturday",
@@ -46,44 +54,47 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
     "Friday",
   ];
 
-  final List<String> _requiredSkills = [
-    'النجارة',
-    'اللحام',
-    'الصيانة',
-    'التركيب',
-  ];
-
-  final List<String> _sampleWorkPhotos = [
-    'صورة العمل 1',
-    'صورة العمل 2',
-    'صورة العمل 3',
-  ];
+  final List<File> _workPhotos = [];
+  final ImagePicker _imagePicker = ImagePicker();
 
   @override
   void initState() {
     super.initState();
     final store = RecruitmentSyncStore.instance;
 
-    RecruitmentJob? existingJob;
     if (widget.jobId != null && widget.jobId!.isNotEmpty) {
       try {
-        existingJob = store.jobs.firstWhere((j) => j.id == widget.jobId);
+        _existingJob = store.jobs.firstWhere((j) => j.id == widget.jobId);
       } catch (_) {
-        existingJob = null;
+        _existingJob = null;
       }
     }
 
     _titleController = TextEditingController(
-      text: existingJob?.title ?? widget.jobTitle,
+      text: _existingJob?.title ?? widget.jobTitle,
     );
-    _descController = TextEditingController(text: widget.initialDesc ?? "");
+    _descController = TextEditingController(
+      text: _existingJob?.description ?? widget.initialDesc ?? '',
+    );
+    _locationController = TextEditingController(
+      text: _existingJob?.location ?? store.currentUserLocation,
+    );
+    _skillInputController = TextEditingController();
     _deadlineController = TextEditingController(
       text: DateTime.now()
           .add(const Duration(days: 7))
           .toString()
           .split(' ')[0],
     );
-    _selectedDays = List.from(existingJob?.tags ?? widget.initialDays ?? []);
+    _selectedDays = List.from(widget.initialDays ?? []);
+    _editableSkills = List.from(_existingJob?.tags ?? []);
+    _postedDateLabel = _formatDate(
+      _existingJob?.publishedAt ?? DateTime.now(),
+    );
+    final jobId = widget.jobId ?? '';
+    _workStatus = jobId.isEmpty
+        ? 'Active'
+        : store.tradesmanJobStatus(jobId, _existingJob?.status ?? 'Active');
   }
 
   @override
@@ -92,7 +103,40 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
     _titleController.dispose();
     _descController.dispose();
     _deadlineController.dispose();
+    _locationController.dispose();
+    _skillInputController.dispose();
     super.dispose();
+  }
+
+  String _formatDate(DateTime date) {
+    final y = date.year;
+    final m = date.month.toString().padLeft(2, '0');
+    final d = date.day.toString().padLeft(2, '0');
+    return '$y-$m-$d';
+  }
+
+  Future<void> _pickWorkPhotos() async {
+    final images = await _imagePicker.pickMultiImage();
+    if (images.isEmpty) return;
+    setState(() {
+      _workPhotos.addAll(images.map((x) => File(x.path)));
+    });
+  }
+
+  String _translateApplicantStatus(String status, bool isAr) {
+    final low = status.toLowerCase();
+    if (isAr) {
+      if (low.contains('accept') || low.contains('hire')) return 'مقبول';
+      if (low.contains('reject') || low.contains('declin')) return 'مرفوض';
+      if (low.contains('pend')) return 'قيد المراجعة';
+      if (low.contains('appli')) return 'تم التقديم';
+      return status;
+    }
+    if (low.contains('accept') || low.contains('hire')) return 'Accepted';
+    if (low.contains('reject') || low.contains('declin')) return 'Rejected';
+    if (low.contains('pend')) return 'Pending';
+    if (low.contains('appli')) return 'Applied';
+    return status;
   }
 
   List<RecruitmentApplication> _buildPreviewApplicants() {
@@ -108,7 +152,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
         gender: 'ذكر',
         birthDate: '1994-06-12',
         languages: ['العربية', 'الإنجليزية'],
-        about: 'محترف في أعمال النجارة والدهانات وصيانة المعدات الصناعية.',
+        about: 'عطل في نظام التكييف ويحتاج فحص وصيانة عاجلة.',
         experienceYears: 6,
         education: 'بكالوريوس هندسة ميكانيكية',
         skills: ['النجارة', 'اللحام', 'الصيانة'],
@@ -128,7 +172,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
         gender: 'أنثى',
         birthDate: '1998-02-20',
         languages: ['العربية'],
-        about: 'مختصة في أعمال التشطيب والتجهيزات المنزلية.',
+        about: 'تسريب مياه في الحمام والمطبخ يحتاج إصلاح فوري.',
         experienceYears: 4,
         education: 'دبلوم صيانة',
         skills: ['التشطيب', 'التركيب', 'الأعمال اليدوية'],
@@ -148,7 +192,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
         gender: 'ذكر',
         birthDate: '1991-11-03',
         languages: ['العربية', 'الفرنسية'],
-        about: 'خبرة واسعة في أعمال الكهرباء والصيانة التحويلية.',
+        about: 'مشكلة كهربائية في لوحة التوزيع مع انقطاع متكرر.',
         experienceYears: 8,
         education: 'بكالوريوس كهرباء',
         skills: ['الكهرباء', 'الصيانة', 'القياس'],
@@ -178,73 +222,58 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
     }).toList();
   }
 
-  Future<void> _updateApplicationStatus(
-    String applicationId,
-    String status,
-  ) async {
+  Future<void> _toggleEdit() async {
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
-    try {
-      await RecruitmentSyncService.instance.updateStatus(
-        applicationId: applicationId,
-        status: status,
-      );
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              isAr
-                  ? "تم تحديث الحالة إلى $status"
-                  : "Status updated to $status",
-            ),
-            backgroundColor: status == 'Accepted' ? Colors.green : Colors.red,
-          ),
-        );
+    if (_isEditing) {
+      final jobId = widget.jobId;
+      if (jobId != null && jobId.isNotEmpty) {
+        try {
+          await RecruitmentSyncService.instance.updateJob(
+            jobId: jobId,
+            title: _titleController.text.trim(),
+            location: _locationController.text.trim(),
+            salaryRange: _existingJob?.salaryRange ?? 'Negotiable',
+            description: _descController.text.trim(),
+            responsibilities: _existingJob?.responsibilities ?? const [],
+            qualifications: _existingJob?.qualifications ?? const [],
+            niceToHaves: _existingJob?.niceToHaves ?? const [],
+            benefits: _existingJob?.benefits ?? const [],
+            category: _existingJob?.category ?? 'Service',
+            companyName: _existingJob?.companyName ??
+                RecruitmentSyncStore.instance.currentUserName,
+            type: _existingJob?.type ?? 'one-time',
+            tags: _editableSkills,
+            requiredCount: _existingJob?.capacity ?? 1,
+            status: _workStatus,
+          );
+          RecruitmentSyncStore.instance.setTradesmanJobStatus(jobId, _workStatus);
+        } catch (_) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  isAr ? 'فشل حفظ التعديلات' : 'Failed to save changes',
+                ),
+                backgroundColor: Colors.redAccent,
+              ),
+            );
+          }
+          return;
+        }
       }
-    } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              isAr ? "فشل تحديث الحالة" : "Failed to update status",
+              isAr ? 'تم حفظ التعديلات بنجاح' : 'Changes saved successfully',
             ),
           ),
         );
       }
     }
-  }
-
-  void _toggleEdit() {
-    setState(() {
-      _isEditing = !_isEditing;
-    });
-    if (!_isEditing) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("تم حفظ التعديلات بنجاح")));
+    if (mounted) {
+      setState(() => _isEditing = !_isEditing);
     }
-  }
-
-  Applicant _toApplicant(RecruitmentApplication app) {
-    return Applicant(
-      id: app.id,
-      fullName: app.userName,
-      role: app.jobTitle,
-      rating: 4.5,
-      stage: app.status,
-      email: app.email ?? 'candidate@jobito.com',
-      phone: app.phone ?? '+20 1000000000',
-      location: app.location ?? 'Unknown',
-      appliedDateLabel: 'Today',
-      gender: app.gender,
-      birthDate: app.birthDate,
-      languages: app.languages,
-      about: app.about,
-      experienceYears: app.experienceYears,
-      education: app.education,
-      skills: app.skills,
-      hasCv: app.hasCv,
-      jobId: app.jobId,
-    );
   }
 
   void _openApplicantProfile(RecruitmentApplication app) {
@@ -252,7 +281,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
       context,
       MaterialPageRoute(
         builder: (context) =>
-            CompanyApplicantDetailsProfileScreen(applicant: _toApplicant(app)),
+            TradesmanServiceRequesterProfileScreen(application: app),
       ),
     );
   }
@@ -358,7 +387,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                   color: theme.cardColor,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: Theme.of(context).dividerColor.withAlpha(0.1),
+                    color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
                   ),
                 ),
                 child: IconButton(
@@ -411,7 +440,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                             : colorScheme.onSurface,
                         size: 20,
                       ),
-                      onPressed: _toggleEdit,
+                      onPressed: () => _toggleEdit(),
                     ),
                   ),
                 ),
@@ -461,9 +490,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                             ),
                       const SizedBox(height: 8),
                       Text(
-                        isAr
-                            ? 'عام • لمرة واحدة • ${realApplicants.length} متقدمين'
-                            : 'General • one-time • ${realApplicants.length} applicants',
+                        '${t.tr(en: 'Posted on', ar: 'تاريخ النشر')}: $_postedDateLabel',
                         style: TextStyle(
                           color: colorScheme.onSurface.withValues(alpha: 0.54),
                           fontSize: 14,
@@ -482,7 +509,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                     children: [
                       _buildTab(t.tr(en: "Applicants", ar: "المتقدمين"), 0),
                       const SizedBox(width: 32),
-                      _buildTab(t.tr(en: "Job Details", ar: "تفاصيل العمل"), 1),
+                      _buildTab(t.tr(en: "Work details", ar: "تفاصيل العمل"), 1),
                     ],
                   ),
                 ),
@@ -725,14 +752,16 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
     required ThemeData theme,
     required ColorScheme colorScheme,
   }) {
-    final statusColor = app.status == 'Accepted'
+    final statusColor = app.status.toLowerCase().contains('accept') ||
+            app.status.toLowerCase().contains('hire')
         ? Colors.green
-        : app.status == 'Rejected'
+        : app.status.toLowerCase().contains('reject') ||
+              app.status.toLowerCase().contains('declin')
         ? Colors.red
         : Colors.blue;
-    final primarySkill = app.skills.isNotEmpty
-        ? app.skills.first
-        : (app.location ?? '').trim();
+    final problemDescription = (app.about ?? '').trim();
+    final appliedDate = _formatDate(app.updatedAt);
+    final statusLabel = _translateApplicantStatus(app.status, isAr);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
@@ -803,7 +832,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                           borderRadius: BorderRadius.circular(999),
                         ),
                         child: Text(
-                          app.status,
+                          statusLabel,
                           style: TextStyle(
                             color: statusColor,
                             fontSize: 10,
@@ -823,19 +852,22 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
-                  if (primarySkill.isNotEmpty) ...[
+                  if (problemDescription.isNotEmpty) ...[
                     const SizedBox(height: 8),
                     Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Icon(
-                          Icons.handyman_outlined,
+                          Icons.report_problem_outlined,
                           size: 15,
                           color: colorScheme.onSurface.withValues(alpha: 0.5),
                         ),
                         const SizedBox(width: 6),
                         Expanded(
                           child: Text(
-                            primarySkill,
+                            problemDescription,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontSize: 12.5,
                               fontWeight: FontWeight.w600,
@@ -843,12 +875,30 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                                 alpha: 0.65,
                               ),
                             ),
-                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],
                     ),
                   ],
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.calendar_today_outlined,
+                        size: 14,
+                        color: colorScheme.onSurface.withValues(alpha: 0.45),
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        '${t.tr(en: 'Applied on', ar: 'تاريخ التقديم')}: $appliedDate',
+                        style: TextStyle(
+                          fontSize: 11.5,
+                          color: colorScheme.onSurface.withValues(alpha: 0.5),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: 14),
                   Divider(
                     height: 1,
@@ -915,10 +965,6 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
   Widget _buildJobDetailsView(bool isAr, AppLocalizations t) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final location =
-        RecruitmentSyncStore.instance.currentUserLocation.trim().isEmpty
-        ? (isAr ? 'غير محدد' : 'Not specified')
-        : RecruitmentSyncStore.instance.currentUserLocation;
 
     return Padding(
       padding: const EdgeInsets.all(24),
@@ -927,7 +973,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
         children: [
           _buildDetailSection(
             icon: Icons.title_outlined,
-            title: t.tr(en: "Job Title", ar: "عنوان الوظيفة"),
+            title: t.tr(en: "Work title", ar: "عنوان العمل"),
             content: _titleController.text,
             controller: _titleController,
             isEditable: true,
@@ -935,7 +981,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
           const SizedBox(height: 24),
           _buildDetailSection(
             icon: Icons.description_outlined,
-            title: t.tr(en: "Description", ar: "الوصف"),
+            title: t.tr(en: "Work description", ar: "وصف العمل"),
             content: _descController.text,
             controller: _descController,
             isMultiLine: true,
@@ -944,8 +990,74 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
           _buildDetailSection(
             icon: Icons.calendar_today_outlined,
             title: t.tr(en: "Posted Date", ar: "تاريخ النشر"),
-            content: DateTime.now().toString().split(' ')[0],
+            content: _postedDateLabel,
             isEditable: false,
+          ),
+          const SizedBox(height: 24),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: colorScheme.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  Icons.toggle_on_outlined,
+                  color: colorScheme.primary,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      t.tr(en: 'Work status', ar: 'حالة العمل'),
+                      style: TextStyle(
+                        color: colorScheme.onSurface.withValues(alpha: 0.38),
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    _isEditing
+                        ? DropdownButtonFormField<String>(
+                            value: _workStatus,
+                            decoration: const InputDecoration(isDense: true),
+                            items: [
+                              DropdownMenuItem(
+                                value: 'Active',
+                                child: Text(isAr ? 'نشط' : 'Active'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'Closed',
+                                child: Text(isAr ? 'مغلق' : 'Closed'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'Inactive',
+                                child: Text(isAr ? 'غير نشط' : 'Inactive'),
+                              ),
+                            ],
+                            onChanged: (v) {
+                              if (v != null) setState(() => _workStatus = v);
+                            },
+                          )
+                        : Text(
+                            RecruitmentSyncStore.instance
+                                .translateTradesmanWorkStatus(_workStatus, isAr),
+                            style: TextStyle(
+                              color: colorScheme.onSurface,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                  ],
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 24),
           _buildDetailSection(
@@ -985,26 +1097,55 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                       ),
                     ),
                     const SizedBox(height: 8),
+                    if (_isEditing) ...[
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: _skillInputController,
+                              decoration: InputDecoration(
+                                isDense: true,
+                                hintText: t.tr(
+                                  en: 'Add skill',
+                                  ar: 'أضف مهارة',
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          IconButton(
+                            onPressed: () {
+                              final skill = _skillInputController.text.trim();
+                              if (skill.isEmpty) return;
+                              setState(() {
+                                if (!_editableSkills.contains(skill)) {
+                                  _editableSkills.add(skill);
+                                }
+                                _skillInputController.clear();
+                              });
+                            },
+                            icon: const Icon(Icons.add_circle_outline),
+                            color: colorScheme.primary,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                    ],
                     Wrap(
                       spacing: 8,
                       runSpacing: 8,
-                      children: _requiredSkills.map((skill) {
-                        return Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: colorScheme.primary.withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(999),
-                          ),
-                          child: Text(
-                            skill,
-                            style: TextStyle(
-                              color: colorScheme.primary,
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
-                            ),
+                      children: _editableSkills.map((skill) {
+                        return InputChip(
+                          label: Text(skill),
+                          onDeleted: _isEditing
+                              ? () => setState(() => _editableSkills.remove(skill))
+                              : null,
+                          backgroundColor:
+                              colorScheme.primary.withValues(alpha: 0.12),
+                          labelStyle: TextStyle(
+                            color: colorScheme.primary,
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
                           ),
                         );
                       }).toList(),
@@ -1044,15 +1185,30 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    Text(
-                      location,
-                      style: TextStyle(
-                        color: colorScheme.onSurface,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        height: 1.4,
-                      ),
-                    ),
+                    _isEditing
+                        ? TextField(
+                            controller: _locationController,
+                            style: TextStyle(
+                              color: colorScheme.onSurface,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            decoration: const InputDecoration(
+                              isDense: true,
+                              contentPadding: EdgeInsets.symmetric(vertical: 8),
+                            ),
+                          )
+                        : Text(
+                            _locationController.text.trim().isEmpty
+                                ? (isAr ? 'غير محدد' : 'Not specified')
+                                : _locationController.text.trim(),
+                            style: TextStyle(
+                              color: colorScheme.onSurface,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              height: 1.4,
+                            ),
+                          ),
                   ],
                 ),
               ),
@@ -1135,52 +1291,101 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                t.tr(en: "Work Photos", ar: "صور العمل"),
-                style: TextStyle(
-                  color: colorScheme.onSurface.withValues(alpha: 0.38),
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 12,
-                runSpacing: 12,
-                children: _sampleWorkPhotos.map((photoLabel) {
-                  return Container(
-                    width: 96,
-                    height: 96,
-                    decoration: BoxDecoration(
-                      color: colorScheme.surface.withValues(alpha: 0.7),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: colorScheme.dividerColor.withValues(alpha: 0.12),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      t.tr(en: "Work Photos", ar: "صور العمل"),
+                      style: TextStyle(
+                        color: colorScheme.onSurface.withValues(alpha: 0.38),
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.image_outlined,
-                          color: colorScheme.primary,
-                          size: 28,
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          photoLabel,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: colorScheme.onSurface.withValues(alpha: 0.6),
-                            fontSize: 10,
-                            fontWeight: FontWeight.w700,
+                  ),
+                  if (_isEditing)
+                    TextButton.icon(
+                      onPressed: _pickWorkPhotos,
+                      icon: const Icon(Icons.add_photo_alternate_outlined, size: 18),
+                      label: Text(t.tr(en: 'Add photos', ar: 'إضافة صور')),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              if (_workPhotos.isEmpty && !_isEditing)
+                Text(
+                  t.tr(en: 'No photos added', ar: 'لا توجد صور'),
+                  style: TextStyle(
+                    color: colorScheme.onSurface.withValues(alpha: 0.45),
+                    fontSize: 13,
+                  ),
+                )
+              else
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  children: [
+                    ..._workPhotos.asMap().entries.map((entry) {
+                      final index = entry.key;
+                      final photo = entry.value;
+                      return Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(16),
+                            child: Image.file(
+                              photo,
+                              width: 96,
+                              height: 96,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          if (_isEditing)
+                            Positioned(
+                              top: -6,
+                              right: -6,
+                              child: GestureDetector(
+                                onTap: () =>
+                                    setState(() => _workPhotos.removeAt(index)),
+                                child: Container(
+                                  padding: const EdgeInsets.all(4),
+                                  decoration: const BoxDecoration(
+                                    color: Colors.redAccent,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(
+                                    Icons.close,
+                                    color: Colors.white,
+                                    size: 14,
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
+                      );
+                    }),
+                    if (_isEditing)
+                      GestureDetector(
+                        onTap: _pickWorkPhotos,
+                        child: Container(
+                          width: 96,
+                          height: 96,
+                          decoration: BoxDecoration(
+                            color: colorScheme.primary.withValues(alpha: 0.08),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: colorScheme.primary.withValues(alpha: 0.25),
+                            ),
+                          ),
+                          child: Icon(
+                            Icons.add,
+                            color: colorScheme.primary,
+                            size: 32,
                           ),
                         ),
-                      ],
-                    ),
-                  );
-                }).toList(),
-              ),
+                      ),
+                  ],
+                ),
             ],
           ),
         ],
@@ -1339,25 +1544,4 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
     );
   }
 
-  Widget _buildHeaderCell(
-    String label, {
-    int flex = 1,
-    TextAlign align = TextAlign.center,
-  }) {
-    return Expanded(
-      flex: flex,
-      child: Text(
-        label,
-        style: TextStyle(
-          color: Theme.of(
-            context,
-          ).colorScheme.onSurface.withValues(alpha: 0.26),
-          fontSize: 12,
-          fontWeight: FontWeight.w800,
-          letterSpacing: 0.5,
-        ),
-        textAlign: align,
-      ),
-    );
-  }
 }

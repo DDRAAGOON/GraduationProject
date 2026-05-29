@@ -776,72 +776,59 @@ class _HomeTab extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 16),
-                SizedBox(
-                  height: 90,
-                  child: ListView(
-                    scrollDirection: Axis.horizontal,
-                    children: [
-                      InkWell(
-                        onTap: () {
-                          store.updateFilters(category: 'Technical');
-                          onTabChange(1);
-                        },
-                        child: _buildCategoryCard(
-                          context,
-                          isAr ? 'تقني' : 'Technical',
-                          store.jobs
-                              .where(
-                                (j) => j.category.toLowerCase() == 'technical',
-                              )
-                              .length,
-                          Icons.memory,
-                          const Color(0xFFF0EFFF),
-                          const Color(0xFF6366F1),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      InkWell(
-                        onTap: () {
-                          store.updateFilters(category: 'Non-Technical');
-                          onTabChange(1);
-                        },
-                        child: _buildCategoryCard(
-                          context,
-                          isAr ? 'غير تقني' : 'Non-Technical',
-                          store.jobs
-                              .where(
-                                (j) =>
-                                    j.category.toLowerCase() == 'non-technical',
-                              )
-                              .length,
-                          Icons.people_outline,
-                          const Color(0xFFFFF7ED),
-                          const Color(0xFFF97316),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      InkWell(
-                        onTap: () {
-                          store.updateFilters(category: 'Service');
-                          onTabChange(1);
-                        },
-                        child: _buildCategoryCard(
-                          context,
-                          isAr ? 'خدمات' : 'Services',
-                          store.jobs
-                              .where(
-                                (j) =>
-                                    j.category.toLowerCase() == 'service' ||
-                                    j.category.toLowerCase() == 'tradesman',
-                              )
-                              .length,
-                          Icons.build_outlined,
-                          const Color(0xFFFEF2F2),
-                          const Color(0xFFEF4444),
-                        ),
-                      ),
-                    ],
-                  ),
+                _buildCategoryExploreTile(
+                  context,
+                  onTap: () {
+                    store.updateFilters(category: 'Technical');
+                    onTabChange(1);
+                  },
+                  title: isAr ? 'تقني' : 'Technical',
+                  subtitle: isAr
+                      ? 'وظائف تقنية وبرمجة وتطوير'
+                      : 'Tech, software & engineering roles',
+                  count: store.jobs
+                      .where((j) => j.category.toLowerCase() == 'technical')
+                      .length,
+                  icon: Icons.memory_rounded,
+                  accent: const Color(0xFF6366F1),
+                ),
+                const SizedBox(height: 12),
+                _buildCategoryExploreTile(
+                  context,
+                  onTap: () {
+                    store.updateFilters(category: 'Non-Technical');
+                    onTabChange(1);
+                  },
+                  title: isAr ? 'غير تقني' : 'Non-Technical',
+                  subtitle: isAr
+                      ? 'إدارة، مبيعات، وموارد بشرية'
+                      : 'Admin, sales & HR opportunities',
+                  count: store.jobs
+                      .where((j) => j.category.toLowerCase() == 'non-technical')
+                      .length,
+                  icon: Icons.groups_rounded,
+                  accent: const Color(0xFFF97316),
+                ),
+                const SizedBox(height: 12),
+                _buildCategoryExploreTile(
+                  context,
+                  onTap: () {
+                    store.updateFilters(category: 'Service');
+                    onTabChange(1);
+                  },
+                  title: isAr ? 'خدمات' : 'Services',
+                  subtitle: isAr
+                      ? 'طلبات صنايعي وخدمات منزلية'
+                      : 'Tradesman & home service requests',
+                  count: store.jobs
+                      .where(
+                        (j) =>
+                            j.category.toLowerCase() == 'service' ||
+                            j.category.toLowerCase() == 'tradesman',
+                      )
+                      .length,
+                  icon: Icons.handyman_rounded,
+                  accent: const Color(0xFFEF4444),
                 ),
                 const SizedBox(height: 24),
                 Row(
@@ -883,63 +870,91 @@ class _HomeTab extends StatelessWidget {
     );
   }
 
-  Widget _buildCategoryCard(
-    BuildContext context,
-    String title,
-    int count,
-    IconData icon,
-    Color boxColor,
-    Color iconColor,
-  ) {
+  Widget _buildCategoryExploreTile(
+    BuildContext context, {
+    required VoidCallback onTap,
+    required String title,
+    required String subtitle,
+    required int count,
+    required IconData icon,
+    required Color accent,
+  }) {
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
-    return Container(
-      width: 160,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Theme.of(context).dividerColor.withValues(alpha: 0.08),
-        ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: boxColor,
-              borderRadius: BorderRadius.circular(12),
+    final theme = Theme.of(context);
+
+    return Material(
+      color: theme.cardColor,
+      borderRadius: BorderRadius.circular(20),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: Ink(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: accent.withValues(alpha: 0.22)),
+            gradient: LinearGradient(
+              colors: [accent.withValues(alpha: 0.08), theme.cardColor],
+              begin: isAr ? Alignment.centerRight : Alignment.centerLeft,
+              end: isAr ? Alignment.centerLeft : Alignment.centerRight,
             ),
-            child: Icon(icon, color: iconColor, size: 22),
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+            child: Row(
               children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
+                Container(
+                  width: 52,
+                  height: 52,
+                  decoration: BoxDecoration(
+                    color: accent.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(16),
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                  child: Icon(icon, color: accent, size: 28),
                 ),
-                Text(
-                  isAr ? '$count وظيفة متاحة' : '$count jobs available',
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.onSurface.withValues(alpha: 0.5),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 16,
+                          color: theme.colorScheme.onSurface,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        subtitle,
+                        style: TextStyle(
+                          fontSize: 12,
+                          height: 1.3,
+                          color: theme.colorScheme.onSurface.withValues(
+                            alpha: 0.55,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        isAr ? '$count فرصة' : '$count openings',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: accent,
+                        ),
+                      ),
+                    ],
                   ),
+                ),
+                Icon(
+                  isAr ? Icons.chevron_left : Icons.chevron_right,
+                  color: accent,
                 ),
               ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }
@@ -1313,8 +1328,9 @@ class _DiscoverTab extends StatelessWidget {
                                           )
                                           .toList(),
                                       onChanged: (value) {
-                                        if (value != null)
+                                        if (value != null) {
                                           store.updateFilters(location: value);
+                                        }
                                       },
                                     ),
                                   ),
@@ -2015,10 +2031,12 @@ class _CompaniesTabState extends State<_CompaniesTab> {
           _selectedLocation == 'All' ||
           (comp['locations'] as Set<String>).contains(_selectedLocation);
       bool matchesType = true;
-      if (_technicalChecked && !_nonTechnicalChecked)
+      if (_technicalChecked && !_nonTechnicalChecked) {
         matchesType = comp['type'] == 'Technical';
-      if (!_technicalChecked && _nonTechnicalChecked)
+      }
+      if (!_technicalChecked && _nonTechnicalChecked) {
         matchesType = comp['type'] == 'Non-Technical';
+      }
       return matchesSearch && matchesLocation && matchesType;
     }).toList();
     return ListView(
@@ -2179,10 +2197,11 @@ class _CompaniesTabState extends State<_CompaniesTab> {
                                         })
                                         .toList(),
                                     onChanged: (value) {
-                                      if (value != null)
+                                      if (value != null) {
                                         setState(
                                           () => _selectedLocation = value,
                                         );
+                                      }
                                     },
                                   ),
                                 ),

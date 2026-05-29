@@ -15,6 +15,7 @@ import 'package:graduationproject/shared/services/recruitment_sync_service.dart'
 import '../setting/settings.dart';
 import '../home/tradesman_home_screen.dart';
 import '../post/post_job.dart';
+import '../profile/tradesman_ratings_hub_screen.dart';
 
 class Navbotton extends StatefulWidget {
   const Navbotton({super.key});
@@ -193,6 +194,19 @@ class _NavbottonState extends State<Navbotton> {
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
             ),
             accountEmail: Text(store.currentUserEmail),
+          ),
+          ListTile(
+            leading: const Icon(Icons.star_outline, color: Color(0xFFFFB300)),
+            title: Text(isAr ? 'التقييمات' : 'Ratings'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const TradesmanRatingsHubScreen(),
+                ),
+              );
+            },
           ),
           ListTile(
             leading: const Icon(Icons.swap_horiz, color: Color(0xFFFF7A2A)),

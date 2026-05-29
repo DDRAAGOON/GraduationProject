@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:graduationproject/screens/user/teardsman/profile/tradesman_edit_profile_screen.dart';
+import 'package:graduationproject/screens/user/teardsman/profile/tradesman_ratings_hub_screen.dart';
 import 'package:graduationproject/shared/utils/image_helper.dart';
 import 'package:graduationproject/shared/l10n/app_localizations.dart';
 import 'package:graduationproject/shared/state/recruitment_sync_store.dart';
@@ -24,7 +26,10 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
         ? t.tr(en: "Tradesman", ar: "صنايعي")
         : t.tr(en: "Job Seeker", ar: "باحث عن عمل");
     
-    return Scaffold(
+    return AnimatedBuilder(
+      animation: store,
+      builder: (context, _) {
+        return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SingleChildScrollView(
         child: Column(
@@ -36,12 +41,39 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
                 Container(
                   height: 220,
                   width: double.infinity,
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Color(0xFF011931), Color(0xFF49769F)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
+                  decoration: BoxDecoration(
+                    gradient: getAppImageProvider(store.backgroundImage) == null
+                        ? const LinearGradient(
+                            colors: [Color(0xFF011931), Color(0xFF49769F)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          )
+                        : null,
+                    image: getAppImageProvider(store.backgroundImage) != null
+                        ? DecorationImage(
+                            image: getAppImageProvider(store.backgroundImage)!,
+                            fit: BoxFit.cover,
+                          )
+                        : null,
+                  ),
+                ),
+                Positioned(
+                  top: 12,
+                  left: isAr ? null : 16,
+                  right: isAr ? 16 : null,
+                  child: IconButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const TradesmanEditProfileScreen(),
+                        ),
+                      );
+                    },
+                    style: IconButton.styleFrom(
+                      backgroundColor: Colors.black.withValues(alpha: 0.35),
                     ),
+                    icon: const Icon(Icons.edit, color: Colors.white),
                   ),
                 ),
                 // Profile Avatar Positioned on the Right
@@ -128,6 +160,138 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
                   ),
                   
                   const SizedBox(height: 16),
+
+                  if (store.currentUserExperience.isNotEmpty)
+                    _buildFullWidthCard(
+                      child: Column(
+                        crossAxisAlignment:
+                            isAr ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                        children: [
+                          _buildSectionHeader(
+                            t.tr(en: 'Experience', ar: 'الخبرات'),
+                            Icons.work_outline,
+                            isAr,
+                          ),
+                          const SizedBox(height: 12),
+                          ...store.currentUserExperience.map(
+                            (exp) => Padding(
+                              padding: const EdgeInsets.only(bottom: 10),
+                              child: Text(
+                                '${exp['title'] ?? ''} • ${exp['company'] ?? ''} • ${exp['duration'] ?? ''}',
+                                textAlign: isAr ? TextAlign.right : TextAlign.left,
+                                style: TextStyle(
+                                  color: colorScheme.onSurface.withValues(alpha: 0.65),
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  if (store.currentUserExperience.isNotEmpty)
+                    const SizedBox(height: 16),
+
+                  if (store.tradesmanServices.isNotEmpty)
+                    _buildFullWidthCard(
+                      child: Column(
+                        crossAxisAlignment:
+                            isAr ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                        children: [
+                          _buildSectionHeader(
+                            t.tr(en: 'Services', ar: 'الخدمات'),
+                            Icons.handyman_outlined,
+                            isAr,
+                          ),
+                          const SizedBox(height: 12),
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: store.tradesmanServices
+                                .map(
+                                  (s) => Chip(
+                                    label: Text(s),
+                                    backgroundColor:
+                                        colorScheme.primary.withValues(alpha: 0.1),
+                                  ),
+                                )
+                                .toList(),
+                          ),
+                        ],
+                      ),
+                    ),
+                  if (store.tradesmanServices.isNotEmpty)
+                    const SizedBox(height: 16),
+
+                  _buildFullWidthCard(
+                    child: Column(
+                      crossAxisAlignment:
+                          isAr ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                      children: [
+                        _buildSectionHeader(
+                          t.tr(en: 'Ratings', ar: 'التقييمات'),
+                          Icons.star_outline,
+                          isAr,
+                        ),
+                        const SizedBox(height: 12),
+                        _buildRatingSummaryRow(
+                          context,
+                          isAr
+                              ? 'تقييمات العملاء'
+                              : 'Client ratings',
+                          store.ratingsFromClients.length,
+                          isAr,
+                          () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const TradesmanRatingsHubScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 10),
+                        _buildRatingSummaryRow(
+                          context,
+                          isAr ? 'تقييماتي للآخرين' : 'My ratings',
+                          store.ratingsGivenByTradesman.length,
+                          isAr,
+                          () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const TradesmanRatingsHubScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  if (store.languages.isNotEmpty)
+                    _buildFullWidthCard(
+                      child: Column(
+                        crossAxisAlignment:
+                            isAr ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                        children: [
+                          _buildSectionHeader(
+                            t.tr(en: 'Languages', ar: 'اللغات'),
+                            Icons.language,
+                            isAr,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            store.languages.join(', '),
+                            textAlign: isAr ? TextAlign.right : TextAlign.left,
+                          ),
+                        ],
+                      ),
+                    ),
+                  if (store.languages.isNotEmpty) const SizedBox(height: 16),
                   
                   // Contact Details Card
                   _buildFullWidthCard(
@@ -269,6 +433,8 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
         ),
       ),
     );
+      },
+    );
   }
 
   Widget _buildFullWidthCard({required Widget child}) {
@@ -295,6 +461,47 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
         if (isAr) const SizedBox(width: 10),
         if (isAr) Icon(icon, color: Theme.of(context).colorScheme.primary, size: 22),
       ],
+    );
+  }
+
+  Widget _buildRatingSummaryRow(
+    BuildContext context,
+    String label,
+    int count,
+    bool isAr,
+    VoidCallback onTap,
+  ) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Row(
+          textDirection: isAr ? TextDirection.rtl : TextDirection.ltr,
+          children: [
+            Icon(
+              Icons.star,
+              color: Theme.of(context).colorScheme.primary,
+              size: 20,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                label,
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
+            ),
+            Text(
+              '$count',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const Icon(Icons.chevron_right),
+          ],
+        ),
+      ),
     );
   }
 

@@ -246,7 +246,7 @@ class _PostJobState extends State<PostJob> {
               // Work Title
               _buildSideTitleSection(
                 isVertical: true,
-                title: "${t.tr(en: "Work title", ar: "عنوان العمل")} *",
+                title: t.tr(en: "Work title", ar: "عنوان العمل"),
                 subtitle: t.tr(
                   en: "Write a short, clear title for the task",
                   ar: "اكتب عنوانًا قصيرًا وواضحًا للمهمة المطلوبة",
@@ -273,7 +273,7 @@ class _PostJobState extends State<PostJob> {
               // Description
               _buildSideTitleSection(
                 isVertical: true,
-                title: "${t.tr(en: "Work description", ar: "وصف العمل")} *",
+                title: t.tr(en: "Work description", ar: "وصف العمل"),
                 subtitle: t.tr(
                   en: "Explain tasks and requirements in detail",
                   ar: "اشرح المهام والمتطلبات بالتفصيل",
@@ -301,8 +301,7 @@ class _PostJobState extends State<PostJob> {
               // Required Skills
               _buildSideTitleSection(
                 isVertical: true,
-                title:
-                    "${t.tr(en: "Required skills", ar: "المهارات المطلوبة")} *",
+                title: t.tr(en: "Required skills", ar: "المهارات المطلوبة"),
                 subtitle: t.tr(
                   en: "Add the skills needed for this work",
                   ar: "أضف المهارات اللازمة لهذا العمل",
@@ -378,13 +377,13 @@ class _PostJobState extends State<PostJob> {
               // Location
               _buildSideTitleSection(
                 isVertical: true,
-                title: "${t.tr(en: "Location", ar: "الموقع")} *",
+                title: t.tr(en: "Location", ar: "الموقع"),
                 subtitle: t.tr(
                   en: "Choose the governorate",
                   ar: "اختر المحافظة",
                 ),
                 child: DropdownButtonFormField<String>(
-                  value: _selectedGovernorate,
+                  initialValue: _selectedGovernorate,
                   decoration: InputDecoration(
                     hintText: t.tr(
                       en: "Select governorate",

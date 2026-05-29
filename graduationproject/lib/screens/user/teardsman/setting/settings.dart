@@ -3,6 +3,8 @@ import 'package:graduationproject/app/router/app_router.dart';
 import 'package:graduationproject/shared/l10n/app_localizations.dart';
 import 'package:graduationproject/screens/user/profile/setting_profile/preferences.dart';
 import 'package:graduationproject/screens/user/profile/edit_profile_screen.dart';
+import 'package:graduationproject/screens/user/teardsman/profile/tradesman_edit_profile_screen.dart';
+import 'package:graduationproject/shared/state/recruitment_sync_store.dart';
 import 'package:graduationproject/screens/user/profile/profile_login_details_screen.dart';
 import 'package:graduationproject/screens/user/profile/setting_profile/notifications.dart';
 
@@ -92,7 +94,18 @@ class _SettingsState extends State<Settings> {
             _buildSettingItem(
               icon: Icons.person_outline,
               title: t.tr(en: "Profile Settings", ar: "إعدادات الملف الشخصي"),
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const EditProfileScreen())),
+              onTap: () {
+                final isTradesman =
+                    RecruitmentSyncStore.instance.userRole == 'Tradesman';
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => isTradesman
+                        ? const TradesmanEditProfileScreen()
+                        : const EditProfileScreen(),
+                  ),
+                );
+              },
             ),
             _buildSettingItem(
               icon: Icons.lock_outline,

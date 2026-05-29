@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import '../../../../shared/l10n/app_localizations.dart';
 import '../../../../shared/state/recruitment_sync_store.dart';
+import '../post/tradesman_rating_prompt.dart';
 import '../../messages/new_chat_screen.dart';
 import 'chat_tradesman.dart';
 
@@ -14,6 +17,7 @@ class MessagesList extends StatefulWidget {
 class _MessagesListState extends State<MessagesList> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = "";
+  Timer? _ratingPollTimer;
 
   @override
   void initState() {
@@ -21,10 +25,21 @@ class _MessagesListState extends State<MessagesList> {
     _searchController.addListener(() {
       setState(() => _searchQuery = _searchController.text.toLowerCase());
     });
+    _ratingPollTimer = Timer.periodic(const Duration(seconds: 2), (_) {
+      if (!mounted) return;
+      final due = RecruitmentSyncStore.instance.consumeDueTradesmanRating();
+      if (due != null) {
+        TradesmanRatingPrompt.showRatingDialog(
+          context,
+          personName: due.personName,
+        );
+      }
+    });
   }
 
   @override
   void dispose() {
+    _ratingPollTimer?.cancel();
     _searchController.dispose();
     super.dispose();
   }
