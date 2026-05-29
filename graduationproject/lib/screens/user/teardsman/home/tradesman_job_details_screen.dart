@@ -1,20 +1,63 @@
 import 'package:flutter/material.dart';
 import 'package:graduationproject/shared/l10n/app_localizations.dart';
-import 'package:graduationproject/shared/utils/image_helper.dart';
 import 'package:graduationproject/shared/state/recruitment_sync_store.dart';
+import 'package:graduationproject/shared/utils/image_helper.dart';
 import 'package:graduationproject/shared/widgets/app_button.dart';
 import 'tradesman_apply_job_screen.dart';
 
-class TradesmanJobDetailsScreen extends StatelessWidget {
+class TradesmanJobDetailsScreen extends StatefulWidget {
   const TradesmanJobDetailsScreen({super.key, required this.job});
 
   final RecruitmentJob job;
 
   @override
+  State<TradesmanJobDetailsScreen> createState() =>
+      _TradesmanJobDetailsScreenState();
+}
+
+class _TradesmanJobDetailsScreenState extends State<TradesmanJobDetailsScreen> {
+  int _selectedRating = 0;
+  final TextEditingController _reviewController = TextEditingController();
+  final List<Map<String, dynamic>> _customerReviews = [
+    {'name': 'محمد', 'rating': 5, 'comment': 'عمل ممتاز وخدمة سريعة جدًا.'},
+    {
+      'name': 'ليلى',
+      'rating': 4,
+      'comment': 'احترافيين في العمل ومراجعة ممتازة.',
+    },
+  ];
+
+  @override
+  void dispose() {
+    _reviewController.dispose();
+    super.dispose();
+  }
+
+  void _submitReview() {
+    final comment = _reviewController.text.trim();
+    if (comment.isEmpty) return;
+
+    setState(() {
+      _customerReviews.insert(0, {
+        'name': 'أنت',
+        'rating': _selectedRating == 0 ? 5 : _selectedRating,
+        'comment': comment,
+      });
+      _reviewController.clear();
+      _selectedRating = 0;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     final store = RecruitmentSyncStore.instance;
-    const orangeColor = Color(0xFFFF7A2A);
+    final job = widget.job;
+    final publishDate = job.publishedAt.toLocal().toString().split(' ').first;
+    final deadlineText = job.deadline != null
+        ? job.deadline!.format(context)
+        : 'غير محدد';
+    final availableCount = (job.capacity - job.acceptedCount).clamp(0, 9999);
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -29,199 +72,338 @@ class TradesmanJobDetailsScreen extends StatelessWidget {
         animation: store,
         builder: (context, _) {
           return ListView(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.all(20),
             children: [
-              // Header Card
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).cardColor,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
-                ),
+              _buildSectionCard(
+                context,
+                title: 'التصنيف',
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      width: 70,
-                      height: 70,
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: Icon(job.logoIcon ?? Icons.work_outline, 
-                          color: Theme.of(context).colorScheme.primary, size: 40),
+                    Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 30,
+                          backgroundColor: Theme.of(
+                            context,
+                          ).colorScheme.primary.withValues(alpha: 0.12),
+                          backgroundImage: job.companyLogoUrl != null
+                              ? getAppImageProvider(job.companyLogoUrl!)
+                              : null,
+                          child: job.companyLogoUrl == null
+                              ? Icon(
+                                  job.logoIcon ?? Icons.business,
+                                  color: Theme.of(context).colorScheme.primary,
+                                  size: 26,
+                                )
+                              : null,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                job.title,
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurface,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                job.companyName,
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.onSurface
+                                      .withValues(alpha: 0.6),
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 16),
-                    Text(
-                      job.title,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      job.companyName,
-                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 14),
-                    ),
-                    const SizedBox(height: 8),
-                    CircleAvatar(
-                      radius: 16,
-                      backgroundImage: job.companyLogoUrl != null ? getAppImageProvider(job.companyLogoUrl) : null,
-                      child: job.companyLogoUrl == null
-                          ? const Icon(Icons.business, size: 16)
-                          : null,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      t.tr(en: 'Hiring ${job.capacity} people', ar: 'مطلوب ${job.capacity} أشخاص'),
-                      style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.w700),
-                    ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 14),
                     Wrap(
-                      alignment: WrapAlignment.center,
                       spacing: 10,
                       runSpacing: 10,
-                      children: job.type.split(RegExp(r'[•,;]')).map((t) {
-                        final type = t.trim();
-                        if (type.isEmpty) return const SizedBox.shrink();
-                        return _buildBadge(type, _getJobTypeColor(type));
-                      }).toList(),
+                      children: [
+                        _buildBadge(job.category, const Color(0xFF2563EB)),
+                        if (job.specialTag != null &&
+                            job.specialTag!.isNotEmpty)
+                          _buildBadge(job.specialTag!, const Color(0xFFFF7A2A)),
+                        ...job.type
+                            .split(RegExp(r'[•,;]'))
+                            .where((value) => value.trim().isNotEmpty)
+                            .map(
+                              (value) => _buildBadge(
+                                value.trim(),
+                                _getJobTypeColor(value.trim()),
+                              ),
+                            ),
+                      ],
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 16),
 
-              // Description Section
-              if (job.description.trim().isNotEmpty) ...[
-                Text(
-                  t.tr(en: 'Description', ar: 'الوصف الوظيفي'),
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
+              _buildSectionCard(
+                context,
+                title: 'تفاصيل الوظيفة',
+                child: Column(
+                  children: [
+                    _buildSimpleCapacityBar(context, job, availableCount),
+                    const SizedBox(height: 12),
+                    _buildInfoRow(
+                      context,
+                      icon: Icons.calendar_today_outlined,
+                      label: 'تاريخ النشر',
+                      value: publishDate,
+                    ),
+                    _buildInfoRow(
+                      context,
+                      icon: Icons.event_available_outlined,
+                      label: 'الانتهاء',
+                      value: deadlineText,
+                    ),
+                    _buildInfoRow(
+                      context,
+                      icon: Icons.work_outline,
+                      label: 'نوع الوظيفة',
+                      value: job.type,
+                    ),
+                    _buildInfoRow(
+                      context,
+                      icon: Icons.location_on_outlined,
+                      label: 'الموقع',
+                      value: job.location,
+                    ),
+                    _buildInfoRow(
+                      context,
+                      icon: Icons.attach_money,
+                      label: 'الراتب',
+                      value: job.salaryRange,
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 12),
-                Text(
-                  job.description,
-                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), fontSize: 15, height: 1.6),
-                ),
-                const SizedBox(height: 24),
-              ],
+              ),
+              const SizedBox(height: 16),
 
-              // Responsibilities Section
-              if (job.responsibilities.isNotEmpty) ...[
-                Text(
-                  t.tr(en: 'Responsibilities', ar: 'المسؤوليات'),
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                ...job.responsibilities.map((item) => Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('• ', style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold)),
-                      Expanded(child: Text(item, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), fontSize: 14))),
-                    ],
-                  ),
-                )),
-                const SizedBox(height: 24),
-              ],
-
-              // Qualifications Section
-              if (job.qualifications.isNotEmpty) ...[
-                Text(
-                  t.tr(en: 'Qualifications', ar: 'المؤهلات'),
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                ...job.qualifications.map((item) => Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('• ', style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold)),
-                      Expanded(child: Text(item, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), fontSize: 14))),
-                    ],
-                  ),
-                )),
-                const SizedBox(height: 24),
-              ],
-
-              // Benefits Section
-              if (job.benefits.isNotEmpty) ...[
-                Text(
-                  t.tr(en: 'Benefits', ar: 'المميزات والفوائد'),
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Wrap(
+              _buildSectionCard(
+                context,
+                title: 'المهارات',
+                child: Wrap(
                   spacing: 10,
                   runSpacing: 10,
-                  children: job.benefits.map((item) => Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: Colors.green.withValues(alpha: 0.05),
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Colors.green.withValues(alpha: 0.1)),
-                    ),
-                    child: Text(
-                      item,
-                      style: const TextStyle(color: Colors.green, fontSize: 13, fontWeight: FontWeight.w600),
-                    ),
-                  )).toList(),
+                  children:
+                      (job.tags.isNotEmpty ? job.tags : job.qualifications).map(
+                        (item) {
+                          final normalized = item.trim();
+                          if (normalized.isEmpty) {
+                            return const SizedBox.shrink();
+                          }
+                          return Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(
+                                0xFFFF7A2A,
+                              ).withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(999),
+                            ),
+                            child: Text(
+                              normalized,
+                              style: TextStyle(
+                                color: const Color(0xFFFF7A2A),
+                                fontWeight: FontWeight.w700,
+                                fontSize: 12,
+                              ),
+                            ),
+                          );
+                        },
+                      ).toList(),
                 ),
-                const SizedBox(height: 24),
-              ],
+              ),
+              const SizedBox(height: 16),
 
-              // Tags Section
-              if (job.tags.isNotEmpty) ...[
-                Text(
-                  t.tr(en: 'Skills', ar: 'المهارات'),
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Wrap(
-                  spacing: 10,
-                  runSpacing: 10,
-                  children: job.tags.where((tag) => tag.trim().toLowerCase() != 'technical').map((tag) => Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: orangeColor.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: orangeColor.withValues(alpha: 0.2)),
+              _buildSectionCard(
+                context,
+                title: 'التقييمات والآراء',
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'اضف تقييمك',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                            ),
+                            Container(
+                              width: 96,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 12,
+                              ),
+                              decoration: BoxDecoration(
+                                color: const Color(
+                                  0xFFFF7A2A,
+                                ).withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: const [
+                                      Icon(
+                                        Icons.star,
+                                        color: Colors.amber,
+                                        size: 18,
+                                      ),
+                                      SizedBox(width: 4),
+                                      Text(
+                                        '2.4',
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: Color(0xFFFF7A2A),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    'تقييم العملاء',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface
+                                          .withValues(alpha: 0.6),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: List.generate(5, (index) {
+                                      final starIndex = index + 1;
+                                      return IconButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            _selectedRating = starIndex;
+                                          });
+                                        },
+                                        icon: Icon(
+                                          starIndex <= _selectedRating
+                                              ? Icons.star
+                                              : Icons.star_border,
+                                          color: Colors.amber,
+                                          size: 28,
+                                        ),
+                                        padding: EdgeInsets.zero,
+                                        constraints: const BoxConstraints(),
+                                      );
+                                    }),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  SizedBox(
+                                    width: double.infinity,
+                                    height: 120,
+                                    child: TextField(
+                                      controller: _reviewController,
+                                      maxLines: 6,
+                                      minLines: 5,
+                                      textAlignVertical: TextAlignVertical.top,
+                                      decoration: InputDecoration(
+                                        hintText: 'اكتب تعليقك هنا...',
+                                        hintStyle: TextStyle(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface
+                                              .withValues(alpha: 0.45),
+                                        ),
+                                        filled: true,
+                                        fillColor: Theme.of(context)
+                                            .colorScheme
+                                            .surface
+                                            .withValues(alpha: 0.7),
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            14,
+                                          ),
+                                          borderSide: BorderSide.none,
+                                        ),
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                              horizontal: 14,
+                                              vertical: 14,
+                                            ),
+                                        suffixIcon: IconButton(
+                                          onPressed: _submitReview,
+                                          icon: const Icon(
+                                            Icons.arrow_forward_rounded,
+                                            color: Color(0xFF4A6ED1),
+                                            size: 20,
+                                          ),
+                                          tooltip: 'إرسال',
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
-                    child: Text(
-                      tag,
-                      style: const TextStyle(color: orangeColor, fontWeight: FontWeight.w600),
+                    const SizedBox(height: 18),
+                    Text(
+                      'التعليقات',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
                     ),
-                  )).toList(),
+                    const SizedBox(height: 10),
+                    ..._customerReviews.map(
+                      (review) => _buildReviewCard(review),
+                    ),
+                  ],
                 ),
-              ],
-              const SizedBox(height: 40),
+              ),
+              const SizedBox(height: 24),
 
-              // Action Buttons
               AppButton(
                 label: t.tr(en: 'Apply Now', ar: 'قدّم الآن'),
                 backgroundColor: const Color(0xFF4A6ED1),
@@ -238,6 +420,177 @@ class TradesmanJobDetailsScreen extends StatelessWidget {
             ],
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildSectionCard(
+    BuildContext context, {
+    required String title,
+    required Widget child,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+          ),
+          const SizedBox(height: 12),
+          child,
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSimpleCapacityBar(
+    BuildContext context,
+    RecruitmentJob job,
+    int availableCount,
+  ) {
+    final acceptedRatio = job.capacity == 0
+        ? 0.0
+        : (job.acceptedCount / job.capacity).clamp(0.0, 1.0);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '${job.acceptedCount} تم قبول من ${job.capacity} متاح',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 15,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+        ),
+        const SizedBox(height: 8),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(999),
+          child: LinearProgressIndicator(
+            value: acceptedRatio,
+            minHeight: 6,
+            backgroundColor: Theme.of(
+              context,
+            ).dividerColor.withValues(alpha: 0.08),
+            valueColor: AlwaysStoppedAnimation<Color>(
+              acceptedRatio >= 1.0 ? Colors.green : const Color(0xFFFF7A2A),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildReviewCard(Map<String, dynamic> review) {
+    final rating = review['rating'] as int;
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.7),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: Theme.of(context).dividerColor.withValues(alpha: 0.12),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                review['name'] as String,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
+              Row(
+                children: List.generate(5, (index) {
+                  return Icon(
+                    index < rating ? Icons.star : Icons.star_border,
+                    size: 14,
+                    color: Colors.amber,
+                  );
+                }),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            review['comment'] as String,
+            style: TextStyle(
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.7),
+              fontSize: 12,
+              height: 1.4,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required String value,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        children: [
+          Container(
+            width: 34,
+            height: 34,
+            decoration: BoxDecoration(
+              color: const Color(0xFFFF7A2A).withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, color: const Color(0xFFFF7A2A), size: 18),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.5),
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -263,21 +616,18 @@ class TradesmanJobDetailsScreen extends StatelessWidget {
 
   Widget _buildBadge(String label, Color color) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: color.withValues(alpha: 0.3),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        color: color.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(999),
       ),
       child: Text(
         label,
-        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+        style: TextStyle(
+          color: color,
+          fontWeight: FontWeight.bold,
+          fontSize: 11,
+        ),
       ),
     );
   }

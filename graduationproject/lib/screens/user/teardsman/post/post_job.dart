@@ -19,9 +19,49 @@ class _PostJobState extends State<PostJob> {
   // Controllers
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _skillController = TextEditingController();
 
-  final List<String> _days = ["Saturday", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+  final List<String> _days = [
+    "Saturday",
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+  ];
   final Set<String> _selectedDays = {};
+  final List<String> _skills = [];
+  final List<String> _governorates = [
+    'القاهرة',
+    'الجيزة',
+    'الإسكندرية',
+    'الدقهلية',
+    'البحر الأحمر',
+    'البحيرة',
+    'الفيوم',
+    'الغربية',
+    'الإسماعيلية',
+    'المنوفية',
+    'المنيا',
+    'القليوبية',
+    'الوادي الجديد',
+    'الشرقية',
+    'السويس',
+    'أسوان',
+    'أسيوط',
+    'بني سويف',
+    'بورسعيد',
+    'دمياط',
+    'جنوب سيناء',
+    'كفر الشيخ',
+    'مطروح',
+    'الأقصر',
+    'قنا',
+    'سوهاج',
+    'شمال سيناء',
+  ];
+  String? _selectedGovernorate;
 
   bool _isWorkTimeExpanded = false;
 
@@ -32,6 +72,7 @@ class _PostJobState extends State<PostJob> {
   void dispose() {
     _titleController.dispose();
     _descriptionController.dispose();
+    _skillController.dispose();
     super.dispose();
   }
 
@@ -46,17 +87,35 @@ class _PostJobState extends State<PostJob> {
 
   Future<void> _validateAndPost(AppLocalizations t) async {
     if (_formKey.currentState!.validate()) {
+      if (_skills.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              t.tr(
+                en: "Please add at least one required skill",
+                ar: "يرجى إضافة مهارة واحدة على الأقل",
+              ),
+            ),
+            backgroundColor: Colors.orange,
+          ),
+        );
+        return;
+      }
+
       final store = RecruitmentSyncStore.instance;
-      
+      final selectedLocation =
+          _selectedGovernorate ?? store.currentUserLocation;
+
       try {
         final String jobId = await RecruitmentSyncService.instance.postJob(
           title: _titleController.text,
-          companyName: store.currentUserName, 
-          location: store.currentUserLocation,
-          salaryRange: "Negotiable", // Default to Negotiable since price is removed
+          companyName: store.currentUserName,
+          location: selectedLocation,
+          salaryRange:
+              "Negotiable", // Default to Negotiable since price is removed
           type: 'one-time',
           category: 'Service',
-          tags: _selectedDays.toList(),
+          tags: _skills,
           description: _descriptionController.text,
           responsibilities: [],
           qualifications: [],
@@ -68,7 +127,9 @@ class _PostJobState extends State<PostJob> {
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(t.tr(en: "Job posted successfully!", ar: "تم نشر الوظيفة بنجاح!")),
+            content: Text(
+              t.tr(en: "Work posted successfully!", ar: "تم نشر العمل بنجاح!"),
+            ),
             backgroundColor: Colors.green,
           ),
         );
@@ -90,7 +151,7 @@ class _PostJobState extends State<PostJob> {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(t.isAr ? 'فشل نشر الوظيفة' : 'Failed to post job'),
+            content: Text(t.isAr ? 'فشل نشر العمل' : 'Failed to post work'),
             backgroundColor: Colors.redAccent,
           ),
         );
@@ -116,7 +177,7 @@ class _PostJobState extends State<PostJob> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          t.tr(en: "Post job", ar: "نشر وظيفة"),
+          t.tr(en: "Publish work", ar: "نشر العمل"),
           style: TextStyle(
             color: colorScheme.onSurface,
             fontWeight: FontWeight.bold,
@@ -134,7 +195,9 @@ class _PostJobState extends State<PostJob> {
                   MaterialPageRoute(
                     builder: (context) => JobApplicantsScreen(
                       jobId: "", // Generic view
-                      jobTitle: _titleController.text.isEmpty ? (t.isAr ? "بدون عنوان" : "Untitled") : _titleController.text,
+                      jobTitle: _titleController.text.isEmpty
+                          ? (t.isAr ? "بدون عنوان" : "Untitled")
+                          : _titleController.text,
                     ),
                   ),
                 );
@@ -142,7 +205,9 @@ class _PostJobState extends State<PostJob> {
               style: TextButton.styleFrom(
                 backgroundColor: colorScheme.primary.withValues(alpha: 0.1),
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
               ),
               child: Text(
                 t.tr(en: "Applicants", ar: "المتقدمين"),
@@ -167,47 +232,225 @@ class _PostJobState extends State<PostJob> {
               const SizedBox(height: 10),
               // Basic Information Header
               _buildSectionHeader(
-                  t.tr(en: "Basic Information", ar: "معلومات أساسية"),
-                  t.tr(en: "This information will be displayed publicly", ar: "سيتم عرض هذه المعلومات بشكل علني")
+                t.tr(en: "Basic Information", ar: "المعلومات الأساسية"),
+                t.tr(
+                  en: "This information will be displayed publicly",
+                  ar: "هذه المعلومات ستظهر للعامة",
+                ),
               ),
-              Divider(color: theme.dividerColor.withValues(alpha: 0.12), height: 40),
+              Divider(
+                color: theme.dividerColor.withValues(alpha: 0.12),
+                height: 40,
+              ),
 
-              // Service Title (Job Title)
+              // Work Title
               _buildSideTitleSection(
                 isVertical: true,
-                title: "${t.tr(en: "Service Title", ar: "عنوان الخدمة")} *",
-                subtitle: t.tr(en: "Describe your profession", ar: "صف مهنتك"),
+                title: "${t.tr(en: "Work title", ar: "عنوان العمل")} *",
+                subtitle: t.tr(
+                  en: "Write a short, clear title for the task",
+                  ar: "اكتب عنوانًا قصيرًا وواضحًا للمهمة المطلوبة",
+                ),
                 child: _buildTextField(
                   controller: _titleController,
-                  hint: "example Professional Plumber",
+                  hint: "مثال: نجار ماهر",
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
-                      return t.tr(en: "Service title is required", ar: "عنوان الخدمة مطلوب");
+                      return t.tr(
+                        en: "Work title is required",
+                        ar: "عنوان العمل مطلوب",
+                      );
                     }
                     return null;
                   },
                 ),
               ),
-              Divider(color: theme.dividerColor.withValues(alpha: 0.12), height: 40),
+              Divider(
+                color: theme.dividerColor.withValues(alpha: 0.12),
+                height: 40,
+              ),
 
               // Description
               _buildSideTitleSection(
                 isVertical: true,
-                title: "${t.tr(en: "Description", ar: "الوصف")} *",
-                subtitle: t.tr(en: "Detail your services", ar: "فصل خدماتك"),
+                title: "${t.tr(en: "Work description", ar: "وصف العمل")} *",
+                subtitle: t.tr(
+                  en: "Explain tasks and requirements in detail",
+                  ar: "اشرح المهام والمتطلبات بالتفصيل",
+                ),
                 child: _buildTextField(
                   controller: _descriptionController,
-                  hint: "Enter detailed description",
+                  hint: "اكتب تفاصيل العمل و المتطلبات",
                   maxLines: 4,
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
-                      return t.tr(en: "Description is required", ar: "الوصف مطلوب");
+                      return t.tr(
+                        en: "Work description is required",
+                        ar: "وصف العمل مطلوب",
+                      );
                     }
                     return null;
                   },
                 ),
               ),
-              Divider(color: theme.dividerColor.withValues(alpha: 0.12), height: 40),
+              Divider(
+                color: theme.dividerColor.withValues(alpha: 0.12),
+                height: 40,
+              ),
+
+              // Required Skills
+              _buildSideTitleSection(
+                isVertical: true,
+                title:
+                    "${t.tr(en: "Required skills", ar: "المهارات المطلوبة")} *",
+                subtitle: t.tr(
+                  en: "Add the skills needed for this work",
+                  ar: "أضف المهارات اللازمة لهذا العمل",
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildTextField(
+                            controller: _skillController,
+                            hint: "مثال: نجارة",
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        ElevatedButton.icon(
+                          onPressed: () {
+                            final skill = _skillController.text.trim();
+                            if (skill.isEmpty) return;
+                            setState(() {
+                              if (!_skills.contains(skill)) {
+                                _skills.add(skill);
+                              }
+                              _skillController.clear();
+                            });
+                          },
+                          icon: const Icon(Icons.add, size: 18),
+                          label: Text(t.tr(en: "Add", ar: "إضافة")),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: colorScheme.primary,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 12,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: _skills.map((skill) {
+                        return Chip(
+                          label: Text(skill),
+                          deleteIcon: const Icon(Icons.close, size: 16),
+                          onDeleted: () =>
+                              setState(() => _skills.remove(skill)),
+                          backgroundColor: colorScheme.primary.withValues(
+                            alpha: 0.1,
+                          ),
+                          labelStyle: TextStyle(
+                            color: colorScheme.primary,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ),
+              ),
+              Divider(
+                color: theme.dividerColor.withValues(alpha: 0.12),
+                height: 40,
+              ),
+
+              // Location
+              _buildSideTitleSection(
+                isVertical: true,
+                title: "${t.tr(en: "Location", ar: "الموقع")} *",
+                subtitle: t.tr(
+                  en: "Choose the governorate",
+                  ar: "اختر المحافظة",
+                ),
+                child: DropdownButtonFormField<String>(
+                  value: _selectedGovernorate,
+                  decoration: InputDecoration(
+                    hintText: t.tr(
+                      en: "Select governorate",
+                      ar: "اختر المحافظة",
+                    ),
+                    hintStyle: TextStyle(
+                      color: theme.colorScheme.onSurface.withValues(
+                        alpha: 0.26,
+                      ),
+                      fontSize: 13,
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 12,
+                    ),
+                    filled: true,
+                    fillColor: theme.cardColor,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(4),
+                      borderSide: BorderSide(
+                        color: theme.dividerColor.withValues(alpha: 0.2),
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(4),
+                      borderSide: BorderSide(
+                        color: theme.dividerColor.withValues(alpha: 0.2),
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(4),
+                      borderSide: BorderSide(
+                        color: theme.colorScheme.primary,
+                        width: 1.5,
+                      ),
+                    ),
+                  ),
+                  items: _governorates.map((governorate) {
+                    return DropdownMenuItem<String>(
+                      value: governorate,
+                      child: Text(
+                        governorate,
+                        style: TextStyle(
+                          color: theme.colorScheme.onSurface,
+                          fontSize: 13,
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (value) =>
+                      setState(() => _selectedGovernorate = value),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return t.tr(
+                        en: "Location is required",
+                        ar: "الموقع مطلوب",
+                      );
+                    }
+                    return null;
+                  },
+                ),
+              ),
+              Divider(
+                color: theme.dividerColor.withValues(alpha: 0.12),
+                height: 40,
+              ),
 
               // Work Time
               _buildSideTitleSection(
@@ -217,10 +460,16 @@ class _PostJobState extends State<PostJob> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     GestureDetector(
-                      onTap: () => setState(() => _isWorkTimeExpanded = !_isWorkTimeExpanded),
-                      child: _buildSmallDropdown(_selectedDays.isEmpty
-                          ? t.tr(en: "Select", ar: "اختر")
-                          : (_selectedDays.length == 7 ? t.tr(en: "All days", ar: "كل الأيام") : "${_selectedDays.length} ${t.tr(en: "Days", ar: "أيام")}")),
+                      onTap: () => setState(
+                        () => _isWorkTimeExpanded = !_isWorkTimeExpanded,
+                      ),
+                      child: _buildSmallDropdown(
+                        _selectedDays.isEmpty
+                            ? t.tr(en: "Select", ar: "اختر")
+                            : (_selectedDays.length == 7
+                                  ? t.tr(en: "All days", ar: "كل الأيام")
+                                  : "${_selectedDays.length} ${t.tr(en: "Days", ar: "أيام")}"),
+                      ),
                     ),
                     if (_isWorkTimeExpanded) ...[
                       const SizedBox(height: 10),
@@ -228,13 +477,21 @@ class _PostJobState extends State<PostJob> {
                         width: double.infinity,
                         decoration: BoxDecoration(
                           color: theme.cardColor,
-                          border: Border.all(color: theme.dividerColor.withValues(alpha: 0.2)),
+                          border: Border.all(
+                            color: theme.dividerColor.withValues(alpha: 0.2),
+                          ),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Column(
                           children: [
-                            _buildDayItem(t.tr(en: "All Days", ar: "كل الأيام"), isSpecial: true),
-                            Divider(color: theme.dividerColor.withValues(alpha: 0.12), height: 1),
+                            _buildDayItem(
+                              t.tr(en: "All Days", ar: "كل الأيام"),
+                              isSpecial: true,
+                            ),
+                            Divider(
+                              color: theme.dividerColor.withValues(alpha: 0.12),
+                              height: 1,
+                            ),
                             ..._days.map((day) => _buildDayItem(day)),
                           ],
                         ),
@@ -243,7 +500,10 @@ class _PostJobState extends State<PostJob> {
                   ],
                 ),
               ),
-              Divider(color: theme.dividerColor.withValues(alpha: 0.12), height: 40),
+              Divider(
+                color: theme.dividerColor.withValues(alpha: 0.12),
+                height: 40,
+              ),
 
               // Images
               _buildSideTitleSection(
@@ -260,16 +520,30 @@ class _PostJobState extends State<PostJob> {
                         decoration: BoxDecoration(
                           color: theme.cardColor,
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: colorScheme.primary.withValues(alpha: 0.3), width: 1.5),
+                          border: Border.all(
+                            color: colorScheme.primary.withValues(alpha: 0.3),
+                            width: 1.5,
+                          ),
                         ),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.cloud_upload_outlined, color: colorScheme.primary, size: 30),
+                            Icon(
+                              Icons.cloud_upload_outlined,
+                              color: colorScheme.primary,
+                              size: 30,
+                            ),
                             const SizedBox(height: 8),
                             Text(
-                              t.tr(en: "Upload work images", ar: "ارفع صور لعملك"),
-                              style: TextStyle(color: colorScheme.primary, fontSize: 13, fontWeight: FontWeight.w500),
+                              t.tr(
+                                en: "Upload work images",
+                                ar: "ارفع صور لعملك",
+                              ),
+                              style: TextStyle(
+                                color: colorScheme.primary,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                           ],
                         ),
@@ -291,17 +565,29 @@ class _PostJobState extends State<PostJob> {
                                   height: 80,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(10),
-                                    image: DecorationImage(image: FileImage(_selectedImages[index]), fit: BoxFit.cover),
+                                    image: DecorationImage(
+                                      image: FileImage(_selectedImages[index]),
+                                      fit: BoxFit.cover,
+                                    ),
                                   ),
                                 ),
                                 Positioned(
                                   top: 2,
                                   right: 12,
                                   child: GestureDetector(
-                                    onTap: () => setState(() => _selectedImages.removeAt(index)),
+                                    onTap: () => setState(
+                                      () => _selectedImages.removeAt(index),
+                                    ),
                                     child: Container(
-                                      decoration: const BoxDecoration(color: Colors.redAccent, shape: BoxShape.circle),
-                                      child: const Icon(Icons.close, color: Colors.white, size: 16),
+                                      decoration: const BoxDecoration(
+                                        color: Colors.redAccent,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Icon(
+                                        Icons.close,
+                                        color: Colors.white,
+                                        size: 16,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -325,12 +611,18 @@ class _PostJobState extends State<PostJob> {
                   onPressed: () => _validateAndPost(t),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: colorScheme.primary,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
                     elevation: 2,
                   ),
                   child: Text(
-                      t.tr(en: "Post job", ar: "نشر وظيفة"),
-                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)
+                    t.tr(en: "Publish work", ar: "نشر العمل"),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
                   ),
                 ),
               ),
@@ -347,23 +639,54 @@ class _PostJobState extends State<PostJob> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: TextStyle(color: theme.colorScheme.onSurface, fontSize: 18, fontWeight: FontWeight.bold)),
+        Text(
+          title,
+          style: TextStyle(
+            color: theme.colorScheme.onSurface,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         const SizedBox(height: 4),
-        Text(subtitle, style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 12)),
+        Text(
+          subtitle,
+          style: TextStyle(
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.38),
+            fontSize: 12,
+          ),
+        ),
       ],
     );
   }
 
-  Widget _buildSideTitleSection({required String title, required String subtitle, required Widget child, bool isVertical = false}) {
+  Widget _buildSideTitleSection({
+    required String title,
+    required String subtitle,
+    required Widget child,
+    bool isVertical = false,
+  }) {
     final theme = Theme.of(context);
     if (isVertical) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: TextStyle(color: theme.colorScheme.onSurface, fontSize: 15, fontWeight: FontWeight.bold)),
+          Text(
+            title,
+            style: TextStyle(
+              color: theme.colorScheme.onSurface,
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           if (subtitle.isNotEmpty) ...[
             const SizedBox(height: 4),
-            Text(subtitle, style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 11)),
+            Text(
+              subtitle,
+              style: TextStyle(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.38),
+                fontSize: 11,
+              ),
+            ),
           ],
           const SizedBox(height: 12),
           child,
@@ -378,19 +701,29 @@ class _PostJobState extends State<PostJob> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, style: TextStyle(color: theme.colorScheme.onSurface, fontSize: 15, fontWeight: FontWeight.bold)),
+              Text(
+                title,
+                style: TextStyle(
+                  color: theme.colorScheme.onSurface,
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               if (subtitle.isNotEmpty) ...[
                 const SizedBox(height: 4),
-                Text(subtitle, style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 11)),
+                Text(
+                  subtitle,
+                  style: TextStyle(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.38),
+                    fontSize: 11,
+                  ),
+                ),
               ],
             ],
           ),
         ),
         const SizedBox(width: 20),
-        Expanded(
-          flex: 5,
-          child: child,
-        ),
+        Expanded(flex: 5, child: child),
       ],
     );
   }
@@ -411,17 +744,24 @@ class _PostJobState extends State<PostJob> {
       style: TextStyle(color: theme.colorScheme.onSurface, fontSize: 14),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.26), fontSize: 13),
+        hintStyle: TextStyle(
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.26),
+          fontSize: 13,
+        ),
         contentPadding: const EdgeInsets.all(12),
         filled: true,
         fillColor: theme.cardColor,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(4),
-          borderSide: BorderSide(color: theme.dividerColor.withValues(alpha: 0.2)),
+          borderSide: BorderSide(
+            color: theme.dividerColor.withValues(alpha: 0.2),
+          ),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(4),
-          borderSide: BorderSide(color: theme.dividerColor.withValues(alpha: 0.2)),
+          borderSide: BorderSide(
+            color: theme.dividerColor.withValues(alpha: 0.2),
+          ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(4),
@@ -452,11 +792,22 @@ class _PostJobState extends State<PostJob> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Expanded(child: Text(hint, style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 12), overflow: TextOverflow.ellipsis)),
+          Expanded(
+            child: Text(
+              hint,
+              style: TextStyle(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.54),
+                fontSize: 12,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
           Icon(
-            _isWorkTimeExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+            _isWorkTimeExpanded
+                ? Icons.keyboard_arrow_up
+                : Icons.keyboard_arrow_down,
             color: theme.colorScheme.onSurface.withValues(alpha: 0.38),
-            size: 16
+            size: 16,
           ),
         ],
       ),
@@ -491,21 +842,31 @@ class _PostJobState extends State<PostJob> {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         decoration: BoxDecoration(
-          color: isSelected ? theme.colorScheme.primary.withValues(alpha: 0.1) : Colors.transparent,
-          border: Border(bottom: BorderSide(color: theme.dividerColor.withValues(alpha: 0.05))),
+          color: isSelected
+              ? theme.colorScheme.primary.withValues(alpha: 0.1)
+              : Colors.transparent,
+          border: Border(
+            bottom: BorderSide(
+              color: theme.dividerColor.withValues(alpha: 0.05),
+            ),
+          ),
         ),
         child: Row(
           children: [
             Icon(
               isSelected ? Icons.check_box : Icons.check_box_outline_blank,
-              color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurface.withValues(alpha: 0.26),
+              color: isSelected
+                  ? theme.colorScheme.primary
+                  : theme.colorScheme.onSurface.withValues(alpha: 0.26),
               size: 20,
             ),
             const SizedBox(width: 12),
             Text(
               day,
               style: TextStyle(
-                color: isSelected ? theme.colorScheme.onSurface : theme.colorScheme.onSurface.withValues(alpha: 0.54),
+                color: isSelected
+                    ? theme.colorScheme.onSurface
+                    : theme.colorScheme.onSurface.withValues(alpha: 0.54),
                 fontSize: 13,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               ),

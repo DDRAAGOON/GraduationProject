@@ -431,6 +431,11 @@ class RecruitmentSyncStore extends ChangeNotifier {
     }
   }
 
+  void removeApplication(String applicationId) {
+    _applications.removeWhere((app) => app.id == applicationId);
+    notifyListeners();
+  }
+
   void removeJob(String jobId) {
     _jobs.removeWhere((j) => j.id == jobId);
     _savedJobIds.remove(jobId);

@@ -121,184 +121,250 @@ class _FindJobsState extends State<FindJobs> {
     return AnimatedBuilder(
       animation: store,
       builder: (context, _) {
+        final jobs = store.filteredJobs
+            .where(
+              (j) =>
+                  j.category.toLowerCase() == 'tradesman' ||
+                  j.category.toLowerCase() == 'service',
+            )
+            .toList();
         return Scaffold(
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           body: SafeArea(
-            child: Builder(
-              builder: (context) {
-                final jobs = store.filteredJobs
-                    .where(
-                      (j) =>
-                          j.category.toLowerCase() == 'tradesman' ||
-                          j.category.toLowerCase() == 'service',
-                    )
-                    .toList();
-                return SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24.0,
-                    vertical: 10,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Blue banner with search and text
+                  Stack(
                     children: [
-                      const SizedBox(height: 10),
                       Container(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 4,
-                          horizontal: 16,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).cardColor,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: Theme.of(
-                              context,
-                            ).dividerColor.withOpacity(0.1),
+                        width: double.infinity,
+                        height: 220,
+                        decoration: const BoxDecoration(
+                          image: DecorationImage(
+                            image: AssetImage(
+                              'assets/tradesman/Screenshot 2026-05-27 032314.png',
+                            ),
+                            fit: BoxFit.cover,
                           ),
-                          boxShadow: isDark
-                              ? []
-                              : [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.05),
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.search,
-                              color: Theme.of(context).colorScheme.primary,
-                              size: 20,
-                            ),
-                            Expanded(
-                              child: TextField(
-                                controller: _searchController,
-                                onChanged: (val) =>
-                                    store.updateFilters(searchQuery: val),
-                                style: TextStyle(
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.onSurface,
-                                  fontSize: 13,
-                                ),
-                                decoration: InputDecoration(
-                                  hintText: t.tr(
-                                    en: "Search jobs",
-                                    ar: "البحث عن وظائف",
-                                  ),
-                                  hintStyle: TextStyle(
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.onSurface.withOpacity(0.38),
-                                  ),
-                                  border: InputBorder.none,
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Container(
-                              height: 24,
-                              width: 1,
-                              color: Theme.of(
-                                context,
-                              ).dividerColor.withOpacity(0.2),
-                            ),
-                            const SizedBox(width: 12),
-                            GestureDetector(
-                              onTap: () => _showLocationPicker(t),
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.location_on_outlined,
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.primary,
-                                    size: 18,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    _selectedLocation == "All"
-                                        ? (t.isAr ? "الكل" : "All")
-                                        : t.translateLocation(
-                                            _selectedLocation,
-                                          ),
-                                    style: TextStyle(
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.onSurface,
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  Icon(
-                                    Icons.keyboard_arrow_down,
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.onSurface.withOpacity(0.38),
-                                    size: 18,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
                         ),
                       ),
-                      const SizedBox(height: 35),
-                      RichText(
-                        text: TextSpan(
+                      Positioned.fill(
+                        child: Container(
+                          alignment: Alignment.topCenter,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 30,
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'ابحث عن اعمال',
+                                style: TextStyle(
+                                  fontSize: 26,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              Text(
+                                'اكتشف فرص العمل المتاحة في مجالك وقدّم خدماتك.',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  color: Colors.white.withOpacity(0.85),
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                              const SizedBox(height: 24),
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(16),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.07),
+                                      blurRadius: 12,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
+                                ),
+                                child: Row(
+                                  children: [
+                                    const SizedBox(width: 10),
+                                    Icon(
+                                      Icons.search,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.primary,
+                                      size: 22,
+                                    ),
+                                    Expanded(
+                                      child: TextField(
+                                        controller: _searchController,
+                                        onChanged: (val) => store.updateFilters(
+                                          searchQuery: val,
+                                        ),
+                                        style: TextStyle(
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.onSurface,
+                                          fontSize: 14,
+                                        ),
+                                        decoration: InputDecoration(
+                                          hintText: 'ابحث عن وظيفة أو مجال...',
+                                          hintStyle: TextStyle(
+                                            color: Colors.grey.shade500,
+                                            fontSize: 13,
+                                          ),
+                                          border: InputBorder.none,
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                                horizontal: 10,
+                                              ),
+                                        ),
+                                      ),
+                                    ),
+                                    Container(
+                                      height: 28,
+                                      width: 1,
+                                      color: Colors.grey.withOpacity(0.18),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    GestureDetector(
+                                      onTap: () => _showLocationPicker(t),
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            Icons.location_on_outlined,
+                                            color: Theme.of(
+                                              context,
+                                            ).colorScheme.primary,
+                                            size: 18,
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            _selectedLocation == "All"
+                                                ? (t.isAr ? "الكل" : "All")
+                                                : t.translateLocation(
+                                                    _selectedLocation,
+                                                  ),
+                                            style: TextStyle(
+                                              color: Theme.of(
+                                                context,
+                                              ).colorScheme.primary,
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                          Icon(
+                                            Icons.keyboard_arrow_down,
+                                            color: Colors.grey.shade500,
+                                            size: 18,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 30),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'عرض وظيفة صنايعي',
                           style: TextStyle(
-                            fontSize: 20,
+                            fontSize: 18,
                             fontWeight: FontWeight.bold,
                             color: Theme.of(context).colorScheme.onSurface,
                           ),
-                          children: [
-                            TextSpan(
-                              text: t.tr(en: "All ", ar: "جميع "),
-                            ),
-                            TextSpan(
-                              text: t.job,
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
-                            ),
-                          ],
                         ),
-                      ),
-                      const SizedBox(height: 25),
-                      jobs.isEmpty
-                          ? Center(
-                              child: Padding(
-                                padding: const EdgeInsets.only(top: 50.0),
-                                child: Text(
-                                  t.tr(
-                                    en: 'No jobs found',
-                                    ar: 'لا توجد وظائف',
-                                  ),
-                                  style: TextStyle(
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.onSurface.withOpacity(0.54),
+                        const SizedBox(height: 12),
+                        _buildJobCard(
+                          RecruitmentJob(
+                            id: 'sample-tradesman-job',
+                            title: 'سباك محترف',
+                            companyName: 'شركة الصيانة الذكية',
+                            location: 'القاهرة',
+                            salaryRange: '3000-5000 ج.م',
+                            type: 'دوام كامل',
+                            status: 'Open',
+                            category: 'tradesman',
+                            publishedAt: DateTime.now(),
+                            description:
+                                'نبحث عن سباك ذو مهارة عالية للعمل على مشاريع الصيانة المنزلية والتجارية.',
+                            responsibilities: const [
+                              'تنفيذ أعمال السباكة المختلفة',
+                              'التعامل مع العملاء بحرفية',
+                            ],
+                            qualifications: const [
+                              'خبرة 3 سنوات على الأقل',
+                              'معرفة بأحدث أدوات السباكة',
+                            ],
+                            benefits: const ['راتب تنافسي', 'فرص تدريب وتطوير'],
+                            acceptedCount: 12,
+                            capacity: 20,
+                            logoIcon: Icons.plumbing,
+                            specialTag: 'مميز',
+                          ),
+                          t,
+                        ),
+                        const SizedBox(height: 20),
+                        jobs.isEmpty
+                            ? Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(top: 50.0),
+                                  child: Text(
+                                    t.tr(
+                                      en: 'No jobs found',
+                                      ar: 'لا توجد وظائف',
+                                    ),
+                                    style: TextStyle(
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurface.withOpacity(0.54),
+                                    ),
                                   ),
                                 ),
+                              )
+                            : ListView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemCount: jobs.length,
+                                itemBuilder: (context, index) {
+                                  return _buildJobCard(jobs[index], t);
+                                },
                               ),
-                            )
-                          : ListView.builder(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemCount: jobs.length,
-                              itemBuilder: (context, index) {
-                                return _buildJobCard(jobs[index], t);
-                              },
+                        const SizedBox(height: 16),
+                        Center(
+                          child: Text(
+                            'اتمام',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurface.withOpacity(0.5),
+                              fontWeight: FontWeight.w500,
                             ),
-                      const SizedBox(height: 20),
-                    ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                );
-              },
+                  const SizedBox(height: 20),
+                ],
+              ),
             ),
           ),
         );
@@ -328,184 +394,177 @@ class _FindJobsState extends State<FindJobs> {
   Widget _buildJobCard(RecruitmentJob job, AppLocalizations t) {
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
 
-    return Card(
-      color: Theme.of(context).cardColor,
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(
-          color: Theme.of(context).dividerColor.withOpacity(0.1),
+    return InkWell(
+      onTap: () {
+        if (!mounted) return;
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => TradesmanJobDetailsScreen(job: job),
+          ),
+        );
+      },
+      borderRadius: BorderRadius.circular(16),
+      child: Card(
+        color: Theme.of(context).cardColor,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(
+            color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
+          ),
         ),
-      ),
-      margin: const EdgeInsets.only(bottom: 12),
-      child: Padding(
-        padding: const EdgeInsets.all(14),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Row(
-              children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
+        margin: const EdgeInsets.only(bottom: 12),
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                      job.logoIcon ?? Icons.work_outline,
+                      color: Theme.of(context).colorScheme.primary,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      t.translateJobTitle(job.title),
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Icon(
+                    Icons.business,
+                    size: 16,
                     color: Theme.of(
                       context,
-                    ).colorScheme.primary.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
+                    ).colorScheme.onSurface.withValues(alpha: 0.54),
                   ),
-                  child: Icon(
-                    job.logoIcon ?? Icons.work_outline,
-                    color: Theme.of(context).colorScheme.primary,
-                    size: 20,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    t.translateJobTitle(job.title),
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: Theme.of(context).colorScheme.onSurface,
+                  const SizedBox(width: 4),
+                  Text(
+                    t.translateCompanyName(job.companyName),
+                    style: TextStyle(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.6),
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Icon(
-                  Icons.business,
-                  size: 16,
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.onSurface.withOpacity(0.54),
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  t.translateCompanyName(job.companyName),
-                  style: TextStyle(
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.onSurface.withOpacity(0.6),
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: job.type.split(RegExp(r'[•,;]')).map((tStr) {
-                final type = tStr.trim();
-                if (type.isEmpty) return const SizedBox.shrink();
-                final color = _getJobTypeColor(type);
-                return Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: color,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    t.translateJobType(type),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
+                ],
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: job.type.split(RegExp(r'[•,;]')).map((tStr) {
+                  final type = tStr.trim();
+                  if (type.isEmpty) return const SizedBox.shrink();
+                  final color = _getJobTypeColor(type);
+                  return Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
                     ),
-                  ),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 16),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      t.tr(
-                        en: '${job.acceptedCount} of ${job.capacity} hired',
-                        ar: 'تم قبول ${job.acceptedCount} من أصل ${job.capacity}',
-                      ),
-                      style: TextStyle(
-                        fontSize: 12,
+                    decoration: BoxDecoration(
+                      color: color,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      t.translateJobType(type),
+                      style: const TextStyle(
+                        color: Colors.white,
                         fontWeight: FontWeight.bold,
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.onSurface.withOpacity(0.6),
-                      ),
-                    ),
-                    Text(
-                      '${((job.acceptedCount / job.capacity) * 100).toInt()}%',
-                      style: TextStyle(
                         fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: job.acceptedCount >= job.capacity
-                            ? Colors.green
-                            : Colors.blue,
                       ),
                     ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: LinearProgressIndicator(
-                    value: (job.acceptedCount / job.capacity).clamp(0.0, 1.0),
-                    backgroundColor: Theme.of(
-                      context,
-                    ).dividerColor.withOpacity(0.05),
-                    color: job.acceptedCount >= job.capacity
-                        ? Colors.green
-                        : const Color(0xFF00D2B4),
-                    minHeight: 6,
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 16),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        t.tr(
+                          en: '${job.acceptedCount} of ${job.capacity} hired',
+                          ar: 'تم قبول ${job.acceptedCount} من أصل ${job.capacity}',
+                        ),
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withValues(alpha: 0.6),
+                        ),
+                      ),
+                      Text(
+                        '${((job.acceptedCount / job.capacity) * 100).toInt()}%',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: job.acceptedCount >= job.capacity
+                              ? Colors.green
+                              : Colors.blue,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Column(
-              children: [
-                AppButton(
-                  label: isAr ? 'عرض التفاصيل' : 'View Details',
-                  backgroundColor: const Color(0xFFFF7A2A),
+                  const SizedBox(height: 8),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: LinearProgressIndicator(
+                      value: (job.acceptedCount / job.capacity).clamp(0.0, 1.0),
+                      backgroundColor: Theme.of(
+                        context,
+                      ).dividerColor.withValues(alpha: 0.05),
+                      color: job.acceptedCount >= job.capacity
+                          ? Colors.green
+                          : const Color(0xFF00D2B4),
+                      minHeight: 6,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: AppButton(
+                  label: isAr ? 'قدّم الآن' : 'Apply Now',
+                  backgroundColor: const Color(0xFF4A6ED1),
                   onPressed: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) =>
-                            TradesmanJobDetailsScreen(job: job),
+                        builder: (context) => TradesmanApplyJobScreen(job: job),
                       ),
                     );
                   },
                 ),
-                const SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  child: AppButton(
-                    label: isAr ? 'قدّم الآن' : 'Apply Now',
-                    backgroundColor: const Color(0xFF4A6ED1),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              TradesmanApplyJobScreen(job: job),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
     );

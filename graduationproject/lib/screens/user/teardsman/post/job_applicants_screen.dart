@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:graduationproject/screens/company/candidates/applicant_details_profile_screen.dart';
 import 'package:graduationproject/shared/l10n/app_localizations.dart';
+import 'package:graduationproject/shared/models/applicant.dart';
 import 'package:graduationproject/shared/state/recruitment_sync_store.dart';
 import 'package:graduationproject/shared/services/recruitment_sync_service.dart';
 import '../Tradesman_Messages/chat_tradesman.dart';
@@ -11,12 +13,12 @@ class JobApplicantsScreen extends StatefulWidget {
   final String? initialBudget;
   final List<String>? initialDays;
   const JobApplicantsScreen({
-    super.key, 
-    this.jobId, 
-    required this.jobTitle, 
-    this.initialDesc, 
-    this.initialBudget, 
-    this.initialDays
+    super.key,
+    this.jobId,
+    required this.jobTitle,
+    this.initialDesc,
+    this.initialBudget,
+    this.initialDays,
   });
 
   @override
@@ -30,15 +32,37 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
 
   late TextEditingController _titleController;
   late TextEditingController _descController;
+  late TextEditingController _deadlineController;
   late List<String> _selectedDays;
-  
-  final List<String> _allDays = ["Saturday", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+
+  final List<String> _allDays = [
+    "Saturday",
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+  ];
+
+  final List<String> _requiredSkills = [
+    'النجارة',
+    'اللحام',
+    'الصيانة',
+    'التركيب',
+  ];
+
+  final List<String> _sampleWorkPhotos = [
+    'صورة العمل 1',
+    'صورة العمل 2',
+    'صورة العمل 3',
+  ];
 
   @override
   void initState() {
     super.initState();
     final store = RecruitmentSyncStore.instance;
-    
+
     RecruitmentJob? existingJob;
     if (widget.jobId != null && widget.jobId!.isNotEmpty) {
       try {
@@ -48,8 +72,16 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
       }
     }
 
-    _titleController = TextEditingController(text: existingJob?.title ?? widget.jobTitle);
+    _titleController = TextEditingController(
+      text: existingJob?.title ?? widget.jobTitle,
+    );
     _descController = TextEditingController(text: widget.initialDesc ?? "");
+    _deadlineController = TextEditingController(
+      text: DateTime.now()
+          .add(const Duration(days: 7))
+          .toString()
+          .split(' ')[0],
+    );
     _selectedDays = List.from(existingJob?.tags ?? widget.initialDays ?? []);
   }
 
@@ -58,10 +90,97 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
     _searchController.dispose();
     _titleController.dispose();
     _descController.dispose();
+    _deadlineController.dispose();
     super.dispose();
   }
 
-  Future<void> _updateApplicationStatus(String applicationId, String status) async {
+  List<RecruitmentApplication> _buildPreviewApplicants() {
+    return [
+      RecruitmentApplication(
+        id: 'preview-1',
+        jobId: widget.jobId ?? 'preview-job',
+        jobTitle: widget.jobTitle,
+        companyName: 'شركة صناعية عربية',
+        userName: 'أحمد المصري',
+        status: 'Applied',
+        updatedAt: DateTime.now().subtract(const Duration(hours: 3)),
+        gender: 'ذكر',
+        birthDate: '1994-06-12',
+        languages: ['العربية', 'الإنجليزية'],
+        about: 'محترف في أعمال النجارة والدهانات وصيانة المعدات الصناعية.',
+        experienceYears: 6,
+        education: 'بكالوريوس هندسة ميكانيكية',
+        skills: ['النجارة', 'اللحام', 'الصيانة'],
+        hasCv: true,
+        email: 'ahmed@example.com',
+        phone: '01000000000',
+        location: 'الجيزة',
+      ),
+      RecruitmentApplication(
+        id: 'preview-2',
+        jobId: widget.jobId ?? 'preview-job',
+        jobTitle: widget.jobTitle,
+        companyName: 'شركة صناعية عربية',
+        userName: 'منى حسن',
+        status: 'Pending',
+        updatedAt: DateTime.now().subtract(const Duration(hours: 9)),
+        gender: 'أنثى',
+        birthDate: '1998-02-20',
+        languages: ['العربية'],
+        about: 'مختصة في أعمال التشطيب والتجهيزات المنزلية.',
+        experienceYears: 4,
+        education: 'دبلوم صيانة',
+        skills: ['التشطيب', 'التركيب', 'الأعمال اليدوية'],
+        hasCv: true,
+        email: 'mona@example.com',
+        phone: '01111111111',
+        location: 'القاهرة',
+      ),
+      RecruitmentApplication(
+        id: 'preview-3',
+        jobId: widget.jobId ?? 'preview-job',
+        jobTitle: widget.jobTitle,
+        companyName: 'شركة صناعية عربية',
+        userName: 'يوسف عبد الله',
+        status: 'Accepted',
+        updatedAt: DateTime.now().subtract(const Duration(days: 1)),
+        gender: 'ذكر',
+        birthDate: '1991-11-03',
+        languages: ['العربية', 'الفرنسية'],
+        about: 'خبرة واسعة في أعمال الكهرباء والصيانة التحويلية.',
+        experienceYears: 8,
+        education: 'بكالوريوس كهرباء',
+        skills: ['الكهرباء', 'الصيانة', 'القياس'],
+        hasCv: true,
+        email: 'yousef@example.com',
+        phone: '01222222222',
+        location: 'الإسكندرية',
+      ),
+    ];
+  }
+
+  List<RecruitmentApplication> _filterApplicants(
+    List<RecruitmentApplication> source,
+  ) {
+    final query = _searchController.text.trim().toLowerCase();
+    if (query.isEmpty) return source;
+
+    return source.where((app) {
+      final haystack = [
+        app.userName,
+        ...app.skills,
+        app.location ?? '',
+        app.status,
+      ].join(' ').toLowerCase();
+
+      return haystack.contains(query);
+    }).toList();
+  }
+
+  Future<void> _updateApplicationStatus(
+    String applicationId,
+    String status,
+  ) async {
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
     try {
       await RecruitmentSyncService.instance.updateStatus(
@@ -71,7 +190,11 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(isAr ? "تم تحديث الحالة إلى $status" : "Status updated to $status"),
+            content: Text(
+              isAr
+                  ? "تم تحديث الحالة إلى $status"
+                  : "Status updated to $status",
+            ),
             backgroundColor: status == 'Accepted' ? Colors.green : Colors.red,
           ),
         );
@@ -79,7 +202,11 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(isAr ? "فشل تحديث الحالة" : "Failed to update status")),
+          SnackBar(
+            content: Text(
+              isAr ? "فشل تحديث الحالة" : "Failed to update status",
+            ),
+          ),
         );
       }
     }
@@ -90,10 +217,77 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
       _isEditing = !_isEditing;
     });
     if (!_isEditing) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("تم حفظ التعديلات بنجاح")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("تم حفظ التعديلات بنجاح")));
     }
+  }
+
+  Applicant _toApplicant(RecruitmentApplication app) {
+    return Applicant(
+      id: app.id,
+      fullName: app.userName,
+      role: app.jobTitle,
+      rating: 4.5,
+      stage: app.status,
+      email: app.email ?? 'candidate@jobito.com',
+      phone: app.phone ?? '+20 1000000000',
+      location: app.location ?? 'Unknown',
+      appliedDateLabel: 'Today',
+      gender: app.gender,
+      birthDate: app.birthDate,
+      languages: app.languages,
+      about: app.about,
+      experienceYears: app.experienceYears,
+      education: app.education,
+      skills: app.skills,
+      hasCv: app.hasCv,
+      jobId: app.jobId,
+    );
+  }
+
+  void _openApplicantProfile(RecruitmentApplication app) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) =>
+            CompanyApplicantDetailsProfileScreen(applicant: _toApplicant(app)),
+      ),
+    );
+  }
+
+  void _confirmDeleteApplicant(RecruitmentApplication app) {
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(isAr ? 'حذف المتقدم' : 'Delete applicant'),
+        content: Text(
+          isAr
+              ? 'هل تريد حذف ${app.userName} من المتقدمين؟'
+              : 'Do you want to remove ${app.userName} from applicants?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(isAr ? 'إلغاء' : 'Cancel'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: Colors.redAccent),
+            onPressed: () {
+              Navigator.pop(context);
+              RecruitmentSyncStore.instance.removeApplication(app.id);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(isAr ? 'تم حذف المتقدم' : 'Applicant removed'),
+                ),
+              );
+            },
+            child: Text(isAr ? 'حذف' : 'Delete'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _showDeleteDialog() {
@@ -102,21 +296,31 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(isAr ? "حذف الوظيفة" : "Delete Job"),
-        content: Text(isAr ? "هل أنت متأكد من رغبتك في حذف هذا المنشور نهائياً؟" : "Are you sure you want to permanently delete this post?"),
+        content: Text(
+          isAr
+              ? "هل أنت متأكد من رغبتك في حذف هذا المنشور نهائياً؟"
+              : "Are you sure you want to permanently delete this post?",
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(isAr ? "إلغاء" : "Cancel", style: const TextStyle(color: Colors.grey)),
+            child: Text(
+              isAr ? "إلغاء" : "Cancel",
+              style: const TextStyle(color: Colors.grey),
+            ),
           ),
           TextButton(
             onPressed: () {
-              Navigator.pop(context); 
-              Navigator.pop(context); 
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("تم حذف المنشور")),
-              );
+              Navigator.pop(context);
+              Navigator.pop(context);
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(const SnackBar(content: Text("تم حذف المنشور")));
             },
-            child: Text(isAr ? "حذف" : "Delete", style: const TextStyle(color: Colors.red)),
+            child: Text(
+              isAr ? "حذف" : "Delete",
+              style: const TextStyle(color: Colors.red),
+            ),
           ),
         ],
       ),
@@ -134,8 +338,10 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
     return ListenableBuilder(
       listenable: store,
       builder: (context, child) {
-        final realApplicants = store.applications.where((app) => app.jobId == widget.jobId).toList();
-        
+        final realApplicants = store.applications
+            .where((app) => app.jobId == widget.jobId)
+            .toList();
+
         return Scaffold(
           backgroundColor: theme.scaffoldBackgroundColor,
           appBar: AppBar(
@@ -148,10 +354,16 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                 decoration: BoxDecoration(
                   color: theme.cardColor,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: theme.dividerColor.withValues(alpha: 0.1)),
+                  border: Border.all(
+                    color: Theme.of(context).dividerColor.withAlpha(0.1),
+                  ),
                 ),
                 child: IconButton(
-                  icon: Icon(Icons.arrow_back, color: colorScheme.onSurface, size: 20),
+                  icon: Icon(
+                    Icons.arrow_back,
+                    color: colorScheme.onSurface,
+                    size: 20,
+                  ),
                   onPressed: () => Navigator.pop(context),
                 ),
               ),
@@ -167,7 +379,11 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: IconButton(
-                        icon: const Icon(Icons.delete_outline, color: Colors.red, size: 20),
+                        icon: const Icon(
+                          Icons.delete_outline,
+                          color: Colors.red,
+                          size: 20,
+                        ),
                         onPressed: _showDeleteDialog,
                       ),
                     ),
@@ -176,13 +392,22 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                   padding: const EdgeInsets.all(8.0),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: _isEditing ? Colors.green.withValues(alpha: 0.1) : theme.cardColor,
+                      color: _isEditing
+                          ? Colors.green.withValues(alpha: 0.1)
+                          : theme.cardColor,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: theme.dividerColor.withValues(alpha: 0.1)),
+                      border: Border.all(
+                        color: theme.dividerColor.withValues(alpha: 0.1),
+                      ),
                     ),
                     child: IconButton(
-                      icon: Icon(_isEditing ? Icons.check : Icons.edit_outlined, 
-                          color: _isEditing ? Colors.green : colorScheme.onSurface, size: 20),
+                      icon: Icon(
+                        _isEditing ? Icons.check : Icons.edit_outlined,
+                        color: _isEditing
+                            ? Colors.green
+                            : colorScheme.onSurface,
+                        size: 20,
+                      ),
                       onPressed: _toggleEdit,
                     ),
                   ),
@@ -196,39 +421,58 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 10,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _isEditing && _activeTabIndex == 1
-                      ? TextField(
-                          controller: _titleController,
-                          style: TextStyle(color: colorScheme.primary, fontSize: 24, fontWeight: FontWeight.w900),
-                          decoration: InputDecoration(
-                            border: InputBorder.none, 
-                            hintText: "Job Title",
-                            hintStyle: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.38)),
-                          ),
-                        )
-                      : Text(
-                        _titleController.text.isEmpty ? (isAr ? "بدون عنوان" : "Untitled") : _titleController.text,
-                        style: TextStyle(
-                          color: colorScheme.primary,
-                          fontSize: 28,
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
+                          ? TextField(
+                              controller: _titleController,
+                              style: TextStyle(
+                                color: colorScheme.primary,
+                                fontSize: 24,
+                                fontWeight: FontWeight.w900,
+                              ),
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: "Job Title",
+                                hintStyle: TextStyle(
+                                  color: colorScheme.onSurface.withValues(
+                                    alpha: 0.38,
+                                  ),
+                                ),
+                              ),
+                            )
+                          : Text(
+                              _titleController.text.isEmpty
+                                  ? (isAr ? "بدون عنوان" : "Untitled")
+                                  : _titleController.text,
+                              style: TextStyle(
+                                color: colorScheme.primary,
+                                fontSize: 28,
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
                       const SizedBox(height: 8),
                       Text(
-                        isAr ? 'عام • لمرة واحدة • ${realApplicants.length} متقدمين' : 'General • one-time • ${realApplicants.length} applicants',
-                        style: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 14, fontWeight: FontWeight.w500),
+                        isAr
+                            ? 'عام • لمرة واحدة • ${realApplicants.length} متقدمين'
+                            : 'General • one-time • ${realApplicants.length} applicants',
+                        style: TextStyle(
+                          color: colorScheme.onSurface.withValues(alpha: 0.54),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ],
                   ),
                 ),
-                
+
                 const SizedBox(height: 10),
-                
+
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Row(
@@ -239,57 +483,183 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                     ],
                   ),
                 ),
-                Divider(height: 1, thickness: 1, color: theme.dividerColor.withValues(alpha: 0.1)),
-                
+                Divider(
+                  height: 1,
+                  thickness: 1,
+                  color: theme.dividerColor.withValues(alpha: 0.1),
+                ),
+
                 const SizedBox(height: 30),
 
-                _activeTabIndex == 0 ? _buildApplicantsView(isAr, t, realApplicants) : _buildJobDetailsView(isAr, t),
-                
+                _activeTabIndex == 0
+                    ? _buildApplicantsView(isAr, t, realApplicants)
+                    : _buildJobDetailsView(isAr, t),
+
                 const SizedBox(height: 100),
               ],
             ),
           ),
         );
-      }
+      },
     );
   }
 
-  Widget _buildApplicantsView(bool isAr, AppLocalizations t, List<RecruitmentApplication> applicants) {
+  Widget _buildApplicantsView(
+    bool isAr,
+    AppLocalizations t,
+    List<RecruitmentApplication> applicants,
+  ) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final demoApplicants = _buildPreviewApplicants();
+    final isPreviewMode = applicants.isEmpty;
+    final displayApplicants = isPreviewMode ? demoApplicants : applicants;
+    final filteredApplicants = _filterApplicants(displayApplicants);
+
     return Column(
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Wrap(
-            alignment: WrapAlignment.spaceBetween,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            spacing: 16,
-            runSpacing: 16,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                isAr ? 'إجمالي المتقدمين: ${applicants.length}' : 'Total Applicants: ${applicants.length}',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: colorScheme.onSurface),
-              ),
+              // Applicants summary card (UI only)
               Container(
                 width: double.infinity,
-                constraints: const BoxConstraints(maxWidth: 300),
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  color: theme.cardColor,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: Theme.of(
+                      context,
+                    ).dividerColor.withAlpha((0.12 * 255).toInt()),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.03),
+                      blurRadius: 16,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          '${filteredApplicants.length}',
+                          style: TextStyle(
+                            fontSize: 46,
+                            fontWeight: FontWeight.w900,
+                            color: colorScheme.primary,
+                            height: 1,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: Text(
+                            isAr ? 'متقدم' : 'Applicant',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: colorScheme.onSurface.withValues(
+                                alpha: 0.62,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const Spacer(),
+                        if (isPreviewMode)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(
+                                0xFFFF7A2A,
+                              ).withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(999),
+                            ),
+                            child: Text(
+                              'بيانات تجريبية للمعاينة',
+                              style: TextStyle(
+                                color: const Color(0xFFFF7A2A),
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 14),
+                    Wrap(
+                      spacing: 10,
+                      runSpacing: 10,
+                      children: [
+                        _chipPill(
+                          label: isAr ? 'ملخص' : 'Summary',
+                          color: const Color(0xFF4A80D8),
+                          isAr: isAr,
+                        ),
+                        _chipPill(
+                          label: isAr ? 'جاهز للمراجعة' : 'Ready',
+                          color: Colors.green,
+                          isAr: isAr,
+                        ),
+                        _chipPill(
+                          label: isAr ? 'حالات متعددة' : 'Multiple',
+                          color: Colors.orange,
+                          isAr: isAr,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              // Search bar
+              Container(
+                width: double.infinity,
+                constraints: const BoxConstraints(maxWidth: 520),
                 height: 45,
                 decoration: BoxDecoration(
                   color: theme.cardColor,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: theme.dividerColor.withValues(alpha: 0.1)),
+                  border: Border.all(
+                    color: theme.dividerColor.withValues(alpha: 0.1),
+                  ),
                   boxShadow: [
-                    BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10, offset: const Offset(0, 4))
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.02),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
                   ],
                 ),
                 child: TextField(
                   controller: _searchController,
+                  onChanged: (_) => setState(() {}),
                   style: TextStyle(color: colorScheme.onSurface),
                   decoration: InputDecoration(
-                    hintText: isAr ? 'البحث في المتقدمين...' : 'Search applicants...',
-                    hintStyle: TextStyle(fontSize: 13, color: colorScheme.onSurface.withValues(alpha: 0.38)),
-                    prefixIcon: Icon(Icons.search, size: 18, color: colorScheme.onSurface.withValues(alpha: 0.38)),
+                    hintText: isAr
+                        ? 'البحث في المتقدمين...'
+                        : 'Search applicants...',
+                    hintStyle: TextStyle(
+                      fontSize: 13,
+                      color: colorScheme.onSurface.withValues(alpha: 0.38),
+                    ),
+                    prefixIcon: Icon(
+                      Icons.search,
+                      size: 18,
+                      color: colorScheme.onSurface.withValues(alpha: 0.38),
+                    ),
                     border: InputBorder.none,
                     contentPadding: const EdgeInsets.symmetric(vertical: 12),
                   ),
@@ -298,34 +668,23 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
             ],
           ),
         ),
-        const SizedBox(height: 40),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            decoration: BoxDecoration(
-              border: Border(bottom: BorderSide(color: theme.dividerColor.withValues(alpha: 0.1), width: 1.5)),
-            ),
-            child: Row(
-              children: [
-                _buildHeaderCell(isAr ? 'المتقدم' : 'Applicant', flex: 2, align: isAr ? TextAlign.right : TextAlign.left),
-                _buildHeaderCell(isAr ? 'التواصل' : 'Contact'),
-                _buildHeaderCell(isAr ? 'الحالة' : 'Status'),
-                _buildHeaderCell(isAr ? 'الإجراءات' : 'Actions', align: isAr ? TextAlign.left : TextAlign.right),
-              ],
-            ),
-          ),
-        ),
-        if (applicants.isEmpty)
+        const SizedBox(height: 28),
+        if (filteredApplicants.isEmpty)
           Center(
             child: Padding(
               padding: const EdgeInsets.only(top: 60),
               child: Column(
                 children: [
-                  Icon(Icons.people_outline, size: 40, color: colorScheme.onSurface.withValues(alpha: 0.12)),
+                  Icon(
+                    Icons.people_outline,
+                    size: 40,
+                    color: colorScheme.onSurface.withValues(alpha: 0.12),
+                  ),
                   const SizedBox(height: 16),
                   Text(
-                    isAr ? 'لا يوجد متقدمين حتى الآن' : 'No applicants yet',
+                    isAr
+                        ? 'لا يوجد متقدمين لعرضهم'
+                        : 'No applicants to display',
                     style: TextStyle(
                       color: colorScheme.onSurface.withValues(alpha: 0.38),
                       fontSize: 16,
@@ -340,96 +699,261 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
           ListView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            itemCount: applicants.length,
+            itemCount: filteredApplicants.length,
             itemBuilder: (context, index) {
-              final app = applicants[index];
+              final app = filteredApplicants[index];
+              final statusColor = app.status == 'Accepted'
+                  ? Colors.green
+                  : app.status == 'Rejected'
+                  ? Colors.red
+                  : Colors.blue;
+
               return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                child: Row(
-                  children: [
-                    Expanded(
-                      flex: 2,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 8,
+                ),
+                child: Material(
+                  color: theme.cardColor,
+                  borderRadius: BorderRadius.circular(18),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(18),
+                    onTap: () => _openApplicantProfile(app),
+                    child: Container(
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: theme.cardColor,
+                        borderRadius: BorderRadius.circular(18),
+                        border: Border.all(
+                          color: theme.dividerColor.withValues(alpha: 0.08),
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.03),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
                       child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           CircleAvatar(
-                            radius: 18,
-                            backgroundColor: colorScheme.primary.withValues(alpha: 0.1),
-                            child: Icon(Icons.person, size: 20, color: colorScheme.primary),
+                            radius: 19,
+                            backgroundColor: colorScheme.primary.withValues(
+                              alpha: 0.12,
+                            ),
+                            child: Text(
+                              app.userName.isNotEmpty
+                                  ? app.userName[0].toUpperCase()
+                                  : 'A',
+                              style: TextStyle(
+                                color: colorScheme.primary,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
+                              ),
+                            ),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
-                            child: Text(
-                              app.userName,
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: colorScheme.onSurface),
-                              overflow: TextOverflow.ellipsis,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        app.userName,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 14.5,
+                                          color: colorScheme.onSurface,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 4,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: statusColor.withValues(
+                                          alpha: 0.12,
+                                        ),
+                                        borderRadius: BorderRadius.circular(
+                                          999,
+                                        ),
+                                      ),
+                                      child: Text(
+                                        app.status,
+                                        style: TextStyle(
+                                          color: statusColor,
+                                          fontSize: 9.5,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  app.jobTitle,
+                                  style: TextStyle(
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.w700,
+                                    color: colorScheme.primary,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 3),
+                                Text(
+                                  app.location ?? '',
+                                  style: TextStyle(
+                                    fontSize: 10.5,
+                                    color: colorScheme.onSurface.withValues(
+                                      alpha: 0.56,
+                                    ),
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 8),
+                                Wrap(
+                                  spacing: 6,
+                                  runSpacing: 6,
+                                  children: [
+                                    if (app.skills.isNotEmpty)
+                                      ...app.skills
+                                          .take(2)
+                                          .map(
+                                            (skill) => Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 8,
+                                                    vertical: 4,
+                                                  ),
+                                              decoration: BoxDecoration(
+                                                color: colorScheme.primary
+                                                    .withValues(alpha: 0.08),
+                                                borderRadius:
+                                                    BorderRadius.circular(999),
+                                              ),
+                                              child: Text(
+                                                skill,
+                                                style: TextStyle(
+                                                  color: colorScheme.primary,
+                                                  fontSize: 9,
+                                                  fontWeight: FontWeight.w700,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                  ],
+                                ),
+                              ],
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                      child: IconButton(
-                        icon: Icon(Icons.chat_outlined, color: colorScheme.primary, size: 20),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ChatTradesman(
-                                name: app.userName,
-                                image: "https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg", 
+                          const SizedBox(width: 10),
+                          Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: Icon(
+                                  Icons.phone_outlined,
+                                  color: Colors.blue,
+                                  size: 17,
+                                ),
+                                tooltip: isAr ? 'اتصال' : 'Call',
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(),
+                                onPressed: () {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        "${t.tr(en: 'Phone Number:', ar: 'رقم الهاتف:')} ${app.phone ?? 'N/A'}",
+                                      ),
+                                    ),
+                                  );
+                                },
                               ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 4),
-                        decoration: BoxDecoration(
-                          color: (app.status == 'Accepted' ? Colors.green : (app.status == 'Rejected' ? Colors.red : Colors.blue)).withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          app.status,
-                          style: TextStyle(
-                            color: app.status == 'Accepted' ? Colors.green : (app.status == 'Rejected' ? Colors.red : Colors.blue), 
-                            fontSize: 10, 
-                            fontWeight: FontWeight.bold
+                            ],
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          if (app.status == 'Applied') ...[
-                            IconButton(
-                              icon: const Icon(Icons.check_circle_outline, color: Colors.green, size: 22),
-                              tooltip: isAr ? 'قبول' : 'Accept',
-                              onPressed: () => _updateApplicationStatus(app.id, 'Accepted'),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.cancel_outlined, color: Colors.red, size: 22),
-                              tooltip: isAr ? 'رفض' : 'Reject',
-                              onPressed: () => _updateApplicationStatus(app.id, 'Rejected'),
-                            ),
-                          ] else ...[
-                            IconButton(
-                              icon: const Icon(Icons.phone_outlined, color: Colors.blue, size: 20),
-                              onPressed: () {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text("${t.tr(en: 'Phone Number:', ar: 'رقم الهاتف:')} ${app.phone ?? 'N/A'}")),
-                                );
-                              },
-                            ),
-                          ],
+                          const SizedBox(width: 8),
+                          Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: Icon(
+                                  Icons.chat_bubble_outline,
+                                  color: colorScheme.primary,
+                                  size: 17,
+                                ),
+                                tooltip: isAr ? 'المحادثة' : 'Chat',
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ChatTradesman(
+                                        name: app.userName,
+                                        image:
+                                            "https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg",
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                              const SizedBox(height: 4),
+                              TextButton.icon(
+                                onPressed: () => _openApplicantProfile(app),
+                                icon: Icon(
+                                  Icons.open_in_new,
+                                  size: 12,
+                                  color: colorScheme.primary,
+                                ),
+                                label: Text(
+                                  isAr ? 'التفاصيل' : 'Details',
+                                  style: TextStyle(
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.bold,
+                                    color: colorScheme.primary,
+                                  ),
+                                ),
+                                style: TextButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 7,
+                                    vertical: 3,
+                                  ),
+                                  minimumSize: const Size(0, 0),
+                                  tapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
+                                  backgroundColor: colorScheme.primary
+                                      .withValues(alpha: 0.08),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              IconButton(
+                                icon: Icon(
+                                  Icons.delete_outline,
+                                  color: Colors.redAccent,
+                                  size: 17,
+                                ),
+                                tooltip: isAr ? 'حذف' : 'Delete',
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(),
+                                onPressed: () => _confirmDeleteApplicant(app),
+                              ),
+                            ],
+                          ),
                         ],
                       ),
                     ),
-                  ],
+                  ),
                 ),
               );
             },
@@ -439,11 +963,26 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
   }
 
   Widget _buildJobDetailsView(bool isAr, AppLocalizations t) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final location =
+        RecruitmentSyncStore.instance.currentUserLocation.trim().isEmpty
+        ? (isAr ? 'غير محدد' : 'Not specified')
+        : RecruitmentSyncStore.instance.currentUserLocation;
+
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          _buildDetailSection(
+            icon: Icons.title_outlined,
+            title: t.tr(en: "Job Title", ar: "عنوان الوظيفة"),
+            content: _titleController.text,
+            controller: _titleController,
+            isEditable: true,
+          ),
+          const SizedBox(height: 24),
           _buildDetailSection(
             icon: Icons.description_outlined,
             title: t.tr(en: "Description", ar: "الوصف"),
@@ -459,47 +998,238 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
             isEditable: false,
           ),
           const SizedBox(height: 24),
+          _buildDetailSection(
+            icon: Icons.event_available_outlined,
+            title: t.tr(en: "Deadline", ar: "تاريخ الانتهاء"),
+            content: _deadlineController.text,
+            controller: _deadlineController,
+            isEditable: true,
+          ),
+          const SizedBox(height: 24),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
                 padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
-                child: Icon(Icons.access_time_outlined, color: Theme.of(context).colorScheme.primary, size: 24),
+                decoration: BoxDecoration(
+                  color: colorScheme.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  Icons.workspace_premium_outlined,
+                  color: colorScheme.primary,
+                  size: 24,
+                ),
               ),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(t.tr(en: "Work Days", ar: "أيام العمل"), style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 13, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 4),
-                    _isEditing
-                    ? Wrap(
-                        spacing: 8,
-                        children: _allDays.map((day) {
-                          bool selected = _selectedDays.contains(day);
-                          return FilterChip(
-                            label: Text(day, style: const TextStyle(fontSize: 12)),
-                            selected: selected,
-                            onSelected: (val) {
-                              setState(() {
-                                if (val) {
-                                  _selectedDays.add(day);
-                                } else {
-                                  _selectedDays.remove(day);
-                                }
-                              });
-                            },
-                            selectedColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
-                            checkmarkColor: Theme.of(context).colorScheme.primary,
-                          );
-                        }).toList(),
-                      )
-                    : Text(_selectedDays.isEmpty ? (isAr ? "غير محدد" : "None selected") : _selectedDays.join(", "), 
-                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 15, fontWeight: FontWeight.w600, height: 1.4)),
+                    Text(
+                      t.tr(en: "Required Skills", ar: "المهارات المطلوبة"),
+                      style: TextStyle(
+                        color: colorScheme.onSurface.withValues(alpha: 0.38),
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: _requiredSkills.map((skill) {
+                        return Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: colorScheme.primary.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: Text(
+                            skill,
+                            style: TextStyle(
+                              color: colorScheme.primary,
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
                   ],
                 ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: colorScheme.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  Icons.location_on_outlined,
+                  color: colorScheme.primary,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      t.tr(en: "Location", ar: "الموقع"),
+                      style: TextStyle(
+                        color: colorScheme.onSurface.withValues(alpha: 0.38),
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      location,
+                      style: TextStyle(
+                        color: colorScheme.onSurface,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        height: 1.4,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: colorScheme.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  Icons.access_time_outlined,
+                  color: colorScheme.primary,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      t.tr(en: "Work Time", ar: "وقت العمل"),
+                      style: TextStyle(
+                        color: colorScheme.onSurface.withValues(alpha: 0.38),
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    _isEditing
+                        ? Wrap(
+                            spacing: 8,
+                            children: _allDays.map((day) {
+                              bool selected = _selectedDays.contains(day);
+                              return FilterChip(
+                                label: Text(
+                                  day,
+                                  style: const TextStyle(fontSize: 12),
+                                ),
+                                selected: selected,
+                                onSelected: (val) {
+                                  setState(() {
+                                    if (val) {
+                                      _selectedDays.add(day);
+                                    } else {
+                                      _selectedDays.remove(day);
+                                    }
+                                  });
+                                },
+                                selectedColor: colorScheme.primary.withValues(
+                                  alpha: 0.2,
+                                ),
+                                checkmarkColor: colorScheme.primary,
+                              );
+                            }).toList(),
+                          )
+                        : Text(
+                            _selectedDays.isEmpty
+                                ? (isAr ? "غير محدد" : "None selected")
+                                : _selectedDays.join(", "),
+                            style: TextStyle(
+                              color: colorScheme.onSurface,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              height: 1.4,
+                            ),
+                          ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                t.tr(en: "Work Photos", ar: "صور العمل"),
+                style: TextStyle(
+                  color: colorScheme.onSurface.withValues(alpha: 0.38),
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                children: _sampleWorkPhotos.map((photoLabel) {
+                  return Container(
+                    width: 96,
+                    height: 96,
+                    decoration: BoxDecoration(
+                      color: colorScheme.surface.withValues(alpha: 0.7),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: colorScheme.dividerColor.withValues(alpha: 0.12),
+                      ),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.image_outlined,
+                          color: colorScheme.primary,
+                          size: 28,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          photoLabel,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: colorScheme.onSurface.withValues(alpha: 0.6),
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
               ),
             ],
           ),
@@ -509,9 +1239,9 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
   }
 
   Widget _buildDetailSection({
-    required IconData icon, 
-    required String title, 
-    required String content, 
+    required IconData icon,
+    required String title,
+    required String content,
     TextEditingController? controller,
     bool isEditable = true,
     bool isMultiLine = false,
@@ -523,7 +1253,10 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
       children: [
         Container(
           padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(color: colorScheme.primary.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
+          decoration: BoxDecoration(
+            color: colorScheme.primary.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(12),
+          ),
           child: Icon(icon, color: colorScheme.primary, size: 24),
         ),
         const SizedBox(width: 16),
@@ -531,20 +1264,88 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, style: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 13, fontWeight: FontWeight.bold)),
+              Text(
+                title,
+                style: TextStyle(
+                  color: colorScheme.onSurface.withValues(alpha: 0.38),
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               const SizedBox(height: 4),
               _isEditing && isEditable && controller != null
-              ? TextField(
-                  controller: controller,
-                  maxLines: isMultiLine ? null : 1,
-                  style: TextStyle(color: colorScheme.onSurface, fontSize: 15, fontWeight: FontWeight.w600),
-                  decoration: const InputDecoration(isDense: true, contentPadding: EdgeInsets.symmetric(vertical: 8)),
-                )
-              : Text(content, style: TextStyle(color: colorScheme.onSurface, fontSize: 15, fontWeight: FontWeight.w600, height: 1.4)),
+                  ? TextField(
+                      controller: controller,
+                      maxLines: isMultiLine ? null : 1,
+                      style: TextStyle(
+                        color: colorScheme.onSurface,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      decoration: const InputDecoration(
+                        isDense: true,
+                        contentPadding: EdgeInsets.symmetric(vertical: 8),
+                      ),
+                    )
+                  : Text(
+                      content,
+                      style: TextStyle(
+                        color: colorScheme.onSurface,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        height: 1.4,
+                      ),
+                    ),
             ],
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildApplicantActionButton({
+    required IconData icon,
+    required Color color,
+    required String tooltip,
+    required VoidCallback onPressed,
+  }) {
+    return Container(
+      width: 34,
+      height: 34,
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: IconButton(
+        icon: Icon(icon, color: color, size: 18),
+        tooltip: tooltip,
+        padding: EdgeInsets.zero,
+        constraints: const BoxConstraints(),
+        onPressed: onPressed,
+      ),
+    );
+  }
+
+  Widget _chipPill({
+    required String label,
+    required Color color,
+    required bool isAr,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: color.withValues(alpha: 0.25)),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: color,
+          fontSize: 12,
+          fontWeight: FontWeight.w800,
+        ),
+      ),
     );
   }
 
@@ -564,7 +1365,9 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
           Text(
             label,
             style: TextStyle(
-              color: isActive ? colorScheme.primary : colorScheme.onSurface.withValues(alpha: 0.45),
+              color: isActive
+                  ? colorScheme.primary
+                  : colorScheme.onSurface.withValues(alpha: 0.45),
               fontWeight: isActive ? FontWeight.w800 : FontWeight.w600,
               fontSize: 15,
             ),
@@ -586,13 +1389,19 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
     );
   }
 
-  Widget _buildHeaderCell(String label, {int flex = 1, TextAlign align = TextAlign.center}) {
+  Widget _buildHeaderCell(
+    String label, {
+    int flex = 1,
+    TextAlign align = TextAlign.center,
+  }) {
     return Expanded(
       flex: flex,
       child: Text(
         label,
         style: TextStyle(
-          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.26),
+          color: Theme.of(
+            context,
+          ).colorScheme.onSurface.withValues(alpha: 0.26),
           fontSize: 12,
           fontWeight: FontWeight.w800,
           letterSpacing: 0.5,
