@@ -547,8 +547,19 @@ class RecruitmentSyncStore extends ChangeNotifier {
   }) {
     _jobs.clear();
     for (final item in jobs) {
-      if (item is Map<String, dynamic>) _jobs.add(RecruitmentJob.fromMap(item));
+      if (item is Map<String, dynamic>) {
+        final newJob = RecruitmentJob.fromMap(item);
+        _jobs.add(newJob);
+      }
     }
+    
+    // Always ensure mock jobs are present for the demo
+    _addInitialMockJobs();
+    
+    // Remove duplicates by ID (keeping the first one found, usually the remote one if it exists)
+    final ids = <String>{};
+    _jobs.retainWhere((j) => ids.add(j.id));
+
     _applications.clear();
     for (final item in applications) {
       if (item is Map<String, dynamic>) {
@@ -702,6 +713,22 @@ class RecruitmentSyncStore extends ChangeNotifier {
         status: isAr ? 'نشط' : 'Active',
         applicantsCount: 2,
         postedAt: DateTime.now().subtract(const Duration(days: 12)),
+      ),
+      TradesmanPostedWorkRow(
+        id: 'mock-work-5',
+        title: isAr ? 'عزل حمامات ومطابخ' : 'Kitchen and bathroom insulation',
+        rate: '4.7',
+        status: isAr ? 'نشط' : 'Active',
+        applicantsCount: 4,
+        postedAt: DateTime.now().subtract(const Duration(days: 1)),
+      ),
+      TradesmanPostedWorkRow(
+        id: 'mock-work-6',
+        title: isAr ? 'تركيب نجف وإضاءة حديثة' : 'Chandelier and modern lighting installation',
+        rate: '4.9',
+        status: isAr ? 'مكتمل' : 'Completed',
+        applicantsCount: 12,
+        postedAt: DateTime.now().subtract(const Duration(days: 15)),
       ),
     ];
   }
@@ -950,7 +977,108 @@ class RecruitmentSyncStore extends ChangeNotifier {
         specialTag: 'مشروع تجاري',
       ),
 
+      // ========== وظائف الخدمة (Service/Tradesman for TechnicalScreen) ==========
+      RecruitmentJob(
+        id: 'service_plumber_2',
+        title: 'سباك لإصلاح أعطال طارئة وتسريبات',
+        companyName: 'الشركة المصرية للصيانة',
+        location: 'Cairo',
+        salaryRange: 'Negotiable',
+        type: 'One-time',
+        status: 'Open',
+        category: 'Service',
+        tags: ['Plumbing', 'صيانة'],
+        publishedAt: DateTime.now().subtract(const Duration(hours: 1)),
+        logoIcon: Icons.plumbing,
+        description: 'مطلوب سباك فوراً لإصلاح مجموعة من التسريبات في عقار سكني.',
+        responsibilities: ['إصلاح التسريبات', 'تغيير المحابس'],
+        qualifications: ['خبرة سابقة في أعمال الصيانة السريعة'],
+        capacity: 2,
+      ),
+      RecruitmentJob(
+        id: 'service_electrician_2',
+        title: 'فني كهرباء لتركيب لوحة مفاتيح رئيسية',
+        companyName: 'نور المستقبل للكهرباء',
+        location: 'Giza',
+        salaryRange: 'Negotiable',
+        type: 'One-time',
+        status: 'Open',
+        category: 'Service',
+        tags: ['Electrical', 'تركيبات'],
+        publishedAt: DateTime.now().subtract(const Duration(hours: 4)),
+        logoIcon: Icons.electrical_services,
+        description: 'نبحث عن كهربائي محترف لتركيب وتوصيل لوحة المفاتيح الرئيسية لمحل تجاري.',
+        responsibilities: ['توصيل الكابلات', 'اختبار اللوحة'],
+        qualifications: ['دقة عالية في العمل'],
+        capacity: 1,
+      ),
+      RecruitmentJob(
+        id: 'service_painter_2',
+        title: 'نقاش لدهان شقة مساحة صغيرة (70 متر)',
+        companyName: 'لمسات فنية للديكور',
+        location: 'Alexandria',
+        salaryRange: '3000 - 5000 ج.م',
+        type: 'One-time',
+        status: 'Open',
+        category: 'Service',
+        tags: ['Painting', 'نقاشة'],
+        publishedAt: DateTime.now().subtract(const Duration(days: 1)),
+        logoIcon: Icons.format_paint,
+        description: 'مطلوب نقاش لدهان شقة سكنية صغيرة - وشين نظافة ومعالجة شروخ بسيطة.',
+        responsibilities: ['معالجة الحوائط', 'الدهان'],
+        capacity: 1,
+      ),
+
       // ========== وظائف Technical ==========
+      RecruitmentJob(
+        id: 'tech_flutter_1',
+        title: 'مطور تطبيقات Flutter (Junior/Mid)',
+        companyName: 'إبداع للبرمجيات',
+        location: 'Cairo',
+        salaryRange: '15k - 25k',
+        type: 'Full-time',
+        status: 'Open',
+        category: 'Technical',
+        tags: ['Flutter', 'Dart', 'Mobile'],
+        publishedAt: DateTime.now().subtract(const Duration(hours: 1)),
+        logoIcon: Icons.smartphone,
+        description: 'مطلوب مطور فلاتر للعمل على تطبيقات التجارة الإلكترونية.',
+        responsibilities: ['تطوير واجهات المستخدم', 'ربط الـ APIs'],
+        qualifications: ['خبرة سنة على الأقل', 'معرفة بـ Bloc أو Riverpod'],
+        capacity: 2,
+      ),
+      RecruitmentJob(
+        id: 'tech_ui_ux_1',
+        title: 'مصمم واجهات مستخدم (UI/UX Designer)',
+        companyName: 'وكالة بيكسل الرقمية',
+        location: 'Remote',
+        salaryRange: 'Negotiable',
+        type: 'Remote',
+        status: 'Open',
+        category: 'Technical',
+        tags: ['UI', 'UX', 'Figma'],
+        publishedAt: DateTime.now().subtract(const Duration(hours: 6)),
+        logoIcon: Icons.design_services,
+        description: 'تصميم تجربة مستخدم مميزة لمواقع الويب وتطبيقات الجوال.',
+        responsibilities: ['رسم النماذج الأولية', 'إجراء بحوث المستخدم'],
+        capacity: 1,
+      ),
+      RecruitmentJob(
+        id: 'tech_devops_1',
+        title: 'مهندس DevOps لإدارة السحابة',
+        companyName: 'سحاب مصر للتكنولوجيا',
+        location: 'Giza',
+        salaryRange: '30k - 45k',
+        type: 'Full-time',
+        status: 'Open',
+        category: 'Technical',
+        tags: ['DevOps', 'AWS', 'Docker'],
+        publishedAt: DateTime.now().subtract(const Duration(days: 1)),
+        logoIcon: Icons.cloud_done,
+        description: 'إدارة البنية التحتية السحابية وتحسين عمليات النشر التلقائي.',
+        capacity: 1,
+      ),
+
       RecruitmentJob(
         id: 'nexora_be',
         title: 'مطور Back-End مسؤول عن بناء وإدارة قواعد البيانات',
@@ -998,6 +1126,66 @@ class RecruitmentSyncStore extends ChangeNotifier {
         logoIcon: Icons.account_tree_rounded,
         description: 'الرد على استفسارات العملاء وتقديم الدعم الفني.',
         responsibilities: ['الرد على المكالمات', 'متابعة الشكاوى'],
+      ),
+      RecruitmentJob(
+        id: 'non_tech_hr_1',
+        title: 'أخصائي موارد بشرية (HR Specialist)',
+        companyName: 'مجموعة الفطيم',
+        location: 'Cairo',
+        salaryRange: '10k - 15k',
+        type: 'Full-time',
+        status: 'Open',
+        category: 'Non-Technical',
+        tags: ['HR', 'Recruitment'],
+        publishedAt: DateTime.now().subtract(const Duration(days: 2)),
+        logoIcon: Icons.people,
+        description: 'إدارة عمليات التوظيف وشؤون الموظفين.',
+        capacity: 1,
+      ),
+      RecruitmentJob(
+        id: 'non_tech_sales_1',
+        title: 'مندوب مبيعات عقارية',
+        companyName: 'إعمار العقارية',
+        location: 'New Cairo',
+        salaryRange: 'Negotiable',
+        type: 'Full-time',
+        status: 'Open',
+        category: 'Non-Technical',
+        tags: ['Sales', 'Real Estate'],
+        publishedAt: DateTime.now().subtract(const Duration(hours: 10)),
+        logoIcon: Icons.sell,
+        description: 'بيع الوحدات السكنية والتجارية في المشاريع الجديدة.',
+        capacity: 5,
+      ),
+      RecruitmentJob(
+        id: 'gen_driver_1',
+        title: 'سائق خاص رخصة درجة أولى',
+        companyName: 'شركة النقل السريع',
+        location: 'Cairo',
+        salaryRange: '6000 - 8000 ج.م',
+        type: 'Full-time',
+        status: 'Open',
+        category: 'Service',
+        tags: ['Driving', 'سواقة'],
+        publishedAt: DateTime.now().subtract(const Duration(days: 1)),
+        logoIcon: Icons.drive_eta,
+        description: 'مطلوب سائق خاص ذو خبرة بالقاهرة والجيزة والمناطق الحيوية.',
+        capacity: 2,
+      ),
+      RecruitmentJob(
+        id: 'gen_security_1',
+        title: 'أفراد أمن لمول تجاري',
+        companyName: 'فالكون للأمن',
+        location: 'Giza',
+        salaryRange: '4000 - 5000 ج.م',
+        type: 'Full-time',
+        status: 'Open',
+        category: 'Service',
+        tags: ['Security', 'أمن'],
+        publishedAt: DateTime.now().subtract(const Duration(days: 3)),
+        logoIcon: Icons.security,
+        description: 'مطلوب أفراد أمن للعمل بمول تجاري بمدينة 6 أكتوبر.',
+        capacity: 10,
       ),
     ]);
   }
