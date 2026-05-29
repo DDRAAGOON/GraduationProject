@@ -4,16 +4,7 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="89a40d2e-dee6-4edc-af06-e2e78f633ab0" name="Changes" comment="v2&#10;user&#10;user2&#10;user3&#10;user4&#10;ع">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/home/find_jobs.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/home/find_jobs.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/home/tradesman_home_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/home/tradesman_home_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/home/tradesman_job_details_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/home/tradesman_job_details_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/post/job_applicants_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/post/job_applicants_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/post/post_job.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/post/post_job.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/shared/state/recruitment_sync_store.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/shared/state/recruitment_sync_store.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/shared/utils/image_helper.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/shared/utils/image_helper.dart" afterDir="false" />
-    </list>
+    <list default="true" id="89a40d2e-dee6-4edc-af06-e2e78f633ab0" name="Changes" comment="v2&#10;user&#10;user2&#10;user3&#10;user4&#10;ع" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -317,7 +308,23 @@
       <option name="project" value="LOCAL؜" />
       <updated>1779985841826</updated>
     </task>
-    <option name="localTasksCounter" value="28" />
+    <task id="LOCAL؜-٠٠٠٢٨" summary="v2&#10;user&#10;user2&#10;user3&#10;user4&#10;ع">
+      <option name="closed" value="true" />
+      <created>1780016563647</created>
+      <option name="number" value="٠٠٠٢٨" />
+      <option name="presentableId" value="LOCAL؜-٠٠٠٢٨" />
+      <option name="project" value="LOCAL؜" />
+      <updated>1780016563648</updated>
+    </task>
+    <task id="LOCAL؜-٠٠٠٢٩" summary="v2&#10;user&#10;user2&#10;user3&#10;user4&#10;ع">
+      <option name="closed" value="true" />
+      <created>1780017528872</created>
+      <option name="number" value="٠٠٠٢٩" />
+      <option name="presentableId" value="LOCAL؜-٠٠٠٢٩" />
+      <option name="project" value="LOCAL؜" />
+      <updated>1780017528872</updated>
+    </task>
+    <option name="localTasksCounter" value="30" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
