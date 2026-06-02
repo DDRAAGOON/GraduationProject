@@ -361,7 +361,6 @@ class RecruitmentSyncStore extends ChangeNotifier {
   String _governorate = '';
   String _district = '';
   List<String> _languages = <String>[];
-  List<String> _tradesmanServices = <String>[];
   final List<TradesmanRatingEntry> _ratingsFromClients =
       <TradesmanRatingEntry>[];
   final List<TradesmanRatingEntry> _ratingsGivenByTradesman =
@@ -383,11 +382,16 @@ class RecruitmentSyncStore extends ChangeNotifier {
   String _filterCategory = 'All';
   String _filterSalaryRange = 'All';
 
-  List<String> _currentUserSkills = [];
+  List<String> _currentUserSkills = ['صيانة عامة', 'تركيبات كهربائية', 'حل مشكلات'];
   List<Map<String, String>> _currentUserEducation = [];
   List<Map<String, String>> _currentUserExperience = [];
   List<Map<String, String>> _socialLinks = [];
-  List<String> _portfolioImages = [];
+  List<String> _portfolioImages = [
+    'assets/company/profile/7.png',
+    'assets/company/profile/company_profile_stats.png',
+  ];
+
+  List<String> _tradesmanServices = ['تأسيس كهرباء', 'تركيب نجف', 'صيانة لوحات'];
 
   List<RecruitmentJob> get jobs => List.unmodifiable(_jobs);
   List<RecruitmentApplication> get applications =>

@@ -10,6 +10,7 @@ import 'package:graduationproject/shared/services/session_manager.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'dart:convert';
 
 class SignUpTradesman extends StatefulWidget {
   const SignUpTradesman({super.key});
@@ -193,11 +194,27 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
       }
 
       try {
-        await RecruitmentSyncService.instance.register(
-          email: _emailController.text.trim(),
-          password: "12345678",
+        String? base64Image;
+        if (_profileImagePath != null) {
+          try {
+            final bytes = await File(_profileImagePath!).readAsBytes();
+            base64Image = 'data:image/jpeg;base64,${base64Encode(bytes)}';
+          } catch (_) {}
+        }
+
+        // Use updateProfile instead of register
+        await RecruitmentSyncService.instance.updateProfile(
           name: _fullNameController.text.trim(),
-          role: "tradesman",
+          photoUrl: base64Image,
+          phone: "+20 ${_phoneController.text}",
+          location: _addressController.text,
+          about: _aboutMeController.text,
+          gender: _selectedGender,
+          dob: "$_selectedYear-$_selectedMonth-$_selectedDay",
+          skills: _skillsList,
+          education: _educationList,
+          tradesmanServices: [_serviceController.text.trim()],
+          role: "Tradesman",
         );
 
         await SessionManager.saveUserSession(
@@ -298,48 +315,22 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
                       fontWeight: FontWeight.bold,
                     ),
                     children: [
-                      TextSpan(text: t.isAr ? "يمكنك " : "You Can "),
+                      TextSpan(text: t.isAr ? "أهلاً بك! " : "Welcome! "),
                       TextSpan(
-                        text: t.isAr ? "التسجيل " : "SignUp ",
+                        text: t.isAr ? "أكمل " : "Complete ",
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.primary,
                         ),
                       ),
                       TextSpan(
                         text: t.isAr
-                            ? "كحرفي أو باحث عن عمل"
-                            : "Tradesman or a job seeker",
+                            ? "بياناتك كحرفي"
+                            : "your profile as a Tradesman",
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 5),
-                Container(
-                  width: 80,
-                  height: 3,
-                  color: Colors.orange,
-                  margin: const EdgeInsets.only(left: 230),
-                ),
                 const SizedBox(height: 25),
-
-                // Role Selection
-                Row(
-                  children: [
-                    Expanded(child: _buildRoleOption("Job Seeker")),
-                    const SizedBox(width: 8),
-                    Text(
-                      t.tr(en: "or", ar: "أو"),
-                      style: const TextStyle(
-                        color: Colors.black54,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(child: _buildRoleOption("Tradesman")),
-                  ],
-                ),
-                const SizedBox(height: 35),
 
                 // Profile Image Avatar Preview (Left aligned)
                 GestureDetector(

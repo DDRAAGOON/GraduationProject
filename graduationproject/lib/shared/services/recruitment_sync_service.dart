@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:dio/dio.dart';
 
 import '../../data/api/company_api_client.dart';
 import '../state/company_store.dart';
@@ -10,103 +11,9 @@ class RecruitmentSyncService {
 
   static final RecruitmentSyncService instance = RecruitmentSyncService._();
 
-  final CompanyApiClient _client = CompanyApiClient();
+  final JobitoApiClient _client = JobitoApiClient();
   Timer? _timer;
   bool get isAuthenticated => _client.hasToken;
-
-  Future<Map<String, dynamic>> login({
-    required String email,
-    required String password,
-    required String expectedRole,
-  }) async {
-    final auth = await _client.login(
-      email: email.trim(),
-      password: password,
-      role: expectedRole,
-    );
-
-    final user = auth['user'] as Map<String, dynamic>?;
-    final role = user?['role']?.toString().toLowerCase().trim();
-    final token = auth['token']?.toString().trim();
-    final expected = expectedRole.toLowerCase().trim();
-
-    if (token == null || token.isEmpty) {
-      throw Exception('Login response missing token');
-    }
-    if (role == null || role.isEmpty) {
-      throw Exception('Login response missing role');
-    }
-    if (expected == 'company') {
-      if (role != 'company') {
-        throw Exception('هذا الحساب ليس حساب شركة');
-      }
-    } else {
-      // For user login, block company accounts from signing in
-      if (role == 'company') {
-        throw Exception('هذا الحساب مخصص للشركات');
-      }
-    }
-
-    _client.setToken(token);
-
-    // Update store with user info
-    if (user != null) {
-      final String name = user['name']?.toString() ?? 'User';
-      RecruitmentSyncStore.instance.updateCurrentUser(
-        name: name,
-        email: user['email']?.toString(),
-        photoUrl: user['photoUrl']?.toString(),
-      );
-
-      if (role == 'company') {
-        CompanyStore.instance.setRegistrationData(
-          companyId: user['id']?.toString(),
-          companyName: name,
-          email: user['email']?.toString(),
-        );
-        final fullProfile = await SessionManager.getCompanyFullProfile();
-        await CompanyStore.instance.loadFromSession(fullProfile);
-      }
-    }
-
-    return user ?? {};
-  }
-
-  Future<Map<String, dynamic>> googleLogin(String idToken) async {
-    final auth = await _client.googleLogin(idToken: idToken);
-
-    final user = auth['user'] as Map<String, dynamic>?;
-    final token = auth['token']?.toString().trim();
-
-    if (token == null || token.isEmpty) {
-      throw Exception('Google login response missing token');
-    }
-
-    _client.setToken(token);
-
-    // Update store with user info
-    if (user != null) {
-      final String name = user['name']?.toString() ?? 'User';
-      RecruitmentSyncStore.instance.updateCurrentUser(
-        name: name,
-        email: user['email']?.toString(),
-        photoUrl: user['photoUrl']?.toString(),
-      );
-
-      final role = user['role']?.toString().toLowerCase().trim();
-      if (role == 'company') {
-        CompanyStore.instance.setRegistrationData(
-          companyId: user['id']?.toString(),
-          companyName: name,
-          email: user['email']?.toString(),
-        );
-        final fullProfile = await SessionManager.getCompanyFullProfile();
-        await CompanyStore.instance.loadFromSession(fullProfile);
-      }
-    }
-
-    return user ?? {};
-  }
 
   Future<Map<String, dynamic>> register({
     required String email,
@@ -114,56 +21,192 @@ class RecruitmentSyncService {
     required String name,
     required String role,
   }) async {
-    final auth = await _client.register(
-      email: email.trim(),
-      password: password,
-      name: name.trim(),
-      role: role.toLowerCase().trim(),
-    );
-
-    final user = auth['user'] as Map<String, dynamic>?;
-    final token = auth['token']?.toString().trim();
-
-    if (token == null || token.isEmpty) {
-      throw Exception('Registration response missing token');
-    }
-
-    _client.setToken(token);
-
-    // Update store with user info
-    if (user != null) {
-      final String name = user['name']?.toString() ?? 'User';
-      RecruitmentSyncStore.instance.updateCurrentUser(
-        name: name,
-        email: user['email']?.toString(),
-        photoUrl: user['photoUrl']?.toString(),
+    try {
+      final auth = await _client.register(
+        email: email.trim(),
+        password: password,
+        name: name.trim(),
+        role: role.toLowerCase().trim(),
       );
 
-      if (role.toLowerCase().trim() == 'company') {
-        CompanyStore.instance.setRegistrationData(
-          companyId: user['id']?.toString(),
-          companyName: name,
-          email: user['email']?.toString(),
-        );
-        final fullProfile = await SessionManager.getCompanyFullProfile();
-        await CompanyStore.instance.loadFromSession(fullProfile);
-      }
-    }
+      final user = auth['user'] as Map<String, dynamic>?;
+      final token = auth['token']?.toString().trim();
 
-    return user ?? {};
+      if (token != null && token.isNotEmpty) {
+        _client.setToken(token);
+      }
+
+      // Update store with user info
+      if (user != null) {
+        final String name = user['name']?.toString() ?? 'User';
+        RecruitmentSyncStore.instance.updateCurrentUser(
+          name: name,
+          email: user['email']?.toString(),
+          photoUrl: user['photoUrl']?.toString(),
+        );
+      }
+
+      return auth;
+    } on DioException catch (e) {
+      String? errorMessage;
+      if (e.response?.data is Map) {
+        final data = e.response!.data as Map<String, dynamic>;
+        errorMessage = data['message']?.toString() ?? 
+                       data['error']?.toString() ?? 
+                       data['errors']?.toString();
+      } else if (e.response?.data is String) {
+        errorMessage = e.response!.data as String;
+      }
+      
+      final msg = errorMessage ?? 'فشل إنشاء الحساب. تأكد من البيانات.';
+      throw Exception(msg);
+    } catch (e) {
+      throw Exception('حدث خطأ غير متوقع');
+    }
+  }
+
+  Future<Map<String, dynamic>> login({
+    required String email,
+    required String password,
+    required String expectedRole,
+  }) async {
+    try {
+      final auth = await _client.login(
+        email: email.trim(),
+        password: password,
+        role: expectedRole,
+      );
+
+      final user = auth['user'] as Map<String, dynamic>?;
+      final role = user?['role']?.toString().toLowerCase().trim();
+      final token = auth['token']?.toString().trim();
+      final expected = expectedRole.toLowerCase().trim();
+
+      if (token == null || token.isEmpty) {
+        throw Exception('Login response missing token');
+      }
+      
+      if (expected == 'company') {
+        if (role != 'company') {
+          throw Exception('هذا الحساب ليس حساب شركة');
+        }
+      } else {
+        if (role == 'company') {
+          throw Exception('هذا الحساب مخصص للشركات');
+        }
+      }
+
+      _client.setToken(token);
+
+      // Update store with user info
+      if (user != null) {
+        final String name = user['name']?.toString() ?? 'User';
+        RecruitmentSyncStore.instance.updateCurrentUser(
+          name: name,
+          email: user['email']?.toString(),
+          photoUrl: user['photoUrl']?.toString(),
+          location: user['location']?.toString(),
+        );
+
+        if (role == 'company') {
+          CompanyStore.instance.setRegistrationData(
+            companyId: user['id']?.toString(),
+            companyName: name,
+            email: user['email']?.toString(),
+          );
+          final fullProfile = await SessionManager.getCompanyFullProfile();
+          await CompanyStore.instance.loadFromSession(fullProfile);
+        }
+      }
+
+      return user ?? {};
+    } on DioException catch (e) {
+      final msg = e.response?.data?['message'] ?? e.response?.data?['error'] ?? 'البريد الإلكتروني أو كلمة المرور غير صحيحة';
+      throw Exception(msg);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<Map<String, dynamic>> googleLogin(String idToken) async {
+    try {
+      final auth = await _client.googleLogin(idToken: idToken);
+
+      final user = auth['user'] as Map<String, dynamic>?;
+      final token = auth['token']?.toString().trim();
+
+      if (token == null || token.isEmpty) {
+        throw Exception('Google login response missing token');
+      }
+
+      _client.setToken(token);
+
+      // Update store with user info
+      if (user != null) {
+        final String name = user['name']?.toString() ?? 'User';
+        RecruitmentSyncStore.instance.updateCurrentUser(
+          name: name,
+          email: user['email']?.toString(),
+          photoUrl: user['photoUrl']?.toString(),
+          location: user['location']?.toString(),
+        );
+
+        final role = user['role']?.toString().toLowerCase().trim();
+        if (role == 'company') {
+          CompanyStore.instance.setRegistrationData(
+            companyId: user['id']?.toString(),
+            companyName: name,
+            email: user['email']?.toString(),
+          );
+          final fullProfile = await SessionManager.getCompanyFullProfile();
+          await CompanyStore.instance.loadFromSession(fullProfile);
+        }
+      }
+
+      return user ?? {};
+    } on DioException catch (e) {
+      final msg = e.response?.data?['message'] ?? e.response?.data?['error'] ?? 'فشل تسجيل الدخول بواسطة جوجل';
+      throw Exception(msg);
+    } catch (e) {
+      rethrow;
+    }
   }
 
   Future<Map<String, dynamic>> updateProfile({
     String? name,
     String? photoUrl,
+    String? phone,
+    String? location,
+    String? about,
+    String? gender,
+    String? dob,
+    List<String>? skills,
+    List<Map<String, dynamic>>? education,
+    List<Map<String, dynamic>>? experience,
+    List<String>? tradesmanServices,
+    String? role,
   }) async {
     _assertAuthenticated();
-    final user = await _client.updateProfile(name: name, photoUrl: photoUrl);
+    final user = await _client.updateProfile(
+      name: name,
+      photoUrl: photoUrl,
+      phone: phone,
+      location: location,
+      about: about,
+      gender: gender,
+      dob: dob,
+      skills: skills,
+      education: education,
+      experience: experience,
+      tradesmanServices: tradesmanServices,
+      role: role,
+    );
 
     final String currentName = user['name']?.toString() ?? 'User';
     RecruitmentSyncStore.instance.updateCurrentUser(
       name: currentName,
       photoUrl: user['photoUrl']?.toString(),
+      location: user['location']?.toString(),
     );
 
     if (RecruitmentSyncStore.instance.userRole.toLowerCase() == 'company') {
@@ -174,6 +217,57 @@ class RecruitmentSyncService {
     }
 
     return user;
+  }
+
+  Future<void> forgotPassword(String email) async {
+    await _client.forgotPassword(email: email);
+  }
+
+  Future<void> resetPassword({
+    required String email,
+    required String code,
+    required String newPassword,
+  }) async {
+    await _client.resetPassword(
+      email: email,
+      code: code,
+      newPassword: newPassword,
+    );
+  }
+
+  Future<void> sendPhoneOtp(String phoneNumber) async {
+    await _client.sendPhoneOtp(phoneNumber: phoneNumber);
+  }
+
+  Future<void> verifyEmailOtp({
+    required String email,
+    required String code,
+  }) async {
+    try {
+      final response = await _client.verifyLogin(email: email, code: code);
+      final token = response['token']?.toString();
+      if (token != null && token.isNotEmpty) {
+        _client.setToken(token);
+      }
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 404) {
+        throw Exception('الرابط غير موجود على السيرفر (404). تأكد من صحة الرابط.');
+      }
+      final data = e.response?.data;
+      String? msg;
+      if (data is Map) {
+        msg = data['message']?.toString() ?? data['error']?.toString();
+      } else if (data is String) {
+        if (data.contains('Cannot POST')) {
+          msg = 'فشل الاتصال: السيرفر لا يدعم هذا الطلب (Cannot POST).';
+        } else {
+          msg = data;
+        }
+      }
+      throw Exception(msg ?? 'رمز التحقق غير صحيح');
+    } catch (e) {
+      throw Exception('فشل التحقق من الرمز: ${e.toString()}');
+    }
   }
 
   void logout() {
@@ -198,6 +292,15 @@ class RecruitmentSyncService {
   Future<void> startPolling() async {
     try {
       await CompanyStore.instance.initFromSession();
+      // Fetch user profile on start
+      if (isAuthenticated) {
+        final profile = await _client.fetchUserProfile();
+        RecruitmentSyncStore.instance.updateCurrentUser(
+          name: profile['name']?.toString(),
+          photoUrl: profile['photoUrl']?.toString(),
+          location: profile['location']?.toString(),
+        );
+      }
     } catch (_) {}
     await _pullServerState();
     _timer?.cancel();

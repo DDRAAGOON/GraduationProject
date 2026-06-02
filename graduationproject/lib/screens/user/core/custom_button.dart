@@ -3,8 +3,14 @@ import 'package:flutter/material.dart';
 class Bottom extends StatelessWidget {
   final bool isLoading;
   final VoidCallback onPressed;
+  final String? label;
 
-  const Bottom({super.key, required this.isLoading, required this.onPressed});
+  const Bottom({
+    super.key,
+    required this.isLoading,
+    required this.onPressed,
+    this.label,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -51,9 +57,9 @@ class Bottom extends StatelessWidget {
                   strokeWidth: 2,
                 ),
               )
-            : const Text(
-                "Continue",
-                style: TextStyle(
+            : Text(
+                label ?? "Continue",
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,

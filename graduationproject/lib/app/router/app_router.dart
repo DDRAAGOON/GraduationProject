@@ -62,6 +62,11 @@ import '../../shared/models/applicant.dart';
 import '../../shared/models/job.dart';
 import '../../shared/models/message_thread.dart';
 
+import '../../screens/user/auth/sign_up_screen/email_password_sign_up_screen.dart';
+import '../../screens/user/auth/sign_up_screen/role_selection_screen.dart';
+import '../../screens/user/auth/sign_up_screen/sign_up_screen.dart';
+import '../../screens/user/auth/sign_up_screen/sign_up_tradesman.dart';
+
 /// The [AppRoutes] class serves as a centralized registry for all named route string constants
 /// used to navigate through the application. Using this class avoids hard-coded strings.
 final class AppRoutes {
@@ -84,6 +89,10 @@ final class AppRoutes {
   static const userEditProfile = '/user/profile/edit';
   static const userCompanyDetails = '/user/company/details';
   static const userAllApplications = '/user/jobs/all_applications';
+  static const userSignUpStart = '/user/auth/signup_start';
+  static const userRoleSelection = '/user/auth/role_selection';
+  static const userSignUpSeeker = '/user/auth/signup_seeker';
+  static const userSignUpTradesman = '/user/auth/signup_tradesman';
 
   // --- Company Onboarding Routes ---
   static const companyOnboardingSmartSearch =
@@ -218,6 +227,14 @@ final class AppRouter {
         );
       case AppRoutes.userAllApplications:
         page = const RecruitmentAllApplicationsScreen();
+      case AppRoutes.userSignUpStart:
+        page = const EmailPasswordSignUpScreen();
+      case AppRoutes.userRoleSelection:
+        page = const UserRoleSelectionScreen();
+      case AppRoutes.userSignUpSeeker:
+        page = const SignUpScreen();
+      case AppRoutes.userSignUpTradesman:
+        page = const SignUpTradesman();
 
       case AppRoutes.companyOnboardingSmartSearch:
         page = const CompanyOnboardingSmartSearchScreen();

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:graduationproject/app/router/app_router.dart';
+import 'package:graduationproject/shared/services/recruitment_sync_service.dart';
 import '../../../../shared/l10n/app_localizations.dart';
 import '../otp_email_verification_screen.dart';
 import '../../core/custom_button.dart';
@@ -17,6 +19,7 @@ class _EmailPasswordSignUpScreenState extends State<EmailPasswordSignUpScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -59,18 +62,51 @@ class _EmailPasswordSignUpScreenState extends State<EmailPasswordSignUpScreen> {
     return null;
   }
 
-  void _submit() {
+  void _submit() async {
     if (!_formKey.currentState!.validate()) {
       return;
     }
 
+    setState(() => _isLoading = true);
     final email = _emailController.text.trim();
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => OtpEmailVerificationScreen(email: email),
-      ),
-    );
+    final password = _passwordController.text;
+
+    try {
+      // Step 1: Create the account on the server. 
+      // This will trigger the server to send the OTP email.
+      await RecruitmentSyncService.instance.register(
+        email: email,
+        password: password,
+        name: "User", // Temporary name for new accounts
+        role: "user",
+      );
+
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      
+      // Step 2: Go to OTP screen
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => OtpEmailVerificationScreen(email: email, password: password),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      
+      // If user already exists, maybe just go to OTP or inform them
+      String error = e.toString().toLowerCase();
+      if (error.contains("already exists") || error.contains("موجود مسبقا")) {
+         ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Account already exists. Please sign in.")),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString().replaceAll('Exception: ', ''))),
+        );
+      }
+    }
   }
 
   InputDecoration _buildFieldDecoration(BuildContext context, String label) {
@@ -187,7 +223,7 @@ class _EmailPasswordSignUpScreenState extends State<EmailPasswordSignUpScreen> {
                   validator: _validateConfirmPassword,
                 ),
                 const SizedBox(height: 24),
-                Bottom(isLoading: false, onPressed: _submit),
+                Bottom(isLoading: _isLoading, onPressed: _submit),
               ],
             ),
           ),

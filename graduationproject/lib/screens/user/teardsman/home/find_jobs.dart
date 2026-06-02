@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:graduationproject/shared/l10n/app_localizations.dart';
 import 'package:graduationproject/shared/state/recruitment_sync_store.dart';
 import 'package:graduationproject/shared/widgets/app_button.dart';
+import 'package:graduationproject/screens/user/messages/chat_thread_screen.dart';
+import 'package:graduationproject/constants/app_images.dart';
 import 'tradesman_apply_job_screen.dart';
 import 'tradesman_job_details_screen.dart';
 
@@ -365,6 +367,26 @@ class _FindJobsState extends State<FindJobs> {
                   const SizedBox(height: 20),
                 ],
               ),
+            ),
+          ),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ChatThreadScreen(
+                    name: t.isAr ? 'مساعد جوبيتو الذكي' : 'Jobito AI Assistant',
+                    image: AppImages.jobito,
+                  ),
+                ),
+              );
+            },
+            backgroundColor: const Color(0xFF4A6ED1),
+            shape: const CircleBorder(),
+            child: const Icon(
+              Icons.smart_toy_outlined,
+              color: Colors.white,
+              size: 28,
             ),
           ),
         );

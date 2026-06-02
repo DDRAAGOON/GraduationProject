@@ -180,28 +180,35 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
       try {
         final role = _selectedRole == "Tradesman" ? "tradesman" : "user";
-        await RecruitmentSyncService.instance.register(
-          email: _emailController.text.trim(),
-          password: "12345678",
+        
+        String? base64Image;
+        if (_profileImagePath != null) {
+          try {
+            final bytes = await File(_profileImagePath!).readAsBytes();
+            base64Image = 'data:image/jpeg;base64,${base64Encode(bytes)}';
+          } catch (_) {}
+        }
+
+        // Use updateProfile with all collected data
+        await RecruitmentSyncService.instance.updateProfile(
           name: _fullNameController.text.trim(),
-          role: role,
+          photoUrl: base64Image,
+          phone: "+20 ${_phoneController.text}",
+          location: _addressController.text,
+          about: _aboutMeController.text,
+          gender: _selectedGender,
+          dob: "$_selectedYear-$_selectedMonth-$_selectedDay",
+          skills: _skillsList,
+          education: _educationList,
+          experience: _experiencesList,
+          role: _selectedRole,
         );
 
+        // Update local session
         await SessionManager.saveUserSession(
           email: _emailController.text.trim(),
           name: _fullNameController.text.trim(),
         );
-
-        if (_profileImagePath != null) {
-          try {
-            final bytes = await File(_profileImagePath!).readAsBytes();
-            final base64Image = 'data:image/jpeg;base64,${base64Encode(bytes)}';
-            await RecruitmentSyncService.instance.updateProfile(
-              photoUrl: base64Image,
-            );
-            _profileImagePath = base64Image;
-          } catch (_) {}
-        }
 
         RecruitmentSyncStore.instance.updateUserProfile(
           fullName: _fullNameController.text,
@@ -277,46 +284,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       fontWeight: FontWeight.bold,
                     ),
                     children: [
-                      TextSpan(text: t.isAr ? "يمكنك " : "You Can "),
+                      TextSpan(text: t.isAr ? "أهلاً بك! " : "Welcome! "),
                       TextSpan(
-                        text: t.isAr ? "التسجيل " : "SignUp ",
+                        text: t.isAr ? "أكمل " : "Complete ",
                         style: const TextStyle(color: Color(0xFF49769F)),
                       ),
                       TextSpan(
                         text: t.isAr
-                            ? "كحرفي أو باحث عن عمل"
-                            : "Tradesman or a job seeker",
+                            ? "بياناتك كباحث عن عمل"
+                            : "your profile as a Job Seeker",
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 5),
-                Container(
-                  width: 80,
-                  height: 3,
-                  color: Colors.orange,
-                  margin: const EdgeInsets.only(left: 230),
-                ),
                 const SizedBox(height: 25),
-
-                // Role selection with lines
-                Row(
-                  children: [
-                    Expanded(child: _buildRoleOption("Job Seeker")),
-                    const SizedBox(width: 8),
-                    Text(
-                      t.tr(en: "or", ar: "أو"),
-                      style: const TextStyle(
-                        color: Colors.black54,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(child: _buildRoleOption("Tradesman")),
-                  ],
-                ),
-                const SizedBox(height: 35),
 
                 // Profile Image Avatar Preview (Moved to the left)
                 GestureDetector(

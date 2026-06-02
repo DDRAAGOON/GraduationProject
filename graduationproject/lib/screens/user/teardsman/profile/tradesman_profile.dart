@@ -143,7 +143,7 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 children: [
-                  // About Me Card
+                  // 1. About Me Card
                   _buildFullWidthCard(
                     child: Column(
                       crossAxisAlignment: isAr ? CrossAxisAlignment.end : CrossAxisAlignment.start,
@@ -151,197 +151,57 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
                         _buildSectionHeader(t.aboutMe, Icons.info_outline, isAr),
                         const SizedBox(height: 12),
                         Text(
-                          store.currentUserAbout.isEmpty ? "No info provided yet." : store.currentUserAbout,
+                          store.currentUserAbout.isEmpty ? (isAr ? "لا توجد معلومات متوفرة حالياً." : "No info provided yet.") : store.currentUserAbout,
                           textAlign: isAr ? TextAlign.right : TextAlign.left,
                           style: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.6), fontSize: 14, height: 1.5),
                         ),
                       ],
                     ),
                   ),
-                  
                   const SizedBox(height: 16),
 
-                  if (store.currentUserExperience.isNotEmpty)
-                    _buildFullWidthCard(
-                      child: Column(
-                        crossAxisAlignment:
-                            isAr ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-                        children: [
-                          _buildSectionHeader(
-                            t.tr(en: 'Experience', ar: 'الخبرات'),
-                            Icons.work_outline,
-                            isAr,
-                          ),
-                          const SizedBox(height: 12),
-                          ...store.currentUserExperience.map(
-                            (exp) => Padding(
-                              padding: const EdgeInsets.only(bottom: 10),
-                              child: Text(
-                                '${exp['title'] ?? ''} • ${exp['company'] ?? ''} • ${exp['duration'] ?? ''}',
-                                textAlign: isAr ? TextAlign.right : TextAlign.left,
-                                style: TextStyle(
-                                  color: colorScheme.onSurface.withValues(alpha: 0.65),
-                                  fontSize: 13,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  if (store.currentUserExperience.isNotEmpty)
-                    const SizedBox(height: 16),
-
-                  if (store.tradesmanServices.isNotEmpty)
-                    _buildFullWidthCard(
-                      child: Column(
-                        crossAxisAlignment:
-                            isAr ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-                        children: [
-                          _buildSectionHeader(
-                            t.tr(en: 'Services', ar: 'الخدمات'),
-                            Icons.handyman_outlined,
-                            isAr,
-                          ),
-                          const SizedBox(height: 12),
-                          Wrap(
-                            spacing: 8,
-                            runSpacing: 8,
-                            children: store.tradesmanServices
-                                .map(
-                                  (s) => Chip(
-                                    label: Text(s),
-                                    backgroundColor:
-                                        colorScheme.primary.withValues(alpha: 0.1),
-                                  ),
-                                )
-                                .toList(),
-                          ),
-                        ],
-                      ),
-                    ),
-                  if (store.tradesmanServices.isNotEmpty)
-                    const SizedBox(height: 16),
-
-                  _buildFullWidthCard(
-                    child: Column(
-                      crossAxisAlignment:
-                          isAr ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-                      children: [
-                        _buildSectionHeader(
-                          t.tr(en: 'Ratings', ar: 'التقييمات'),
-                          Icons.star_outline,
-                          isAr,
-                        ),
-                        const SizedBox(height: 12),
-                        _buildRatingSummaryRow(
-                          context,
-                          isAr
-                              ? 'تقييمات العملاء'
-                              : 'Client ratings',
-                          store.ratingsFromClients.length,
-                          isAr,
-                          () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const TradesmanRatingsHubScreen(),
-                              ),
-                            );
-                          },
-                        ),
-                        const SizedBox(height: 10),
-                        _buildRatingSummaryRow(
-                          context,
-                          isAr ? 'تقييماتي للآخرين' : 'My ratings',
-                          store.ratingsGivenByTradesman.length,
-                          isAr,
-                          () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const TradesmanRatingsHubScreen(),
-                              ),
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  if (store.languages.isNotEmpty)
-                    _buildFullWidthCard(
-                      child: Column(
-                        crossAxisAlignment:
-                            isAr ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-                        children: [
-                          _buildSectionHeader(
-                            t.tr(en: 'Languages', ar: 'اللغات'),
-                            Icons.language,
-                            isAr,
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            store.languages.join(', '),
-                            textAlign: isAr ? TextAlign.right : TextAlign.left,
-                          ),
-                        ],
-                      ),
-                    ),
-                  if (store.languages.isNotEmpty) const SizedBox(height: 16),
-                  
-                  // Contact Details Card
-                  _buildFullWidthCard(
-                    child: Column(
-                      children: [
-                        _buildInfoRow(t.emailAddress, store.currentUserEmail, Icons.email_outlined, isAr),
-                        Divider(height: 32, color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
-                        _buildInfoRow(t.phoneNumber, store.currentUserPhone, Icons.phone_android_outlined, isAr),
-                        Divider(height: 32, color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
-                        _buildInfoRow(t.address, store.currentUserLocation, Icons.location_on_outlined, isAr),
-                        Divider(height: 32, color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
-                        _buildInfoRow(t.tr(en: "Skills", ar: "المهارات"), store.currentUserSkills.join(', '), Icons.psychology_outlined, isAr),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  // Gallery Section
-                  if (store.portfolioImages.isNotEmpty) ...[
+                  // 2. Experience Section
+                  if (store.currentUserExperience.isNotEmpty) ...[
                     _buildFullWidthCard(
                       child: Column(
                         crossAxisAlignment: isAr ? CrossAxisAlignment.end : CrossAxisAlignment.start,
                         children: [
-                          _buildSectionHeader(t.tr(en: "Portfolio Gallery", ar: "معرض الأعمال"), Icons.image_outlined, isAr),
-                          const SizedBox(height: 16),
-                          SizedBox(
-                            height: 110,
-                            child: ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: store.portfolioImages.length,
-                              itemBuilder: (context, index) {
-                                final path = store.portfolioImages[index];
-                                return Container(
-                                  margin: const EdgeInsets.only(right: 12),
-                                  width: 110,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(16),
-                                    border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
+                          _buildSectionHeader(t.tr(en: 'Experience', ar: 'الخبرات'), Icons.work_outline, isAr),
+                          const SizedBox(height: 12),
+                          ...store.currentUserExperience.map((exp) => Padding(
+                            padding: const EdgeInsets.only(bottom: 10),
+                            child: Row(
+                              textDirection: isAr ? TextDirection.rtl : TextDirection.ltr,
+                              children: [
+                                Icon(Icons.circle, size: 6, color: colorScheme.primary),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    '${exp['title'] ?? ''} • ${exp['company'] ?? ''} • ${exp['duration'] ?? ''}',
+                                    style: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.65), fontSize: 13),
                                   ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(15),
-                                    child: Image(
-                                      image: getAppImageProvider(path) ?? const AssetImage('assets/placeholder.png'),
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                );
-                              },
+                                ),
+                              ],
                             ),
+                          )),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+
+                  // 3. Languages Section
+                  if (store.languages.isNotEmpty) ...[
+                    _buildFullWidthCard(
+                      child: Column(
+                        crossAxisAlignment: isAr ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                        children: [
+                          _buildSectionHeader(t.tr(en: 'Languages', ar: 'اللغات'), Icons.language, isAr),
+                          const SizedBox(height: 12),
+                          Text(
+                            store.languages.join(', '),
+                            textAlign: isAr ? TextAlign.right : TextAlign.left,
+                            style: TextStyle(color: colorScheme.onSurface, fontWeight: FontWeight.w600),
                           ),
                         ],
                       ),
@@ -349,7 +209,135 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
                     const SizedBox(height: 16),
                   ],
 
-                  // Social Links
+                  // 4. Contact Details & Skills Card
+                  _buildFullWidthCard(
+                    child: Column(
+                      children: [
+                        _buildInfoRow(t.emailAddress, store.currentUserEmail, Icons.email_outlined, isAr),
+                        Divider(height: 32, color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
+                        _buildInfoRow(t.phoneNumber, store.currentUserPhone.isEmpty ? "01XXXXXXXXX" : store.currentUserPhone, Icons.phone_android_outlined, isAr),
+                        Divider(height: 32, color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
+                        _buildInfoRow(t.address, store.currentUserLocation, Icons.location_on_outlined, isAr),
+                        Divider(height: 32, color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
+                        _buildInfoRow(t.tr(en: "Skills", ar: "المهارات"), store.currentUserSkills.isEmpty ? (isAr ? "لم تضف مهارات" : "No skills added") : store.currentUserSkills.join(', '), Icons.psychology_outlined, isAr),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // 5. Education Section
+                  if (store.currentUserEducation.isNotEmpty) ...[
+                    _buildFullWidthCard(
+                      child: Column(
+                        crossAxisAlignment: isAr ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                        children: [
+                          _buildSectionHeader(t.education, Icons.school_outlined, isAr),
+                          const SizedBox(height: 16),
+                          ...store.currentUserEducation.map((edu) => Padding(
+                            padding: const EdgeInsets.only(bottom: 16),
+                            child: Row(
+                              textDirection: isAr ? TextDirection.rtl : TextDirection.ltr,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(color: colorScheme.primary.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
+                                  child: Icon(Icons.school, color: colorScheme.primary, size: 20),
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: isAr ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                                    children: [
+                                      Text(edu['institution'] ?? "", style: TextStyle(fontWeight: FontWeight.bold, color: colorScheme.onSurface)),
+                                      Text("${edu['degree']} • ${edu['duration']}", style: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 12)),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+
+                  // 6. Services Section
+                  _buildFullWidthCard(
+                    child: Column(
+                      crossAxisAlignment: isAr ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                      children: [
+                        _buildSectionHeader(t.tr(en: 'Services', ar: 'الخدمات التي أقدمها'), Icons.handyman_outlined, isAr),
+                        const SizedBox(height: 12),
+                        store.tradesmanServices.isEmpty
+                            ? Text(isAr ? "لم يتم تحديد خدمات بعد." : "No services specified yet.", style: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.5)))
+                            : Wrap(
+                                spacing: 10,
+                                runSpacing: 10,
+                                children: store.tradesmanServices.map((s) => Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                                  decoration: BoxDecoration(
+                                    color: colorScheme.primary.withValues(alpha: 0.08),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(color: colorScheme.primary.withValues(alpha: 0.15)),
+                                  ),
+                                  child: Text(s, style: TextStyle(color: colorScheme.primary, fontWeight: FontWeight.bold, fontSize: 13)),
+                                )).toList(),
+                              ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // 7. Portfolio Gallery Section
+                  _buildFullWidthCard(
+                    child: Column(
+                      crossAxisAlignment: isAr ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                      children: [
+                        _buildSectionHeader(t.tr(en: "Portfolio Gallery", ar: "معرض الأعمال"), Icons.image_outlined, isAr),
+                        const SizedBox(height: 16),
+                        store.portfolioImages.isEmpty
+                            ? Container(
+                                height: 100,
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  color: colorScheme.onSurface.withValues(alpha: 0.03),
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1), style: BorderStyle.none),
+                                ),
+                                child: Center(child: Text(isAr ? "المعرض فارغ" : "Gallery is empty", style: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.3)))),
+                              )
+                            : SizedBox(
+                                height: 110,
+                                child: ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: store.portfolioImages.length,
+                                  itemBuilder: (context, index) {
+                                    final path = store.portfolioImages[index];
+                                    return Container(
+                                      margin: const EdgeInsets.only(right: 12),
+                                      width: 110,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(16),
+                                        border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
+                                      ),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(15),
+                                        child: Image(
+                                          image: getAppImageProvider(path) ?? const AssetImage('assets/placeholder.png'),
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // 8. Social Links
                   if (store.socialLinks.isNotEmpty) ...[
                     _buildFullWidthCard(
                       child: Column(
@@ -389,41 +377,41 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
                     const SizedBox(height: 16),
                   ],
 
-                  // Education Section
-                  if (store.currentUserEducation.isNotEmpty) ...[
-                    _buildFullWidthCard(
-                      child: Column(
-                        crossAxisAlignment: isAr ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-                        children: [
-                          _buildSectionHeader(t.education, Icons.school_outlined, isAr),
-                          const SizedBox(height: 16),
-                          ...store.currentUserEducation.map((edu) => Padding(
-                            padding: const EdgeInsets.only(bottom: 16),
-                            child: Row(
-                              textDirection: isAr ? TextDirection.rtl : TextDirection.ltr,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(10),
-                                  decoration: BoxDecoration(color: colorScheme.primary.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
-                                  child: Icon(Icons.school, color: colorScheme.primary, size: 20),
-                                ),
-                                const SizedBox(width: 16),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: isAr ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-                                    children: [
-                                      Text(edu['institution'] ?? "", style: TextStyle(fontWeight: FontWeight.bold, color: colorScheme.onSurface)),
-                                      Text("${edu['degree']} • ${edu['duration']}", style: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 12)),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )),
-                        ],
-                      ),
+                  // 9. Ratings Section (Last)
+                  _buildFullWidthCard(
+                    child: Column(
+                      crossAxisAlignment: isAr ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                      children: [
+                        _buildSectionHeader(t.tr(en: 'Ratings & Reviews', ar: 'التقييمات والمراجعات'), Icons.star_outline, isAr),
+                        const SizedBox(height: 12),
+                        _buildRatingSummaryRow(
+                          context,
+                          isAr ? 'تقييمات الشركات والعملاء' : 'Company & Client ratings',
+                          store.ratingsFromClients.length,
+                          isAr,
+                          () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const TradesmanRatingsHubScreen()),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 10),
+                        _buildRatingSummaryRow(
+                          context,
+                          isAr ? 'تقييمات الآخرين لي' : 'Others\' ratings for me',
+                          store.ratingsGivenByTradesman.length, // Using this as others for me for demo
+                          isAr,
+                          () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const TradesmanRatingsHubScreen()),
+                            );
+                          },
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                   
                   const SizedBox(height: 100),
                 ],

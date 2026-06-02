@@ -3,16 +3,25 @@
 final class ApiEndpoints {
   const ApiEndpoints._();
 
-  // Render deployment URL (can be overridden at build time).
-  static const String baseUrl = String.fromEnvironment(
-    'API_BASE_URL',
-    defaultValue: 'https://jobito.runasp.net',
-  );
+  // Railway deployment URL
+  static const String baseUrl = 'https://jobito-api-production.up.railway.app';
 
   // Auth
   static const String login = '/api/auth/login';
+  static const String verifyLogin = '/api/auth/verify-login';
   static const String googleLogin = '/api/auth/google';
   static const String register = '/api/auth/register';
+  static const String registerCompany = '/api/auth/register-company';
+  static const String sendPhoneOtp = '/api/auth/send-phone-otp';
+  static const String verifyPhone = '/api/auth/verify-phone';
+  static const String forgotPassword = '/api/auth/forgot-password';
+  static const String resetPassword = '/api/auth/reset-password';
+
+  // Users
+  static const String users = '/api/users';
+  static const String profile = '/api/users/profile';
+  static const String settings = '/api/users/settings';
+  static const String changePassword = '/api/users/change-password';
 
   // Recruitment entities
   static const String jobs = '/api/jobs';

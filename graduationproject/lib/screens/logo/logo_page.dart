@@ -123,7 +123,7 @@ class LogoPage extends StatelessWidget {
                 ),
                 color: cs.primary,
                 onTap: () =>
-                    Navigator.of(context).pushNamed(AppRoutes.userOnboardingNew),
+                    Navigator.of(context).pushNamed(AppRoutes.userSignUpStart),
               ),
               SizedBox(height: size.height * 0.022),
               _RoleButton(

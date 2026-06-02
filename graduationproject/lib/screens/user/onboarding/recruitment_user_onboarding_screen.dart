@@ -107,7 +107,7 @@ class _RecruitmentUserOnboardingScreenState
                       onPressed: () {
                         if (_index == items.length - 1) {
                           Navigator.of(context)
-                              .pushReplacementNamed(AppRoutes.userSignInNew);
+                              .pushReplacementNamed(AppRoutes.userSignUpStart);
                           return;
                         }
                         _controller.nextPage(

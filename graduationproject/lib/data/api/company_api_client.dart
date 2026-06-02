@@ -2,8 +2,8 @@ import 'api_endpoints.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
-final class CompanyApiClient {
-  CompanyApiClient({this.baseUrl = ApiEndpoints.baseUrl})
+final class JobitoApiClient {
+  JobitoApiClient({this.baseUrl = ApiEndpoints.baseUrl})
     : _dio = Dio(
         BaseOptions(
           baseUrl: baseUrl,
@@ -75,6 +75,7 @@ final class CompanyApiClient {
       data: <String, dynamic>{
         'email': email,
         'password': password,
+        'fullName': name, // Sending both to be safe
         'name': name,
         'role': role,
       },
@@ -82,14 +83,122 @@ final class CompanyApiClient {
     return Map<String, dynamic>.from(response.data as Map);
   }
 
+  Future<Map<String, dynamic>> registerCompany({
+    required String email,
+    required String password,
+    required String companyName,
+    required String address,
+    required String taxNumber,
+    required String companyNumber,
+  }) async {
+    final Response<dynamic> response = await _dio.post<dynamic>(
+      ApiEndpoints.registerCompany,
+      data: <String, dynamic>{
+        'email': email,
+        'password': password,
+        'companyName': companyName,
+        'address': address,
+        'taxNumber': taxNumber,
+        'companyNumber': companyNumber,
+      },
+    );
+    return Map<String, dynamic>.from(response.data as Map);
+  }
+
+  Future<Map<String, dynamic>> fetchUserProfile() async {
+    final Response<dynamic> response = await _dio.get<dynamic>(
+      ApiEndpoints.profile,
+      options: _authOptions,
+    );
+    return Map<String, dynamic>.from(response.data as Map);
+  }
+
   Future<Map<String, dynamic>> updateProfile({
     String? name,
     String? photoUrl,
+    String? phone,
+    String? location,
+    String? about,
+    String? gender,
+    String? dob,
+    List<String>? skills,
+    List<Map<String, dynamic>>? education,
+    List<Map<String, dynamic>>? experience,
+    List<String>? tradesmanServices,
+    String? role,
   }) async {
-    final Response<dynamic> response = await _dio.put<dynamic>(
-      '/api/auth/profile',
-      data: <String, dynamic>{'name': ?name, 'photoUrl': ?photoUrl},
+    final payload = <String, dynamic>{
+      if (name != null) 'name': name,
+      if (photoUrl != null) 'photoUrl': photoUrl,
+      if (phone != null) 'phone': phone,
+      if (location != null) 'location': location,
+      if (about != null) 'about': about,
+      if (gender != null) 'gender': gender,
+      if (dob != null) 'dob': dob,
+      if (skills != null) 'skills': skills,
+      if (education != null) 'education': education,
+      if (experience != null) 'experience': experience,
+      if (tradesmanServices != null) 'tradesmanServices': tradesmanServices,
+      if (role != null) 'role': role,
+    };
+    final Response<dynamic> response = await _dio.patch<dynamic>(
+      ApiEndpoints.profile,
+      data: payload,
       options: _authOptions,
+    );
+    return Map<String, dynamic>.from(response.data as Map);
+  }
+
+  Future<Map<String, dynamic>> verifyLogin({
+    required String email,
+    required String code,
+  }) async {
+    final Response<dynamic> response = await _dio.post<dynamic>(
+      ApiEndpoints.verifyLogin,
+      data: <String, dynamic>{
+        'email': email,
+        'code': code.trim(),
+      },
+    );
+    return Map<String, dynamic>.from(response.data as Map);
+  }
+
+  Future<void> sendPhoneOtp({required String phoneNumber}) async {
+    await _dio.post<dynamic>(
+      ApiEndpoints.sendPhoneOtp,
+      data: <String, dynamic>{'phoneNumber': phoneNumber},
+      options: _authOptions,
+    );
+  }
+
+  Future<void> verifyPhone({required String code}) async {
+    await _dio.post<dynamic>(
+      ApiEndpoints.verifyPhone,
+      data: <String, dynamic>{'code': code},
+      options: _authOptions,
+    );
+  }
+
+  Future<Map<String, dynamic>> forgotPassword({required String email}) async {
+    final Response<dynamic> response = await _dio.post<dynamic>(
+      ApiEndpoints.forgotPassword,
+      data: <String, dynamic>{'email': email},
+    );
+    return Map<String, dynamic>.from(response.data as Map);
+  }
+
+  Future<Map<String, dynamic>> resetPassword({
+    required String email,
+    required String code,
+    required String newPassword,
+  }) async {
+    final Response<dynamic> response = await _dio.post<dynamic>(
+      ApiEndpoints.resetPassword,
+      data: <String, dynamic>{
+        'email': email,
+        'code': code,
+        'newPassword': newPassword,
+      },
     );
     return Map<String, dynamic>.from(response.data as Map);
   }
@@ -186,7 +295,7 @@ final class CompanyApiClient {
       'tags': tags,
       'requiredCount': requiredCount,
       if (deadline != null) 'deadline': deadline.toUtc().toIso8601String(),
-      'status': ?status,
+      if (status != null) 'status': status,
     };
 
     final res = await _dio.put<dynamic>(

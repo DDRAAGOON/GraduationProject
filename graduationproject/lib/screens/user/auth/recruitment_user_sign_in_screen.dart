@@ -8,7 +8,8 @@ import '../../../shared/services/session_manager.dart';
 import '../../../shared/services/recruitment_sync_service.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_text_field.dart';
-import 'sign_up_screen/email_password_sign_up_screen.dart';
+import 'package:graduationproject/screens/user/auth/sign_up_screen/role_selection_screen.dart';
+import 'package:graduationproject/screens/user/auth/sign_up_screen/email_password_sign_up_screen.dart';
 import '../../../shared/l10n/app_localizations.dart';
 
 class RecruitmentUserSignInScreen extends StatefulWidget {
@@ -65,9 +66,16 @@ class _RecruitmentUserSignInScreenState
 
       if (!mounted) return;
       setState(() => _loading = false);
-      Navigator.of(
-        context,
-      ).pushNamedAndRemoveUntil(AppRoutes.userWorkspace, (route) => false);
+      
+      // If it's a new user (default name 'User'), go to profile completion (Role Selection)
+      if (name == 'User') {
+        Navigator.of(context).pushReplacementNamed(AppRoutes.userRoleSelection);
+      } else {
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          AppRoutes.userWorkspace,
+          (route) => false,
+        );
+      }
     } catch (e) {
       if (!mounted) return;
       setState(() => _loading = false);
@@ -130,9 +138,11 @@ class _RecruitmentUserSignInScreenState
       if (!mounted) return;
 
       setState(() => _loading = false);
-      Navigator.of(
-        context,
-      ).pushNamedAndRemoveUntil(AppRoutes.userWorkspace, (route) => false);
+      
+      // For Google Sign-In, we might also want to check if profile is complete.
+      // Usually Google gives a name, so 'User' check might not work here.
+      // But for simplicity in this flow:
+      Navigator.of(context).pushReplacementNamed(AppRoutes.userRoleSelection);
     } catch (e) {
       if (!mounted) return;
       setState(() => _loading = false);
@@ -250,12 +260,7 @@ class _RecruitmentUserSignInScreenState
               /* زر إنشاء حساب جديد - ينقل المستخدم لصفحة التسجيل الموحدة */
               TextButton(
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const EmailPasswordSignUpScreen(),
-                    ),
-                  );
+                  Navigator.pushNamed(context, AppRoutes.userSignUpStart);
                 },
                 child: Text(
                   t.signUpBtn,
