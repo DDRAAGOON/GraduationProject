@@ -1,8 +1,7 @@
 ﻿import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:country_picker/country_picker.dart';
-import 'package:graduationproject/screens/user/core/custom_button.dart';
-import 'package:graduationproject/screens/user/auth/cubit/auth_cubit.dart';
+import '../../../shared/l10n/app_localizations.dart';
+import '../../../shared/state/theme_controller.dart';
 import 'otp_email_verification_screen.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
@@ -33,12 +32,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   );
 
   bool _isValidEmail(String email) {
-    final regex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-    return regex.hasMatch(email);
+    return email.toLowerCase().endsWith('@gmail.com');
   }
 
   bool _isValidPhone(String phone) {
-    return phone.length >= 10;
+    // التحقق من أن رقم الهاتف يتراوح بين 10 إلى 11 رقم (حسب الدولة)
+    return phone.length >= 10 && phone.length <= 11;
   }
 
   @override
@@ -50,211 +49,273 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AuthCubit, AuthState>(
-      builder: (context, state) {
-        bool isLoading = state is AuthLoading;
+    final t = AppLocalizations.of(context);
+    
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: ThemeController.instance.themeMode,
+      builder: (context, themeMode, _) {
+        final isDark = themeMode == ThemeMode.dark || 
+                      (themeMode == ThemeMode.system && MediaQuery.platformBrightnessOf(context) == Brightness.dark);
+        
+        final backgroundColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
+        final textColorPrimary = isDark ? Colors.white : Colors.black;
 
         return Scaffold(
-          backgroundColor: const Color(0xFF011931),
+          backgroundColor: backgroundColor,
           appBar: AppBar(
             backgroundColor: Colors.transparent,
             elevation: 0,
             leading: IconButton(
-              icon: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 20),
+              icon: Icon(Icons.arrow_back_ios, color: isDark ? Colors.white70 : Colors.black54, size: 20),
               onPressed: () => Navigator.pop(context),
             ),
-            title: const Text(
-              "Forgot Password",
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600),
+            title: Text(
+              t.isAr ? 'نسيت كلمة المرور' : "Forgot Password",
+              style: const TextStyle(
+                color: Color(0xFFF77F32), 
+                fontSize: 20, 
+                fontWeight: FontWeight.bold
+              ),
             ),
             centerTitle: true,
           ),
           body: SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 30),
-                  const Text(
-                    "Forgot Password?",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
+            child: ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20),
+              children: [
+                const SizedBox(height: 20),
+                // Main Heading
+                RichText(
+                  text: TextSpan(
+                    style: const TextStyle(
+                      fontSize: 32,
                       fontWeight: FontWeight.bold,
+                      height: 1.2,
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    "Enter your email address to receive a confirmation\ncode resetting your password.",
-                    style: TextStyle(
-                      color: Colors.white60,
-                      fontSize: 14,
-                      height: 1.4,
-                    ),
-                  ),
-                  const SizedBox(height: 40),
-                  const Text(
-                    "Email Address",
-                    style: TextStyle(color: Colors.white70, fontSize: 14),
-                  ),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: _emailController,
-                    style: const TextStyle(color: Colors.white),
-                    decoration: InputDecoration(
-                      hintText: "Enter your email",
-                      hintStyle: const TextStyle(color: Colors.white38),
-                      filled: true,
-                      fillColor: Colors.white.withValues(alpha: 0.05),
-                      errorText: _emailError,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(color: Colors.white24),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(color: Colors.white24),
-                      ),
-                      errorBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(color: Colors.red),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  const Text(
-                    "Mobile Number",
-                    style: TextStyle(color: Colors.white70, fontSize: 14),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      GestureDetector(
-                        onTap: () {
-                          showCountryPicker(
-                            context: context,
-                            showPhoneCode: true,
-                            onSelect: (Country country) {
-                              setState(() {
-                                _selectedCountry = country;
-                              });
-                            },
-                            countryListTheme: CountryListThemeData(
-                              backgroundColor: const Color(0xFF011931),
-                              textStyle: const TextStyle(color: Colors.white),
-                              searchTextStyle:
-                                  const TextStyle(color: Colors.white),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                          );
-                        },
-                        child: Container(
-                          height: 56,
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.05),
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: Colors.white24),
-                          ),
-                          child: Row(
-                            children: [
-                              Text(
-                                _selectedCountry.flagEmoji,
-                                style: const TextStyle(fontSize: 20),
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                "+${_selectedCountry.phoneCode}",
-                                style: const TextStyle(color: Colors.white),
-                              ),
-                            ],
-                          ),
-                        ),
+                      TextSpan(
+                        text: t.isAr ? 'نسيت ' : 'Forgot ', 
+                        style: const TextStyle(color: Color(0xFFF77F32))
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: TextField(
-                          controller: _phoneController,
-                          keyboardType: TextInputType.phone,
-                          style: const TextStyle(color: Colors.white),
-                          decoration: InputDecoration(
-                            hintText: "Enter Mobile Number",
-                            hintStyle: const TextStyle(color: Colors.white38),
-                            filled: true,
-                            fillColor: Colors.white.withValues(alpha: 0.05),
-                            errorText: _phoneError,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: const BorderSide(color: Colors.white24),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: const BorderSide(color: Colors.white24),
-                            ),
-                            errorBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: const BorderSide(color: Colors.red),
-                            ),
-                          ),
-                        ),
+                      TextSpan(
+                        text: t.isAr ? 'كلمة المرور؟' : 'Password?', 
+                        style: const TextStyle(color: Color(0xFF0051DD))
                       ),
                     ],
                   ),
-                  const SizedBox(height: 60),
-                  Bottom(
-                    isLoading: isLoading,
-                    onPressed: () {
-                      final email = _emailController.text.trim();
-                      final phone = _phoneController.text.trim();
-
-                      setState(() {
-                        _emailError = null;
-                        _phoneError = null;
-                      });
-
-                      bool hasError = false;
-
-                      if (email.isEmpty) {
-                        _emailError = "Please enter your email";
-                        hasError = true;
-                      } else if (!_isValidEmail(email)) {
-                        _emailError = "Enter a valid email";
-                        hasError = true;
-                      }
-
-                      if (phone.isEmpty) {
-                        _phoneError = "Please enter your phone number";
-                        hasError = true;
-                      } else if (!_isValidPhone(phone)) {
-                        _phoneError = "This number is not correct";
-                        hasError = true;
-                      }
-
-                      setState(() {});
-
-                      if (hasError) return;
-
-                      // Navigate to OTP Screen
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => OtpEmailVerificationScreen(email: email),
-                        ),
-                      );
-                    },
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  t.tr(
+                    en: "Enter your email address to receive a confirmation code resetting your password.",
+                    ar: "أدخل بريدك الإلكتروني لتلقي رمز تأكيد لإعادة تعيين كلمة المرور الخاصة بك."
                   ),
-                ],
-              ),
+                  style: TextStyle(
+                    color: isDark ? Colors.white70 : Colors.black54,
+                    fontSize: 15,
+                    height: 1.4,
+                  ),
+                ),
+                
+                const SizedBox(height: 48),
+
+                // Email Field
+                _buildLabel(t.emailAddress, textColorPrimary),
+                const SizedBox(height: 8),
+                _buildTextField(
+                  controller: _emailController,
+                  hint: t.tr(en: "Enter your email", ar: "أدخل بريدك الإلكتروني"),
+                  isDark: isDark,
+                  errorText: _emailError,
+                ),
+
+                const SizedBox(height: 24),
+
+                // Mobile Number Field
+                _buildLabel(t.phoneNumber, textColorPrimary),
+                const SizedBox(height: 8),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        showCountryPicker(
+                          context: context,
+                          showPhoneCode: true,
+                          onSelect: (Country country) {
+                            setState(() {
+                              _selectedCountry = country;
+                            });
+                          },
+                          countryListTheme: CountryListThemeData(
+                            backgroundColor: backgroundColor,
+                            textStyle: TextStyle(color: textColorPrimary),
+                            searchTextStyle: TextStyle(color: textColorPrimary),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        height: 56,
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        decoration: BoxDecoration(
+                          color: isDark ? Colors.white.withOpacity(0.05) : Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: isDark ? Colors.white24 : Colors.black12),
+                        ),
+                        child: Row(
+                          children: [
+                            Text(_selectedCountry.flagEmoji, style: const TextStyle(fontSize: 20)),
+                            const SizedBox(width: 8),
+                            Text(
+                              "+${_selectedCountry.phoneCode}",
+                              style: TextStyle(color: textColorPrimary, fontWeight: FontWeight.w600),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _buildTextField(
+                        controller: _phoneController,
+                        hint: t.tr(en: "Enter Mobile Number", ar: "أدخل رقم الهاتف"),
+                        isDark: isDark,
+                        keyboardType: TextInputType.phone,
+                        errorText: _phoneError,
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 60),
+
+                // Continue Button
+                _buildLargeButton(
+                  label: t.tr(en: "Continue", ar: "متابعة"),
+                  onPressed: () {
+                    final email = _emailController.text.trim();
+                    final phone = _phoneController.text.trim();
+
+                    setState(() {
+                      _emailError = null;
+                      _phoneError = null;
+                    });
+
+                    bool hasError = false;
+
+                    if (email.isEmpty) {
+                      _emailError = t.enterYourEmail;
+                      hasError = true;
+                    } else if (!_isValidEmail(email)) {
+                      _emailError = t.isAr ? "يجب أن ينتهي البريد بـ @gmail.com" : "Email must end with @gmail.com";
+                      hasError = true;
+                    }
+
+                    if (phone.isEmpty) {
+                      _phoneError = t.enterMobileNumber;
+                      hasError = true;
+                    } else if (!_isValidPhone(phone)) {
+                      _phoneError = t.isAr ? "رقم الهاتف غير صحيح" : "Invalid phone number";
+                      hasError = true;
+                    }
+
+                    if (hasError) return;
+
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => OtpEmailVerificationScreen(
+                          email: email,
+                          isForgotPassword: true,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ],
             ),
           ),
         );
       },
     );
   }
-}
 
+  Widget _buildLabel(String text, Color color) {
+    return Text(
+      text,
+      style: TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.w600,
+        color: color.withOpacity(0.8),
+      ),
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String hint,
+    required bool isDark,
+    TextInputType? keyboardType,
+    String? errorText,
+  }) {
+    final borderColor = isDark ? Colors.white30 : Colors.black26;
+
+    return TextField(
+      controller: controller,
+      keyboardType: keyboardType,
+      style: TextStyle(color: isDark ? Colors.white : Colors.black),
+      decoration: InputDecoration(
+        hintText: hint,
+        hintStyle: const TextStyle(color: Colors.black26, fontSize: 14),
+        filled: true,
+        fillColor: isDark ? Colors.white.withOpacity(0.05) : Colors.white,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: borderColor),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: isDark ? Colors.white : const Color(0xFF142C66), width: 1.5),
+        ),
+        errorText: errorText,
+      ),
+    );
+  }
+
+  Widget _buildLargeButton({required String label, required VoidCallback onPressed}) {
+    return Container(
+      width: double.infinity,
+      height: 56,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(28),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF142C66).withOpacity(0.3),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFF142C66),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(28),
+          ),
+          elevation: 0,
+        ),
+        child: Text(
+          label,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 17,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+}

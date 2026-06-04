@@ -78,16 +78,16 @@ class _RecruitmentJobFiltersScreenState
   Widget build(BuildContext context) {
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: const Color(0xFFF8FBF4),
       appBar: AppBar(
         title: Text(
           isAr ? 'فلاتر متقدمة' : 'Advanced Filters',
-          style: TextStyle(
+          style: const TextStyle(
             fontWeight: FontWeight.bold,
-            color: Theme.of(context).colorScheme.onSurface,
+            color: Color(0xFFFF7A2A),
           ),
         ),
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        backgroundColor: const Color(0xFFF8FBF4),
         elevation: 0,
         surfaceTintColor: Colors.transparent,
       ),
@@ -132,6 +132,7 @@ class _RecruitmentJobFiltersScreenState
               const SizedBox(height: 48),
               AppButton(
                 label: isAr ? 'تطبيق الفلاتر' : 'Apply Filters',
+                backgroundColor: const Color(0xFF142C66),
                 onPressed: () {
                   RecruitmentSyncStore.instance.updateFilters(
                     type: _selectedType,

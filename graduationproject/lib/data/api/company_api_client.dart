@@ -7,8 +7,8 @@ final class CompanyApiClient {
     : _dio = Dio(
         BaseOptions(
           baseUrl: baseUrl,
-          connectTimeout: const Duration(seconds: 12),
-          receiveTimeout: const Duration(seconds: 12),
+          connectTimeout: const Duration(seconds: 15),
+          receiveTimeout: const Duration(seconds: 15),
           headers: const {'Content-Type': 'application/json'},
         ),
       ) {
@@ -16,7 +16,7 @@ final class CompanyApiClient {
       LogInterceptor(
         requestBody: true,
         responseBody: true,
-        logPrint: (o) => debugPrint(o.toString()),
+        logPrint: (o) => debugPrint('API LOG: ${o.toString()}'),
       ),
     );
   }
@@ -40,28 +40,28 @@ final class CompanyApiClient {
         : <String, dynamic>{'Authorization': 'Bearer $_accessToken'},
   );
 
+  Map<String, dynamic> _parseMap(dynamic data) {
+    if (data is Map) return Map<String, dynamic>.from(data);
+    return {};
+  }
+
   Future<Map<String, dynamic>> login({
     required String email,
     required String password,
     String? role,
   }) async {
     final payload = <String, dynamic>{'email': email, 'password': password};
-    if (role != null && role.trim().isNotEmpty) {
-      payload['role'] = role.trim().toLowerCase();
-    }
-    final Response<dynamic> response = await _dio.post<dynamic>(
-      ApiEndpoints.login,
-      data: payload,
-    );
-    return Map<String, dynamic>.from(response.data as Map);
+    if (role != null) payload['role'] = role.toLowerCase().trim();
+    final response = await _dio.post<dynamic>(ApiEndpoints.login, data: payload);
+    return _parseMap(response.data);
   }
 
   Future<Map<String, dynamic>> googleLogin({required String idToken}) async {
-    final Response<dynamic> response = await _dio.post<dynamic>(
+    final response = await _dio.post<dynamic>(
       ApiEndpoints.googleLogin,
       data: <String, dynamic>{'idToken': idToken},
     );
-    return Map<String, dynamic>.from(response.data as Map);
+    return _parseMap(response.data);
   }
 
   Future<Map<String, dynamic>> register({
@@ -70,182 +70,94 @@ final class CompanyApiClient {
     required String name,
     required String role,
   }) async {
-    final Response<dynamic> response = await _dio.post<dynamic>(
+    final response = await _dio.post<dynamic>(
       ApiEndpoints.register,
-      data: <String, dynamic>{
+      data: {
         'email': email,
         'password': password,
         'name': name,
-        'role': role,
+        'role': role.toLowerCase(),
       },
     );
-    return Map<String, dynamic>.from(response.data as Map);
+    return _parseMap(response.data);
   }
 
   Future<Map<String, dynamic>> updateProfile({
     String? name,
     String? photoUrl,
   }) async {
-    final Response<dynamic> response = await _dio.put<dynamic>(
+    final response = await _dio.put<dynamic>(
       '/api/auth/profile',
-      data: <String, dynamic>{'name': ?name, 'photoUrl': ?photoUrl},
-      options: _authOptions,
-    );
-    return Map<String, dynamic>.from(response.data as Map);
-  }
-
-  Future<List<Map<String, dynamic>>> fetchJobs() async {
-    final Response<dynamic> response = await _dio.get<dynamic>(
-      ApiEndpoints.jobs,
-      options: _authOptions,
-    );
-    return (response.data as List<dynamic>)
-        .map((dynamic e) => Map<String, dynamic>.from(e as Map))
-        .toList();
-  }
-
-  Future<List<Map<String, dynamic>>> fetchApplications() async {
-    final Response<dynamic> response = await _dio.get<dynamic>(
-      ApiEndpoints.applications,
-      options: _authOptions,
-    );
-    return (response.data as List<dynamic>)
-        .map((dynamic e) => Map<String, dynamic>.from(e as Map))
-        .toList();
-  }
-
-  Future<Map<String, dynamic>> createJob({
-    required String title,
-    required String companyName,
-    required String location,
-    required String salaryRange,
-    required String type,
-    required String description,
-    required List<String> responsibilities,
-    required List<String> qualifications,
-    required List<String> niceToHaves,
-    required List<String> benefits,
-    required List<String> tags,
-    required String category,
-    int requiredCount = 1,
-    DateTime? deadline,
-  }) async {
-    final Response<dynamic> response = await _dio.post<dynamic>(
-      ApiEndpoints.jobs,
       data: <String, dynamic>{
-        'title': title,
-        'companyName': companyName,
-        'location': location,
-        'salaryRange': salaryRange,
-        'type': type,
-        'description': description,
-        'responsibilities': responsibilities,
-        'qualifications': qualifications,
-        'niceToHaves': niceToHaves,
-        'benefits': benefits,
-        'tags': tags,
-        'category': category,
-        'requiredCount': requiredCount,
-        if (deadline != null) 'deadline': deadline.toIso8601String(),
+        if (name != null) 'name': name,
+        if (photoUrl != null) 'photoUrl': photoUrl,
       },
       options: _authOptions,
     );
-    return Map<String, dynamic>.from(response.data as Map);
+    return _parseMap(response.data);
   }
 
-  Future<Map<String, dynamic>> updateJob({
-    required String jobId,
-    required String title,
-    required String companyName,
-    required String location,
-    required String salaryRange,
-    required String type,
-    required String description,
-    required List<String> responsibilities,
-    required List<String> qualifications,
-    required List<String> niceToHaves,
-    required List<String> benefits,
-    required String category,
-    required List<String> tags,
-    required int requiredCount,
-    DateTime? deadline,
-    String? status,
-  }) async {
-    final payload = <String, dynamic>{
-      'title': title,
-      'companyName': companyName,
-      'location': location,
-      'salaryRange': salaryRange,
-      'type': type,
-      'description': description,
-      'responsibilities': responsibilities,
-      'qualifications': qualifications,
-      'niceToHaves': niceToHaves,
-      'benefits': benefits,
-      'category': category,
-      'tags': tags,
-      'requiredCount': requiredCount,
-      if (deadline != null) 'deadline': deadline.toUtc().toIso8601String(),
-      'status': ?status,
-    };
-
-    final res = await _dio.put<dynamic>(
-      '${ApiEndpoints.jobs}/$jobId',
-      data: payload,
-      options: _authOptions,
-    );
-    return res.data as Map<String, dynamic>;
+  Future<List<Map<String, dynamic>>> fetchJobs() async {
+    final response = await _dio.get<dynamic>(ApiEndpoints.jobs, options: _authOptions);
+    if (response.data is List) {
+      return (response.data as List).map((e) => Map<String, dynamic>.from(e as Map)).toList();
+    }
+    return [];
   }
 
-  Future<Map<String, dynamic>> createApplication({
-    required String jobId,
-    required String userName,
-  }) async {
-    final Response<dynamic> response = await _dio.post<dynamic>(
+  Future<List<Map<String, dynamic>>> fetchApplications() async {
+    final response = await _dio.get<dynamic>(ApiEndpoints.applications, options: _authOptions);
+    if (response.data is List) {
+      return (response.data as List).map((e) => Map<String, dynamic>.from(e as Map)).toList();
+    }
+    return [];
+  }
+
+  Future<Map<String, dynamic>> createJob(Map<String, dynamic> data) async {
+    final response = await _dio.post<dynamic>(ApiEndpoints.jobs, data: data, options: _authOptions);
+    return _parseMap(response.data);
+  }
+
+  Future<Map<String, dynamic>> updateJob(String id, Map<String, dynamic> data) async {
+    final response = await _dio.put<dynamic>('${ApiEndpoints.jobs}/$id', data: data, options: _authOptions);
+    return _parseMap(response.data);
+  }
+
+  Future<void> deleteJob(String id) async {
+    await _dio.delete<dynamic>('${ApiEndpoints.jobs}/$id', options: _authOptions);
+  }
+
+  Future<Map<String, dynamic>> createApplication({required String jobId, required String userName}) async {
+    final response = await _dio.post<dynamic>(
       ApiEndpoints.applications,
-      data: <String, dynamic>{'jobId': jobId, 'userName': userName},
+      data: {'jobId': jobId, 'userName': userName},
       options: _authOptions,
     );
-    return Map<String, dynamic>.from(response.data as Map);
+    return _parseMap(response.data);
   }
 
-  Future<Map<String, dynamic>> updateApplicationStatus({
-    required String applicationId,
-    required String status,
-  }) async {
-    final String path = ApiEndpoints.applicationStatus.replaceFirst(
-      '{id}',
-      applicationId,
-    );
-    final Response<dynamic> response = await _dio.patch<dynamic>(
+  Future<Map<String, dynamic>> updateApplicationStatus({required String applicationId, required String status}) async {
+    final String path = ApiEndpoints.applicationStatus.replaceFirst('{id}', applicationId);
+    final response = await _dio.patch<dynamic>(
       path,
       data: <String, dynamic>{'status': status},
       options: _authOptions,
     );
-    return Map<String, dynamic>.from(response.data as Map);
+    return _parseMap(response.data);
   }
 
   Future<List<Map<String, dynamic>>> fetchMessages() async {
-    final Response<dynamic> response = await _dio.get<dynamic>(
-      ApiEndpoints.messages,
-      options: _authOptions,
-    );
-    return (response.data as List<dynamic>)
-        .map((dynamic e) => Map<String, dynamic>.from(e as Map))
-        .toList();
+    final response = await _dio.get<dynamic>(ApiEndpoints.messages, options: _authOptions);
+    if (response.data is List) {
+      return (response.data as List).map((e) => Map<String, dynamic>.from(e as Map)).toList();
+    }
+    return [];
   }
 
   Future<void> sendMessage(String text) async {
     await _dio.post<dynamic>(
       ApiEndpoints.messages,
       data: <String, dynamic>{'text': text},
-      options: _authOptions,
-    );
-  }
-
-  Future<void> deleteJob(String jobId) async {
-    await _dio.delete<dynamic>(
-      '${ApiEndpoints.jobs}/$jobId',
       options: _authOptions,
     );
   }

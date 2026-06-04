@@ -7,7 +7,7 @@ class LocaleController {
 
   static final LocaleController instance = LocaleController._();
 
-  final ValueNotifier<Locale> locale = ValueNotifier<Locale>(const Locale('en'));
+  final ValueNotifier<Locale> locale = ValueNotifier<Locale>(const Locale('ar'));
 
   void toggle() {
     locale.value = locale.value.languageCode == 'ar'

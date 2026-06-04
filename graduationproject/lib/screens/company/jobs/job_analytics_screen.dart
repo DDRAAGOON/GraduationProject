@@ -10,6 +10,9 @@ import '../../../shared/state/recruitment_sync_store.dart';
 import '../../../shared/widgets/app_scaffold.dart';
 import '../widgets/company_app_bar_actions.dart';
 import '../widgets/company_bottom_nav.dart';
+import '../widgets/glowing_chatbot_fab.dart';
+import '../../user/messages/chat_thread_screen.dart';
+import '../../../constants/app_images.dart';
 
 class CompanyJobAnalyticsScreen extends StatelessWidget {
   const CompanyJobAnalyticsScreen({super.key, required this.job});
@@ -27,6 +30,17 @@ class CompanyJobAnalyticsScreen extends StatelessWidget {
       body: const _AnalyticsBody(),
       bottomNavigationBar: const CompanyBottomNav(
         current: CompanyTab.analytics,
+      ),
+      floatingActionButton: GlowingChatbotFAB(
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ChatThreadScreen(
+              name: t.isAr ? 'مساعد جوبيتو الذكي' : 'Jobito AI Assistant',
+              image: AppImages.jobito,
+            ),
+          ),
+        ),
       ),
     );
   }

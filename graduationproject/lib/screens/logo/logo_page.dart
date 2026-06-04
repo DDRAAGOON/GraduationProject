@@ -2,226 +2,200 @@ import 'package:flutter/material.dart';
 import '../../app/router/app_router.dart';
 import '../../shared/l10n/app_localizations.dart';
 import '../../shared/state/locale_controller.dart';
+import '../../shared/state/theme_controller.dart';
 
-/// First launch: choose Job seeker (User) or Recruiter (Company), then each flow’s onboarding.
 class LogoPage extends StatelessWidget {
   const LogoPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
-    final t = AppLocalizations.of(context);
-    final cs = Theme.of(context).colorScheme;
-
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.public, color: Color(0xFF1B2D4F)),
-            onPressed: () => _showLanguagePicker(context),
-          ),
-          const SizedBox(width: 8),
-        ],
-      ),
-      extendBodyBehindAppBar: true,
-      body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: size.width * 0.08),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: size.height * 0.02),
-              Text(
-                t.isAr ? 'مرحباً بك' : 'WELCOME',
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.w900,
-                  color: cs.primary,
-                  letterSpacing: 0.5,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                t.isAr
-                    ? 'ابحث عن وظيفتك القادمة أو وظّف أفضل الكوادر بسرعة.'
-                    : 'Find your next role or hire top talent faster.',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: cs.onSurface.withValues(alpha: 0.7),
-                ),
-              ),
-              SizedBox(height: size.height * 0.04),
-
-              // قسم الصورة مع الحجم المعدل (تكبير الحجم)
-              Center(
-                child: Column(
-                  children: [
-                    ConstrainedBox(
-                      constraints: BoxConstraints(
-                        maxWidth: size.width * 0.95, // تكبير العرض
-                        maxHeight: size.height * 0.38, // تكبير الارتفاع
-                      ),
-                      child: Image.asset(
-                        'assets/company/Onboarding/kkk.png',
-                        fit: BoxFit.contain,
-                        errorBuilder: (context, error, stackTrace) => Icon(
-                          Icons.work_outline_rounded,
-                          size: size.width * 0.35,
-                          color: const Color(0xFF1B2D4F),
+    
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: ThemeController.instance.themeMode,
+      builder: (context, themeMode, _) {
+        return ValueListenableBuilder<Locale>(
+          valueListenable: LocaleController.instance.locale,
+          builder: (context, locale, _) {
+            final t = AppLocalizations.of(context);
+            final isDark = themeMode == ThemeMode.dark || 
+                          (themeMode == ThemeMode.system && MediaQuery.platformBrightnessOf(context) == Brightness.dark);
+            
+            return Scaffold(
+              backgroundColor: isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4),
+              body: Stack(
+                children: [
+                  // Main content (Top icons and Illustration)
+                  SafeArea(
+                    child: Column(
+                      children: [
+                        // Top Icons (Mode & Language)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                          child: Directionality(
+                            textDirection: TextDirection.ltr, // Keep icons on the right always
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                _CircleIconButton(
+                                  icon: isDark ? Icons.nightlight_outlined : Icons.wb_sunny_outlined,
+                                  onPressed: () {
+                                    if (isDark) {
+                                      ThemeController.instance.setLight();
+                                    } else {
+                                      ThemeController.instance.setDark();
+                                    }
+                                  },
+                                ),
+                                const SizedBox(width: 12),
+                                _CircleIconButton(
+                                  icon: Icons.public,
+                                  onPressed: () => LocaleController.instance.toggle(),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    // النص التوضيحي الملون تحت الصورة
-                    Text.rich(
-                      TextSpan(
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color: cs.onSurface.withValues(alpha: 0.8),
+
+                        const Spacer(flex: 1),
+
+                        // Main Illustration
+                        Center(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            child: ConstrainedBox(
+                              constraints: BoxConstraints(
+                                maxHeight: size.height * 0.85, 
+                              ),
+                              child: Image.asset(
+                                'assets/tradesman/Group 289310.png',
+                                width: size.width,
+                                fit: BoxFit.contain,
+                                errorBuilder: (_, __, ___) => const Icon(
+                                  Icons.auto_awesome_mosaic,
+                                  size: 150,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ),
+                          ),
                         ),
-                        children: t.isAr
-                            ? [
-                          const TextSpan(text: 'تقدر الآن تسجل ك'),
-                          const TextSpan(
-                            text: 'باحث عن عمل',
-                            style: TextStyle(color: Color(0xFF4A6ED1)),
-                          ),
-                          const TextSpan(text: ' أو '),
-                          const TextSpan(
-                            text: 'شركة',
-                            style: TextStyle(color: Color(0xFFFF7A2A)),
-                          ),
-                        ]
-                            : [
-                          const TextSpan(text: 'You can now register as a '),
-                          const TextSpan(
-                            text: 'job seeker',
-                            style: TextStyle(color: Color(0xFF4A6ED1)),
-                          ),
-                          const TextSpan(text: ' or a '),
-                          const TextSpan(
-                            text: 'company',
-                            style: TextStyle(color: Color(0xFFFF7A2A)),
-                          ),
-                        ],
-                      ),
-                      textAlign: TextAlign.center,
+
+                        const Spacer(flex: 2), 
+                      ],
                     ),
-                  ],
-                ),
-              ),
+                  ),
 
-              // زيادة المسافة لنزول الأزرار تحت أكثر
-              SizedBox(height: size.height * 0.06),
-
-              _RoleButton(
-                label: t.userTr(
-                  'role.user',
-                  fallbackEn: 'User',
-                  fallbackAr: 'مستخدم',
-                ),
-                color: cs.primary,
-                onTap: () =>
-                    Navigator.of(context).pushNamed(AppRoutes.userOnboardingNew),
-              ),
-              SizedBox(height: size.height * 0.022),
-              _RoleButton(
-                label: t.companyTr(
-                  'role.company',
-                  fallbackEn: 'Company',
-                  fallbackAr: 'شركة',
-                ),
-                color: cs.secondary,
-                onTap: () =>
-                    Navigator.of(context).pushNamed(AppRoutes.companyOnboardingNew),
-              ),
-              SizedBox(height: size.height * 0.012),
-              SizedBox(height: size.height * 0.07),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _showLanguagePicker(BuildContext context) {
-    final t = AppLocalizations.of(context);
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) {
-        return Container(
-          padding: const EdgeInsets.symmetric(vertical: 20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: const Icon(Icons.language),
-                title: Text(t.english),
-                onTap: () {
-                  if (t.isAr) LocaleController.instance.toggle();
-                  Navigator.pop(context);
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.language),
-                title: Text(t.arabic),
-                onTap: () {
-                  if (!t.isAr) LocaleController.instance.toggle();
-                  Navigator.pop(context);
-                },
-              ),
-            ],
-          ),
+                  // Role Buttons positioned at the bottom
+                  Positioned(
+                    bottom: size.height * 0.1,
+                    left: 45,
+                    right: 45,
+                    child: Column(
+                      children: [
+                        _GradientRoleButton(
+                          text: t.userTr('role.user', fallbackEn: 'User', fallbackAr: 'مستخدم'),
+                          onPressed: () => Navigator.pushNamed(context, AppRoutes.userOnboarding),
+                          colors: const [Color(0xFFF77F32), Color(0xFF3955B1), Color(0xFF0F35B0)],
+                        ),
+                        const SizedBox(height: 16),
+                        _GradientRoleButton(
+                          text: t.companyTr('role.company', fallbackEn: 'Company', fallbackAr: 'شركة'),
+                          onPressed: () => Navigator.pushNamed(context, AppRoutes.companyOnboardingSmartSearch),
+                          colors: const [Color(0xFF0F35B0), Color(0xFF3955B1), Color(0xFFF77F32)],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ));
+          },
         );
       },
     );
   }
 }
 
-class _RoleButton extends StatelessWidget {
-  const _RoleButton({
-    required this.label,
-    required this.color,
-    required this.onTap,
-  });
+class _CircleIconButton extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onPressed;
 
-  final String label;
-  final Color color;
-  final VoidCallback onTap;
+  const _CircleIconButton({required this.icon, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(14),
-        child: Ink(
-          width: double.infinity,
-          height: 54,
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.circular(14),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.15),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
-              ),
-            ],
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    return Container(
+      width: 42,
+      height: 42,
+      decoration: BoxDecoration(
+        color: isDark ? Colors.white12 : Colors.white,
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
           ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onPressed,
+          borderRadius: BorderRadius.circular(21),
+          child: Icon(icon, color: isDark ? Colors.white70 : const Color(0xFF0F35B0), size: 20),
+        ),
+      ),
+    );
+  }
+}
+
+class _GradientRoleButton extends StatelessWidget {
+  final String text;
+  final VoidCallback onPressed;
+  final List<Color> colors;
+
+  const _GradientRoleButton({
+    required this.text,
+    required this.onPressed,
+    required this.colors,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      height: 54,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(27),
+        gradient: LinearGradient(
+          colors: colors,
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF0F35B0).withValues(alpha: 0.2),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onPressed,
+          borderRadius: BorderRadius.circular(27),
           child: Center(
             child: Text(
-              label,
+              text,
               style: const TextStyle(
                 color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 0.3,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 0.5,
               ),
             ),
           ),

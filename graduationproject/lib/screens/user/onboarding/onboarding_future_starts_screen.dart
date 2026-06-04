@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../constants/app_images.dart';
 import '../../../shared/l10n/app_localizations.dart';
-import '../core/app_colors.dart';
+import '../../../shared/state/theme_controller.dart';
 
 class Screen3 extends StatelessWidget {
   final VoidCallback onNext;
@@ -12,115 +11,133 @@ class Screen3 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
-    return Scaffold(
-      backgroundColor: const Color(0xFF011931),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Column(
+    final size = MediaQuery.sizeOf(context);
+
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: ThemeController.instance.themeMode,
+      builder: (context, themeMode, _) {
+        final isDark = themeMode == ThemeMode.dark || 
+                      (themeMode == ThemeMode.system && MediaQuery.platformBrightnessOf(context) == Brightness.dark);
+        
+        return Scaffold(
+          backgroundColor: isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4),
+          body: Stack(
             children: [
-              const Spacer(flex: 2),
-              Image.asset(
-                AppImages.companyOnboarding3,
-                height: MediaQuery.of(context).size.height * 0.3,
-                fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) {
-                  return const Icon(
-                    Icons.broken_image,
-                    size: 100,
-                    color: Colors.white,
-                  );
-                },
-              ),
-              const Spacer(flex: 2),
-              Text(
-                t.userTr(
-                  'onboarding.title3',
-                  fallbackEn: 'Your Future Starts Here',
-                  fallbackAr: 'مستقبلك يبدأ من هنا',
-                ),
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                t.userTr(
-                  'onboarding.subtitle3',
-                  fallbackEn:
-                      'Thousands of job opportunities are waiting\nfor you',
-                  fallbackAr: 'آلاف فرص العمل في انتظارك',
-                ),
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  height: 1.5,
-                ),
-              ),
-              const Spacer(flex: 3),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: List.generate(
-                      3,
-                      (index) =>
-                          _buildIndicator(isActive: index == currentPage),
-                    ),
+              // The diagonal background image
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: Image.asset(
+                  'assets/tradesman/Rectangle 4127.png',
+                  width: size.width,
+                  fit: BoxFit.fitWidth,
+                  errorBuilder: (_, __, ___) => Container(
+                    height: size.height * 0.5,
+                    color: const Color(0xFFF17C21),
                   ),
-                  buildNextButton(onNext, t),
-                ],
+                ),
               ),
-              const SizedBox(height: 40),
+              
+              SafeArea(
+                child: Column(
+                  children: [
+                    const Spacer(flex: 40),
+                    // Illustration
+                    Padding(
+                      padding: const EdgeInsets.only(left: 130),
+                      child: Center(
+                        child: Image.asset(
+                          'assets/company/Onboarding/Onboarding-3.png',
+                          height: size.height * 0.3,
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, error, stackTrace) => const Icon(
+                            Icons.rocket_launch,
+                            size: 100,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const Spacer(flex: 2),
+                    // Text Content
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: Column(
+                        children: [
+                          Text(
+                            t.userTr(
+                              'onboarding.title3',
+                              fallbackEn: 'Your Future Starts Here',
+                              fallbackAr: 'مستقبلك يبدأ من هنا',
+                            ),
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              color: Color(0xFFF17C21),
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            t.userTr(
+                              'onboarding.subtitle3',
+                              fallbackEn:
+                                  'Take the next step toward your dream job All in one app',
+                              fallbackAr: 'آلاف فرص العمل في انتظارك',
+                            ),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: isDark ? Colors.white70 : Colors.black87,
+                              fontSize: 16,
+                              height: 1.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Spacer(flex: 3),
+                    // Navigation Area
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: List.generate(
+                              3,
+                              (index) => _buildIndicator(isActive: index == currentPage),
+                            ),
+                          ),
+                          _buildNextButton(onNext, t),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
-  Widget buildNextButton(VoidCallback onPressed, AppLocalizations t) {
-    return GestureDetector(
-      onTap: onPressed,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 40),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [
-              Color(0xFF0A2A4A), // Dark
-              Color(0xFF2F5F8F), // Light
-              Color.fromARGB(255, 118, 159, 178),
-            ],
-            begin: Alignment.centerLeft,
-            end: Alignment.centerRight,
-          ),
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(70),
-            bottomLeft: Radius.circular(25),
-            topRight: Radius.circular(25),
-            bottomRight: Radius.circular(70),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.3),
-              blurRadius: 10,
-              offset: const Offset(0, 5),
-            ),
-          ],
+  Widget _buildNextButton(VoidCallback onPressed, AppLocalizations t) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color(0xFF142C66),
+        foregroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(horizontal: 45, vertical: 16),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(25),
         ),
-        child: Text(
-          t.userTr('onboarding.next', fallbackEn: 'Next', fallbackAr: 'التالي'),
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        elevation: 5,
+      ),
+      child: Text(
+        t.userTr('common.next', fallbackEn: 'Next', fallbackAr: 'التالي'),
+        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
       ),
     );
   }
@@ -128,14 +145,21 @@ class Screen3 extends StatelessWidget {
   Widget _buildIndicator({required bool isActive}) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
-      margin: const EdgeInsets.only(right: 6),
-      width: isActive ? 32 : 12,
+      margin: const EdgeInsets.only(right: 8),
+      width: isActive ? 28 : 12,
       height: 10,
       decoration: BoxDecoration(
-        color: isActive ? Colors.white : AppColors.primary,
+        color: isActive ? const Color(0xFFF17C21) : Colors.white70,
         borderRadius: BorderRadius.circular(5),
+        boxShadow: [
+          if (isActive)
+            BoxShadow(
+              color: const Color(0xFFF17C21).withOpacity(0.3),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+        ],
       ),
     );
   }
 }
-

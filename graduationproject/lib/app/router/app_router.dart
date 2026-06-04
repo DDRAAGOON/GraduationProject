@@ -34,6 +34,7 @@ import '../../screens/company/onboarding/onboarding_smart_search_screen.dart';
 import '../../screens/company/onboarding/recruitment_company_onboarding_screen.dart';
 import '../../screens/company/profile/company_edit_intro_screen.dart';
 import '../../screens/company/profile/company_profile_screen.dart';
+import '../../screens/company/profile/company_ratings_screen.dart';
 import '../../screens/company/profile/profile_settings_overview_screen.dart';
 import '../../screens/company/profile/profile_settings_social_links_screen.dart';
 import '../../screens/company/profile/recruitment_company_profile_screen.dart';
@@ -51,12 +52,16 @@ import '../../screens/user/jobs/recruitment_job_filters_screen.dart';
 import '../../screens/user/jobs/recruitment_job_details_screen.dart';
 import '../../screens/user/jobs/recruitment_all_applications_screen.dart';
 import '../../screens/user/auth/recruitment_user_sign_in_screen.dart';
+import '../../screens/user/auth/forgot_password_screen.dart' as user_auth;
+import '../../screens/user/auth/reset_password_screen.dart' as user_reset;
 import '../../screens/user/onboarding/onboarding.dart';
 import '../../screens/user/onboarding/recruitment_user_onboarding_screen.dart';
 import '../../screens/user/profile/edit_profile_screen.dart';
+import '../../screens/user/profile/complete_profile_screen.dart';
 import '../../screens/user/settings/recruitment_user_settings_screen.dart';
 import '../../screens/user/home/recruitment_user_shell_screen.dart';
 import '../../screens/user/home/company_details_screen.dart';
+import '../../screens/user/teardsman/nav_Botton_bar/nav_bottom_bar.dart';
 import '../../shared/state/recruitment_sync_store.dart';
 import '../../shared/models/applicant.dart';
 import '../../shared/models/job.dart';
@@ -84,6 +89,10 @@ final class AppRoutes {
   static const userEditProfile = '/user/profile/edit';
   static const userCompanyDetails = '/user/company/details';
   static const userAllApplications = '/user/jobs/all_applications';
+  static const userCompleteProfile = '/user/profile/complete';
+  static const userForgotPassword = '/user/auth/forgot_password';
+  static const userResetPassword = '/user/auth/reset_password';
+  static const tradesmanWorkspace = '/user/tradesman/workspace';
 
   // --- Company Onboarding Routes ---
   static const companyOnboardingSmartSearch =
@@ -141,6 +150,7 @@ final class AppRoutes {
   static const companyNotifications = '/company/notifications';
   static const companyHelpCenter = '/company/help/center';
   static const companyAccountSecurity = '/company/settings/account_security';
+  static const companyRatings = '/company/ratings';
 }
 
 /// The [AppRouter] is responsible for generating route transitions and providing
@@ -218,6 +228,14 @@ final class AppRouter {
         );
       case AppRoutes.userAllApplications:
         page = const RecruitmentAllApplicationsScreen();
+      case AppRoutes.userCompleteProfile:
+        page = const CompleteProfileScreen();
+      case AppRoutes.userForgotPassword:
+        page = const user_auth.ForgotPasswordScreen();
+      case AppRoutes.userResetPassword:
+        page = const user_reset.ResetPasswordScreen();
+      case AppRoutes.tradesmanWorkspace:
+        page = const Navbotton();
 
       case AppRoutes.companyOnboardingSmartSearch:
         page = const CompanyOnboardingSmartSearchScreen();
@@ -343,6 +361,8 @@ final class AppRouter {
         page = const CompanyHelpCenterScreen();
       case AppRoutes.companyAccountSecurity:
         page = const CompanyAccountSecurityScreen();
+      case AppRoutes.companyRatings:
+        page = const CompanyRatingsScreen();
       default:
         page = const _UnknownRouteScreen();
     }

@@ -13,6 +13,10 @@ import '../../../shared/state/recruitment_sync_store.dart';
 import '../../../shared/widgets/app_scaffold.dart';
 import '../../../shared/widgets/section_title.dart';
 import '../widgets/company_bottom_nav.dart';
+import '../widgets/glowing_chatbot_fab.dart';
+import '../../user/messages/chat_thread_screen.dart';
+import '../../../constants/app_images.dart';
+import '../../../constants/app_images.dart';
 
 class CompanyDashboardScreen extends StatefulWidget {
   const CompanyDashboardScreen({super.key});
@@ -94,9 +98,16 @@ class _CompanyDashboardScreenState extends State<CompanyDashboardScreen> {
               constraints: const BoxConstraints(maxWidth: 980),
               child: LayoutBuilder(
                 builder: (context, constraints) {
-                  final jobs = RecruitmentSyncStore.instance.jobs
+                  final allJobs = RecruitmentSyncStore.instance.jobs;
+                  final companyJobs = allJobs
                       .where((j) => j.companyName == companyStore.companyName)
                       .toList();
+                  
+                  // If no real jobs found for this company, show mock jobs for UI preview
+                  final jobs = companyJobs.isNotEmpty 
+                      ? companyJobs 
+                      : allJobs.where((j) => j.id.startsWith('mock_')).toList();
+
                   final t = AppLocalizations.of(context);
                   void onTapNewCandidates() {
                     if (jobs.isEmpty) {
@@ -182,6 +193,20 @@ class _CompanyDashboardScreenState extends State<CompanyDashboardScreen> {
             ),
           ),
           bottomNavigationBar: const CompanyBottomNav(current: CompanyTab.home),
+          floatingActionButton: GlowingChatbotFAB(
+            onTap: () {
+              final tLocal = AppLocalizations.of(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ChatThreadScreen(
+                    name: tLocal.isAr ? 'مساعد جوبيتو الذكي' : 'Jobito AI Assistant',
+                    image: AppImages.jobito,
+                  ),
+                ),
+              );
+            },
+          ),
         );
       },
     );

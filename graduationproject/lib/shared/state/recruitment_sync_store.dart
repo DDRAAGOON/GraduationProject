@@ -260,7 +260,73 @@ class ServiceRequestPost {
 class RecruitmentSyncStore extends ChangeNotifier {
   RecruitmentSyncStore._() {
     _addInitialMockJobs();
+    _addInitialMockApplications();
     _seedTradesmanRatingsPreview();
+  }
+
+  void _addInitialMockApplications() {
+    final mocks = [
+      RecruitmentApplication(
+        id: 'mock_app_1',
+        jobId: 'mock_company_job_1',
+        jobTitle: 'Senior Flutter Developer',
+        companyName: 'Jobito Labs',
+        userName: 'Karim',
+        status: 'Hired',
+        updatedAt: DateTime(2026, 5, 2),
+      ),
+      RecruitmentApplication(
+        id: 'mock_app_2',
+        jobId: 'mock_company_job_2',
+        jobTitle: 'Digital Marketing Manager',
+        companyName: 'Jobito Labs',
+        userName: 'Karim',
+        status: 'Applied',
+        updatedAt: DateTime(2026, 5, 2),
+      ),
+      RecruitmentApplication(
+        id: 'mock_app_3',
+        jobId: 'mock_company_job_3',
+        jobTitle: 'UI/UX Designer',
+        companyName: 'المارودي للمقاولات',
+        userName: 'Karim',
+        status: 'Waitlist',
+        updatedAt: DateTime(2026, 5, 1),
+      ),
+      RecruitmentApplication(
+        id: 'mock_app_4',
+        jobId: 'mock_company_job_4',
+        jobTitle: 'HR Generalist',
+        companyName: 'المارودي للمقاولات',
+        userName: 'Karim',
+        status: 'Rejected',
+        updatedAt: DateTime(2026, 4, 30),
+      ),
+      RecruitmentApplication(
+        id: 'mock_app_5',
+        jobId: 'tech_flutter_1',
+        jobTitle: 'Junior Flutter Developer',
+        companyName: 'إبداع للبرمجيات',
+        userName: 'Karim',
+        status: 'Applied',
+        updatedAt: DateTime(2026, 4, 28),
+      ),
+      RecruitmentApplication(
+        id: 'mock_app_6',
+        jobId: 'tech_ui_ux_1',
+        jobTitle: 'UI/UX Designer',
+        companyName: 'وكالة بيكسل الرقمية',
+        userName: 'Karim',
+        status: 'Applied',
+        updatedAt: DateTime(2026, 4, 28),
+      ),
+    ];
+
+    for (var mock in mocks) {
+      if (!_applications.any((a) => a.id == mock.id)) {
+        _applications.add(mock);
+      }
+    }
   }
 
   void _seedTradesmanRatingsPreview() {
@@ -409,6 +475,7 @@ class RecruitmentSyncStore extends ChangeNotifier {
   String get currentUserTitle => _currentUserTitle;
   String get userRole => _userRole;
   String? get profileImage => _profileImage;
+  String get searchQuery => _searchQuery;
   String get filterType => _filterType;
   String get filterLocation => _filterLocation;
   String get filterCategory => _filterCategory;
@@ -566,6 +633,13 @@ class RecruitmentSyncStore extends ChangeNotifier {
         _applications.add(RecruitmentApplication.fromMap(item));
       }
     }
+    // Ensure mock applications are present for the demo
+    _addInitialMockApplications();
+    
+    // Remove duplicates by ID
+    final appIds = <String>{};
+    _applications.retainWhere((a) => appIds.add(a.id));
+
     _messages.clear();
     for (final item in messages) {
       if (item is Map<String, dynamic>) {
@@ -735,6 +809,72 @@ class RecruitmentSyncStore extends ChangeNotifier {
 
   void _addInitialMockJobs() {
     _jobs.addAll([
+      // ========== وظائف الشركة (Company Sample Jobs) ==========
+      RecruitmentJob(
+        id: 'mock_company_job_1',
+        title: 'مطور تطبيقات فلاتر (Senior Flutter Developer)',
+        companyName: 'Jobito Labs', // Default demo name
+        location: 'Cairo - Remote',
+        salaryRange: '25000 - 35000 ج.م',
+        type: 'Full-time',
+        status: 'Open',
+        category: 'Technical',
+        tags: ['Flutter', 'Clean Architecture', 'Bloc'],
+        publishedAt: DateTime.now().subtract(const Duration(hours: 4)),
+        logoIcon: Icons.code,
+        description: 'مطلوب مطور فلاتر خبير لقيادة فريق تطوير واجهات المستخدم في مشاريعنا الكبرى.',
+        capacity: 5,
+        acceptedCount: 2,
+      ),
+      RecruitmentJob(
+        id: 'mock_company_job_2',
+        title: 'مدير تسويق رقمي (Digital Marketing Manager)',
+        companyName: 'Jobito Labs',
+        location: 'Giza',
+        salaryRange: '15000 - 20000 ج.م',
+        type: 'Full-time',
+        status: 'Open',
+        category: 'Non-Technical',
+        tags: ['Marketing', 'SEO', 'Ads'],
+        publishedAt: DateTime.now().subtract(const Duration(days: 2)),
+        logoIcon: Icons.campaign,
+        description: 'إدارة حملات التواصل الاجتماعي وتحليل البيانات لزيادة انتشار العلامة التجارية.',
+        capacity: 2,
+        acceptedCount: 0,
+      ),
+      RecruitmentJob(
+        id: 'mock_company_job_3',
+        title: 'مصمم واجهات (UI/UX Designer)',
+        companyName: 'المارودي للمقاولات',
+        location: 'Cairo',
+        salaryRange: 'Negotiable',
+        type: 'Part-time',
+        status: 'Open',
+        category: 'Technical',
+        tags: ['Figma', 'Prototyping'],
+        publishedAt: DateTime.now().subtract(const Duration(hours: 12)),
+        logoIcon: Icons.design_services,
+        description: 'تصميم تجربة مستخدم مميزة لتطبيقات الهواتف والويب الخاصة بالشركة.',
+        capacity: 1,
+        acceptedCount: 0,
+      ),
+      RecruitmentJob(
+        id: 'mock_company_job_4',
+        title: 'أخصائي موارد بشرية (HR Generalist)',
+        companyName: 'المارودي للمقاولات',
+        location: 'Cairo',
+        salaryRange: '10000 - 14000 ج.م',
+        type: 'Full-time',
+        status: 'Closed',
+        category: 'Non-Technical',
+        tags: ['HR', 'Recruitment'],
+        publishedAt: DateTime.now().subtract(const Duration(days: 15)),
+        logoIcon: Icons.people,
+        description: 'إدارة شؤون الموظفين وعمليات التوظيف والتدريب الداخلي.',
+        capacity: 1,
+        acceptedCount: 1,
+      ),
+
       // ========== وظائف الصنايعية (Tradesman) ==========
       RecruitmentJob(
         id: 'trade_plumber_1',

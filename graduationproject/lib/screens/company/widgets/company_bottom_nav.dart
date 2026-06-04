@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../app/router/app_router.dart';
 import '../../../shared/l10n/app_localizations.dart';
 
-enum CompanyTab { home, chat, applicants, profile, analytics }
+enum CompanyTab { home, chat, applicants, profile, analytics, ratings }
 
 class CompanyBottomNav extends StatelessWidget {
   const CompanyBottomNav({super.key, required this.current});
@@ -18,6 +18,7 @@ class CompanyBottomNav extends StatelessWidget {
     CompanyTab.applicants => 2,
     CompanyTab.profile => 3,
     CompanyTab.analytics => 4,
+    CompanyTab.ratings => 5,
   };
 
   void _go(BuildContext context, int index) {
@@ -27,6 +28,7 @@ class CompanyBottomNav extends StatelessWidget {
       2 => AppRoutes.companyJobsHub,
       3 => AppRoutes.companyCompanyProfile,
       4 => AppRoutes.companyJobAnalytics,
+      5 => AppRoutes.companyRatings,
       _ => AppRoutes.companyDashboard,
     };
     Navigator.of(context).pushReplacementNamed(route);
@@ -59,6 +61,10 @@ class CompanyBottomNav extends StatelessWidget {
         NavigationDestination(
           icon: const Icon(Icons.bar_chart_outlined),
           label: t.stats,
+        ),
+        NavigationDestination(
+          icon: const Icon(Icons.star_outline),
+          label: t.tr(en: 'Ratings', ar: 'التقييمات'),
         ),
       ],
     );

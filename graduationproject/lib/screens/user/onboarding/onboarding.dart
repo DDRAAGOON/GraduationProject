@@ -23,9 +23,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
       );
     } else {
       // Use named route for consistency
-      Navigator.pushReplacementNamed(context, AppRoutes.companySignIn); 
-      // Note: Assuming you want to go to sign in. 
-      // If there's a specific user sign in route, use it.
+      Navigator.pushReplacementNamed(context, AppRoutes.userSignInNew);
     }
   }
 

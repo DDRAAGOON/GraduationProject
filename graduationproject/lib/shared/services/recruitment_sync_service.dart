@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 
 import '../../data/api/company_api_client.dart';
 import '../state/company_store.dart';
@@ -17,95 +19,59 @@ class RecruitmentSyncService {
   Future<Map<String, dynamic>> login({
     required String email,
     required String password,
-    required String expectedRole,
+    String? expectedRole,
   }) async {
-    final auth = await _client.login(
-      email: email.trim(),
-      password: password,
-      role: expectedRole,
-    );
-
-    final user = auth['user'] as Map<String, dynamic>?;
-    final role = user?['role']?.toString().toLowerCase().trim();
-    final token = auth['token']?.toString().trim();
-    final expected = expectedRole.toLowerCase().trim();
-
-    if (token == null || token.isEmpty) {
-      throw Exception('Login response missing token');
-    }
-    if (role == null || role.isEmpty) {
-      throw Exception('Login response missing role');
-    }
-    if (expected == 'company') {
-      if (role != 'company') {
-        throw Exception('هذا الحساب ليس حساب شركة');
-      }
-    } else {
-      // For user login, block company accounts from signing in
-      if (role == 'company') {
-        throw Exception('هذا الحساب مخصص للشركات');
-      }
-    }
-
-    _client.setToken(token);
-
-    // Update store with user info
-    if (user != null) {
-      final String name = user['name']?.toString() ?? 'User';
-      RecruitmentSyncStore.instance.updateCurrentUser(
-        name: name,
-        email: user['email']?.toString(),
-        photoUrl: user['photoUrl']?.toString(),
+    try {
+      final auth = await _client.login(
+        email: email.trim(),
+        password: password,
+        role: expectedRole,
       );
 
-      if (role == 'company') {
-        CompanyStore.instance.setRegistrationData(
-          companyId: user['id']?.toString(),
-          companyName: name,
-          email: user['email']?.toString(),
-        );
-        final fullProfile = await SessionManager.getCompanyFullProfile();
-        await CompanyStore.instance.loadFromSession(fullProfile);
-      }
-    }
+      final user = auth['user'] as Map<String, dynamic>?;
+      final role = user?['role']?.toString().toLowerCase().trim();
+      final token = auth['token']?.toString().trim();
 
-    return user ?? {};
+      if (token == null || token.isEmpty) {
+        throw Exception('Login response missing token');
+      }
+      
+      _client.setToken(token);
+
+      if (user != null) {
+        final String name = user['name']?.toString() ?? 'User';
+        RecruitmentSyncStore.instance.updateCurrentUser(
+          name: name,
+          email: user['email']?.toString(),
+          photoUrl: user['photoUrl']?.toString(),
+        );
+
+        if (role == 'company') {
+          CompanyStore.instance.setRegistrationData(
+            companyId: user['id']?.toString(),
+            companyName: name,
+            email: user['email']?.toString(),
+          );
+          final fullProfile = await SessionManager.getCompanyFullProfile();
+          await CompanyStore.instance.loadFromSession(fullProfile);
+        }
+      }
+
+      return user ?? {};
+    } on DioException catch (e) {
+      throw Exception(_handleDioError(e));
+    }
   }
 
   Future<Map<String, dynamic>> googleLogin(String idToken) async {
-    final auth = await _client.googleLogin(idToken: idToken);
-
-    final user = auth['user'] as Map<String, dynamic>?;
-    final token = auth['token']?.toString().trim();
-
-    if (token == null || token.isEmpty) {
-      throw Exception('Google login response missing token');
+    try {
+      final auth = await _client.googleLogin(idToken: idToken);
+      final token = auth['token']?.toString().trim();
+      if (token != null) _client.setToken(token);
+      return auth;
+    } catch (e) {
+      rethrow;
     }
-
-    _client.setToken(token);
-
-    // Update store with user info
-    if (user != null) {
-      final String name = user['name']?.toString() ?? 'User';
-      RecruitmentSyncStore.instance.updateCurrentUser(
-        name: name,
-        email: user['email']?.toString(),
-        photoUrl: user['photoUrl']?.toString(),
-      );
-
-      final role = user['role']?.toString().toLowerCase().trim();
-      if (role == 'company') {
-        CompanyStore.instance.setRegistrationData(
-          companyId: user['id']?.toString(),
-          companyName: name,
-          email: user['email']?.toString(),
-        );
-        final fullProfile = await SessionManager.getCompanyFullProfile();
-        await CompanyStore.instance.loadFromSession(fullProfile);
-      }
-    }
-
-    return user ?? {};
   }
 
   Future<Map<String, dynamic>> register({
@@ -114,43 +80,21 @@ class RecruitmentSyncService {
     required String name,
     required String role,
   }) async {
-    final auth = await _client.register(
-      email: email.trim(),
-      password: password,
-      name: name.trim(),
-      role: role.toLowerCase().trim(),
-    );
-
-    final user = auth['user'] as Map<String, dynamic>?;
-    final token = auth['token']?.toString().trim();
-
-    if (token == null || token.isEmpty) {
-      throw Exception('Registration response missing token');
-    }
-
-    _client.setToken(token);
-
-    // Update store with user info
-    if (user != null) {
-      final String name = user['name']?.toString() ?? 'User';
-      RecruitmentSyncStore.instance.updateCurrentUser(
-        name: name,
-        email: user['email']?.toString(),
-        photoUrl: user['photoUrl']?.toString(),
+    try {
+      final auth = await _client.register(
+        email: email.trim(),
+        password: password,
+        name: name.trim(),
+        role: role.toLowerCase().trim(),
       );
 
-      if (role.toLowerCase().trim() == 'company') {
-        CompanyStore.instance.setRegistrationData(
-          companyId: user['id']?.toString(),
-          companyName: name,
-          email: user['email']?.toString(),
-        );
-        final fullProfile = await SessionManager.getCompanyFullProfile();
-        await CompanyStore.instance.loadFromSession(fullProfile);
-      }
-    }
+      final token = auth['token']?.toString().trim();
+      if (token != null) _client.setToken(token);
 
-    return user ?? {};
+      return auth;
+    } catch (e) {
+      rethrow;
+    }
   }
 
   Future<Map<String, dynamic>> updateProfile({
@@ -158,41 +102,122 @@ class RecruitmentSyncService {
     String? photoUrl,
   }) async {
     _assertAuthenticated();
-    final user = await _client.updateProfile(name: name, photoUrl: photoUrl);
+    return await _client.updateProfile(name: name, photoUrl: photoUrl);
+  }
 
-    final String currentName = user['name']?.toString() ?? 'User';
-    RecruitmentSyncStore.instance.updateCurrentUser(
-      name: currentName,
-      photoUrl: user['photoUrl']?.toString(),
-    );
-
-    if (RecruitmentSyncStore.instance.userRole.toLowerCase() == 'company') {
-      CompanyStore.instance.setRegistrationData(
-        companyName: currentName,
-        customProfileImage: user['photoUrl']?.toString(),
+  Future<void> updateStatus({
+    required String applicationId,
+    required String status,
+  }) async {
+    _assertAuthenticated();
+    try {
+      await _client.updateApplicationStatus(
+        applicationId: applicationId,
+        status: status,
       );
+      await _pullServerState();
+    } catch (_) {}
+  }
+
+  Future<void> updateJob({
+    required String jobId,
+    required String title,
+    required String companyName,
+    required String location,
+    required String salaryRange,
+    required String type,
+    required String description,
+    required List<String> responsibilities,
+    required List<String> qualifications,
+    required List<String> niceToHaves,
+    required List<String> benefits,
+    required String category,
+    required List<String> tags,
+    required int requiredCount,
+    DateTime? deadline,
+    String? status,
+  }) async {
+    _assertAuthenticated();
+    try {
+      await _client.updateJob(jobId, {
+        'title': title,
+        'companyName': companyName,
+        'location': location,
+        'salaryRange': salaryRange,
+        'type': type,
+        'description': description,
+        'responsibilities': responsibilities,
+        'qualifications': qualifications,
+        'niceToHaves': niceToHaves,
+        'benefits': benefits,
+        'category': category,
+        'tags': tags,
+        'requiredCount': requiredCount,
+        if (deadline != null) 'deadline': deadline.toUtc().toIso8601String(),
+        if (status != null) 'status': status,
+      });
+      await _pullServerState();
+    } catch (_) {}
+  }
+
+  Future<void> deleteJob(String jobId) async {
+    _assertAuthenticated();
+    try {
+      await _client.deleteJob(jobId);
+      await _pullServerState();
+    } catch (_) {}
+  }
+
+  Future<String> postJob({
+    required String title,
+    String companyName = 'Company',
+    required String location,
+    required String salaryRange,
+    String type = 'Full-time',
+    required String description,
+    required List<String> responsibilities,
+    required List<String> qualifications,
+    List<String> niceToHaves = const [],
+    required List<String> benefits,
+    String category = 'Technical',
+    List<String> tags = const [],
+    int requiredCount = 1,
+    DateTime? deadline,
+  }) async {
+    _assertAuthenticated();
+    try {
+      final response = await _client.createJob({
+        'title': title,
+        'companyName': companyName,
+        'location': location,
+        'salaryRange': salaryRange,
+        'type': type,
+        'description': description,
+        'responsibilities': responsibilities,
+        'qualifications': qualifications,
+        'niceToHaves': niceToHaves,
+        'benefits': benefits,
+        'tags': tags,
+        'category': category,
+        'requiredCount': requiredCount,
+        if (deadline != null) 'deadline': deadline.toIso8601String(),
+      });
+      await _pullServerState();
+      return response['id']?.toString() ?? '';
+    } catch (e) {
+      throw Exception('فشل نشر الوظيفة');
     }
-
-    return user;
   }
 
-  void logout() {
-    _client.clearToken();
-    stopPolling();
-  }
-
-  void _assertAuthenticated() {
-    if (!isAuthenticated) {
-      throw Exception('Not authenticated. Please login first.');
-    }
-  }
-
-  Future<void> loginForDemo({required bool companyRole}) async {
-    await login(
-      email: companyRole ? 'company@jobito.com' : 'user@jobito.com',
-      password: '12345678',
-      expectedRole: companyRole ? 'company' : 'user',
-    );
+  Future<void> applyToJob({
+    required String jobId,
+    required String userName,
+  }) async {
+    _assertAuthenticated();
+    try {
+      await _client.createApplication(jobId: jobId, userName: userName);
+      await _pullServerState();
+    } catch (_) {}
   }
 
   Future<void> startPolling() async {
@@ -212,143 +237,39 @@ class RecruitmentSyncService {
   }
 
   Future<void> _pullServerState() async {
-    final RecruitmentSyncStore store = RecruitmentSyncStore.instance;
+    if (!isAuthenticated) return;
     try {
       final jobs = await _client.fetchJobs();
       final applications = await _client.fetchApplications();
       final messages = await _client.fetchMessages();
-      store.replaceFromRemote(
+      RecruitmentSyncStore.instance.replaceFromRemote(
         jobs: jobs,
         applications: applications,
         messages: messages,
       );
-    } catch (_) {
-      // Keep local state if backend is unreachable.
+    } catch (_) {}
+  }
+
+  String _handleDioError(DioException e) {
+    if (e.response?.data is Map) {
+      final data = e.response!.data as Map;
+      return data['message']?.toString() ?? data['error']?.toString() ?? 'حدث خطأ في الطلب';
+    }
+    return 'حدث خطأ غير متوقع';
+  }
+
+  void logout() {
+    _client.clearToken();
+    stopPolling();
+  }
+
+  void _assertAuthenticated() {
+    if (!isAuthenticated) {
+      throw Exception('Not authenticated. Please login first.');
     }
   }
 
-  Future<String> postJob({
-    required String title,
-    required String location,
-    required String salaryRange,
-    required String description,
-    required List<String> responsibilities,
-    required List<String> qualifications,
-    required List<String> niceToHaves,
-    required List<String> benefits,
-    required String category,
-    String companyName = 'Jobito Labs',
-    String type = 'Full-time',
-    List<String> tags = const <String>['General'],
-    int requiredCount = 1,
-    DateTime? deadline,
-  }) async {
-    _assertAuthenticated();
-    final response = await _client.createJob(
-      title: title,
-      companyName: companyName,
-      location: location,
-      salaryRange: salaryRange,
-      type: type,
-      description: description,
-      responsibilities: responsibilities,
-      qualifications: qualifications,
-      niceToHaves: niceToHaves,
-      benefits: benefits,
-      tags: tags,
-      category: category,
-      requiredCount: requiredCount,
-      deadline: deadline,
-    );
-    final String jobId = response['id']?.toString() ?? '';
-    await _pullServerState();
-    return jobId;
-  }
-
-  Future<void> updateJob({
-    required String jobId,
-    required String title,
-    required String location,
-    required String salaryRange,
-    required String description,
-    required List<String> responsibilities,
-    required List<String> qualifications,
-    required List<String> niceToHaves,
-    required List<String> benefits,
-    required String category,
-    String companyName = 'Jobito Labs',
-    String type = 'Full-time',
-    List<String> tags = const <String>['General'],
-    int requiredCount = 1,
-    DateTime? deadline,
-    String? status,
-  }) async {
-    _assertAuthenticated();
-    await _client.updateJob(
-      jobId: jobId,
-      title: title,
-      companyName: companyName,
-      location: location,
-      salaryRange: salaryRange,
-      type: type,
-      description: description,
-      responsibilities: responsibilities,
-      qualifications: qualifications,
-      niceToHaves: niceToHaves,
-      benefits: benefits,
-      tags: tags,
-      category: category,
-      requiredCount: requiredCount,
-      deadline: deadline,
-      status: status,
-    );
-    await _pullServerState();
-  }
-
-  Future<void> applyToJob({
-    required String jobId,
-    required String userName,
-  }) async {
-    _assertAuthenticated();
-    await _client.createApplication(jobId: jobId, userName: userName);
-    await _pullServerState();
-  }
-
-  Future<void> updateStatus({
-    required String applicationId,
-    required String status,
-  }) async {
-    _assertAuthenticated();
-    try {
-      await _client.updateApplicationStatus(
-        applicationId: applicationId,
-        status: status,
-      );
-      await _pullServerState();
-    } catch (_) {
-      RecruitmentSyncStore.instance.companyUpdateApplicationStatus(
-        applicationId: applicationId,
-        nextStatus: status,
-      );
-    }
-  }
-
-  Future<void> sendBroadcast(String text) async {
-    _assertAuthenticated();
-    try {
-      await _client.sendMessage(text);
-      await _pullServerState();
-    } catch (_) {
-      RecruitmentSyncStore.instance.companySendMessage(text);
-    }
-  }
-
-  Future<void> deleteJob(String jobId) async {
-    _assertAuthenticated();
-    await _client.deleteJob(jobId);
-    // Optimistically remove from both local stores before server refresh
-    RecruitmentSyncStore.instance.removeJob(jobId);
-    CompanyStore.instance.deleteJob(jobId);
-    await _pullServerState();
-  }
+  // Legacy support
+  Future<void> verifyEmailOtp({required String email, required String code}) async {}
+  Future<void> resendOtp(String email) async {}
 }

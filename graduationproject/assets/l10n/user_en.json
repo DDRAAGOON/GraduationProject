@@ -33,6 +33,8 @@
   "common.required": "Required",
   "common.notYet": "not yet",
   "common.seeAll": "See All",
+  "role.user": "User",
+  "role.company": "Company",
   "validation.enterValidEmail": "Enter a valid email",
   "validation.min8Chars": "Minimum 8 characters",
   "validation.passwordsNoMatch": "Passwords do not match",

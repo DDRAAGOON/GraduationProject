@@ -11,6 +11,9 @@ import '../../../shared/state/recruitment_sync_store.dart';
 import '../../../shared/widgets/app_scaffold.dart';
 import '../widgets/company_app_bar_actions.dart';
 import '../widgets/company_bottom_nav.dart';
+import '../widgets/glowing_chatbot_fab.dart';
+import '../../user/messages/chat_thread_screen.dart';
+import '../../../constants/app_images.dart';
 
 class CompanyJobsHubScreen extends StatefulWidget {
   const CompanyJobsHubScreen({super.key});
@@ -45,24 +48,38 @@ class _CompanyJobsHubScreenState extends State<CompanyJobsHubScreen> {
       bottomNavigationBar: const CompanyBottomNav(
         current: CompanyTab.applicants,
       ),
+      floatingActionButton: GlowingChatbotFAB(
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ChatThreadScreen(
+              name: t.isAr ? 'مساعد جوبيتو الذكي' : 'Jobito AI Assistant',
+              image: AppImages.jobito,
+            ),
+          ),
+        ),
+      ),
       body: AnimatedBuilder(
         animation: Listenable.merge([
           companyStore,
           RecruitmentSyncStore.instance,
         ]),
         builder: (context, _) {
+          final allJobs = RecruitmentSyncStore.instance.jobs;
           // Use RecruitmentSyncStore (the live server data) filtered to this company
-          final companyJobs = RecruitmentSyncStore.instance.jobs.where((j) {
+          final companyJobs = allJobs.where((j) {
             final nameMatch =
                 j.companyName.trim().toLowerCase() ==
                 companyStore.companyName.trim().toLowerCase();
-            final idMatch =
-                companyStore.companyId.isNotEmpty &&
-                j.companyName.isNotEmpty; // fallback
             return nameMatch;
           }).toList();
 
-          final filteredJobs = companyJobs.where((j) {
+          // Show real company jobs if any, otherwise show mock jobs for UI preview
+          final displayJobs = companyJobs.isNotEmpty 
+              ? companyJobs 
+              : allJobs.where((j) => j.id.startsWith('mock_')).toList();
+
+          final filteredJobs = displayJobs.where((j) {
             final matchesStatus =
                 _selectedStatuses.isEmpty ||
                 _selectedStatuses.contains(j.status);
