@@ -15,84 +15,22 @@ class TradesmanVerificationScreen extends StatefulWidget {
 
 class _TradesmanVerificationScreenState
     extends State<TradesmanVerificationScreen> {
-  static const String _visaKey = 'tradesman_verified_visa';
-  static const String _tradesKey = 'tradesman_verified_trades';
-
   final List<String> _tradeOptions = [
-    'نجار',
-    'ميكانيكي',
     'كهربائي',
+    'فني سباكة',
+    'نجار',
+    'نقاش',
+    'ميكانيكي',
+    'حداد',
     'فني تكييف',
-    'سباك',
-    'دهان',
-    'نجارة خشب',
-    'تصليح أجهزة',
   ];
 
   final Set<String> _selectedTrades = <String>{};
   final TextEditingController _customTradeController = TextEditingController();
-  String? _visaFileName;
+  String? _fishFileName;
   bool _isLoading = false;
 
-  @override
-  void initState() {
-    super.initState();
-    _initializeState();
-  }
-
-  @override
-  void dispose() {
-    _customTradeController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _initializeState() async {
-    await _loadSavedState();
-
-    final prefs = await SharedPreferences.getInstance();
-    final isCompleted =
-        prefs.getBool('tradesman_verification_complete') ?? false;
-
-    if (!mounted) return;
-
-    if (isCompleted && (_visaFileName != null || _selectedTrades.isNotEmpty)) {
-      final store = RecruitmentSyncStore.instance;
-      store.updateUserProfile(
-        fullName: store.currentUserName,
-        title: _selectedTrades.join(', '),
-        role: 'Tradesman',
-      );
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const Navbotton()),
-      );
-    }
-  }
-
-  Future<void> _loadSavedState() async {
-    final prefs = await SharedPreferences.getInstance();
-    if (!mounted) return;
-
-    final savedVisa = prefs.getString(_visaKey);
-
-    setState(() {
-      _visaFileName = savedVisa != null && savedVisa.isNotEmpty
-          ? savedVisa
-          : null;
-      _selectedTrades
-        ..clear()
-        ..addAll(prefs.getStringList(_tradesKey) ?? <String>[]);
-    });
-  }
-
-  Future<void> _persistState() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_visaKey, _visaFileName ?? '');
-    await prefs.setStringList(_tradesKey, _selectedTrades.toList());
-  }
-
-  Future<void> _pickDocument({required String type}) async {
+  Future<void> _pickDocument() async {
     setState(() => _isLoading = true);
     try {
       FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -101,49 +39,33 @@ class _TradesmanVerificationScreenState
         allowMultiple: false,
       );
 
-      if (result == null || result.files.isEmpty) {
-        return;
+      if (result != null && result.files.isNotEmpty) {
+        setState(() {
+          _fishFileName = result.files.first.name;
+        });
       }
-
-      final file = result.files.first;
-      setState(() {
-        if (type == 'visa') {
-          _visaFileName = file.name;
-        }
-      });
-
-      await _persistState();
     } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
-  Future<void> _addCustomTrade() async {
-    final rawValue = _customTradeController.text.trim();
-    if (rawValue.isEmpty) {
-      return;
+  void _addCustomTrade() {
+    final text = _customTradeController.text.trim();
+    if (text.isNotEmpty) {
+      setState(() {
+        _selectedTrades.add(text);
+        _customTradeController.clear();
+      });
     }
-
-    setState(() {
-      _selectedTrades.add(rawValue);
-      _customTradeController.clear();
-    });
-
-    await _persistState();
   }
 
   Future<void> _submit() async {
-    if (_visaFileName == null) {
+    final t = AppLocalizations.of(context);
+    
+    if (_fishFileName == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            AppLocalizations.of(context).tr(
-              en: 'Please upload the visa/permit document before continuing.',
-              ar: 'يرجى رفع ملف الفيش/الترخيص قبل المتابعة.',
-            ),
-          ),
+          content: Text(t.tr(en: "Please upload your criminal record", ar: "يرجى رفع صحيفة الحالة الجنائية أولاً")),
           backgroundColor: Colors.redAccent,
         ),
       );
@@ -153,342 +75,226 @@ class _TradesmanVerificationScreenState
     if (_selectedTrades.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            AppLocalizations.of(context).tr(
-              en: 'Please select at least one trade before continuing.',
-              ar: 'يرجى اختيار مهنة واحدة على الأقل قبل المتابعة.',
-            ),
-          ),
-          backgroundColor: Colors.orangeAccent,
+          content: Text(t.tr(en: "Please select at least one service", ar: "يرجى اختيار خدمة واحدة على الأقل")),
+          backgroundColor: Colors.redAccent,
         ),
       );
       return;
     }
 
     setState(() => _isLoading = true);
-    try {
-      await _persistState();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('tradesman_verification_complete', true);
+    
+    final store = RecruitmentSyncStore.instance;
+    store.updateUserProfile(
+      fullName: store.currentUserName,
+      title: _selectedTrades.join(', '),
+      role: 'Tradesman',
+      tradesmanServices: _selectedTrades.toList(),
+    );
 
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('tradesman_verification_complete', true);
-
-      final store = RecruitmentSyncStore.instance;
-      store.updateUserProfile(
-        fullName: store.currentUserName,
-        title: _selectedTrades.join(', '),
-        role: 'Tradesman',
+    if (mounted) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const Navbotton()),
       );
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              AppLocalizations.of(context).tr(
-                en: 'Tradesman verification saved successfully.',
-                ar: 'تم حفظ بيانات الصنايعي بنجاح.',
-              ),
-            ),
-            backgroundColor: Colors.green.shade700,
-          ),
-        );
-
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const Navbotton()),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
-    final colorScheme = Theme.of(context).colorScheme;
+    final isAr = t.isAr;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final onSurfaceColor = isDark ? Colors.white : Colors.black;
 
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4),
       appBar: AppBar(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+          icon: Icon(Icons.arrow_back_ios, color: onSurfaceColor),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          t.tr(en: 'Trade verification', ar: 'التحقق من الصنايعي'),
-          style: const TextStyle(fontWeight: FontWeight.bold),
+          t.tr(en: "Complete Data", ar: "إكمال البيانات"),
+          style: TextStyle(color: onSurfaceColor, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: Colors.amber.shade50,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.amber.shade300),
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Icon(
-                      Icons.warning_amber_rounded,
-                      color: Color(0xFFFFB300),
-                      size: 26,
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        t.tr(
-                          en: 'Warning: you must complete this registration before entering tradesman mode.',
-                          ar: 'تنبيه: يجب إكمال هذه البيانات أولًا قبل الدخول لوضع الصنايعي.',
-                        ),
-                        style: const TextStyle(
-                          color: Color(0xFF7A5600),
-                          fontWeight: FontWeight.w600,
-                          height: 1.4,
-                        ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 1. Warning Box (Yellow Message)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.amber.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.amber.withOpacity(0.5)),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 28),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      t.tr(
+                        en: "Warning: You must complete your data (Criminal Record and Services) to switch to Tradesman Mode.",
+                        ar: "تنبيه: يجب إكمال بياناتك (الصحيفة الجنائية والخدمات) لتتمكن من التبديل لوضع الصنايعي."
                       ),
+                      style: TextStyle(color: isDark ? Colors.amber[100] : const Color(0xFF856404), fontWeight: FontWeight.w600, height: 1.4),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 32),
+
+            // 2. Upload Section (Criminal Record)
+            Text(
+              t.tr(en: "Criminal Record (Fish)", ar: "صحيفة الحالة الجنائية (فيش و تشبيه)"),
+              style: TextStyle(color: onSurfaceColor, fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 12),
+            GestureDetector(
+              onTap: _pickDocument,
+              child: Container(
+                width: double.infinity,
+                height: 120,
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF0D2D4D) : Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: _fishFileName != null ? Colors.green : onSurfaceColor.withOpacity(0.1)),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      _fishFileName != null ? Icons.check_circle : Icons.cloud_upload_outlined,
+                      color: _fishFileName != null ? Colors.green : const Color(0xFF0051DD),
+                      size: 40,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      _fishFileName ?? (isAr ? "اضغط لرفع الملف" : "Click to upload file"),
+                      style: TextStyle(color: _fishFileName != null ? Colors.green : onSurfaceColor.withOpacity(0.5), fontSize: 13),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
-              Text(
-                t.tr(en: 'Required documents', ar: 'المستندات المطلوبة'),
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                t.tr(
-                  en: 'Upload your visa/permit to continue.',
-                  ar: 'ارفع ملف الفيش/الترخيص للمتابعة.',
-                ),
-                style: TextStyle(
-                  color: colorScheme.onSurface.withValues(alpha: 0.66),
-                  height: 1.4,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).cardColor,
-                  borderRadius: BorderRadius.circular(18),
-                  border: Border.all(
-                    color: Theme.of(
-                      context,
-                    ).dividerColor.withValues(alpha: 0.12),
-                  ),
-                ),
-                child: _buildUploadCard(
-                  title: t.tr(en: 'Visa / permit', ar: 'الفيش / الترخيص'),
-                  subtitle: t.tr(
-                    en: 'Upload your work visa or permit document',
-                    ar: 'ارفع ملف الفيش أو الترخيص الخاص بك',
-                  ),
-                  fileName: _visaFileName,
-                  onTap: () => _pickDocument(type: 'visa'),
-                  icon: Icons.badge_outlined,
-                ),
-              ),
-              const SizedBox(height: 24),
-              Text(
-                t.tr(en: 'Select your profession', ar: 'اختر الحرفة الخاصة بك'),
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                t.tr(
-                  en: 'Choose one or more trades you can work in.',
-                  ar: 'اختر مهنة أو أكثر يمكنك العمل بها.',
-                ),
-                style: TextStyle(
-                  color: colorScheme.onSurface.withValues(alpha: 0.66),
-                  height: 1.4,
-                ),
-              ),
-              const SizedBox(height: 14),
-              Wrap(
-                spacing: 10,
-                runSpacing: 10,
-                children: _tradeOptions.map((trade) {
-                  final selected = _selectedTrades.contains(trade);
-                  return FilterChip(
-                    label: Text(trade),
-                    selected: selected,
-                    onSelected: (value) async {
-                      setState(() {
-                        if (value) {
-                          _selectedTrades.add(trade);
-                        } else {
-                          _selectedTrades.remove(trade);
-                        }
-                      });
-                      await _persistState();
-                    },
-                    backgroundColor: Theme.of(context).cardColor,
-                    selectedColor: colorScheme.primary.withValues(alpha: 0.18),
-                    checkmarkColor: colorScheme.primary,
-                    labelStyle: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: selected
-                          ? colorScheme.primary
-                          : colorScheme.onSurface,
-                    ),
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _customTradeController,
-                      decoration: InputDecoration(
-                        hintText: t.tr(
-                          en: 'Add another profession',
-                          ar: 'أضف حرفة أخرى',
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 12,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  ElevatedButton.icon(
-                    onPressed: _addCustomTrade,
-                    icon: const Icon(Icons.add, size: 18),
-                    label: Text(t.tr(en: 'Add', ar: 'إضافة')),
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 14,
-                      ),
-                      backgroundColor: colorScheme.primary,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 26),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: _isLoading ? null : _submit,
-                  icon: _isLoading
-                      ? const SizedBox(
-                          width: 18,
-                          height: 18,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Icon(Icons.check_circle_outline),
-                  label: Text(t.tr(en: 'Continue', ar: 'متابعة')),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    backgroundColor: colorScheme.primary,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+            ),
 
-  Widget _buildUploadCard({
-    required String title,
-    required String subtitle,
-    required String? fileName,
-    required VoidCallback onTap,
-    required IconData icon,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Theme.of(context).cardColor,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
-          ),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: Theme.of(
-                  context,
-                ).colorScheme.primary.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(icon, color: Theme.of(context).colorScheme.primary),
+            const SizedBox(height: 32),
+
+            // 3. Services Selection
+            Text(
+              t.tr(en: "Select Service", ar: "اختر الخدمة"),
+              style: TextStyle(color: onSurfaceColor, fontSize: 16, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
+            const SizedBox(height: 16),
+            Wrap(
+              spacing: 10,
+              runSpacing: 10,
+              children: _tradeOptions.map((trade) {
+                final isSelected = _selectedTrades.contains(trade);
+                return GestureDetector(
+                  onTap: () => setState(() => isSelected ? _selectedTrades.remove(trade) : _selectedTrades.add(trade)),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: isSelected ? const Color(0xFF0051DD) : (isDark ? const Color(0xFF0D2D4D) : Colors.white),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: isSelected ? Colors.transparent : onSurfaceColor.withOpacity(0.1)),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (isSelected) const Icon(Icons.check, color: Colors.white, size: 16),
+                        if (isSelected) const SizedBox(width: 8),
+                        Text(
+                          trade,
+                          style: TextStyle(
+                            color: isSelected ? Colors.white : onSurfaceColor,
+                            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    fileName != null ? '$fileName ✓' : subtitle,
-                    style: TextStyle(
-                      color: fileName != null
-                          ? Colors.green.shade700
-                          : Theme.of(
-                              context,
-                            ).colorScheme.onSurface.withValues(alpha: 0.55),
-                      fontSize: 12,
+                );
+              }).toList(),
+            ),
+
+            const SizedBox(height: 24),
+
+            // 4. Custom Service
+            Text(
+              t.tr(en: "Write another service", ar: "اكتب خدمة اخرى"),
+              style: TextStyle(color: onSurfaceColor, fontSize: 14, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _customTradeController,
+                    style: TextStyle(color: onSurfaceColor),
+                    decoration: InputDecoration(
+                      hintText: t.tr(en: "Type here...", ar: "اكتب هنا..."),
+                      filled: true,
+                      fillColor: isDark ? const Color(0xFF0D2D4D) : Colors.white,
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     ),
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(width: 10),
+                IconButton(
+                  onPressed: _addCustomTrade,
+                  icon: const Icon(Icons.add_circle, color: Color(0xFF0051DD), size: 36),
+                ),
+              ],
             ),
-            Icon(
-              Icons.cloud_upload_outlined,
-              color: Theme.of(context).colorScheme.primary,
+
+            const SizedBox(height: 60),
+
+            // 5. Buttons (Confirm & Cancel)
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      side: const BorderSide(color: Colors.grey),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    ),
+                    child: Text(t.cancel, style: const TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: _isLoading ? null : _submit,
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      backgroundColor: const Color(0xFF0051DD),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    ),
+                    child: _isLoading 
+                      ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                      : Text(t.tr(en: "Confirm", ar: "تأكيد"), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  ),
+                ),
+              ],
             ),
           ],
         ),

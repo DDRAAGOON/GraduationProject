@@ -449,6 +449,11 @@ class RecruitmentSyncStore extends ChangeNotifier {
   String _filterCategory = 'All';
   String _filterSalaryRange = 'All';
 
+  // Notification Settings
+  bool _emailNotifications = true;
+  bool _jobAlerts = true;
+  bool _applicationUpdates = false;
+
   List<String> _currentUserSkills = [];
   List<Map<String, String>> _currentUserEducation = [];
   List<Map<String, String>> _currentUserExperience = [];
@@ -480,6 +485,10 @@ class RecruitmentSyncStore extends ChangeNotifier {
   String get filterLocation => _filterLocation;
   String get filterCategory => _filterCategory;
   String get filterSalaryRange => _filterSalaryRange;
+
+  bool get emailNotifications => _emailNotifications;
+  bool get jobAlerts => _jobAlerts;
+  bool get applicationUpdates => _applicationUpdates;
 
   List<String> get currentUserSkills => _currentUserSkills;
   List<Map<String, String>> get currentUserEducation => _currentUserEducation;
@@ -604,6 +613,17 @@ class RecruitmentSyncStore extends ChangeNotifier {
 
   void setSearchQuery(String query) {
     _searchQuery = query;
+    notifyListeners();
+  }
+
+  void updateNotificationSettings({
+    bool? email,
+    bool? jobs,
+    bool? updates,
+  }) {
+    if (email != null) _emailNotifications = email;
+    if (jobs != null) _jobAlerts = jobs;
+    if (updates != null) _applicationUpdates = updates;
     notifyListeners();
   }
 

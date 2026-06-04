@@ -77,8 +77,11 @@ class _RecruitmentJobFiltersScreenState
   @override
   Widget build(BuildContext context) {
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FBF4),
+      backgroundColor: backgroundColor,
       appBar: AppBar(
         title: Text(
           isAr ? 'فلاتر متقدمة' : 'Advanced Filters',
@@ -87,9 +90,13 @@ class _RecruitmentJobFiltersScreenState
             color: Color(0xFFFF7A2A),
           ),
         ),
-        backgroundColor: const Color(0xFFF8FBF4),
+        backgroundColor: backgroundColor,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios, color: isDark ? Colors.white : Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       body: SingleChildScrollView(
         child: Padding(

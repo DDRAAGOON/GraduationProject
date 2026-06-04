@@ -272,21 +272,27 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
     final t = AppLocalizations.of(context);
     final isAr = t.isAr;
     final store = RecruitmentSyncStore.instance;
-    final theme = Theme.of(context);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
+    final onSurfaceColor = isDark ? Colors.white : Colors.black;
     final areas = _governorate == null
         ? <String>[]
         : RecruitmentSyncStore.tradesmanGovernorateAreas[_governorate] ?? [];
 
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
+      backgroundColor: backgroundColor,
       appBar: AppBar(
         title: Text(
           t.tr(en: 'Edit Profile', ar: 'تعديل الملف الشخصي'),
-          style: const TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.bold, color: onSurfaceColor),
         ),
-        backgroundColor: theme.scaffoldBackgroundColor,
+        backgroundColor: Colors.transparent,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios, color: onSurfaceColor),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       body: Form(
         key: _formKey,
@@ -295,7 +301,7 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _sectionTitle(t.tr(en: 'Personal information', ar: 'المعلومات الشخصية')),
+              _sectionTitle(t.tr(en: 'Personal information', ar: 'المعلومات الشخصية'), onSurfaceColor),
               const SizedBox(height: 12),
               GestureDetector(
                 onTap: () => _pickImage(true),
@@ -341,12 +347,14 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
               ),
               const SizedBox(height: 20),
               _field(
+                context,
                 _fullNameController,
                 t.tr(en: 'Full name', ar: 'الاسم الكامل'),
                 required: true,
               ),
               const SizedBox(height: 12),
               _field(
+                context,
                 _phoneController,
                 t.tr(en: 'Phone number', ar: 'رقم الهاتف'),
                 keyboard: TextInputType.phone,
@@ -354,44 +362,48 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
               ),
               const SizedBox(height: 12),
               _field(
+                context,
                 _emailController,
                 t.tr(en: 'Email', ar: 'البريد الإلكتروني'),
                 keyboard: TextInputType.emailAddress,
                 required: true,
               ),
               const SizedBox(height: 12),
-              _label(t.dob),
+              _label(t.dob, onSurfaceColor),
               const SizedBox(height: 6),
               InkWell(
                 onTap: _pickBirthDate,
                 child: InputDecorator(
-                  decoration: _inputDecoration(),
+                  decoration: _inputDecoration(context),
                   child: Text(
                     _birthDate == null
                         ? t.tr(en: 'Select date', ar: 'اختر التاريخ')
                         : '${_birthDate!.year}-${_birthDate!.month.toString().padLeft(2, '0')}-${_birthDate!.day.toString().padLeft(2, '0')}',
+                    style: TextStyle(color: onSurfaceColor),
                   ),
                 ),
               ),
               const SizedBox(height: 12),
-              _label(t.gender),
+              _label(t.gender, onSurfaceColor),
               DropdownButtonFormField<String>(
                 value: _gender,
-                decoration: _inputDecoration(),
+                decoration: _inputDecoration(context),
+                dropdownColor: isDark ? const Color(0xFF0D2D4D) : Colors.white,
                 items: [
-                  DropdownMenuItem(value: 'Male', child: Text(t.male)),
-                  DropdownMenuItem(value: 'Female', child: Text(t.female)),
+                  DropdownMenuItem(value: 'Male', child: Text(t.male, style: TextStyle(color: onSurfaceColor))),
+                  DropdownMenuItem(value: 'Female', child: Text(t.female, style: TextStyle(color: onSurfaceColor))),
                 ],
                 onChanged: (v) => setState(() => _gender = v ?? 'Male'),
               ),
               const SizedBox(height: 12),
-              _label(t.tr(en: 'Governorate', ar: 'المحافظة')),
+              _label(t.tr(en: 'Governorate', ar: 'المحافظة'), onSurfaceColor),
               DropdownButtonFormField<String>(
                 value: _governorate,
-                decoration: _inputDecoration(),
-                hint: Text(t.tr(en: 'Select governorate', ar: 'اختر المحافظة')),
+                decoration: _inputDecoration(context),
+                dropdownColor: isDark ? const Color(0xFF0D2D4D) : Colors.white,
+                hint: Text(t.tr(en: 'Select governorate', ar: 'اختر المحافظة'), style: TextStyle(color: onSurfaceColor.withOpacity(0.5))),
                 items: RecruitmentSyncStore.tradesmanGovernorateAreas.keys
-                    .map((g) => DropdownMenuItem(value: g, child: Text(g)))
+                    .map((g) => DropdownMenuItem(value: g, child: Text(g, style: TextStyle(color: onSurfaceColor))))
                     .toList(),
                 onChanged: (v) => setState(() {
                   _governorate = v;
@@ -399,29 +411,32 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
                 }),
               ),
               const SizedBox(height: 12),
-              _label(t.tr(en: 'Area', ar: 'المنطقة')),
+              _label(t.tr(en: 'Area', ar: 'المنطقة'), onSurfaceColor),
               DropdownButtonFormField<String>(
                 value: _district,
-                decoration: _inputDecoration(),
-                hint: Text(t.tr(en: 'Select area', ar: 'اختر المنطقة')),
+                decoration: _inputDecoration(context),
+                dropdownColor: isDark ? const Color(0xFF0D2D4D) : Colors.white,
+                hint: Text(t.tr(en: 'Select area', ar: 'اختر المنطقة'), style: TextStyle(color: onSurfaceColor.withOpacity(0.5))),
                 items: areas
-                    .map((a) => DropdownMenuItem(value: a, child: Text(a)))
+                    .map((a) => DropdownMenuItem(value: a, child: Text(a, style: TextStyle(color: onSurfaceColor))))
                     .toList(),
                 onChanged: (v) => setState(() => _district = v),
               ),
               const SizedBox(height: 24),
-              _sectionTitle(t.aboutMe),
+              _sectionTitle(t.aboutMe, onSurfaceColor),
               _hint(t.tr(
                 en: 'Briefly describe your skills and experience',
                 ar: 'صف مهاراتك وخبراتك باختصار',
-              )),
+              ), onSurfaceColor),
               const SizedBox(height: 8),
               TextFormField(
                 controller: _aboutController,
                 maxLines: 4,
+                style: TextStyle(color: onSurfaceColor),
                 validator: (v) =>
                     (v == null || v.trim().isEmpty) ? t.tr(en: 'Required', ar: 'مطلوب') : null,
                 decoration: _inputDecoration(
+                  context,
                   hint: t.tr(en: 'About me', ar: 'نبذة عني'),
                 ),
               ),
@@ -429,6 +444,7 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
               _sectionWithAdd(
                 t.tr(en: 'Experience', ar: 'الخبرات'),
                 t.tr(en: 'Add your work experience briefly', ar: 'أضف خبراتك العملية باختصار'),
+                onSurfaceColor,
                 () => _showAddDialog(
                   title: t.tr(en: 'Add experience', ar: 'إضافة خبرة'),
                   keys: const ['title', 'company', 'duration'],
@@ -444,6 +460,7 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
                 (e) => _removableTile(
                   e['title'] ?? '',
                   e['company'] ?? '',
+                  onSurfaceColor,
                   () => setState(() => _experiences.remove(e)),
                 ),
               ),
@@ -451,6 +468,7 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
               _sectionWithAdd(
                 t.skills,
                 t.tr(en: 'Add your skills', ar: 'أضف مهاراتك'),
+                onSurfaceColor,
                 () {
                   if (_skillController.text.trim().isEmpty) return;
                   setState(() {
@@ -462,7 +480,7 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
               ),
               Row(
                 children: [
-                  Expanded(child: TextField(controller: _skillController, decoration: _inputDecoration(hint: t.tr(en: 'Skill', ar: 'مهارة')))),
+                  Expanded(child: TextField(controller: _skillController, style: TextStyle(color: onSurfaceColor), decoration: _inputDecoration(context, hint: t.tr(en: 'Skill', ar: 'مهارة')))),
                   IconButton(
                     icon: const Icon(Icons.add_circle_outline, color: Colors.blueAccent),
                     onPressed: () {
@@ -485,6 +503,7 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
               _sectionWithAdd(
                 t.education,
                 t.tr(en: 'Add your education', ar: 'أضف تعليمك'),
+                onSurfaceColor,
                 () => _showAddDialog(
                   title: t.tr(en: 'Add education', ar: 'إضافة تعليم'),
                   keys: const ['institution', 'degree', 'duration'],
@@ -500,6 +519,7 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
                 (e) => _removableTile(
                   e['institution'] ?? '',
                   e['degree'] ?? '',
+                  onSurfaceColor,
                   () => setState(() => _education.remove(e)),
                 ),
               ),
@@ -507,6 +527,7 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
               _sectionWithAdd(
                 t.tr(en: 'Languages', ar: 'اللغات'),
                 t.tr(en: 'Add languages you speak', ar: 'أضف اللغات التي تتحدثها'),
+                onSurfaceColor,
                 () {
                   if (_languageController.text.trim().isEmpty) return;
                   setState(() {
@@ -518,7 +539,7 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
               ),
               Row(
                 children: [
-                  Expanded(child: TextField(controller: _languageController, decoration: _inputDecoration(hint: t.tr(en: 'Language', ar: 'لغة')))),
+                  Expanded(child: TextField(controller: _languageController, style: TextStyle(color: onSurfaceColor), decoration: _inputDecoration(context, hint: t.tr(en: 'Language', ar: 'لغة')))),
                   IconButton(
                     icon: const Icon(Icons.add_circle_outline, color: Colors.blueAccent),
                     onPressed: () {
@@ -538,15 +559,15 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
                     .toList(),
               ),
               const SizedBox(height: 16),
-              _sectionTitle(t.tr(en: 'Social links', ar: 'روابط التواصل')),
-              _field(_facebookController, isAr ? 'فيسبوك' : 'Facebook'),
+              _sectionTitle(t.tr(en: 'Social links', ar: 'روابط التواصل'), onSurfaceColor),
+              _field(context, _facebookController, isAr ? 'فيسبوك' : 'Facebook'),
               const SizedBox(height: 10),
-              _field(_instagramController, isAr ? 'إنستجرام' : 'Instagram'),
+              _field(context, _instagramController, isAr ? 'إنستجرام' : 'Instagram'),
               const SizedBox(height: 10),
-              _field(_whatsappController, isAr ? 'واتساب' : 'WhatsApp'),
+              _field(context, _whatsappController, isAr ? 'واتساب' : 'WhatsApp'),
               const SizedBox(height: 16),
-              _sectionTitle(t.tr(en: 'Services', ar: 'الخدمات')),
-              _hint(t.tr(en: 'Select your profession', ar: 'اختر مهنتك')),
+              _sectionTitle(t.tr(en: 'Services', ar: 'الخدمات'), onSurfaceColor),
+              _hint(t.tr(en: 'Select your profession', ar: 'اختر مهنتك'), onSurfaceColor),
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
@@ -573,7 +594,9 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
                   Expanded(
                     child: TextField(
                       controller: _customServiceController,
+                      style: TextStyle(color: onSurfaceColor),
                       decoration: _inputDecoration(
+                        context,
                         hint: t.tr(en: 'Other profession', ar: 'مهنة أخرى'),
                       ),
                     ),
@@ -595,6 +618,7 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
               _sectionWithAdd(
                 t.tr(en: 'Portfolio', ar: 'المعرض'),
                 t.tr(en: 'Add or remove your work photos', ar: 'أضف أو احذف صور أعمالك'),
+                onSurfaceColor,
                 _pickPortfolioImages,
               ),
               Wrap(
@@ -643,32 +667,40 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
     );
   }
 
-  Widget _sectionTitle(String text) => Text(
+  Widget _sectionTitle(String text, Color color) => Text(
         text,
-        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: color),
       );
 
-  Widget _hint(String text) => Text(
+  Widget _hint(String text, Color color) => Text(
         text,
         style: TextStyle(
           fontSize: 12,
-          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.45),
+          color: color.withValues(alpha: 0.45),
         ),
       );
 
-  Widget _label(String text) => Text(
+  Widget _label(String text, Color color) => Text(
         text,
-        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: color),
       );
 
-  InputDecoration _inputDecoration({String? hint}) => InputDecoration(
-        hintText: hint,
-        filled: true,
-        fillColor: Theme.of(context).cardColor,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-      );
+  InputDecoration _inputDecoration(BuildContext context, {String? hint}) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return InputDecoration(
+      hintText: hint,
+      filled: true,
+      fillColor: isDark ? const Color(0xFF0D2D4D) : Colors.white,
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(color: isDark ? Colors.white10 : Colors.black12),
+      ),
+    );
+  }
 
   Widget _field(
+    BuildContext context,
     TextEditingController controller,
     String label, {
     bool required = false,
@@ -677,18 +709,20 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
     return TextFormField(
       controller: controller,
       keyboardType: keyboard,
+      style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black),
       validator: required
           ? (v) => (v == null || v.trim().isEmpty)
               ? AppLocalizations.of(context).tr(en: 'Required', ar: 'مطلوب')
               : null
           : null,
-      decoration: _inputDecoration(hint: label),
+      decoration: _inputDecoration(context, hint: label),
     );
   }
 
   Widget _sectionWithAdd(
     String title,
     String subtitle,
+    Color color,
     VoidCallback onAdd, {
     bool addInline = false,
   }) {
@@ -697,7 +731,7 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
       children: [
         Row(
           children: [
-            Expanded(child: _sectionTitle(title)),
+            Expanded(child: _sectionTitle(title, color)),
             if (!addInline)
               IconButton(
                 icon: const Icon(Icons.add_circle_outline, color: Colors.blueAccent),
@@ -705,17 +739,17 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
               ),
           ],
         ),
-        _hint(subtitle),
+        _hint(subtitle, color),
         const SizedBox(height: 8),
       ],
     );
   }
 
-  Widget _removableTile(String title, String subtitle, VoidCallback onRemove) {
+  Widget _removableTile(String title, String subtitle, Color color, VoidCallback onRemove) {
     return ListTile(
       contentPadding: EdgeInsets.zero,
-      title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-      subtitle: Text(subtitle),
+      title: Text(title, style: TextStyle(fontWeight: FontWeight.bold, color: color)),
+      subtitle: Text(subtitle, style: TextStyle(color: color.withOpacity(0.6))),
       trailing: IconButton(
         icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
         onPressed: onRemove,

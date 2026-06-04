@@ -22,9 +22,5 @@ ImageProvider? getAppImageProvider(String? path) {
   if (path.startsWith('assets/')) {
     return AssetImage(path);
   }
-  final file = File(path);
-  if (!file.existsSync()) {
-    return null;
-  }
-  return FileImage(file);
+  return FileImage(File(path));
 }

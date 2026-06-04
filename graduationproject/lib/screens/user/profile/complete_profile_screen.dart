@@ -4,6 +4,9 @@ import 'dart:io';
 import '../../../shared/l10n/app_localizations.dart';
 import '../../../shared/state/theme_controller.dart';
 import '../../../app/router/app_router.dart';
+import '../../../shared/state/recruitment_sync_store.dart';
+import '../../../shared/services/recruitment_sync_service.dart';
+import '../../../screens/user/profile/user_data.dart';
 
 class CompleteProfileScreen extends StatefulWidget {
   const CompleteProfileScreen({super.key});
@@ -627,7 +630,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
 
   Widget _buildSaveButton(AppLocalizations t) {
     return ElevatedButton(
-      onPressed: () {
+      onPressed: () async {
         setState(() {
           _fullNameError = _fullName.text.isEmpty ? t.required : null;
           _phoneError = _phone.text.isEmpty ? t.required : null;
@@ -652,6 +655,47 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
           );
           return;
         }
+
+        // Save data to Store
+        final store = RecruitmentSyncStore.instance;
+        
+        // Prepare social links
+        final List<Map<String, String>> socialLinks = [];
+        if (_facebook.text.isNotEmpty) socialLinks.add({'platform': 'Facebook', 'url': _facebook.text});
+        if (_instagram.text.isNotEmpty) socialLinks.add({'platform': 'Instagram', 'url': _instagram.text});
+        if (_whatsapp.text.isNotEmpty) socialLinks.add({'platform': 'WhatsApp', 'url': _whatsapp.text});
+
+        // Update Store
+        store.updateUserProfile(
+          fullName: _fullName.text,
+          title: _selectedRole == "Tradesman" ? (_selectedServices.isNotEmpty ? _selectedServices.join(", ") : "Tradesman") : "Job Seeker",
+          email: _email.text,
+          phone: _phone.text,
+          location: _selectedGovernorate ?? "",
+          about: _aboutMe.text,
+          skills: _skillsList,
+          education: _educationList,
+          experience: _experienceList,
+          socialLinks: socialLinks,
+          role: _selectedRole,
+          backgroundImage: _wallpaperImage?.path,
+          profileImage: _profileImage?.path,
+          portfolioImages: _workImages.map((e) => e.path).toList(),
+          birthDate: _dob.text,
+          gender: _selectedGender,
+          governorate: _selectedGovernorate ?? "",
+          tradesmanServices: _selectedServices,
+        );
+
+        // Sync with Service (optional depending on your backend state)
+        RecruitmentSyncService.instance.updateProfile(
+          name: _fullName.text,
+          photoUrl: _profileImage?.path,
+        );
+
+        // Save to static legacy data if needed
+        UserProfileData.dob = _dob.text;
+        UserProfileData.gender = _selectedGender;
 
         if (_selectedRole == "Tradesman") {
           Navigator.of(context).pushReplacementNamed(AppRoutes.tradesmanWorkspace);

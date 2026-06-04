@@ -37,6 +37,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   late List<Map<String, String>> _education;
   late List<String> _skills;
   late List<Map<String, String>> _socialLinks;
+  late List<String> _portfolioPaths;
+  String? _localBackgroundImage;
+  String? _localProfileImage;
 
   @override
   void initState() {
@@ -52,7 +55,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _emailController = TextEditingController(text: store.currentUserEmail);
 
     // Parse DOB into Day, Month, Year
-    String currentDob = UserProfileData.dob;
+    String currentDob = UserProfileData.dob.isNotEmpty ? UserProfileData.dob : (store.birthDate.isNotEmpty ? store.birthDate : '01/01/1995');
     List<String> dobParts = currentDob.split('/');
     _dayController = TextEditingController(
       text: dobParts.isNotEmpty ? dobParts[0] : '',
@@ -70,7 +73,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _skillController = TextEditingController();
 
     _selectedGender =
-        (UserProfileData.gender == "أنثى" || UserProfileData.gender == "Female")
+        (UserProfileData.gender == "أنثى" || UserProfileData.gender == "Female" || store.gender.toLowerCase().contains('female'))
         ? "Female"
         : "Male";
 
@@ -78,6 +81,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _education = List.from(store.currentUserEducation);
     _skills = List.from(store.currentUserSkills);
     _socialLinks = List.from(store.socialLinks);
+    _portfolioPaths = List.from(store.portfolioImages);
+    _localBackgroundImage = store.backgroundImage;
+    _localProfileImage = store.profileImage;
   }
 
   @override
@@ -98,8 +104,27 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Future<void> _pickImage() async {
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
-      await RecruitmentSyncService.instance.updateProfile(photoUrl: image.path);
-      setState(() {});
+      setState(() {
+        _localProfileImage = image.path;
+      });
+    }
+  }
+
+  Future<void> _pickBackgroundImage() async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      setState(() {
+        _localBackgroundImage = image.path;
+      });
+    }
+  }
+
+  Future<void> _pickPortfolioImages() async {
+    final List<XFile> images = await _picker.pickMultiImage();
+    if (images.isNotEmpty) {
+      setState(() {
+        _portfolioPaths.addAll(images.map((e) => e.path));
+      });
     }
   }
 
@@ -122,6 +147,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       education: _education,
       experience: _experiences,
       socialLinks: _socialLinks,
+      portfolioImages: _portfolioPaths,
+      backgroundImage: _localBackgroundImage,
+      profileImage: _localProfileImage,
+      birthDate: dob,
+      gender: _selectedGender,
     );
 
     RecruitmentSyncService.instance.updateProfile(
@@ -143,17 +173,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final t = AppLocalizations.of(context);
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
     final store = RecruitmentSyncStore.instance;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
+    final onSurfaceColor = isDark ? Colors.white : Colors.black;
 
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: backgroundColor,
       appBar: AppBar(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        backgroundColor: Colors.transparent,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         title: Text(
           t.tr(en: "Edit Profile", ar: "تعديل الملف الشخصي"),
           style: TextStyle(
-            color: Theme.of(context).colorScheme.onSurface,
+            color: onSurfaceColor,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -162,7 +195,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         leading: IconButton(
           icon: Icon(
             isAr ? Icons.arrow_back_ios_new : Icons.arrow_back_ios,
-            color: Theme.of(context).colorScheme.onSurface,
+            color: onSurfaceColor,
           ),
           onPressed: () => Navigator.pop(context),
         ),
@@ -181,6 +214,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     t.tr(en: "Profile Setting", ar: "إعدادات الملف"),
                     true,
                     () {},
+                    isDark,
+                    onSurfaceColor,
                   ),
                   const SizedBox(width: 20),
                   _buildTabItem(
@@ -195,6 +230,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         ),
                       );
                     },
+                    isDark,
+                    onSurfaceColor,
                   ),
                   const SizedBox(width: 20),
                   _buildTabItem(
@@ -208,6 +245,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         ),
                       );
                     },
+                    isDark,
+                    onSurfaceColor,
                   ),
                   const SizedBox(width: 20),
                   _buildTabItem(
@@ -221,13 +260,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         ),
                       );
                     },
+                    isDark,
+                    onSurfaceColor,
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 10),
             Divider(
-              color: Theme.of(context).dividerColor.withValues(alpha: 0.12),
+              color: onSurfaceColor.withValues(alpha: 0.12),
               height: 1,
             ),
             const SizedBox(height: 30),
@@ -235,7 +276,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             Text(
               t.tr(en: "Basic Information", ar: "معلومات أساسية"),
               style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface,
+                color: onSurfaceColor,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
@@ -247,21 +288,47 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ar: "هذه هي معلوماتك الشخصية التي يمكنك تحديثها في أي وقت.",
               ),
               style: TextStyle(
-                color: Theme.of(
-                  context,
-                ).colorScheme.onSurface.withValues(alpha: 0.54),
+                color: onSurfaceColor.withValues(alpha: 0.54),
                 fontSize: 13,
               ),
             ),
             Divider(
-              color: Theme.of(context).dividerColor.withValues(alpha: 0.12),
+              color: onSurfaceColor.withValues(alpha: 0.12),
               height: 40,
             ),
 
             Text(
+              t.tr(en: "Background Photo", ar: "صورة الخلفية"),
+              style: TextStyle(
+                color: onSurfaceColor,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 20),
+            GestureDetector(
+              onTap: _pickBackgroundImage,
+              child: Container(
+                height: 120,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  color: isDark ? const Color(0xFF0D2D4D) : Colors.grey.withValues(alpha: 0.1),
+                  image: _localBackgroundImage != null && getAppImageProvider(_localBackgroundImage) != null
+                    ? DecorationImage(image: getAppImageProvider(_localBackgroundImage)!, fit: BoxFit.cover)
+                    : null,
+                ),
+                alignment: Alignment.center,
+                child: (_localBackgroundImage == null || getAppImageProvider(_localBackgroundImage) == null) 
+                  ? Icon(Icons.add_photo_alternate_outlined, color: onSurfaceColor.withOpacity(0.5), size: 40) : null,
+              ),
+            ),
+            const SizedBox(height: 30),
+
+            Text(
               t.tr(en: "Profile Photo", ar: "صورة الملف الشخصي"),
               style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface,
+                color: onSurfaceColor,
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
@@ -274,13 +341,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   CircleAvatar(
                     radius: 35,
                     backgroundColor: Colors.grey.withValues(alpha: 0.1),
-                    backgroundImage: getAppImageProvider(store.profileImage),
-                    child: store.profileImage == null
+                    backgroundImage: getAppImageProvider(_localProfileImage),
+                    child: (_localProfileImage == null || getAppImageProvider(_localProfileImage) == null)
                         ? Icon(
                             Icons.camera_alt,
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.onSurface.withValues(alpha: 0.3),
+                            color: onSurfaceColor.withValues(alpha: 0.3),
                           )
                         : null,
                   ),
@@ -290,9 +355,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         border: Border.all(
-                          color: Theme.of(
-                            context,
-                          ).dividerColor.withValues(alpha: 0.12),
+                          color: onSurfaceColor.withValues(alpha: 0.12),
                         ),
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -300,9 +363,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         children: [
                           Icon(
                             Icons.image_outlined,
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.onSurface.withValues(alpha: 0.38),
+                            color: onSurfaceColor.withValues(alpha: 0.38),
                             size: 30,
                           ),
                           const SizedBox(height: 8),
@@ -324,29 +385,27 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               ),
             ),
             Divider(
-              color: Theme.of(context).dividerColor.withValues(alpha: 0.12),
+              color: onSurfaceColor.withValues(alpha: 0.12),
               height: 40,
             ),
 
             _buildTextFieldWithLabel(
+              context,
               _fullNameController,
               t.tr(en: "Full Name", ar: "الاسم بالكامل"),
               t.tr(en: "Enter Full Name", ar: "أدخل الاسم بالكامل"),
-            ),
-            const SizedBox(height: 20),
-            _buildTextFieldWithLabel(
-              _titleController,
-              t.tr(en: "Job Title", ar: "المسمى الوظيفي"),
-              t.tr(en: "Enter Job Title", ar: "أدخل المسمى الوظيفي"),
+              onSurfaceColor,
             ),
             const SizedBox(height: 20),
             Row(
               children: [
                 Expanded(
                   child: _buildTextFieldWithLabel(
+                    context,
                     _phoneController,
                     t.tr(en: "Phone Number", ar: "رقم الهاتف"),
                     t.tr(en: "Enter Phone Number", ar: "أدخل رقم الهاتف"),
+                    onSurfaceColor,
                     keyboardType: TextInputType.phone,
                     inputFormatters: [
                       FilteringTextInputFormatter.digitsOnly,
@@ -357,9 +416,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 const SizedBox(width: 15),
                 Expanded(
                   child: _buildTextFieldWithLabel(
+                    context,
                     _emailController,
                     t.tr(en: "Email", ar: "البريد الإلكتروني"),
                     t.tr(en: "Enter Email", ar: "أدخل البريد الإلكتروني"),
+                    onSurfaceColor,
                     keyboardType: TextInputType.emailAddress,
                   ),
                 ),
@@ -376,9 +437,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     children: [
                       Text(
                         t.dob,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
+                          color: onSurfaceColor,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -386,8 +448,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         children: [
                           Expanded(
                             child: _buildTextField(
+                              context,
                               _dayController,
                               "DD",
+                              onSurfaceColor,
                               keyboardType: TextInputType.number,
                               inputFormatters: [
                                 FilteringTextInputFormatter.digitsOnly,
@@ -398,8 +462,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           const SizedBox(width: 5),
                           Expanded(
                             child: _buildTextField(
+                              context,
                               _monthController,
                               "MM",
+                              onSurfaceColor,
                               keyboardType: TextInputType.number,
                               inputFormatters: [
                                 FilteringTextInputFormatter.digitsOnly,
@@ -411,8 +477,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           Expanded(
                             flex: 2,
                             child: _buildTextField(
+                              context,
                               _yearController,
                               "YYYY",
+                              onSurfaceColor,
                               keyboardType: TextInputType.number,
                               inputFormatters: [
                                 FilteringTextInputFormatter.digitsOnly,
@@ -434,7 +502,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       Text(
                         t.gender,
                         style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface,
+                          color: onSurfaceColor,
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
                         ),
@@ -444,26 +512,25 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         height: 50,
                         padding: const EdgeInsets.symmetric(horizontal: 12),
                         decoration: BoxDecoration(
-                          color: Theme.of(context).cardColor,
+                          color: isDark ? const Color(0xFF0D2D4D) : Colors.white,
                           border: Border.all(
-                            color: Theme.of(
-                              context,
-                            ).dividerColor.withValues(alpha: 0.2),
+                            color: onSurfaceColor.withValues(alpha: 0.2),
                           ),
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: DropdownButtonHideUnderline(
                           child: DropdownButton<String>(
                             value: _selectedGender,
+                            dropdownColor: isDark ? const Color(0xFF0D2D4D) : Colors.white,
                             isExpanded: true,
                             items: [
                               DropdownMenuItem(
                                 value: "Male",
-                                child: Text(t.male),
+                                child: Text(t.male, style: TextStyle(color: onSurfaceColor)),
                               ),
                               DropdownMenuItem(
                                 value: "Female",
-                                child: Text(t.female),
+                                child: Text(t.female, style: TextStyle(color: onSurfaceColor)),
                               ),
                             ],
                             onChanged: (val) {
@@ -481,37 +548,41 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             ),
             const SizedBox(height: 20),
             _buildTextFieldWithLabel(
+              context,
               _locationController,
               t.address,
               t.tr(en: "Enter Address", ar: "أدخل العنوان"),
+              onSurfaceColor,
               suffixIcon: Icons.location_on_outlined,
             ),
 
             Divider(
-              color: Theme.of(context).dividerColor.withValues(alpha: 0.12),
+              color: onSurfaceColor.withValues(alpha: 0.12),
               height: 40,
             ),
 
             Text(
               t.aboutMe,
               style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface,
+                color: onSurfaceColor,
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 12),
             _buildTextField(
+              context,
               _aboutMeController,
               t.tr(en: "Enter About Me", ar: "أدخل معلومات عنك"),
+              onSurfaceColor,
               maxLines: 3,
             ),
             Divider(
-              color: Theme.of(context).dividerColor.withValues(alpha: 0.12),
+              color: onSurfaceColor.withValues(alpha: 0.12),
               height: 40,
             ),
 
-            _buildSectionHeader(t.workExperience, () {
+            _buildSectionHeader(t.workExperience, onSurfaceColor, () {
               _showAddItemDialog(
                 title: t.tr(en: "Add Experience", ar: "إضافة خبرة"),
                 fieldKeys: ["title", "company", "duration"],
@@ -527,15 +598,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               (exp) => _buildRemovableItem(
                 exp['title'] ?? "",
                 exp['company'] ?? "",
+                onSurfaceColor,
                 () => setState(() => _experiences.remove(exp)),
               ),
             ),
             Divider(
-              color: Theme.of(context).dividerColor.withValues(alpha: 0.12),
+              color: onSurfaceColor.withValues(alpha: 0.12),
               height: 40,
             ),
 
-            _buildSectionHeader(t.education, () {
+            _buildSectionHeader(t.education, onSurfaceColor, () {
               _showAddItemDialog(
                 title: t.tr(en: "Add Education", ar: "إضافة تعليم"),
                 fieldKeys: ["institution", "degree", "duration"],
@@ -551,18 +623,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               (edu) => _buildRemovableItem(
                 edu['institution'] ?? "",
                 edu['degree'] ?? "",
+                onSurfaceColor,
                 () => setState(() => _education.remove(edu)),
               ),
             ),
             Divider(
-              color: Theme.of(context).dividerColor.withValues(alpha: 0.12),
+              color: onSurfaceColor.withValues(alpha: 0.12),
               height: 40,
             ),
 
             Text(
               t.skills,
               style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface,
+                color: onSurfaceColor,
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
@@ -574,7 +647,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               children: _skills
                   .map(
                     (skill) => Chip(
-                      label: Text(skill, style: const TextStyle(fontSize: 12)),
+                      label: Text(skill, style: TextStyle(fontSize: 12, color: onSurfaceColor)),
                       onDeleted: () => setState(() => _skills.remove(skill)),
                       backgroundColor: Theme.of(
                         context,
@@ -589,8 +662,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               children: [
                 Expanded(
                   child: _buildTextField(
+                    context,
                     _skillController,
                     t.tr(en: "Add Skill", ar: "إضافة مهارة"),
+                    onSurfaceColor,
                   ),
                 ),
                 IconButton(
@@ -607,11 +682,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               ],
             ),
             Divider(
-              color: Theme.of(context).dividerColor.withValues(alpha: 0.12),
+              color: onSurfaceColor.withValues(alpha: 0.12),
               height: 40,
             ),
 
-            _buildSectionHeader(t.socialMedia, () {
+            _buildSectionHeader(t.socialMedia, onSurfaceColor, () {
               _showAddItemDialog(
                 title: t.tr(en: "Add Social Link", ar: "إضافة رابط تواصل"),
                 fieldKeys: ["platform", "url"],
@@ -626,15 +701,54 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               (link) => _buildRemovableItem(
                 link['platform'] ?? "",
                 link['url'] ?? "",
+                onSurfaceColor,
                 () => setState(() => _socialLinks.remove(link)),
               ),
             ),
+
+            Divider(
+              color: onSurfaceColor.withValues(alpha: 0.12),
+              height: 40,
+            ),
+
+            _buildSectionHeader(t.tr(en: "Gallery", ar: "المعرض"), onSurfaceColor, _pickPortfolioImages),
+            if (_portfolioPaths.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: _portfolioPaths.length,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3, crossAxisSpacing: 10, mainAxisSpacing: 10,
+                  ),
+                  itemBuilder: (context, i) {
+                    final provider = getAppImageProvider(_portfolioPaths[i]);
+                    if (provider == null) return const SizedBox.shrink();
+                    return Stack(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image(image: provider, fit: BoxFit.cover, width: double.infinity, height: double.infinity),
+                        ),
+                        Positioned(
+                          right: 0, top: 0,
+                          child: GestureDetector(
+                            onTap: () => setState(() => _portfolioPaths.removeAt(i)),
+                            child: Container(color: Colors.black54, child: const Icon(Icons.close, color: Colors.white, size: 16)),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ),
 
             const SizedBox(height: 40),
             AppButton(
               label: t.tr(en: "Save Profile", ar: "حفظ الملف الشخصي"),
               onPressed: _saveData,
-              backgroundColor: const Color(0xFF4A6ED1),
+              backgroundColor: const Color(0xFF142C66),
             ),
             const SizedBox(height: 100),
           ],
@@ -643,7 +757,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
-  Widget _buildTabItem(String label, bool isActive, VoidCallback onTap) {
+  Widget _buildTabItem(String label, bool isActive, VoidCallback onTap, bool isDark, Color onSurfaceColor) {
     return GestureDetector(
       onTap: onTap,
       child: Column(
@@ -653,7 +767,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             style: TextStyle(
               color: isActive
                   ? Theme.of(context).colorScheme.primary
-                  : Colors.grey,
+                  : onSurfaceColor.withOpacity(0.5),
               fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
             ),
           ),
@@ -670,9 +784,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   Widget _buildTextFieldWithLabel(
+    BuildContext context,
     TextEditingController controller,
     String label,
-    String hint, {
+    String hint,
+    Color onSurfaceColor, {
     IconData? suffixIcon,
     TextInputType? keyboardType,
     List<TextInputFormatter>? inputFormatters,
@@ -682,12 +798,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       children: [
         Text(
           label,
-          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: onSurfaceColor),
         ),
         const SizedBox(height: 8),
         _buildTextField(
+          context,
           controller,
           hint,
+          onSurfaceColor,
           suffixIcon: suffixIcon,
           keyboardType: keyboardType,
           inputFormatters: inputFormatters,
@@ -697,33 +815,40 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   Widget _buildTextField(
+    BuildContext context,
     TextEditingController controller,
-    String hint, {
+    String hint,
+    Color onSurfaceColor, {
     IconData? suffixIcon,
     int maxLines = 1,
     TextInputType? keyboardType,
     List<TextInputFormatter>? inputFormatters,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return TextField(
       controller: controller,
       maxLines: maxLines,
       keyboardType: keyboardType,
       inputFormatters: inputFormatters,
-      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+      style: TextStyle(color: onSurfaceColor),
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: TextStyle(
-          color: Theme.of(
-            context,
-          ).colorScheme.onSurface.withValues(alpha: 0.38),
+          color: onSurfaceColor.withValues(alpha: 0.38),
         ),
-        suffixIcon: suffixIcon != null ? Icon(suffixIcon, size: 20) : null,
+        suffixIcon: suffixIcon != null ? Icon(suffixIcon, size: 20, color: onSurfaceColor.withOpacity(0.5)) : null,
         filled: true,
-        fillColor: Theme.of(context).cardColor,
+        fillColor: isDark ? const Color(0xFF0D2D4D) : Colors.white,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
           borderSide: BorderSide(
-            color: Theme.of(context).dividerColor.withValues(alpha: 0.2),
+            color: onSurfaceColor.withValues(alpha: 0.2),
+          ),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(
+            color: onSurfaceColor.withValues(alpha: 0.1),
           ),
         ),
         contentPadding: const EdgeInsets.symmetric(
@@ -734,13 +859,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
-  Widget _buildSectionHeader(String title, VoidCallback onAdd) {
+  Widget _buildSectionHeader(String title, Color color, VoidCallback onAdd) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
           title,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: color),
         ),
         IconButton(
           icon: const Icon(Icons.add_circle_outline, color: Colors.blueAccent),
@@ -753,11 +878,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Widget _buildRemovableItem(
     String title,
     String subtitle,
+    Color color,
     VoidCallback onRemove,
   ) {
     return ListTile(
-      title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-      subtitle: Text(subtitle),
+      title: Text(title, style: TextStyle(fontWeight: FontWeight.bold, color: color)),
+      subtitle: Text(subtitle, style: TextStyle(color: color.withOpacity(0.6))),
       trailing: IconButton(
         icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
         onPressed: onRemove,

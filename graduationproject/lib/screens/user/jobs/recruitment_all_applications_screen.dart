@@ -41,6 +41,7 @@ class _RecruitmentAllApplicationsScreenState extends State<RecruitmentAllApplica
   Widget build(BuildContext context) {
     final store = RecruitmentSyncStore.instance;
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     
     final filteredApps = store.applications.where((app) {
       final matchesSearch = app.jobTitle.toLowerCase().contains(_searchQuery.toLowerCase()) || 
@@ -53,249 +54,230 @@ class _RecruitmentAllApplicationsScreenState extends State<RecruitmentAllApplica
     }).toList();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFDF9F6),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        centerTitle: true,
-        title: Text(
-          isAr ? 'سجل التقديم' : 'Application History',
-          style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header Section
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.black12),
+      backgroundColor: isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4),
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Top Bar: Applications Record
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(
+                    isAr ? 'سجل التقديمات' : 'Applications Record',
+                    style: const TextStyle(color: Color(0xFFFF7A2A), fontWeight: FontWeight.bold, fontSize: 16),
                   ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.calendar_today_outlined, size: 16, color: Colors.black87),
-                      const SizedBox(width: 8),
-                      Text(
-                        '2/6/2026',
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ],
+                  const Spacer(),
+                  IconButton(
+                    icon: Icon(isAr ? Icons.arrow_forward_ios : Icons.arrow_back_ios, color: isDark ? Colors.white : Colors.black),
+                    onPressed: () => Navigator.pop(context),
                   ),
-                ),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        isAr ? '${store.currentUserName} ,استمر في العمل الجيد' : '${store.currentUserName}, keep up the good work',
-                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
-                        textAlign: TextAlign.right,
-                      ),
-                      Text(
-                        isAr ? 'إليك ما يحدث مع طلباتك اعتباراً من اليوم' : 'Here is what is happening with your applications as of today',
-                        style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-                        textAlign: TextAlign.right,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
 
-          // Tabs
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              children: [
-                _buildTab(isAr ? 'الكل' : 'All'),
-                _buildTab(isAr ? 'تم التوظيف' : 'Hired'),
-                _buildTab(isAr ? 'قيد المراجعة' : 'Review'),
-                _buildTab(isAr ? 'تم التقديم' : 'Applied'),
-                _buildTab(isAr ? 'مرفوض' : 'Rejected'),
-              ],
+            // Main Info Card
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF0D2D4D) : const Color(0xFFE0E0E0),
+                  borderRadius: BorderRadius.circular(24),
+                  boxShadow: [
+                    BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 4))
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    RichText(
+                      textAlign: TextAlign.center,
+                      text: TextSpan(
+                        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                        children: [
+                          TextSpan(text: '${store.currentUserName} ', style: const TextStyle(color: Color(0xFFFF7A2A))),
+                          TextSpan(text: isAr ? 'استمر في العمل الجيد' : 'keep up the good work', style: TextStyle(color: isDark ? Colors.white : const Color(0xFF213E75))),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      isAr ? 'إليك ما يحدث مع طلباتك اعتباراً من اليوم' : 'Here is what is happening with your applications as of today',
+                      style: TextStyle(fontSize: 12, color: isDark ? Colors.white70 : Colors.black54),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 24),
+                    // Tabs inside card - Ordered from Right (First child in RTL)
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          _buildCardTab(isAr ? 'الكل' : 'All'),
+                          _buildCardTab(isAr ? 'تم التوظيف' : 'Hired'),
+                          _buildCardTab(isAr ? 'قيد المراجعة' : 'Review'),
+                          _buildCardTab(isAr ? 'تم التقديم' : 'Applied'),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ),
 
-          const SizedBox(height: 24),
+            const SizedBox(height: 32),
 
-          // List Header & Search
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
+            // Section Title
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Align(
+                alignment: isAr ? Alignment.centerRight : Alignment.centerLeft,
+                child: Text(
                   isAr ? 'سجل الطلبات' : 'Applications Record',
                   style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
-                const SizedBox(height: 16),
-                Container(
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // Search Bar in Dark Blue Container
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF142C66),
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF1F1F1),
-                    borderRadius: BorderRadius.circular(15),
+                    color: const Color(0xFFECEAF2),
+                    borderRadius: BorderRadius.circular(10),
                   ),
                   child: TextField(
                     controller: _searchController,
                     textAlign: isAr ? TextAlign.right : TextAlign.left,
                     onChanged: (v) => setState(() => _searchQuery = v),
+                    style: const TextStyle(color: Colors.black87),
                     decoration: InputDecoration(
-                      hintText: isAr ? 'بحث بالوظيفة أو الشركة...' : 'Search by job or company...',
-                      prefixIcon: const Icon(Icons.search, color: Color(0xFF213E75)),
+                      hintText: isAr ? 'ابحث عن الوظيفة أو الشركة...' : 'Search by job or company...',
+                      prefixIcon: const Icon(Icons.search, color: Colors.grey),
                       border: InputBorder.none,
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      filled: false,
                       contentPadding: const EdgeInsets.symmetric(vertical: 12),
                     ),
                   ),
                 ),
-              ],
+              ),
             ),
-          ),
 
-          const SizedBox(height: 20),
+            const SizedBox(height: 20),
 
-          // Table Header
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Row(
-              children: [
-                Expanded(flex: 2, child: Text(isAr ? 'الحالة' : 'Status', textAlign: TextAlign.center, style: TextStyle(color: Colors.grey, fontSize: 12))),
-                Expanded(flex: 2, child: Text(isAr ? 'التاريخ' : 'Date', textAlign: TextAlign.center, style: TextStyle(color: Colors.grey, fontSize: 12))),
-                Expanded(flex: 3, child: Text(isAr ? 'المسمى الوظيفي' : 'Job Title', textAlign: TextAlign.center, style: TextStyle(color: Colors.grey, fontSize: 12))),
-                Expanded(flex: 3, child: Text(isAr ? 'مقدم الخدمة / الشركة' : 'Company', textAlign: TextAlign.center, style: TextStyle(color: Colors.grey, fontSize: 12))),
-                const SizedBox(width: 30, child: Text('#', textAlign: TextAlign.center, style: TextStyle(color: Colors.grey, fontSize: 12))),
-              ],
-            ),
-          ),
-          const Divider(indent: 24, endIndent: 24),
+            // List of Applications
+            Expanded(
+              child: ListView.builder(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                itemCount: filteredApps.length,
+                itemBuilder: (context, index) {
+                  final app = filteredApps[index];
+                  final status = _translateStatus(app.status, isAr);
+                  final color = _getStatusColor(app.status);
 
-          // Applications List
-          Expanded(
-            child: ListView.separated(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-              itemCount: filteredApps.length,
-              separatorBuilder: (context, index) => const Divider(height: 32),
-              itemBuilder: (context, index) {
-                final app = filteredApps[index];
-                final status = _translateStatus(app.status, isAr);
-                final color = _getStatusColor(app.status);
-
-                return InkWell(
-                  onTap: () => Navigator.pushNamed(context, AppRoutes.userApplicationTimeline, arguments: app),
-                  child: Row(
-                    children: [
-                      // Status
-                      Expanded(
-                        flex: 2,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 6),
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF0D2D4D) : Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 5)],
+                    ),
+                    child: Row(
+                      children: [
+                        // Right: Logo (First child in Row for RTL)
+                        Container(
+                          padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: color.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(20),
+                            color: Colors.grey.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                          child: Text(
-                            status,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.bold),
-                          ),
+                          child: const Icon(Icons.business, size: 20, color: Color(0xFF49769F)),
                         ),
-                      ),
-                      // Date
-                      Expanded(
-                        flex: 2,
-                        child: Text(
-                          '${app.updatedAt.day}/${app.updatedAt.month}/${app.updatedAt.year}',
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(fontSize: 12, color: Colors.black87),
-                        ),
-                      ),
-                      // Job Title
-                      Expanded(
-                        flex: 3,
-                        child: Text(
-                          app.jobTitle,
-                          textAlign: TextAlign.center,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(fontSize: 12),
-                        ),
-                      ),
-                      // Company
-                      Expanded(
-                        flex: 3,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                             Text(
-                              app.companyName,
-                              textAlign: TextAlign.right,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(fontSize: 12),
-                            ),
-                            const SizedBox(width: 8),
-                            Container(
-                              padding: const EdgeInsets.all(6),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFFFF5E9),
-                                borderRadius: BorderRadius.circular(8),
+                        const SizedBox(width: 12),
+                        // Middle: Job Info
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: isAr ? CrossAxisAlignment.start : CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                app.jobTitle,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                               ),
-                              child: const Icon(Icons.business, size: 16, color: Color(0xFFF77F32)),
+                              Text(
+                                isAr ? 'دوام كامل •' : 'Full Time •',
+                                style: const TextStyle(fontSize: 12, color: Colors.grey),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Spacer(),
+                        // Left: Date (Top) and Status (Bottom)
+                        Column(
+                          crossAxisAlignment: isAr ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '${app.updatedAt.day}/${app.updatedAt.month}/${app.updatedAt.year}',
+                              style: const TextStyle(fontSize: 11, color: Colors.grey),
+                            ),
+                            const SizedBox(height: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: color.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Text(
+                                status,
+                                style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.bold),
+                              ),
                             ),
                           ],
                         ),
-                      ),
-                      // Index
-                      SizedBox(
-                        width: 30,
-                        child: Text(
-                          '${index + 1}',
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
+                      ],
+                    ),
+                  );
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildTab(String label) {
+  Widget _buildCardTab(String label) {
     final isSelected = _activeTab == label;
     return GestureDetector(
       onTap: () => setState(() => _activeTab = label),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        margin: const EdgeInsets.symmetric(horizontal: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(
-              color: isSelected ? const Color(0xFF213E75) : Colors.transparent,
-              width: 3,
-            ),
-          ),
+          border: isSelected ? const Border(bottom: BorderSide(color: Color(0xFFFF7A2A), width: 3)) : null,
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: isSelected ? const Color(0xFF213E75) : Colors.grey,
+            color: isSelected ? const Color(0xFFFF7A2A) : Colors.grey,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            fontSize: 13,
           ),
         ),
       ),

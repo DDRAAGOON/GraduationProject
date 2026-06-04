@@ -56,6 +56,9 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
                           )
                         : null,
                   ),
+                  child: store.backgroundImage != null && getAppImageProvider(store.backgroundImage) == null
+                      ? const Center(child: Icon(Icons.broken_image, color: Colors.white30))
+                      : null,
                 ),
                 Positioned(
                   top: 12,
@@ -90,7 +93,7 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
                       radius: 60,
                       backgroundColor: Theme.of(context).cardColor,
                       backgroundImage: getAppImageProvider(store.profileImage),
-                      child: store.profileImage == null 
+                      child: (store.profileImage == null || getAppImageProvider(store.profileImage) == null)
                           ? const Icon(Icons.person, size: 70, color: Color(0xFF49769F)) 
                           : null,
                     ),

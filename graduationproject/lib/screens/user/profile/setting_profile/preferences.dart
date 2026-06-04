@@ -18,20 +18,23 @@ class _PreferencesState extends State<Preferences> {
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     final isAr = t.isAr;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
+    final onSurfaceColor = isDark ? Colors.white : Colors.black;
 
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: backgroundColor,
       appBar: AppBar(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        backgroundColor: Colors.transparent,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         title: Text(
           t.tr(en: "Edit Profile", ar: "تعديل الملف الشخصي"),
-          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 20, fontWeight: FontWeight.bold),
+          style: TextStyle(color: onSurfaceColor, fontSize: 20, fontWeight: FontWeight.bold),
         ),
         centerTitle: false,
         leading: IconButton(
-          icon: Icon(isAr ? Icons.arrow_forward_ios : Icons.arrow_back_ios, color: Theme.of(context).colorScheme.onSurface),
+          icon: Icon(isAr ? Icons.arrow_forward_ios : Icons.arrow_back_ios, color: onSurfaceColor),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -48,26 +51,26 @@ class _PreferencesState extends State<Preferences> {
                 children: [
                   _buildTabItem(t.tr(en: "Profile Setting", ar: "إعدادات الملف"), false, () {
                     Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const EditProfileScreen()));
-                  }),
+                  }, isDark, onSurfaceColor),
                   const SizedBox(width: 20),
                   _buildTabItem(t.tr(en: "Account Security", ar: "أمان الحساب"), false, () {
                     Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const ProfileLoginDetailsScreen()));
-                  }),
+                  }, isDark, onSurfaceColor),
                   const SizedBox(width: 20),
                   _buildTabItem(t.tr(en: "Notification", ar: "الإشعارات"), false, () {
                     Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Notifications()));
-                  }),
+                  }, isDark, onSurfaceColor),
                   const SizedBox(width: 20),
-                  _buildTabItem(t.tr(en: "Preferences", ar: "التفضيلات"), true, () {}),
+                  _buildTabItem(t.tr(en: "Preferences", ar: "التفضيلات"), true, () {}, isDark, onSurfaceColor),
                 ],
               ),
             ),
             const SizedBox(height: 10),
-            Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 1),
+            Divider(color: onSurfaceColor.withValues(alpha: 0.12), height: 1),
             const SizedBox(height: 30),
 
             // App Settings
-            Text(t.tr(en: "App Settings", ar: "إعدادات التطبيق"), style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 18, fontWeight: FontWeight.bold)),
+            Text(t.tr(en: "App Settings", ar: "إعدادات التطبيق"), style: TextStyle(color: onSurfaceColor, fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 20),
 
             _buildAppSettingItem(
@@ -75,6 +78,8 @@ class _PreferencesState extends State<Preferences> {
               title: t.language,
               subtitle: isAr ? "العربية" : "English",
               onTap: () => _showLanguageDialog(context, t),
+              isDark: isDark,
+              onSurfaceColor: onSurfaceColor,
             ),
             const SizedBox(height: 15),
             _buildAppSettingItem(
@@ -82,6 +87,8 @@ class _PreferencesState extends State<Preferences> {
               title: t.appearance,
               subtitle: ThemeController.instance.themeMode.value == ThemeMode.dark ? t.dark : t.light,
               onTap: () => _showThemeDialog(context, t),
+              isDark: isDark,
+              onSurfaceColor: onSurfaceColor,
             ),
 
             const SizedBox(height: 100),
@@ -91,7 +98,7 @@ class _PreferencesState extends State<Preferences> {
     );
   }
 
-  Widget _buildTabItem(String title, bool isActive, VoidCallback onTap) {
+  Widget _buildTabItem(String title, bool isActive, VoidCallback onTap, bool isDark, Color onSurfaceColor) {
     return GestureDetector(
       onTap: onTap,
       child: Column(
@@ -99,7 +106,7 @@ class _PreferencesState extends State<Preferences> {
           Text(
             title,
             style: TextStyle(
-              color: isActive ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5), 
+              color: isActive ? Theme.of(context).colorScheme.primary : onSurfaceColor.withValues(alpha: 0.5), 
               fontWeight: isActive ? FontWeight.bold : FontWeight.normal, 
               fontSize: 14,
             ),
@@ -116,12 +123,12 @@ class _PreferencesState extends State<Preferences> {
     );
   }
 
-  Widget _buildAppSettingItem({required IconData icon, required String title, required String subtitle, required VoidCallback onTap}) {
+  Widget _buildAppSettingItem({required IconData icon, required String title, required String subtitle, required VoidCallback onTap, required bool isDark, required Color onSurfaceColor}) {
     return Container(
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
+        color: isDark ? const Color(0xFF0D2D4D) : Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.2)),
+        border: Border.all(color: onSurfaceColor.withValues(alpha: 0.2)),
       ),
       child: ListTile(
         onTap: onTap,
@@ -130,9 +137,9 @@ class _PreferencesState extends State<Preferences> {
           decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1), shape: BoxShape.circle),
           child: Icon(icon, color: Theme.of(context).colorScheme.primary, size: 20),
         ),
-        title: Text(title, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 15, fontWeight: FontWeight.w600)),
-        subtitle: Text(subtitle, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), fontSize: 12)),
-        trailing: Icon(Icons.keyboard_arrow_down, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3), size: 20),
+        title: Text(title, style: TextStyle(color: onSurfaceColor, fontSize: 15, fontWeight: FontWeight.w600)),
+        subtitle: Text(subtitle, style: TextStyle(color: onSurfaceColor.withValues(alpha: 0.6), fontSize: 12)),
+        trailing: Icon(Icons.keyboard_arrow_down, color: onSurfaceColor.withValues(alpha: 0.3), size: 20),
       ),
     );
   }

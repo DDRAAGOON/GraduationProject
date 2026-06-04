@@ -5,10 +5,38 @@ import '../../../shared/utils/image_helper.dart';
 import '../../../app/router/app_router.dart';
 import '../../../shared/widgets/app_button.dart';
 
-class CompanyDetailsScreen extends StatelessWidget {
+class CompanyDetailsScreen extends StatefulWidget {
   final Map<String, dynamic> company;
 
   const CompanyDetailsScreen({super.key, required this.company});
+
+  @override
+  State<CompanyDetailsScreen> createState() => _CompanyDetailsScreenState();
+}
+
+class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
+  final TextEditingController _commentController = TextEditingController();
+  final List<Map<String, String>> _comments = [
+    {'name': 'أحمد علي', 'text': 'بيئة عمل ممتازة جداً واحترافية عالية.'},
+  ];
+
+  @override
+  void dispose() {
+    _commentController.dispose();
+    super.dispose();
+  }
+
+  void _addComment() {
+    if (_commentController.text.trim().isNotEmpty) {
+      setState(() {
+        _comments.insert(0, {
+          'name': RecruitmentSyncStore.instance.currentUserName,
+          'text': _commentController.text.trim(),
+        });
+        _commentController.clear();
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,222 +44,261 @@ class CompanyDetailsScreen extends StatelessWidget {
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
     final store = RecruitmentSyncStore.instance;
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final Color textColor = isDark ? const Color(0xFFD9D9D9) : Colors.black;
     
-    // Filter jobs for this specific company
     final companyJobs = store.jobs.where((job) => 
-      job.companyName.trim().toLowerCase() == company['name'].toString().trim().toLowerCase()
+      job.companyName.trim().toLowerCase() == (widget.company['name'] ?? '').toString().trim().toLowerCase()
     ).toList();
 
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
+      backgroundColor: isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4),
       appBar: AppBar(
-        backgroundColor: theme.scaffoldBackgroundColor,
+        backgroundColor: Colors.transparent,
         elevation: 0,
-        surfaceTintColor: Colors.transparent,
         leading: IconButton(
-          icon: Icon(isAr ? Icons.arrow_back_ios_new : Icons.arrow_back_ios, color: theme.colorScheme.onSurface),
+          icon: Icon(Icons.arrow_back_ios, color: isDark ? Colors.white : Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          t.tr(en: 'Company Details', ar: 'تفاصيل الشركة'),
-          style: const TextStyle(fontWeight: FontWeight.bold),
+          t.tr(en: 'Company Profile', ar: 'ملف الشركة'),
+          style: TextStyle(color: isDark ? Colors.white : Colors.black, fontWeight: FontWeight.bold),
         ),
       ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Company Header
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: theme.cardColor,
-                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(32)),
-                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4))],
-              ),
-              child: Column(
-                children: [
-                  Container(
-                    width: 90, height: 90,
-                    decoration: BoxDecoration(
-                      color: theme.scaffoldBackgroundColor,
-                      borderRadius: BorderRadius.circular(24),
-                      border: Border.all(color: theme.dividerColor.withValues(alpha: 0.1)),
-                    ),
-                    child: Center(
-                      child: getAppImageProvider(company['logoUrl']?.toString()) != null
-                          ? CircleAvatar(radius: 40, backgroundImage: getAppImageProvider(company['logoUrl']?.toString()))
-                          : Icon(Icons.business, color: theme.colorScheme.primary, size: 48),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    company['name'] as String,
-                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.primary.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      company['industry'] as String,
-                      style: TextStyle(color: theme.colorScheme.primary, fontWeight: FontWeight.bold, fontSize: 14),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            // Header Section
+            _buildHeader(context, isDark, isAr, textColor),
             
-            const SizedBox(height: 24),
-
-            // About Section
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
+              padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    t.tr(en: 'About Company', ar: 'عن الشركة'),
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
+                  // 1. Company Basic Info Rows
+                  _buildSectionTitle(t.tr(en: 'Company Information', ar: 'معلومات الشركة'), textColor),
                   const SizedBox(height: 12),
-                  Text(
-                    company['description'] as String,
-                    style: TextStyle(
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
-                      fontSize: 15,
-                      height: 1.6,
+                  _buildContentCard(
+                    isDark,
+                    Column(
+                      children: [
+                        _buildDetailRow(Icons.category_outlined, t.tr(en: 'Industry', ar: 'مجال العمل'), widget.company['industry'] ?? '---', isDark, textColor),
+                        const Divider(),
+                        _buildDetailRow(Icons.location_on_outlined, t.tr(en: 'Location', ar: 'الموقع'), 'القاهرة، مصر', isDark, textColor),
+                        const Divider(),
+                        _buildDetailRow(Icons.groups_outlined, t.tr(en: 'Employees', ar: 'عدد الموظفين'), '50 - 200', isDark, textColor),
+                        const Divider(),
+                        _buildDetailRow(Icons.event_available_outlined, t.tr(en: 'Founded', ar: 'تاريخ التأسيس'), '2015', isDark, textColor),
+                      ],
                     ),
                   ),
-                ],
-              ),
-            ),
-            
-            const SizedBox(height: 32),
-            
-            // Jobs List Header
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    t.tr(en: 'Open Vacancies', ar: 'الوظائف المتاحة'),
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  const SizedBox(height: 24),
+
+                  // 2. Reviews & Feedback (Input + List)
+                  _buildSectionTitle(t.tr(en: 'Reviews & Feedback', ar: 'التقييمات والآراء'), textColor),
+                  const SizedBox(height: 12),
+                  _buildContentCard(
+                    isDark,
+                    Column(
+                      children: [
+                        TextField(
+                          controller: _commentController,
+                          style: TextStyle(color: isDark ? Colors.white : Colors.black),
+                          decoration: InputDecoration(
+                            hintText: isAr ? 'اكتب تعليقك هنا...' : 'Write your comment...',
+                            hintStyle: TextStyle(color: textColor.withOpacity(0.5)),
+                            suffixIcon: IconButton(
+                              icon: const Icon(Icons.send, color: Color(0xFFFF7A2A)),
+                              onPressed: _addComment,
+                            ),
+                            border: InputBorder.none,
+                          ),
+                        ),
+                        const Divider(),
+                        ..._comments.map((c) => ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          leading: const CircleAvatar(child: Icon(Icons.person)),
+                          title: Text(c['name']!, style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black)),
+                          subtitle: Text(c['text']!, style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
+                        )),
+                      ],
+                    ),
                   ),
-                  Text(
-                    '${companyJobs.length} ${isAr ? "وظيفة" : "Jobs"}',
-                    style: TextStyle(color: theme.colorScheme.primary, fontWeight: FontWeight.bold),
+                  const SizedBox(height: 24),
+
+                  // 3. About Company (Description)
+                  _buildSectionTitle(t.tr(en: 'About Company', ar: 'عن الشركة'), textColor),
+                  const SizedBox(height: 12),
+                  _buildContentCard(
+                    isDark,
+                    Text(
+                      widget.company['description'] ?? '---',
+                      style: TextStyle(height: 1.6, color: isDark ? Colors.white70 : Colors.black87),
+                    ),
                   ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-            
-            if (companyJobs.isEmpty)
-              Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(40),
-                  child: Column(
+                  const SizedBox(height: 24),
+
+                  // 4. Social Media Links
+                  _buildSectionTitle(t.tr(en: 'Social Media', ar: 'روابط التواصل'), textColor),
+                  const SizedBox(height: 12),
+                  _buildContentCard(
+                    isDark,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _buildSocialIcon(Icons.language, Colors.blue),
+                        _buildSocialIcon(Icons.facebook, Colors.indigo),
+                        _buildSocialIcon(Icons.link, Colors.blueAccent),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // 5. Benefits/Perks
+                  _buildSectionTitle(t.tr(en: 'Benefits', ar: 'المميزات'), textColor),
+                  const SizedBox(height: 12),
+                  Wrap(
+                    spacing: 10,
+                    runSpacing: 10,
                     children: [
-                      Icon(Icons.work_off_outlined, size: 64, color: theme.dividerColor.withValues(alpha: 0.2)),
-                      const SizedBox(height: 16),
-                      Text(
-                        t.tr(en: 'No jobs available right now', ar: 'لا توجد وظائف متاحة حالياً'),
-                        style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.38)),
-                      ),
+                      _buildBenefitChip(t.tr(en: 'Health Insurance', ar: 'تأمين صحي'), isDark),
+                      _buildBenefitChip(t.tr(en: 'Flexible Hours', ar: 'ساعات مرنة'), isDark),
+                      _buildBenefitChip(t.tr(en: 'Transportation', ar: 'بدل انتقال'), isDark),
                     ],
                   ),
-                ),
-              )
-            else
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                itemCount: companyJobs.length,
-                itemBuilder: (context, index) {
-                  final job = companyJobs[index];
-                  return _buildJobCard(context, job, t);
-                },
+                  const SizedBox(height: 32),
+
+                  // 6. Open Vacancies
+                  _buildSectionTitle(t.tr(en: 'Open Vacancies', ar: 'الوظائف المتاحة'), textColor),
+                  const SizedBox(height: 16),
+                  if (companyJobs.isEmpty)
+                    Center(child: Text(t.tr(en: 'No vacancies', ar: 'لا توجد وظائف حالياً'), style: TextStyle(color: textColor)))
+                  else
+                    ...companyJobs.map((job) => _buildJobItem(job, context, isDark)),
+                  
+                  const SizedBox(height: 50),
+                ],
               ),
-            const SizedBox(height: 100),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildJobCard(BuildContext context, RecruitmentJob job, AppLocalizations t) {
-    final theme = Theme.of(context);
-    final isAr = Localizations.localeOf(context).languageCode == 'ar';
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      color: theme.cardColor,
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-        side: BorderSide(color: theme.dividerColor.withValues(alpha: 0.1)),
+  Widget _buildHeader(BuildContext context, bool isDark, bool isAr, Color textColor) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF0D2D4D) : Colors.white,
+        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(32)),
+        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10)],
       ),
-      child: InkWell(
-        onTap: () => Navigator.of(context).pushNamed(AppRoutes.userJobDetails, arguments: job),
-        borderRadius: BorderRadius.circular(20),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Text(
-                      job.title,
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  Text(
-                    job.salaryRange,
-                    style: TextStyle(color: theme.colorScheme.primary, fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  _buildIconText(theme, Icons.location_on_outlined, job.location),
-                  const SizedBox(width: 16),
-                  _buildIconText(theme, Icons.work_outline, job.type),
-                ],
-              ),
-              const SizedBox(height: 20),
-              AppButton(
-                label: t.tr(en: 'Apply Now', ar: 'قدّم الآن'),
-                backgroundColor: const Color(0xFF4A6ED1),
-                onPressed: () => Navigator.of(context).pushNamed(AppRoutes.userJobApplication, arguments: job),
-              ),
-            ],
+      child: Column(
+        children: [
+          CircleAvatar(
+            radius: 50,
+            backgroundColor: const Color(0xFF213E75).withOpacity(0.1),
+            child: const Icon(Icons.business, size: 50, color: Color(0xFF213E75)),
           ),
-        ),
+          const SizedBox(height: 16),
+          Text(
+            widget.company['name'] ?? '---',
+            style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            widget.company['industry'] ?? '---',
+            style: const TextStyle(color: Color(0xFFFF7A2A), fontWeight: FontWeight.bold),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildIconText(ThemeData theme, IconData icon, String text) {
-    return Row(
-      children: [
-        Icon(icon, size: 16, color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
-        const SizedBox(width: 6),
-        Text(
-          text,
-          style: TextStyle(fontSize: 13, color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
+  Widget _buildSectionTitle(String title, Color textColor) {
+    return Text(
+      title,
+      style: TextStyle(
+        fontSize: 18, 
+        fontWeight: FontWeight.bold, 
+        color: textColor
+      ),
+    );
+  }
+
+  Widget _buildContentCard(bool isDark, Widget child) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF0D2D4D) : Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: isDark ? Colors.white10 : Colors.black12),
+      ),
+      child: child,
+    );
+  }
+
+  Widget _buildDetailRow(IconData icon, String label, String value, bool isDark, Color textColor) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        children: [
+          Icon(icon, size: 20, color: const Color(0xFFFF7A2A)),
+          const SizedBox(width: 12),
+          Text(label, style: TextStyle(color: textColor.withOpacity(0.7))),
+          const Spacer(),
+          Text(value, style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSocialIcon(IconData icon, Color color) {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(color: color.withOpacity(0.1), shape: BoxShape.circle),
+      child: Icon(icon, color: color),
+    );
+  }
+
+  Widget _buildBenefitChip(String label, bool isDark) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: const Color(0xFF4CAF50).withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFF4CAF50).withOpacity(0.2)),
+      ),
+      child: Text(label, style: const TextStyle(color: Color(0xFF4CAF50), fontWeight: FontWeight.bold, fontSize: 13)),
+    );
+  }
+
+  Widget _buildJobItem(RecruitmentJob job, BuildContext context, bool isDark) {
+    return GestureDetector(
+      onTap: () => Navigator.of(context).pushNamed(AppRoutes.userJobDetails, arguments: job),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: const Color(0xFF213E75),
+          borderRadius: BorderRadius.circular(16),
         ),
-      ],
+        child: Row(
+          children: [
+            const Icon(Icons.work_outline, color: Colors.white70),
+            const SizedBox(width: 16),
+            Expanded(child: Text(job.title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
+            const Icon(Icons.arrow_forward_ios, color: Colors.white, size: 14),
+          ],
+        ),
+      ),
     );
   }
 }
+
+

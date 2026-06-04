@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../shared/l10n/app_localizations.dart';
+import '../../../../shared/state/recruitment_sync_store.dart';
 import '../edit_profile_screen.dart';
 import '../profile_login_details_screen.dart';
 import 'preferences.dart';
@@ -12,119 +13,127 @@ class Notifications extends StatefulWidget {
 }
 
 class _NotificationsState extends State<Notifications> {
-  bool _emailEnabled = true;
-  bool _jobsEnabled = true;
-  bool _updatesEnabled = false;
+  final store = RecruitmentSyncStore.instance;
 
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     final isAr = t.isAr;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
+    final onSurfaceColor = isDark ? Colors.white : Colors.black;
 
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        elevation: 0,
-        surfaceTintColor: Colors.transparent,
-        title: Text(
-          t.tr(en: "Edit Profile", ar: "تعديل الملف الشخصي"),
-          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-        centerTitle: false,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: Theme.of(context).colorScheme.onSurface),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: Column(
-          crossAxisAlignment: isAr ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 20),
-            // Tabs
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  _buildTabItem(t.tr(en: "Profile Setting", ar: "إعدادات الملف"), false, () {
-                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const EditProfileScreen()));
-                  }),
-                  const SizedBox(width: 20),
-                  _buildTabItem(t.tr(en: "Account Security", ar: "أمان الحساب"), false, () {
-                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const ProfileLoginDetailsScreen()));
-                  }),
-                  const SizedBox(width: 20),
-                  _buildTabItem(t.tr(en: "Notification", ar: "الإشعارات"), true, () {}),
-                  const SizedBox(width: 20),
-                  _buildTabItem(t.tr(en: "Preferences", ar: "التفضيلات"), false, () {
-                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Preferences()));
-                  }),
-                ],
-              ),
+    return AnimatedBuilder(
+      animation: store,
+      builder: (context, _) {
+        return Scaffold(
+          backgroundColor: backgroundColor,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            surfaceTintColor: Colors.transparent,
+            title: Text(
+              t.tr(en: "Edit Profile", ar: "تعديل الملف الشخصي"),
+              style: TextStyle(color: onSurfaceColor, fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 10),
-            Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 1),
-            const SizedBox(height: 30),
-
-            // Notification Settings Title
-            Text(t.tr(en: "Notification Settings", ar: "إعدادات الإشعارات"), style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            Text(t.tr(en: "Choose how and when you want to receive notifications from us.", ar: "اختر كيف ومتى تود استلام الإشعارات منا."), style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 13)),
-            const SizedBox(height: 40),
-
-            _buildNotificationOption(
-              t.tr(en: "Email Notifications", ar: "إشعارات البريد الإلكتروني"),
-              t.tr(en: "Receive weekly summary for jobs and articles", ar: "استلم ملخصاً أسبوعياً للوظائف والمقالات"),
-              _emailEnabled,
-              (val) => setState(() => _emailEnabled = val),
+            centerTitle: false,
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back_ios, color: onSurfaceColor),
+              onPressed: () => Navigator.pop(context),
             ),
-            _buildNotificationOption(
-              t.tr(en: "Job Alerts", ar: "تنبيهات الوظائف"),
-              t.tr(en: "When new jobs that match your skills are posted", ar: "عند نشر وظيفة جديدة تناسب مهاراتك"),
-              _jobsEnabled,
-              (val) => setState(() => _jobsEnabled = val),
-            ),
-            _buildNotificationOption(
-              t.tr(en: "Application Updates", ar: "تحديثات الطلبات"),
-              t.tr(en: "When your application status changes", ar: "عند تغير حالة طلبات التوظيف الخاصة بك"),
-              _updatesEnabled,
-              (val) => setState(() => _updatesEnabled = val),
-            ),
-
-            const SizedBox(height: 60),
-            Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.12), height: 1),
-            const SizedBox(height: 30),
-
-            // Save Button
-            SizedBox(
-              width: double.infinity,
-              child: Align(
-                alignment: isAr ? Alignment.centerLeft : Alignment.centerRight,
-                child: ElevatedButton(
-                  onPressed: () {
-                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Notification Settings Saved!")),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+          ),
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start, // Let Directionality handle it
+              children: [
+                const SizedBox(height: 20),
+                // Tabs
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      _buildTabItem(context, t.tr(en: "Profile Setting", ar: "إعدادات الملف"), false, () {
+                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const EditProfileScreen()));
+                      }, isDark, onSurfaceColor),
+                      const SizedBox(width: 20),
+                      _buildTabItem(context, t.tr(en: "Account Security", ar: "أمان الحساب"), false, () {
+                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const ProfileLoginDetailsScreen()));
+                      }, isDark, onSurfaceColor),
+                      const SizedBox(width: 20),
+                      _buildTabItem(context, t.tr(en: "Notification", ar: "الإشعارات"), true, () {}, isDark, onSurfaceColor),
+                      const SizedBox(width: 20),
+                      _buildTabItem(context, t.tr(en: "Preferences", ar: "التفضيلات"), false, () {
+                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Preferences()));
+                      }, isDark, onSurfaceColor),
+                    ],
                   ),
-                  child: Text(t.tr(en: "Save Profile", ar: "حفظ الملف الشخصي"), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                 ),
-              ),
+                const SizedBox(height: 10),
+                Divider(color: onSurfaceColor.withValues(alpha: 0.12), height: 1),
+                const SizedBox(height: 30),
+
+                // Notification Settings Title
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start, // Start = Right in RTL
+                  children: [
+                    Text(
+                      t.tr(en: "Notification Settings", ar: "إعدادات الإشعارات"), 
+                      style: TextStyle(color: onSurfaceColor, fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      t.tr(en: "Choose how and when you want to receive notifications from us.", ar: "اختر كيف ومتى تود استلام الإشعارات منا."), 
+                      style: TextStyle(color: onSurfaceColor.withValues(alpha: 0.7), fontSize: 13),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 40),
+
+                _buildNotificationOption(
+                  context,
+                  t.tr(en: "Email Notifications", ar: "إشعارات البريد الإلكتروني"),
+                  t.tr(en: "Receive weekly summary for jobs and articles", ar: "استلم ملخصاً أسبوعياً للوظائف والمقالات"),
+                  store.emailNotifications,
+                  (val) {
+                    store.updateNotificationSettings(email: val);
+                  },
+                  onSurfaceColor,
+                  isAr,
+                ),
+                _buildNotificationOption(
+                  context,
+                  t.tr(en: "Job Alerts", ar: "تنبيهات الوظائف"),
+                  t.tr(en: "When new jobs that match your skills are posted", ar: "عند نشر وظيفة جديدة تناسب مهاراتك"),
+                  store.jobAlerts,
+                  (val) {
+                    store.updateNotificationSettings(jobs: val);
+                  },
+                  onSurfaceColor,
+                  isAr,
+                ),
+                _buildNotificationOption(
+                  context,
+                  t.tr(en: "Application Updates", ar: "تحديثات الطلبات"),
+                  t.tr(en: "When your application status changes", ar: "عند تغير حالة طلبات التوظيف الخاصة بك"),
+                  store.applicationUpdates,
+                  (val) {
+                    store.updateNotificationSettings(updates: val);
+                  },
+                  onSurfaceColor,
+                  isAr,
+                ),
+
+                const SizedBox(height: 100),
+              ],
             ),
-            const SizedBox(height: 100),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
-  Widget _buildTabItem(String title, bool isActive, VoidCallback onTap) {
+  Widget _buildTabItem(BuildContext context, String title, bool isActive, VoidCallback onTap, bool isDark, Color onSurfaceColor) {
     return GestureDetector(
       onTap: onTap,
       child: Column(
@@ -132,7 +141,7 @@ class _NotificationsState extends State<Notifications> {
           Text(
             title,
             style: TextStyle(
-              color: isActive ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5), 
+              color: isActive ? Theme.of(context).colorScheme.primary : onSurfaceColor.withValues(alpha: 0.5), 
               fontWeight: isActive ? FontWeight.bold : FontWeight.normal, 
               fontSize: 14,
             ),
@@ -149,21 +158,28 @@ class _NotificationsState extends State<Notifications> {
     );
   }
 
-  Widget _buildNotificationOption(String title, String subtitle, bool value, ValueChanged<bool> onChanged) {
+  Widget _buildNotificationOption(BuildContext context, String title, String subtitle, bool value, ValueChanged<bool> onChanged, Color onSurfaceColor, bool isAr) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 30),
       child: Row(
         children: [
           Expanded(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start, // Respects RTL/LTR automatically
               children: [
-                Text(title, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16, fontWeight: FontWeight.bold)),
+                Text(
+                  title, 
+                  style: TextStyle(color: onSurfaceColor, fontSize: 16, fontWeight: FontWeight.bold),
+                ),
                 const SizedBox(height: 4),
-                Text(subtitle, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), fontSize: 13)),
+                Text(
+                  subtitle, 
+                  style: TextStyle(color: onSurfaceColor.withValues(alpha: 0.6), fontSize: 13),
+                ),
               ],
             ),
           ),
+          const SizedBox(width: 16),
           Switch(
             value: value,
             onChanged: onChanged,

@@ -133,12 +133,22 @@ class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScree
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     final isAr = t.isAr;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final primaryColor = Theme.of(context).primaryColor;
+    final backgroundColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
+    final cardColor = isDark ? const Color(0xFF0D2D4D) : Colors.white;
 
     return Scaffold(
+      backgroundColor: backgroundColor,
       appBar: AppBar(
         title: Text(t.tr(en: 'Job Details', ar: 'تفاصيل الوظيفة')),
         centerTitle: true,
+        backgroundColor: backgroundColor,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios, color: isDark ? Colors.white : Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -148,11 +158,11 @@ class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScree
               width: double.infinity,
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
+                color: cardColor,
                 borderRadius: const BorderRadius.vertical(bottom: Radius.circular(32)),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
+                    color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -174,6 +184,7 @@ class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScree
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                           fontWeight: FontWeight.w900,
+                          color: isDark ? Colors.white : Colors.black,
                         ),
                   ),
                   const SizedBox(height: 8),
@@ -181,7 +192,7 @@ class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScree
                     widget.job.companyName,
                     style: TextStyle(
                       fontSize: 16,
-                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                      color: isDark ? Colors.white70 : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -190,8 +201,8 @@ class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScree
                     spacing: 8,
                     alignment: WrapAlignment.center,
                     children: [
-                      _buildHeaderTag(context, Icons.location_on_outlined, _translateValue(widget.job.location, isAr)),
-                      _buildHeaderTag(context, Icons.work_outline, _translateValue(widget.job.type, isAr)),
+                      _buildHeaderTag(context, Icons.location_on_outlined, _translateValue(widget.job.location, isAr), isDark),
+                      _buildHeaderTag(context, Icons.work_outline, _translateValue(widget.job.type, isAr), isDark),
                     ],
                   ),
                 ],
@@ -203,51 +214,81 @@ class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScree
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // About Job Container
-                  _buildSectionTitle(context, t.tr(en: 'About the Job', ar: 'عن الوظيفة'), primaryColor),
+                  // Merged About Job & Description Container
+                  _buildSectionTitle(context, t.tr(en: 'About the Job', ar: 'عن الوظيفة'), primaryColor, isDark),
                   const SizedBox(height: 12),
                   _buildContentContainer(
                     context,
+                    isDark,
                     Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // Description at the top if exists
+                        if (widget.job.description.trim().isNotEmpty) ...[
+                          Text(
+                            t.descriptionSection,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: isDark ? Colors.white : Colors.black,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            widget.job.description,
+                            style: TextStyle(
+                              fontSize: 15,
+                              height: 1.6,
+                              color: isDark ? Colors.white70 : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          Divider(color: isDark ? Colors.white10 : Colors.black12),
+                          const SizedBox(height: 20),
+                        ],
                         _buildJobInfoRow(
                           context, 
                           Icons.people_outline, 
                           t.tr(en: 'Seats (Accepted / Required)', ar: 'المقاعد (مقبول / مطلوب)'), 
                           '${widget.job.acceptedCount} / ${widget.job.capacity}', 
-                          primaryColor
+                          primaryColor,
+                          isDark
                         ),
-                        const Divider(height: 32),
+                        Divider(height: 32, color: isDark ? Colors.white10 : Colors.black12),
                         _buildJobInfoRow(
                           context, 
                           Icons.calendar_today_outlined, 
                           t.tr(en: 'Published Date', ar: 'تاريخ النشر'), 
                           '${widget.job.publishedAt.day}/${widget.job.publishedAt.month}/${widget.job.publishedAt.year}', 
-                          primaryColor
+                          primaryColor,
+                          isDark
                         ),
-                        const Divider(height: 32),
+                        Divider(height: 32, color: isDark ? Colors.white10 : Colors.black12),
                         _buildJobInfoRow(
                           context, 
                           Icons.work_outline, 
                           t.jobTypeLabel, 
                           _translateValue(widget.job.type, isAr), 
-                          primaryColor
+                          primaryColor,
+                          isDark
                         ),
-                        const Divider(height: 32),
+                        Divider(height: 32, color: isDark ? Colors.white10 : Colors.black12),
                         _buildJobInfoRow(
                           context, 
                           Icons.location_on_outlined, 
                           t.locationLabel, 
                           _translateValue(widget.job.location, isAr), 
-                          primaryColor
+                          primaryColor,
+                          isDark
                         ),
-                        const Divider(height: 32),
+                        Divider(height: 32, color: isDark ? Colors.white10 : Colors.black12),
                         _buildJobInfoRow(
                           context, 
                           Icons.payments_outlined, 
                           t.salaryLabel, 
                           widget.job.salaryRange, 
-                          primaryColor
+                          primaryColor,
+                          isDark
                         ),
                       ],
                     ),
@@ -256,10 +297,11 @@ class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScree
 
                   // Job Category (Field) Container
                   if (widget.job.category.isNotEmpty) ...[
-                    _buildSectionTitle(context, t.tr(en: 'Job Field', ar: 'مجال العمل'), primaryColor),
+                    _buildSectionTitle(context, t.tr(en: 'Job Field', ar: 'مجال العمل'), primaryColor, isDark),
                     const SizedBox(height: 12),
                     _buildContentContainer(
                       context,
+                      isDark,
                       Row(
                         children: [
                           Container(
@@ -276,7 +318,7 @@ class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScree
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color: Theme.of(context).colorScheme.onSurface,
+                              color: isDark ? Colors.white : Theme.of(context).colorScheme.onSurface,
                             ),
                           ),
                         ],
@@ -287,29 +329,74 @@ class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScree
 
                   // Tags / Skills Container
                   if (widget.job.tags.isNotEmpty) ...[
-                    _buildSectionTitle(context, t.requiredSkills, primaryColor),
+                    _buildSectionTitle(context, t.requiredSkills, primaryColor, isDark),
                     const SizedBox(height: 12),
                     _buildContentContainer(
                       context,
+                      isDark,
                       Wrap(
                         spacing: 8,
                         runSpacing: 8,
                         children: widget.job.tags.map((tag) => Chip(
                           label: Text(_translateValue(tag, isAr)),
-                          backgroundColor: primaryColor.withValues(alpha: 0.1),
+                          backgroundColor: isDark ? Colors.white.withValues(alpha: 0.1) : primaryColor.withValues(alpha: 0.1),
                           side: BorderSide.none,
-                          labelStyle: TextStyle(color: primaryColor, fontWeight: FontWeight.bold),
+                          labelStyle: TextStyle(color: isDark ? Colors.white : primaryColor, fontWeight: FontWeight.bold),
                         )).toList(),
                       ),
                     ),
                     const SizedBox(height: 24),
                   ],
 
-                  // Reviews & Feedback Section
-                  _buildSectionTitle(context, t.tr(en: 'Reviews & Feedback', ar: 'التقييمات والآراء'), primaryColor),
+                  // Responsibilities
+                  if (widget.job.responsibilities.isNotEmpty) ...[
+                    _buildSectionTitle(context, t.responsibilities, primaryColor, isDark),
+                    const SizedBox(height: 12),
+                    ...widget.job.responsibilities.map((item) => _buildBulletPoint(context, item, primaryColor, isDark)),
+                    const SizedBox(height: 24),
+                  ],
+
+                  // Qualifications
+                  if (widget.job.qualifications.isNotEmpty) ...[
+                    _buildSectionTitle(context, t.qualifications, primaryColor, isDark),
+                    const SizedBox(height: 12),
+                    ...widget.job.qualifications.map((item) => _buildBulletPoint(context, item, primaryColor, isDark)),
+                    const SizedBox(height: 24),
+                  ],
+
+                  // Benefits
+                  if (widget.job.benefits.isNotEmpty) ...[
+                    _buildSectionTitle(context, t.perksAndBenefits, primaryColor, isDark),
+                    const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 10,
+                      runSpacing: 10,
+                      children: widget.job.benefits.map((item) => Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.green.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.green.withValues(alpha: 0.2)),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.check_circle, size: 16, color: Colors.green),
+                            const SizedBox(width: 8),
+                            Text(item, style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
+                          ],
+                        ),
+                      )).toList(),
+                    ),
+                    const SizedBox(height: 32),
+                  ],
+
+                  // Reviews & Feedback Section - MOVED TO BOTTOM
+                  _buildSectionTitle(context, t.tr(en: 'Reviews & Feedback', ar: 'التقييمات والآراء'), primaryColor, isDark),
                   const SizedBox(height: 12),
                   _buildContentContainer(
                     context,
+                    isDark,
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -340,11 +427,11 @@ class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScree
                         
                         // Rating input section - ONLY visible after application
                         if (_hasApplied) ...[
-                          const Divider(),
+                          Divider(color: isDark ? Colors.white10 : Colors.black12),
                           const SizedBox(height: 16),
                           Text(
                             t.tr(en: 'Rate the company', ar: 'قيم الشركة:'),
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: isDark ? Colors.white : Colors.black),
                           ),
                           const SizedBox(height: 8),
                           Row(
@@ -362,16 +449,16 @@ class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScree
                           const SizedBox(height: 12),
                           TextField(
                             controller: _commentController,
-                            style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14),
+                            style: TextStyle(color: isDark ? Colors.white : Colors.black, fontSize: 14),
                             decoration: InputDecoration(
                               hintText: t.tr(en: 'Write your experience...', ar: 'اكتب تجربتك هنا...'),
-                              hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4)),
+                              hintStyle: TextStyle(color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.4)),
                               suffixIcon: IconButton(
                                 icon: Icon(Icons.send, color: primaryColor),
                                 onPressed: _addComment,
                               ),
                               filled: true,
-                              fillColor: Theme.of(context).scaffoldBackgroundColor,
+                              fillColor: isDark ? Colors.white.withValues(alpha: 0.05) : Theme.of(context).scaffoldBackgroundColor,
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                                 borderSide: BorderSide.none,
@@ -380,7 +467,7 @@ class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScree
                             ),
                           ),
                           const SizedBox(height: 24),
-                          const Divider(),
+                          Divider(color: isDark ? Colors.white10 : Colors.black12),
                           const SizedBox(height: 16),
                         ],
 
@@ -395,11 +482,11 @@ class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScree
                                 children: [
                                   Text(
                                     review['userName'],
-                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: isDark ? Colors.white : Colors.black),
                                   ),
                                   Text(
                                     review['date'],
-                                    style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
+                                    style: TextStyle(fontSize: 11, color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.5)),
                                   ),
                                 ],
                               ),
@@ -414,12 +501,12 @@ class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScree
                               const SizedBox(height: 6),
                               Text(
                                 review['comment'],
-                                style: TextStyle(fontSize: 13, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8)),
+                                style: TextStyle(fontSize: 13, color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.8)),
                               ),
                               if (_mockReviews.last != review)
                                 Padding(
                                   padding: const EdgeInsets.only(top: 12),
-                                  child: Divider(height: 1, color: Theme.of(context).dividerColor.withValues(alpha: 0.05)),
+                                  child: Divider(height: 1, color: isDark ? Colors.white10 : Theme.of(context).dividerColor.withValues(alpha: 0.05)),
                                 ),
                             ],
                           ),
@@ -427,69 +514,11 @@ class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScree
                       ],
                     ),
                   ),
-                  const SizedBox(height: 24),
-
-                  // Description
-                  if (widget.job.description.trim().isNotEmpty) ...[
-                    _buildSectionTitle(context, t.descriptionSection, primaryColor),
-                    const SizedBox(height: 8),
-                    Text(
-                      widget.job.description,
-                      style: TextStyle(
-                        fontSize: 15,
-                        height: 1.6,
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                  ],
-
-                  // Responsibilities
-                  if (widget.job.responsibilities.isNotEmpty) ...[
-                    _buildSectionTitle(context, t.responsibilities, primaryColor),
-                    const SizedBox(height: 12),
-                    ...widget.job.responsibilities.map((item) => _buildBulletPoint(context, item, primaryColor)),
-                    const SizedBox(height: 24),
-                  ],
-
-                  // Qualifications
-                  if (widget.job.qualifications.isNotEmpty) ...[
-                    _buildSectionTitle(context, t.qualifications, primaryColor),
-                    const SizedBox(height: 12),
-                    ...widget.job.qualifications.map((item) => _buildBulletPoint(context, item, primaryColor)),
-                    const SizedBox(height: 24),
-                  ],
-
-                  // Benefits
-                  if (widget.job.benefits.isNotEmpty) ...[
-                    _buildSectionTitle(context, t.perksAndBenefits, primaryColor),
-                    const SizedBox(height: 12),
-                    Wrap(
-                      spacing: 10,
-                      runSpacing: 10,
-                      children: widget.job.benefits.map((item) => Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: Colors.green.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.green.withValues(alpha: 0.2)),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(Icons.check_circle, size: 16, color: Colors.green),
-                            const SizedBox(width: 8),
-                            Text(item, style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
-                          ],
-                        ),
-                      )).toList(),
-                    ),
-                    const SizedBox(height: 32),
-                  ],
+                  const SizedBox(height: 32),
 
                   AppButton(
                     label: t.tr(en: 'Apply for this Job', ar: 'قدّم طلبك الآن'),
-                    backgroundColor: const Color(0xFF4A6ED1),
+                    backgroundColor: const Color(0xFF142C66),
                     onPressed: () => Navigator.of(context).pushNamed(
                       AppRoutes.userJobApplication,
                       arguments: widget.job,
@@ -505,17 +534,17 @@ class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScree
     );
   }
 
-  Widget _buildContentContainer(BuildContext context, Widget child) {
+  Widget _buildContentContainer(BuildContext context, bool isDark, Widget child) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
+        color: isDark ? const Color(0xFF0D2D4D) : Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
+        border: Border.all(color: isDark ? Colors.white10 : Theme.of(context).dividerColor.withValues(alpha: 0.1)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.02),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -525,35 +554,35 @@ class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScree
     );
   }
 
-  Widget _buildHeaderTag(BuildContext context, IconData icon, String label) {
+  Widget _buildHeaderTag(BuildContext context, IconData icon, String label, bool isDark) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: Theme.of(context).dividerColor.withValues(alpha: 0.05),
+        color: isDark ? Colors.white.withValues(alpha: 0.05) : Theme.of(context).dividerColor.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 16, color: Colors.grey),
+          Icon(icon, size: 16, color: isDark ? Colors.white60 : Colors.grey),
           const SizedBox(width: 4),
-          Text(label, style: const TextStyle(fontSize: 13, color: Colors.grey)),
+          Text(label, style: TextStyle(fontSize: 13, color: isDark ? Colors.white60 : Colors.grey)),
         ],
       ),
     );
   }
 
-  Widget _buildSectionTitle(BuildContext context, String title, Color color) {
+  Widget _buildSectionTitle(BuildContext context, String title, Color color, bool isDark) {
     return Text(
       title,
       style: Theme.of(context).textTheme.titleLarge?.copyWith(
             fontWeight: FontWeight.bold,
-            color: color,
+            color: isDark ? const Color(0xFFFF7A2A) : color,
           ),
     );
   }
 
-  Widget _buildJobInfoRow(BuildContext context, IconData icon, String title, String value, Color color) {
+  Widget _buildJobInfoRow(BuildContext context, IconData icon, String title, String value, Color color, bool isDark) {
     return Row(
       children: [
         Container(
@@ -572,7 +601,7 @@ class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScree
               Text(
                 title, 
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5), 
+                  color: isDark ? Colors.white60 : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5), 
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                 )
@@ -580,9 +609,10 @@ class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScree
               const SizedBox(height: 2),
               Text(
                 value, 
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14, 
-                  fontWeight: FontWeight.bold
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? Colors.white : Colors.black,
                 )
               ),
             ],
@@ -592,7 +622,7 @@ class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScree
     );
   }
 
-  Widget _buildBulletPoint(BuildContext context, String text, Color color) {
+  Widget _buildBulletPoint(BuildContext context, String text, Color color, bool isDark) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
@@ -606,7 +636,7 @@ class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScree
           Expanded(
             child: Text(
               text,
-              style: const TextStyle(fontSize: 15, height: 1.4),
+              style: TextStyle(fontSize: 15, height: 1.4, color: isDark ? Colors.white70 : Colors.black87),
             ),
           ),
         ],

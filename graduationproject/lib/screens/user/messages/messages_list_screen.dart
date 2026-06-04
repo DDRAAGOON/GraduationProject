@@ -34,9 +34,12 @@ class _MessagesListScreenState extends State<MessagesListScreen> {
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     final store = RecruitmentSyncStore.instance;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
+    final onSurfaceColor = isDark ? Colors.white : Colors.black;
 
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: backgroundColor,
       floatingActionButton: FloatingActionButton(
         onPressed: () => Navigator.push(
           context,
@@ -56,13 +59,13 @@ class _MessagesListScreenState extends State<MessagesListScreen> {
               Text(
                 t.messages,
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface,
+                  color: onSurfaceColor,
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 15),
-              _buildSearchBar(context, t),
+              _buildSearchBar(context, t, isDark, onSurfaceColor),
               const SizedBox(height: 20),
               Expanded(
                 child: AnimatedBuilder(
@@ -74,14 +77,14 @@ class _MessagesListScreenState extends State<MessagesListScreen> {
                     ).toList();
 
                     if (messages.isEmpty) {
-                      return _buildEmptyState(t);
+                      return _buildEmptyState(t, onSurfaceColor);
                     }
 
                     return ListView.separated(
                       physics: const BouncingScrollPhysics(),
                       itemCount: messages.length,
                       separatorBuilder: (context, index) => Divider(
-                        color: Theme.of(context).dividerColor.withValues(alpha: 0.12),
+                        color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.12),
                         height: 1,
                       ),
                       itemBuilder: (context, index) {
@@ -92,6 +95,7 @@ class _MessagesListScreenState extends State<MessagesListScreen> {
                           message: msg.text,
                           time: "${msg.createdAt.hour}:${msg.createdAt.minute.toString().padLeft(2, '0')}",
                           image: AppImages.companyProfile2, // Fallback image
+                          onSurfaceColor: onSurfaceColor,
                         );
                       },
                     );
@@ -105,17 +109,17 @@ class _MessagesListScreenState extends State<MessagesListScreen> {
     );
   }
 
-  Widget _buildEmptyState(AppLocalizations t) {
+  Widget _buildEmptyState(AppLocalizations t, Color onSurfaceColor) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.chat_bubble_outline, size: 64, color: Colors.grey.withValues(alpha: 0.2)),
+          Icon(Icons.chat_bubble_outline, size: 64, color: onSurfaceColor.withValues(alpha: 0.2)),
           const SizedBox(height: 16),
           Text(
             t.tr(en: "No messages yet", ar: "لا توجد رسائل بعد"),
             style: TextStyle(
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
+              color: onSurfaceColor.withValues(alpha: 0.54),
               fontSize: 16,
             ),
           ),
@@ -124,23 +128,23 @@ class _MessagesListScreenState extends State<MessagesListScreen> {
     );
   }
 
-  Widget _buildSearchBar(BuildContext context, AppLocalizations t) {
+  Widget _buildSearchBar(BuildContext context, AppLocalizations t, bool isDark, Color onSurfaceColor) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: Theme.of(context).brightness == Brightness.dark
+        color: isDark
             ? Colors.white.withValues(alpha: 0.05)
             : Colors.black.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(30),
-        border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.12)),
+        border: Border.all(color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.12)),
       ),
       child: TextField(
         controller: _searchController,
-        style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+        style: TextStyle(color: onSurfaceColor),
         decoration: InputDecoration(
-          icon: Icon(Icons.search, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
+          icon: Icon(Icons.search, color: onSurfaceColor.withValues(alpha: 0.54)),
           hintText: t.tr(en: "Search messages", ar: "البحث في الرسائل"),
-          hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)),
+          hintStyle: TextStyle(color: onSurfaceColor.withValues(alpha: 0.38)),
           border: InputBorder.none,
         ),
       ),
@@ -153,6 +157,7 @@ class _MessagesListScreenState extends State<MessagesListScreen> {
     required String message,
     required String time,
     required String image,
+    required Color onSurfaceColor,
   }) {
     return InkWell(
       onTap: () => Navigator.push(
@@ -175,12 +180,12 @@ class _MessagesListScreenState extends State<MessagesListScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(name, style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface,
+                        color: onSurfaceColor,
                         fontSize: 16, 
                         fontWeight: FontWeight.bold
                       )),
                       Text(time, style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), 
+                        color: onSurfaceColor.withValues(alpha: 0.38), 
                         fontSize: 12
                       )),
                     ],
@@ -191,7 +196,7 @@ class _MessagesListScreenState extends State<MessagesListScreen> {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), 
+                      color: onSurfaceColor.withValues(alpha: 0.54),
                       fontSize: 14
                     ),
                   ),

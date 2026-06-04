@@ -56,6 +56,7 @@ import '../../screens/user/auth/forgot_password_screen.dart' as user_auth;
 import '../../screens/user/auth/reset_password_screen.dart' as user_reset;
 import '../../screens/user/onboarding/onboarding.dart';
 import '../../screens/user/onboarding/recruitment_user_onboarding_screen.dart';
+import '../../screens/user/help/user_help_center_screen.dart';
 import '../../screens/user/profile/edit_profile_screen.dart';
 import '../../screens/user/profile/complete_profile_screen.dart';
 import '../../screens/user/settings/recruitment_user_settings_screen.dart';
@@ -89,6 +90,7 @@ final class AppRoutes {
   static const userEditProfile = '/user/profile/edit';
   static const userCompanyDetails = '/user/company/details';
   static const userAllApplications = '/user/jobs/all_applications';
+  static const userHelpCenter = '/user/help/center';
   static const userCompleteProfile = '/user/profile/complete';
   static const userForgotPassword = '/user/auth/forgot_password';
   static const userResetPassword = '/user/auth/reset_password';
@@ -228,6 +230,8 @@ final class AppRouter {
         );
       case AppRoutes.userAllApplications:
         page = const RecruitmentAllApplicationsScreen();
+      case AppRoutes.userHelpCenter:
+        page = const UserHelpCenterScreen();
       case AppRoutes.userCompleteProfile:
         page = const CompleteProfileScreen();
       case AppRoutes.userForgotPassword:

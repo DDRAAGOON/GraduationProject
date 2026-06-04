@@ -63,20 +63,23 @@ class _SettingsState extends State<Settings> {
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     final isAr = t.isAr;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
+    final onSurfaceColor = isDark ? Colors.white : Colors.black;
 
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: backgroundColor,
       appBar: AppBar(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        backgroundColor: Colors.transparent,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         title: Text(
           t.settings,
-          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 22, fontWeight: FontWeight.bold),
+          style: TextStyle(color: onSurfaceColor, fontSize: 22, fontWeight: FontWeight.bold),
         ),
         centerTitle: false,
         leading: IconButton(
-          icon: Icon(isAr ? Icons.arrow_forward_ios : Icons.arrow_back_ios, color: Theme.of(context).colorScheme.onSurface),
+          icon: Icon(Icons.arrow_back_ios, color: onSurfaceColor, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -87,7 +90,7 @@ class _SettingsState extends State<Settings> {
           children: [
             Text(
               t.tr(en: "Account Settings", ar: "إعدادات الحساب"),
-              style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 14, fontWeight: FontWeight.bold),
+              style: TextStyle(color: onSurfaceColor.withValues(alpha: 0.7), fontSize: 14, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
             
@@ -106,26 +109,36 @@ class _SettingsState extends State<Settings> {
                   ),
                 );
               },
+              isDark: isDark,
+              onSurfaceColor: onSurfaceColor,
             ),
             _buildSettingItem(
               icon: Icons.lock_outline,
               title: t.tr(en: "Account Security", ar: "أمان الحساب"),
               onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const ProfileLoginDetailsScreen())),
+              isDark: isDark,
+              onSurfaceColor: onSurfaceColor,
             ),
             _buildSettingItem(
               icon: Icons.notifications_none_outlined,
               title: t.notifications,
               onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const Notifications())),
+              isDark: isDark,
+              onSurfaceColor: onSurfaceColor,
             ),
             _buildSettingItem(
               icon: Icons.tune_outlined,
               title: t.tr(en: "Preferences", ar: "التفضيلات"),
               onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const Preferences())),
+              isDark: isDark,
+              onSurfaceColor: onSurfaceColor,
             ),
             _buildSettingItem(
               icon: Icons.help_outline_rounded,
               title: t.tr(en: "Help Center", ar: "مركز المساعدة"),
-              onTap: () => Navigator.of(context).pushNamed(AppRoutes.companyHelpCenter),
+              onTap: () => Navigator.of(context).pushNamed(AppRoutes.userHelpCenter),
+              isDark: isDark,
+              onSurfaceColor: onSurfaceColor,
             ),
 
             const SizedBox(height: 40),
@@ -135,6 +148,8 @@ class _SettingsState extends State<Settings> {
               titleColor: Colors.redAccent,
               showArrow: false,
               onTap: _showLogoutDialog,
+              isDark: isDark,
+              onSurfaceColor: onSurfaceColor,
             ),
           ],
         ),
@@ -149,14 +164,16 @@ class _SettingsState extends State<Settings> {
     required VoidCallback onTap,
     Color? titleColor,
     bool showArrow = true,
+    required bool isDark,
+    required Color onSurfaceColor,
   }) {
     final isAr = AppLocalizations.of(context).isAr;
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
+        color: isDark ? const Color(0xFF0D2D4D) : Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.2)),
+        border: Border.all(color: onSurfaceColor.withValues(alpha: 0.1)),
       ),
       child: ListTile(
         onTap: onTap,
@@ -168,9 +185,9 @@ class _SettingsState extends State<Settings> {
           ),
           child: Icon(icon, color: Theme.of(context).colorScheme.primary, size: 20),
         ),
-        title: Text(title, style: TextStyle(color: titleColor ?? Theme.of(context).colorScheme.onSurface, fontSize: 15, fontWeight: FontWeight.w600)),
-        subtitle: subtitle != null ? Text(subtitle, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5), fontSize: 12)) : null,
-        trailing: showArrow ? Icon(isAr ? Icons.arrow_back_ios : Icons.arrow_forward_ios, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3), size: 14) : null,
+        title: Text(title, style: TextStyle(color: titleColor ?? onSurfaceColor, fontSize: 15, fontWeight: FontWeight.w600)),
+        subtitle: subtitle != null ? Text(subtitle, style: TextStyle(color: onSurfaceColor.withValues(alpha: 0.5), fontSize: 12)) : null,
+        trailing: showArrow ? Icon(Icons.arrow_forward_ios, color: onSurfaceColor.withValues(alpha: 0.3), size: 14) : null,
       ),
     );
   }
