@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';
 import '../../../constants/app_images.dart';
+import '../../../shared/l10n/app_localizations.dart';
 import '../../../shared/models/applicant.dart';
 import '../../../shared/models/job.dart';
 import '../../../shared/state/recruitment_sync_store.dart';
@@ -25,13 +26,13 @@ class _CompanyJobApplicantsTableViewScreenState
     extends State<CompanyJobApplicantsTableViewScreen> {
   final _searchController = TextEditingController();
 
-  static const _stageOptions = <String>[
-    'Applied',
-    'In Review',
-    'Shortlisted',
-    'Waitlist',
-    'Hired',
-    'Declined',
+  static List<String> _getStageOptions(AppLocalizations t) => [
+    t.isAr ? 'تم التقديم' : 'Applied',
+    t.isAr ? 'قيد المراجعة' : 'In Review',
+    t.isAr ? 'مختصر' : 'Shortlisted',
+    t.isAr ? 'قائمة الانتظار' : 'Waitlist',
+    t.isAr ? 'تم التوظيف' : 'Hired',
+    t.isAr ? 'مرفوض' : 'Declined',
   ];
 
   late Set<String> _selectedStages;
@@ -39,7 +40,12 @@ class _CompanyJobApplicantsTableViewScreenState
   @override
   void initState() {
     super.initState();
-    _selectedStages = _stageOptions.toSet();
+    // Default to all stages. We'll initialize with default English names 
+    // but the filter matching will handle it.
+    _selectedStages = {
+      'Applied', 'In Review', 'Shortlisted', 'Waitlist', 'Hired', 'Declined',
+      'Pending', 'Accepted', 'Rejected' // Additional sync statuses
+    };
   }
 
   @override
@@ -60,6 +66,9 @@ class _CompanyJobApplicantsTableViewScreenState
   }
 
   Future<void> _openFilterSheet() async {
+    final t = AppLocalizations.of(context);
+    final stages = _getStageOptions(t);
+    
     final result = await showModalBottomSheet<Set<String>>(
       context: context,
       showDragHandle: true,
@@ -74,28 +83,32 @@ class _CompanyJobApplicantsTableViewScreenState
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Filter',
+                    t.isAr ? 'تصفية' : 'Filter',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.w900,
                     ),
                   ),
                   const SizedBox(height: 14),
-                  ..._stageOptions.map(
-                    (s) => CheckboxListTile(
-                      dense: true,
-                      value: temp.contains(s),
-                      onChanged: (v) {
-                        setInnerState(() {
-                          if (v == true) {
-                            temp.add(s);
-                          } else {
-                            temp.remove(s);
-                          }
-                        });
-                      },
-                      title: Text(s),
-                      controlAffinity: ListTileControlAffinity.leading,
-                    ),
+                  ...stages.map(
+                    (s) {
+                      // Map localized name back to internal status for matching
+                      final internalStatus = _mapLocalizedStatusToInternal(s, t);
+                      return CheckboxListTile(
+                        dense: true,
+                        value: temp.contains(internalStatus),
+                        onChanged: (v) {
+                          setInnerState(() {
+                            if (v == true) {
+                              temp.add(internalStatus);
+                            } else {
+                              temp.remove(internalStatus);
+                            }
+                          });
+                        },
+                        title: Text(s),
+                        controlAffinity: ListTileControlAffinity.leading,
+                      );
+                    },
                   ),
                   const SizedBox(height: 10),
                   Row(
@@ -103,15 +116,18 @@ class _CompanyJobApplicantsTableViewScreenState
                       Expanded(
                         child: OutlinedButton(
                           onPressed: () =>
-                              Navigator.of(ctx).pop(_stageOptions.toSet()),
-                          child: const Text('Reset'),
+                              Navigator.of(ctx).pop({
+                                'Applied', 'In Review', 'Shortlisted', 'Waitlist', 'Hired', 'Declined',
+                                'Pending', 'Accepted', 'Rejected'
+                              }),
+                          child: Text(t.isAr ? 'إعادة تعيين' : 'Reset'),
                         ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: FilledButton(
                           onPressed: () => Navigator.of(ctx).pop(temp),
-                          child: const Text('Apply'),
+                          child: Text(t.isAr ? 'تطبيق' : 'Apply'),
                         ),
                       ),
                     ],
@@ -129,8 +145,19 @@ class _CompanyJobApplicantsTableViewScreenState
     setState(() => _selectedStages = result);
   }
 
+  String _mapLocalizedStatusToInternal(String localized, AppLocalizations t) {
+    if (localized == (t.isAr ? 'تم التقديم' : 'Applied')) return 'Applied';
+    if (localized == (t.isAr ? 'قيد المراجعة' : 'In Review')) return 'In Review';
+    if (localized == (t.isAr ? 'مختصر' : 'Shortlisted')) return 'Shortlisted';
+    if (localized == (t.isAr ? 'قائمة الانتظار' : 'Waitlist')) return 'Waitlist';
+    if (localized == (t.isAr ? 'تم التوظيف' : 'Hired')) return 'Hired';
+    if (localized == (t.isAr ? 'مرفوض' : 'Declined')) return 'Declined';
+    return localized;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return ListenableBuilder(
       listenable: RecruitmentSyncStore.instance,
       builder: (context, _) {
@@ -188,9 +215,9 @@ class _CompanyJobApplicantsTableViewScreenState
                             TextField(
                               controller: _searchController,
                               onChanged: (_) => setState(() {}),
-                              decoration: const InputDecoration(
-                                hintText: 'Search applicants',
-                                prefixIcon: Icon(Icons.search),
+                              decoration: InputDecoration(
+                                hintText: t.isAr ? 'البحث في المتقدمين' : 'Search applicants',
+                                prefixIcon: const Icon(Icons.search),
                               ),
                             ),
                             const SizedBox(height: 10),
@@ -199,7 +226,7 @@ class _CompanyJobApplicantsTableViewScreenState
                               child: OutlinedButton.icon(
                                 onPressed: _openFilterSheet,
                                 icon: const Icon(Icons.filter_list),
-                                label: const Text('Filter'),
+                                label: Text(t.isAr ? 'تصفية' : 'Filter'),
                               ),
                             ),
                           ],
@@ -211,9 +238,9 @@ class _CompanyJobApplicantsTableViewScreenState
                             child: TextField(
                               controller: _searchController,
                               onChanged: (_) => setState(() {}),
-                              decoration: const InputDecoration(
-                                hintText: 'Search applicants',
-                                prefixIcon: Icon(Icons.search),
+                              decoration: InputDecoration(
+                                hintText: t.isAr ? 'البحث في المتقدمين' : 'Search applicants',
+                                prefixIcon: const Icon(Icons.search),
                               ),
                             ),
                           ),
@@ -221,7 +248,7 @@ class _CompanyJobApplicantsTableViewScreenState
                           OutlinedButton.icon(
                             onPressed: _openFilterSheet,
                             icon: const Icon(Icons.filter_list),
-                            label: const Text('Filter'),
+                            label: Text(t.isAr ? 'تصفية' : 'Filter'),
                           ),
                         ],
                       );
@@ -234,7 +261,7 @@ class _CompanyJobApplicantsTableViewScreenState
                 return Padding(
                   padding: const EdgeInsets.only(top: 18),
                   child: Text(
-                    'No applicants',
+                    t.isAr ? 'لا يوجد متقدمين' : 'No applicants',
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       color: Theme.of(
                         context,

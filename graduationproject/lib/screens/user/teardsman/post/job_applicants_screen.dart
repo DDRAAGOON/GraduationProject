@@ -115,6 +115,27 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
     return '$y-$m-$d';
   }
 
+  String _getTranslatedDay(String day, AppLocalizations t) {
+    switch (day) {
+      case "Saturday":
+        return t.tr(en: "Saturday", ar: "السبت");
+      case "Sunday":
+        return t.tr(en: "Sunday", ar: "الأحد");
+      case "Monday":
+        return t.tr(en: "Monday", ar: "الاثنين");
+      case "Tuesday":
+        return t.tr(en: "Tuesday", ar: "الثلاثاء");
+      case "Wednesday":
+        return t.tr(en: "Wednesday", ar: "الأربعاء");
+      case "Thursday":
+        return t.tr(en: "Thursday", ar: "الخميس");
+      case "Friday":
+        return t.tr(en: "Friday", ar: "الجمعة");
+      default:
+        return day;
+    }
+  }
+
   Future<void> _pickWorkPhotos() async {
     final images = await _imagePicker.pickMultiImage();
     if (images.isEmpty) return;
@@ -263,7 +284,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
   }
 
   Future<void> _toggleEdit() async {
-    final isAr = Localizations.localeOf(context).languageCode == 'ar';
+    final t = AppLocalizations.of(context);
     if (_isEditing) {
       final jobId = widget.jobId;
       if (jobId != null && jobId.isNotEmpty) {
@@ -292,7 +313,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
-                  isAr ? 'فشل حفظ التعديلات' : 'Failed to save changes',
+                  t.tr(en: 'Failed to save changes', ar: 'فشل حفظ التعديلات'),
                 ),
                 backgroundColor: Colors.redAccent,
               ),
@@ -305,7 +326,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              isAr ? 'تم حفظ التعديلات بنجاح' : 'Changes saved successfully',
+              t.tr(en: 'Changes saved successfully', ar: 'تم حفظ التعديلات بنجاح'),
             ),
           ),
         );
@@ -327,25 +348,26 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
   }
 
   Future<bool> _confirmDeleteApplicant(RecruitmentApplication app) async {
-    final isAr = Localizations.localeOf(context).languageCode == 'ar';
+    final t = AppLocalizations.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(isAr ? 'حذف المتقدم' : 'Delete applicant'),
+        title: Text(t.tr(en: 'Delete applicant', ar: 'حذف المتقدم')),
         content: Text(
-          isAr
-              ? 'هل تريد حذف ${app.userName} من المتقدمين؟'
-              : 'Do you want to remove ${app.userName} from applicants?',
+          t.tr(
+            en: 'Do you want to remove ${app.userName} from applicants?',
+            ar: 'هل تريد حذف ${app.userName} من المتقدمين؟',
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text(isAr ? 'إلغاء' : 'Cancel'),
+            child: Text(t.tr(en: 'Cancel', ar: 'إلغاء')),
           ),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: Colors.redAccent),
             onPressed: () => Navigator.pop(context, true),
-            child: Text(isAr ? 'حذف' : 'Delete'),
+            child: Text(t.tr(en: 'Delete', ar: 'حذف')),
           ),
         ],
       ),
@@ -355,7 +377,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
       setState(() {});
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(isAr ? 'تم حذف المتقدم' : 'Applicant removed'),
+          content: Text(t.tr(en: 'Applicant removed', ar: 'تم حذف المتقدم')),
         ),
       );
     }
@@ -363,21 +385,22 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
   }
 
   void _showDeleteDialog() {
-    final isAr = Localizations.localeOf(context).languageCode == 'ar';
+    final t = AppLocalizations.of(context);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(isAr ? "حذف الوظيفة" : "Delete Job"),
+        title: Text(t.tr(en: "Delete Job", ar: "حذف الوظيفة")),
         content: Text(
-          isAr
-              ? "هل أنت متأكد من رغبتك في حذف هذا المنشور نهائياً؟"
-              : "Are you sure you want to permanently delete this post?",
+          t.tr(
+            en: "Are you sure you want to permanently delete this post?",
+            ar: "هل أنت متأكد من رغبتك في حذف هذا المنشور نهائياً؟",
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(
-              isAr ? "إلغاء" : "Cancel",
+              t.tr(en: "Cancel", ar: "إلغاء"),
               style: const TextStyle(color: Colors.grey),
             ),
           ),
@@ -387,10 +410,14 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
               Navigator.pop(context);
               ScaffoldMessenger.of(
                 context,
-              ).showSnackBar(const SnackBar(content: Text("تم حذف المنشور")));
+              ).showSnackBar(
+                SnackBar(
+                  content: Text(t.tr(en: "Job deleted", ar: "تم حذف المنشور")),
+                ),
+              );
             },
             child: Text(
-              isAr ? "حذف" : "Delete",
+              t.tr(en: "Delete", ar: "حذف"),
               style: const TextStyle(color: Colors.red),
             ),
           ),
@@ -414,7 +441,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
             .where((app) => app.jobId == widget.jobId)
             .toList();
         final isDark = theme.brightness == Brightness.dark;
-        final bgColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
+        final bgColor = theme.scaffoldBackgroundColor;
 
         return Scaffold(
           backgroundColor: bgColor,
@@ -512,7 +539,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                               ),
                               decoration: InputDecoration(
                                 border: InputBorder.none,
-                                hintText: "Job Title",
+                                hintText: t.tr(en: "Job Title", ar: "عنوان الوظيفة"),
                                 hintStyle: TextStyle(
                                   color: colorScheme.onSurface.withValues(
                                     alpha: 0.38,
@@ -522,7 +549,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                             )
                           : Text(
                               _titleController.text.isEmpty
-                                  ? (isAr ? "بدون عنوان" : "Untitled")
+                                  ? t.tr(en: "Untitled", ar: "بدون عنوان")
                                   : _titleController.text,
                               style: TextStyle(
                                 color: colorScheme.primary,
@@ -629,7 +656,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                         Padding(
                           padding: const EdgeInsets.only(bottom: 8),
                           child: Text(
-                            isAr ? 'متقدم' : 'Applicant',
+                            t.tr(en: 'Applicant', ar: 'متقدم'),
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w700,
@@ -650,9 +677,9 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                               color: Colors.white.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(999),
                             ),
-                            child: const Text(
-                              'بيانات تجريبية للمعاينة',
-                              style: TextStyle(
+                            child: Text(
+                              t.tr(en: 'Demo data for preview', ar: 'بيانات تجريبية للمعاينة'),
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
@@ -667,17 +694,17 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                       runSpacing: 10,
                       children: [
                         _chipPill(
-                          label: isAr ? 'ملخص' : 'Summary',
+                          label: t.tr(en: 'Summary', ar: 'ملخص'),
                           color: Colors.white,
                           isAr: isAr,
                         ),
                         _chipPill(
-                          label: isAr ? 'جاهز للمراجعة' : 'Ready',
+                          label: t.tr(en: 'Ready', ar: 'جاهز للمراجعة'),
                           color: Colors.greenAccent,
                           isAr: isAr,
                         ),
                         _chipPill(
-                          label: isAr ? 'حالات متعددة' : 'Multiple',
+                          label: t.tr(en: 'Multiple', ar: 'حالات متعددة'),
                           color: Colors.orangeAccent,
                           isAr: isAr,
                         ),
@@ -713,9 +740,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                   onChanged: (_) => setState(() {}),
                   style: TextStyle(color: colorScheme.onSurface),
                   decoration: InputDecoration(
-                    hintText: isAr
-                        ? 'البحث في المتقدمين...'
-                        : 'Search applicants...',
+                    hintText: t.tr(en: 'Search applicants...', ar: 'البحث في المتقدمين...'),
                     hintStyle: TextStyle(
                       fontSize: 13,
                       color: colorScheme.onSurface.withValues(alpha: 0.38),
@@ -747,9 +772,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    isAr
-                        ? 'لا يوجد متقدمين لعرضهم'
-                        : 'No applicants to display',
+                    t.tr(en: 'No applicants to display', ar: 'لا يوجد متقدمين لعرضهم'),
                     style: TextStyle(
                       color: colorScheme.onSurface.withValues(alpha: 0.38),
                       fontSize: 16,
@@ -943,7 +966,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                       _buildApplicantActionButton(
                         icon: Icons.phone_outlined,
                         color: Colors.cyanAccent,
-                        tooltip: isAr ? 'اتصال' : 'Call',
+                        tooltip: t.tr(en: 'Call', ar: 'اتصال'),
                         onPressed: () {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
@@ -957,7 +980,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                       _buildApplicantActionButton(
                         icon: Icons.chat_bubble_outline,
                         color: Colors.orangeAccent,
-                        tooltip: isAr ? 'المحادثة' : 'Chat',
+                        tooltip: t.tr(en: 'Chat', ar: 'المحادثة'),
                         onPressed: () {
                           Navigator.push(
                             context,
@@ -974,13 +997,13 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                       _buildApplicantActionButton(
                         icon: Icons.person_outline,
                         color: Colors.white,
-                        tooltip: isAr ? 'التفاصيل' : 'Details',
+                        tooltip: t.tr(en: 'Details', ar: 'التفاصيل'),
                         onPressed: () => _openApplicantProfile(app),
                       ),
                       _buildApplicantActionButton(
                         icon: Icons.delete_outline,
                         color: Colors.redAccent,
-                        tooltip: isAr ? 'حذف' : 'Delete',
+                        tooltip: t.tr(en: 'Delete', ar: 'حذف'),
                         onPressed: () => _confirmDeleteApplicant(app),
                       ),
                     ],
@@ -1062,15 +1085,15 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                             items: [
                               DropdownMenuItem(
                                 value: 'Active',
-                                child: Text(isAr ? 'نشط' : 'Active'),
+                                child: Text(t.tr(en: 'Active', ar: 'نشط')),
                               ),
                               DropdownMenuItem(
                                 value: 'Closed',
-                                child: Text(isAr ? 'مغلق' : 'Closed'),
+                                child: Text(t.tr(en: 'Closed', ar: 'مغلق')),
                               ),
                               DropdownMenuItem(
                                 value: 'Inactive',
-                                child: Text(isAr ? 'غير نشط' : 'Inactive'),
+                                child: Text(t.tr(en: 'Inactive', ar: 'غير نشط')),
                               ),
                             ],
                             onChanged: (v) {
@@ -1232,7 +1255,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                           )
                         : Text(
                             _locationController.text.trim().isEmpty
-                                ? (isAr ? 'غير محدد' : 'Not specified')
+                                ? t.tr(en: 'Not specified', ar: 'غير محدد')
                                 : _locationController.text.trim(),
                             style: TextStyle(
                               color: colorScheme.onSurface,
@@ -1283,7 +1306,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                               bool selected = _selectedDays.contains(day);
                               return FilterChip(
                                 label: Text(
-                                  day,
+                                  _getTranslatedDay(day, t),
                                   style: const TextStyle(fontSize: 12),
                                 ),
                                 selected: selected,
@@ -1305,8 +1328,10 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                           )
                         : Text(
                             _selectedDays.isEmpty
-                                ? (isAr ? "غير محدد" : "None selected")
-                                : _selectedDays.join(", "),
+                                ? t.tr(en: "None selected", ar: "غير محدد")
+                                : _selectedDays
+                                    .map((day) => _getTranslatedDay(day, t))
+                                    .join(", "),
                             style: TextStyle(
                               color: colorScheme.onSurface,
                               fontSize: 15,

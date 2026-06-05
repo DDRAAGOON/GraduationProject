@@ -134,11 +134,11 @@ class _CompanyPostJobStep1InformationScreenState
     final newSkill = await showDialog<String>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(t.tr(en: 'Add Skill', ar: 'إضافة مهارة')),
+        title: Text(t.addSkillLabel),
         content: TextField(
           controller: controller,
           decoration: InputDecoration(
-            hintText: t.tr(en: 'Enter skill', ar: 'أدخل المهارة'),
+            hintText: t.enterSkillLabel,
             border: const OutlineInputBorder(),
           ),
           autofocus: true,
@@ -218,32 +218,32 @@ class _CompanyPostJobStep1InformationScreenState
             runSpacing: 10,
             children: [
               _TypeChip(
-                label: 'Full-Time',
+                label: t.fullTime,
                 selected: _types.contains('Full-Time'),
                 onTap: () => _toggle('Full-Time'),
               ),
               _TypeChip(
-                label: 'Remote',
+                label: t.remote,
                 selected: _types.contains('Remote'),
                 onTap: () => _toggle('Remote'),
               ),
               _TypeChip(
-                label: 'Part-Time',
+                label: t.partTime,
                 selected: _types.contains('Part-Time'),
                 onTap: () => _toggle('Part-Time'),
               ),
               _TypeChip(
-                label: 'Internship',
+                label: t.internship,
                 selected: _types.contains('Internship'),
                 onTap: () => _toggle('Internship'),
               ),
               _TypeChip(
-                label: 'One Time',
+                label: t.oneTime,
                 selected: _types.contains('One Time'),
                 onTap: () => _toggle('One Time'),
               ),
               _TypeChip(
-                label: 'Freelance',
+                label: t.freelance,
                 selected: _types.contains('Freelance'),
                 onTap: () => _toggle('Freelance'),
               ),
@@ -292,14 +292,14 @@ class _CompanyPostJobStep1InformationScreenState
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                t.tr(en: "Positions", ar: "العدد المطلوب"),
+                t.positions,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w900, fontSize: 15),
               ),
               const SizedBox(height: 12),
               AppTextField(
                 label: '',
                 controller: _positions,
-                hint: t.tr(en: "e.g. 1", ar: "حدد عدد المقاعد المتاحة لهذا المنصب"),
+                hint: t.positionsHint,
                 keyboardType: TextInputType.number,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 validatorText: _positionsError,
@@ -313,7 +313,7 @@ class _CompanyPostJobStep1InformationScreenState
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                t.tr(en: "Category", ar: "التصنيف"),
+                t.categoryLabel,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w900, fontSize: 15),
               ),
               const SizedBox(height: 12),
@@ -321,11 +321,11 @@ class _CompanyPostJobStep1InformationScreenState
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   children: [
-                    _buildRadioChip(t.tr(en: "Technical", ar: "تقني"), "Technical"),
+                    _buildRadioChip(t.technical, "Technical"),
                     const SizedBox(width: 8),
-                    _buildRadioChip(t.tr(en: "Non-Technical", ar: "غير تقني"), "Non-Technical"),
+                    _buildRadioChip(t.nonTechnical, "Non-Technical"),
                     const SizedBox(width: 8),
-                    _buildRadioChip(t.tr(en: "Service", ar: "خدمات"), "Service"),
+                    _buildRadioChip(t.service, "Service"),
                   ],
                 ),
               ),
@@ -338,14 +338,14 @@ class _CompanyPostJobStep1InformationScreenState
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                t.tr(en: "Job Department", ar: "القسم الوظيفي"),
+                t.jobDepartment,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w900, fontSize: 15),
               ),
               const SizedBox(height: 12),
               AppTextField(
                 label: '',
                 controller: _department,
-                hint: t.tr(en: "e.g. Engineering, Marketing...", ar: "اكتب فئة الوظيفة المناسبة... مثال: هندسة، تسويق"),
+                hint: t.departmentHint,
               ),
             ],
           ),
@@ -356,7 +356,7 @@ class _CompanyPostJobStep1InformationScreenState
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                t.tr(en: "Deadline", ar: "تاريخ انتهاء التقديم"),
+                t.deadlineLabel,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w900, fontSize: 15),
               ),
               const SizedBox(height: 12),
@@ -374,7 +374,7 @@ class _CompanyPostJobStep1InformationScreenState
                     children: [
                       Text(
                         _deadline == null 
-                          ? (t.isAr ? 'متى سيغلق باب التقديم؟' : 'When will it close?')
+                          ? t.whenClose
                           : "${_deadline!.month.toString().padLeft(2, '0')}/${_deadline!.day.toString().padLeft(2, '0')}/${_deadline!.year}",
                         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                       ),

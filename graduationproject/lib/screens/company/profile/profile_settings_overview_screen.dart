@@ -193,7 +193,7 @@ class _CompanyProfileSettingsOverviewScreenState
             tabs: [
               Tab(text: t.profileSettings),
               Tab(text: t.accountSecurity),
-              Tab(text: t.tr(en: "Appearance", ar: "المظهر")),
+              Tab(text: t.appearanceLabel),
             ],
           ),
           Expanded(
@@ -225,10 +225,10 @@ class _CompanyProfileSettingsOverviewScreenState
         _buildProfileHeader(),
         const SizedBox(height: 30),
         
-        Text(t.tr(en: "Basic Information", ar: "معلومات أساسية"), 
+        Text(t.basicInfoLabel, 
           style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         const SizedBox(height: 8),
-        Text(t.tr(en: "Update your company identity and contact details.", ar: "قم بتحديث هوية شركتك وتفاصيل الاتصال."), 
+        Text(t.updateIdentity,
           style: TextStyle(color: Colors.grey.shade600, fontSize: 13)),
         const Divider(height: 40),
 

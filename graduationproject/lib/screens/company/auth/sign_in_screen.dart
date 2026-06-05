@@ -101,7 +101,7 @@ class _CompanySignInScreenState extends State<CompanySignInScreen> {
       if (!mounted) return;
       setState(() => _loading = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Google Sign-In failed: ${e.toString()}')),
+        SnackBar(content: Text('${t.googleSignInFailed}: ${e.toString()}')),
       );
     }
   }
@@ -142,25 +142,17 @@ class _CompanySignInScreenState extends State<CompanySignInScreen> {
     } catch (e) {
       if (!mounted) return;
       setState(() => _loading = false);
-      String msg = t.isAr
-          ? 'البريد الإلكتروني أو كلمة المرور غير صحيحة'
-          : 'Invalid email or password.';
+      String msg = t.invalidCredentials;
 
       if (e is DioException) {
         if (e.type == DioExceptionType.connectionTimeout ||
             e.type == DioExceptionType.receiveTimeout) {
-          msg = t.isAr
-              ? 'فشل الاتصال بالخادم، تحقق من الإنترنت'
-              : 'Connection timeout. Check your internet.';
+          msg = t.timeoutError;
         } else if (e.response?.statusCode == 401 ||
             e.response?.statusCode == 403) {
-          msg = t.isAr
-              ? 'البريد الإلكتروني أو كلمة المرور غير صحيحة'
-              : 'Invalid email or password.';
+          msg = t.invalidCredentials;
         } else {
-          msg = t.isAr
-              ? 'حدث خطأ في الاتصال بالخادم'
-              : 'Server connection error.';
+          msg = t.connectionError;
         }
       } else {
         msg =

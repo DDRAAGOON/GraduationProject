@@ -28,7 +28,7 @@ class _ProfileOverviewScreenState extends State<ProfileOverviewScreen> {
           builder: (context, _) {
             // تحديد مسمى الحالة بناءً على دور المستخدم
             final String statusLabel = store.userRole == 'Tradesman'
-                ? t.tr(en: "Tradesman", ar: "صنايعي")
+                ? t.tr(en: "Tradesman", ar: "حرفي")
                 : t.tr(en: "Job Seeker", ar: "باحث عن عمل");
 
             return SingleChildScrollView(

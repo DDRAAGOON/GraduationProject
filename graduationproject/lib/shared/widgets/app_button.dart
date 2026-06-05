@@ -29,16 +29,7 @@ class AppButton extends StatelessWidget {
       child: isPrimary
           ? Container(
               decoration: BoxDecoration(
-                color: backgroundColor,
-                gradient: backgroundColor != null ? null : LinearGradient(
-                  colors: [
-                    Theme.of(context).colorScheme.primary,
-                    Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
-                    Theme.of(context).colorScheme.secondary.withValues(alpha: 0.6),
-                  ],
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                ),
+                color: backgroundColor ?? Theme.of(context).colorScheme.primary,
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(70),
                   bottomLeft: Radius.circular(25),

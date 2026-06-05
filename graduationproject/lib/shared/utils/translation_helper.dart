@@ -43,7 +43,7 @@ class TranslationHelper {
     if (low == 'service' || low == 'services') return 'خدمة';
     if (low == 'technical') return 'تقني';
     if (low == 'non-technical') return 'غير تقني';
-    if (low == 'tradesman') return 'صنايعي';
+    if (low == 'tradesman') return 'حرفي';
     if (low == 'general') return 'عام';
 
     // Job Titles & Status

@@ -105,10 +105,10 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                       children: [
                         TextField(
                           controller: _commentController,
-                          style: TextStyle(color: isDark ? Colors.white : Colors.black),
+                          style: const TextStyle(color: Color(0xFF142C66)),
                           decoration: InputDecoration(
                             hintText: isAr ? 'اكتب تعليقك هنا...' : 'Write your comment...',
-                            hintStyle: TextStyle(color: textColor.withOpacity(0.5)),
+                            hintStyle: TextStyle(color: const Color(0xFF142C66).withOpacity(0.5)),
                             suffixIcon: IconButton(
                               icon: const Icon(Icons.send, color: Color(0xFFFF7A2A)),
                               onPressed: _addComment,
@@ -116,12 +116,12 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                             border: InputBorder.none,
                           ),
                         ),
-                        const Divider(),
+                        const Divider(color: Colors.white24),
                         ..._comments.map((c) => ListTile(
                           contentPadding: EdgeInsets.zero,
                           leading: const CircleAvatar(child: Icon(Icons.person)),
-                          title: Text(c['name']!, style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black)),
-                          subtitle: Text(c['text']!, style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
+                          title: Text(c['name']!, style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF142C66))),
+                          subtitle: Text(c['text']!, style: const TextStyle(color: Color(0xFF142C66))),
                         )),
                       ],
                     ),
@@ -135,7 +135,7 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                     isDark,
                     Text(
                       widget.company['description'] ?? '---',
-                      style: TextStyle(height: 1.6, color: isDark ? Colors.white70 : Colors.black87),
+                      style: const TextStyle(height: 1.6, color: Color(0xFF142C66), fontWeight: FontWeight.w500),
                     ),
                   ),
                   const SizedBox(height: 24),
@@ -189,30 +189,31 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
   }
 
   Widget _buildHeader(BuildContext context, bool isDark, bool isAr, Color textColor) {
+    const headerColor = Color(0xFF213E75);
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF0D2D4D) : Colors.white,
-        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(32)),
-        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10)],
+      decoration: const BoxDecoration(
+        color: headerColor,
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(32)),
+        boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 10)],
       ),
       child: Column(
         children: [
           CircleAvatar(
             radius: 50,
-            backgroundColor: const Color(0xFF213E75).withOpacity(0.1),
-            child: const Icon(Icons.business, size: 50, color: Color(0xFF213E75)),
+            backgroundColor: Colors.white.withOpacity(0.15),
+            child: const Icon(Icons.business, size: 50, color: Colors.white),
           ),
           const SizedBox(height: 16),
           Text(
             widget.company['name'] ?? '---',
-            style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black),
+            style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.white),
           ),
           const SizedBox(height: 8),
           Text(
             widget.company['industry'] ?? '---',
-            style: const TextStyle(color: Color(0xFFFF7A2A), fontWeight: FontWeight.bold),
+            style: const TextStyle(color: Colors.cyanAccent, fontWeight: FontWeight.bold),
           ),
         ],
       ),
@@ -235,24 +236,43 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF0D2D4D) : Colors.white,
+        color: const Color(0xFFB5ADAD),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: isDark ? Colors.white10 : Colors.black12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: child,
     );
   }
 
   Widget _buildDetailRow(IconData icon, String label, String value, bool isDark, Color textColor) {
+    const rowTextColor = Color(0xFF142C66);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         children: [
-          Icon(icon, size: 20, color: const Color(0xFFFF7A2A)),
+          Icon(icon, size: 20, color: const Color(0xFF142C66)),
           const SizedBox(width: 12),
-          Text(label, style: TextStyle(color: textColor.withOpacity(0.7))),
+          Text(
+            label, 
+            style: TextStyle(
+              color: rowTextColor.withOpacity(0.7),
+              fontWeight: FontWeight.w600,
+            ),
+          ),
           const Spacer(),
-          Text(value, style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black)),
+          Text(
+            value, 
+            style: const TextStyle(
+              fontWeight: FontWeight.bold, 
+              color: rowTextColor,
+            ),
+          ),
         ],
       ),
     );

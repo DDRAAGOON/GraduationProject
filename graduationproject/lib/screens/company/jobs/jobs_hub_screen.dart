@@ -106,21 +106,22 @@ class _CompanyJobsHubScreenState extends State<CompanyJobsHubScreen> {
                               .length;
                           final isOpen = j.status == 'Open';
 
+                          const cardColor = Color(0xFF213E75);
                           return Card(
-                            color: Theme.of(context).cardTheme.color,
-                            elevation: 0,
+                            color: cardColor,
+                            elevation: 4,
+                            shadowColor: Colors.black.withOpacity(0.2),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
                               side: BorderSide(
-                                color: Theme.of(
-                                  context,
-                                ).dividerColor.withOpacity(0.05),
+                                color: Colors.white.withOpacity(0.1),
                               ),
                             ),
                             margin: const EdgeInsets.only(bottom: 12),
                             child: InkWell(
                               borderRadius: BorderRadius.circular(16),
                               onTap: () {
+                                // ... same as before
                                 // Convert RecruitmentJob to Job for the details screen
                                 final jobArg = Job(
                                   id: j.id,
@@ -165,17 +166,14 @@ class _CompanyJobsHubScreenState extends State<CompanyJobsHubScreen> {
                                         const Icon(
                                           Icons.business,
                                           size: 16,
-                                          color: Colors.grey,
+                                          color: Colors.white60,
                                         ),
                                         const SizedBox(width: 4),
                                         Expanded(
                                           child: Text(
                                             j.companyName,
-                                            style: TextStyle(
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .onSurface
-                                                  .withOpacity(0.7),
+                                            style: const TextStyle(
+                                              color: Colors.white70,
                                               fontWeight: FontWeight.w600,
                                             ),
                                           ),
@@ -196,6 +194,7 @@ class _CompanyJobsHubScreenState extends State<CompanyJobsHubScreen> {
                                                 .titleMedium
                                                 ?.copyWith(
                                                   fontWeight: FontWeight.w700,
+                                                  color: Colors.white,
                                                 ),
                                           ),
                                         ),
@@ -203,7 +202,7 @@ class _CompanyJobsHubScreenState extends State<CompanyJobsHubScreen> {
                                           PopupMenuButton<String>(
                                             icon: const Icon(
                                               Icons.more_vert,
-                                              color: Colors.grey,
+                                              color: Colors.white70,
                                             ),
                                             onSelected: (val) async {
                                               if (val == 'close') {
@@ -362,22 +361,17 @@ class _CompanyJobsHubScreenState extends State<CompanyJobsHubScreen> {
                                                 color: Theme.of(context)
                                                     .colorScheme
                                                     .surfaceContainerHighest
-                                                    .withOpacity(0.5),
+                                                    .withOpacity(0.15),
                                                 borderRadius:
                                                     BorderRadius.circular(8),
                                                 border: Border.all(
-                                                  color: Theme.of(context)
-                                                      .dividerColor
-                                                      .withOpacity(0.1),
+                                                  color: Colors.white.withOpacity(0.1),
                                                 ),
                                               ),
                                               child: Text(
                                                 tag,
-                                                style: TextStyle(
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .onSurface
-                                                      .withOpacity(0.7),
+                                                style: const TextStyle(
+                                                  color: Colors.white70,
                                                   fontSize: 12,
                                                 ),
                                               ),
@@ -389,20 +383,16 @@ class _CompanyJobsHubScreenState extends State<CompanyJobsHubScreen> {
                                     // Hiring stats row
                                     Row(
                                       children: [
-                                        Icon(
+                                        const Icon(
                                           Icons.people_outline,
                                           size: 16,
-                                          color: Theme.of(
-                                            context,
-                                          ).colorScheme.primary,
+                                          color: Colors.cyanAccent,
                                         ),
                                         const SizedBox(width: 6),
                                         Text(
                                           '$count ${isAr ? 'متقدمين' : 'applicants'}',
-                                          style: TextStyle(
-                                            color: Theme.of(
-                                              context,
-                                            ).colorScheme.primary,
+                                          style: const TextStyle(
+                                            color: Colors.cyanAccent,
                                             fontWeight: FontWeight.w600,
                                             fontSize: 13,
                                           ),
@@ -416,8 +406,8 @@ class _CompanyJobsHubScreenState extends State<CompanyJobsHubScreen> {
                                             style: TextStyle(
                                               color:
                                                   j.acceptedCount >= j.capacity
-                                                  ? Colors.green.shade700
-                                                  : Colors.blue.shade700,
+                                                  ? Colors.greenAccent
+                                                  : Colors.white,
                                               fontWeight: FontWeight.w600,
                                               fontSize: 12,
                                             ),
@@ -428,16 +418,16 @@ class _CompanyJobsHubScreenState extends State<CompanyJobsHubScreen> {
                                     Row(
                                       children: [
                                         if (j.location.isNotEmpty) ...[
-                                          Icon(
+                                          const Icon(
                                             Icons.location_on_outlined,
                                             size: 16,
-                                            color: Colors.grey.shade600,
+                                            color: Colors.white60,
                                           ),
                                           const SizedBox(width: 4),
                                           Text(
                                             j.location,
-                                            style: TextStyle(
-                                              color: Colors.grey.shade600,
+                                            style: const TextStyle(
+                                              color: Colors.white60,
                                               fontSize: 13,
                                             ),
                                           ),
@@ -450,8 +440,8 @@ class _CompanyJobsHubScreenState extends State<CompanyJobsHubScreen> {
                                           ),
                                           decoration: BoxDecoration(
                                             color: isOpen
-                                                ? Colors.green.withOpacity(0.1)
-                                                : Colors.grey.withOpacity(0.1),
+                                                ? Colors.greenAccent.withOpacity(0.2)
+                                                : Colors.white.withOpacity(0.1),
                                             borderRadius: BorderRadius.circular(
                                               20,
                                             ),
@@ -462,8 +452,8 @@ class _CompanyJobsHubScreenState extends State<CompanyJobsHubScreen> {
                                                 : (isAr ? 'مغلق' : 'Closed'),
                                             style: TextStyle(
                                               color: isOpen
-                                                  ? Colors.green.shade700
-                                                  : Colors.grey.shade700,
+                                                  ? Colors.greenAccent
+                                                  : Colors.white70,
                                               fontSize: 12,
                                               fontWeight: FontWeight.bold,
                                             ),

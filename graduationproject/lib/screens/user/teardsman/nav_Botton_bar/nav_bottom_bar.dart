@@ -207,7 +207,7 @@ class _NavbottonState extends State<Navbotton> {
             accountName: Text(
               store.currentUserName.isNotEmpty
                   ? store.currentUserName
-                  : (isAr ? 'صنايعي' : 'Tradesman'),
+                  : (isAr ? 'حرفي' : 'Tradesman'),
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
             ),
             accountEmail: Text(store.currentUserEmail),

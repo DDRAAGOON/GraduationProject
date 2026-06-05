@@ -67,11 +67,14 @@ class _RatingsList extends StatelessWidget {
       separatorBuilder: (_, __) => const SizedBox(height: 12),
       itemBuilder: (context, index) {
         final entry = entries[index];
+        const cardColor = Color(0xFF213E75);
         return Card(
-          elevation: 0,
+          elevation: 4,
+          color: cardColor,
+          shadowColor: Colors.black.withOpacity(0.2),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
-            side: BorderSide(color: Theme.of(context).dividerColor.withOpacity(0.1)),
+            side: BorderSide(color: Colors.white.withOpacity(0.1)),
           ),
           child: Padding(
             padding: const EdgeInsets.all(16),
@@ -83,14 +86,24 @@ class _RatingsList extends StatelessWidget {
                     Expanded(
                       child: Text(
                         entry.name,
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                     Row(
                       children: [
                         const Icon(Icons.star, color: Colors.amber, size: 18),
                         const SizedBox(width: 4),
-                        Text(entry.rating.toString(), style: const TextStyle(fontWeight: FontWeight.bold)),
+                        Text(
+                          entry.rating.toString(),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
                       ],
                     ),
                   ],
@@ -98,17 +111,27 @@ class _RatingsList extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   entry.role,
-                  style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.w600),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Colors.cyanAccent,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   entry.comment,
-                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7), height: 1.4),
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.8),
+                    height: 1.4,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   entry.date,
-                  style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)),
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.white.withOpacity(0.5),
+                  ),
                 ),
               ],
             ),

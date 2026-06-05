@@ -34,11 +34,12 @@ class _CompanyForgotPasswordScreenState
   }
 
   bool _validate() {
+    final t = AppLocalizations.of(context);
     final email = _email.text.trim();
     final mobile = _mobile.text.trim();
     setState(() {
-      _emailError = email.contains('@') ? null : 'Enter a valid email';
-      _mobileError = mobile.length >= 6 ? null : 'Enter mobile number';
+      _emailError = email.contains('@') ? null : t.enterValidEmail;
+      _mobileError = mobile.length >= 6 ? null : t.enterMobileNumber;
     });
     return _emailError == null && _mobileError == null;
   }
@@ -59,31 +60,28 @@ class _CompanyForgotPasswordScreenState
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     return AppScaffold(
-      title: t.tr(en: 'Forgot Password', ar: 'نسيت كلمة المرور'),
+      title: t.forgotPassword,
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
           Text(
-            t.tr(en: 'Forgot Password?', ar: 'نسيت كلمة المرور؟'),
+            t.forgotPassword,
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.w800,
                 ),
           ),
           const SizedBox(height: 8),
           Text(
-            t.tr(
-              en: 'Enter your email address to receive a confirmation\ncode resetting your password.',
-              ar: 'أدخل بريدك الإلكتروني لاستلام رمز التأكيد\nلإعادة تعيين كلمة المرور.',
-            ),
+            t.forgotPasswordInstruction,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                 ),
           ),
           const SizedBox(height: 22),
           AppTextField(
-            label: t.tr(en: 'Email Address', ar: 'البريد الإلكتروني'),
+            label: t.emailAddress,
             controller: _email,
-            hint: t.tr(en: 'Enter your email', ar: 'أدخل بريدك الإلكتروني'),
+            hint: t.enterYourEmail,
             keyboardType: TextInputType.emailAddress,
             validatorText: _emailError,
           ),
@@ -92,7 +90,7 @@ class _CompanyForgotPasswordScreenState
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                t.tr(en: 'Mobile Number', ar: 'رقم الهاتف'),
+                t.mobileNumberLabel,
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.w600,
                       color: Theme.of(context).colorScheme.onSurface,
@@ -102,7 +100,7 @@ class _CompanyForgotPasswordScreenState
               IntlPhoneField(
                 controller: _mobile,
                 decoration: InputDecoration(
-                  hintText: t.tr(en: 'Enter mobile number', ar: 'أدخل رقم الهاتف'),
+                  hintText: t.enterMobileNumber,
                   errorText: _mobileError,
                   filled: true,
                   fillColor: Theme.of(context).colorScheme.surfaceBright,
@@ -144,7 +142,7 @@ class _CompanyForgotPasswordScreenState
           ),
           const SizedBox(height: 20),
           AppButton(
-            label: t.tr(en: 'Continue', ar: 'متابعة'),
+            label: t.continueBtn,
             loading: _loading,
             onPressed: _submit,
           ),

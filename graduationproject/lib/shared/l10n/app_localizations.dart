@@ -326,6 +326,24 @@ class AppLocalizations {
   String translateJobType(String type) => userTr('jobType.$type', fallbackEn: type, fallbackAr: type);
   String translateCategory(String cat) => userTr('category.$cat', fallbackEn: cat, fallbackAr: cat);
 
+  String get positions => tr(en: 'Positions', ar: 'العدد المطلوب');
+  String get positionsHint => tr(en: 'e.g. 1', ar: 'حدد عدد المقاعد المتاحة لهذا المنصب');
+  String get whenClose => tr(en: 'When will it close?', ar: 'متى سيغلق باب التقديم؟');
+  String get basicInfoLabel => tr(en: 'Basic Information', ar: 'معلومات أساسية');
+  String get updateIdentity => tr(en: 'Update your company identity and contact details.', ar: 'قم بتحديث هوية شركتك وتفاصيل الاتصال.');
+  String get appearanceLabel => tr(en: 'Appearance', ar: 'المظهر');
+  String get addSkillLabel => tr(en: 'Add Skill', ar: 'إضافة مهارة');
+  String get enterSkillLabel => tr(en: 'Enter skill', ar: 'أدخل المهارة');
+  String get jobDepartment => tr(en: 'Job Department', ar: 'القسم الوظيفي');
+  String get departmentHint => tr(en: 'e.g. Engineering, Marketing...', ar: 'اكتب فئة الوظيفة المناسبة... مثال: هندسة، تسويق');
+  String get deadlineLabel => tr(en: 'Deadline', ar: 'تاريخ انتهاء التقديم');
+  String get fullTime => tr(en: 'Full-Time', ar: 'دوام كامل');
+  String get partTime => tr(en: 'Part-Time', ar: 'دوام جزئي');
+  String get remote => tr(en: 'Remote', ar: 'عن بعد');
+  String get internship => tr(en: 'Internship', ar: 'تدريب');
+  String get freelance => tr(en: 'Freelance', ar: 'عمل حر');
+  String get oneTime => tr(en: 'One Time', ar: 'مرة واحدة');
+  String get service => tr(en: 'Service', ar: 'خدمات');
   String get technical => tr(en: 'Technical', ar: 'تقني');
   String get nonTechnical => tr(en: 'Non-Technical', ar: 'غير تقني');
   String get benefits => tr(en: 'Benefits', ar: 'المزايا');
@@ -340,6 +358,21 @@ class AppLocalizations {
   String get newPasswordLabel => tr(en: 'New Password', ar: 'كلمة المرور الجديدة');
   String get confirmNewPassword => tr(en: 'Confirm New Password', ar: 'تأكيد كلمة المرور الجديدة');
   String get hiredStatusUpdate => tr(en: 'Applicant status updated to:', ar: 'تم تحديث حالة المتقدم إلى:');
+  String get invalidCredentials => tr(en: 'Invalid email or password.', ar: 'البريد الإلكتروني أو كلمة المرور غير صحيحة');
+  String get connectionError => tr(en: 'Server connection error.', ar: 'حدث خطأ في الاتصال بالخادم');
+  String get timeoutError => tr(en: 'Connection timeout. Check your internet.', ar: 'فشل الاتصال بالخادم، تحقق من الإنترنت');
+  String get googleSignInFailed => tr(en: 'Google Sign-In failed', ar: 'فشل تسجيل الدخول باستخدام جوجل');
+  String get commercialRegisterLabel => tr(en: 'Commercial Register', ar: 'السجل التجاري');
+  String get enterCommercialRegisterHint => tr(en: 'Enter Commercial Register', ar: 'أدخل السجل التجاري');
+  String get nationalNumberOfficialLabel => tr(en: 'National Number of Official', ar: 'الرقم القومي للمسؤول');
+  String get enterNationalNumberHint => tr(en: 'Enter National Number', ar: 'أدخل الرقم القومي للمسؤول');
+  String get forgotPasswordInstruction => tr(
+    en: 'Enter your email address to receive a confirmation\ncode resetting your password.',
+    ar: 'أدخل بريدك الإلكتروني لاستلام رمز التأكيد\nلإعادة تعيين كلمة المرور.',
+  );
+  String get mobileNumberLabel => tr(en: 'Mobile Number', ar: 'رقم الهاتف');
+  String get registrationFailed => tr(en: 'Registration failed. Please try again.', ar: 'فشل التسجيل، حاول مرة أخرى.');
+  String get emailAlreadyRegistered => tr(en: 'Email already registered. Try a different one.', ar: 'البريد الإلكتروني مستخدم بالفعل، جرّب بريداً آخر.');
   String get newChat => tr(en: 'New Chat', ar: 'محادثة جديدة');
   String get searchUsersHint => tr(en: 'Search users by name or email...', ar: 'ابحث عن مستخدمين بالاسم أو الإيميل...');
   String get startNewConversation => tr(en: 'Starting a new conversation...', ar: 'بدء محادثة جديدة...');
@@ -353,6 +386,14 @@ class AppLocalizations {
 
   // ── Unknown route ──────────────────────────────────────────────────────────
   String get unknownRoute => userTr('common.unknownRoute', fallbackEn: 'Unknown route', fallbackAr: 'المشار غير معروف');
+  String get welcomeBackCompany => tr(en: 'Welcome Back Company', ar: 'مرحباً بعودتكم');
+  String get signInCompanyAccountSub => tr(
+    en: 'Sign in with your company account to manage jobs and candidates.',
+    ar: 'سجل دخولك بحساب الشركة لإدارة الوظائف والمرشحين.',
+  );
+  String get createCompanyAccount => tr(en: 'Create Company Account', ar: 'إنشاء حساب شركة');
+  String get welcomeBack => tr(en: 'Welcome Back', ar: 'مرحباً بعودتك');
+  String get signInToManage => tr(en: 'Sign in with your company account to manage jobs and candidates.', ar: 'سجل الدخول بحساب شركتك لإدارة الوظائف والمرشحين.');
 }
 
 class _AppLocalizationsDelegate

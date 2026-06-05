@@ -93,6 +93,16 @@ class _CompanyDashboardScreenState extends State<CompanyDashboardScreen> {
           showBack: false,
           centerTitle: false,
           showAppBarDivider: true,
+          actions: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Image.asset(
+                AppImages.jobitoTradesman,
+                height: 35,
+                fit: BoxFit.contain,
+              ),
+            ),
+          ],
           body: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 980),
@@ -248,13 +258,13 @@ class _StatsGrid extends StatelessWidget {
             .where((app) => jobs.any((j) => j.id == app.jobId))
             .length
             .toString(),
-        color: cs.primary.withOpacity(0.2),
+        color: const Color(0xFFB5ADAD),
         onTap: onTapNewCandidates,
       ),
       _MetricCard(
         title: t.messagesReceived,
         value: RecruitmentSyncStore.instance.messages.length.toString(),
-        color: Colors.orange.withOpacity(0.25),
+        color: const Color(0xFFB5ADAD),
         onTap: () => Navigator.of(
           context,
         ).pushReplacementNamed(AppRoutes.companyMessagesList),
@@ -288,10 +298,14 @@ class _MetricCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const cardColor = Color(0xFFB5ADAD);
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(18),
       child: Card(
+        color: cardColor,
+        elevation: 4,
+        shadowColor: Colors.black.withOpacity(0.2),
         child: Padding(
           padding: const EdgeInsets.all(14),
           child: Row(
@@ -304,7 +318,10 @@ class _MetricCard extends StatelessWidget {
                     Flexible(
                       child: Text(
                         title,
-                        style: Theme.of(context).textTheme.labelLarge,
+                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                              color: const Color(0xFF142C66),
+                              fontWeight: FontWeight.w800,
+                            ),
                         overflow: TextOverflow.ellipsis,
                         maxLines: 2,
                       ),
@@ -314,8 +331,13 @@ class _MetricCard extends StatelessWidget {
                       alignment: AlignmentDirectional.centerStart,
                       child: Text(
                         value,
-                        style: Theme.of(context).textTheme.headlineSmall
-                            ?.copyWith(fontWeight: FontWeight.w900),
+                        style: Theme.of(context)
+                            .textTheme
+                            .headlineSmall
+                            ?.copyWith(
+                              fontWeight: FontWeight.w900,
+                              color: const Color(0xFF142C66),
+                            ),
                       ),
                     ),
                   ],
@@ -326,10 +348,10 @@ class _MetricCard extends StatelessWidget {
                 width: 38,
                 height: 38,
                 decoration: BoxDecoration(
-                  color: color,
+                  color: const Color(0xFF142C66).withOpacity(0.15),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(Icons.trending_up, size: 20),
+                child: const Icon(Icons.trending_up, size: 20, color: Color(0xFF142C66)),
               ),
             ],
           ),
@@ -368,6 +390,7 @@ class _JobUpdateCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     final syncStore = RecruitmentSyncStore.instance;
+    const cardColor = Color(0xFF213E75);
 
     final appliedCount = syncStore.applications
         .where((a) => a.jobId == job.id)
@@ -408,12 +431,13 @@ class _JobUpdateCard extends StatelessWidget {
         ),
         borderRadius: BorderRadius.circular(18),
         child: Card(
-          elevation: 0,
-          color: Theme.of(context).cardTheme.color,
+          elevation: 4,
+          color: cardColor,
+          shadowColor: Colors.black.withOpacity(0.2),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(18),
             side: BorderSide(
-              color: Theme.of(context).dividerColor.withOpacity(0.05),
+              color: Colors.white.withOpacity(0.1),
             ),
           ),
           child: Padding(
@@ -430,13 +454,14 @@ class _JobUpdateCard extends StatelessWidget {
                         style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                           fontSize: 18,
+                          color: Colors.white,
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     if (job.status == 'Open')
                       PopupMenuButton<String>(
-                        icon: const Icon(Icons.more_vert, color: Colors.grey),
+                        icon: const Icon(Icons.more_vert, color: Colors.white70),
                         onSelected: (val) async {
                           if (val == 'close') {
                             try {
@@ -483,14 +508,12 @@ class _JobUpdateCard extends StatelessWidget {
                 const SizedBox(height: 6),
                 Row(
                   children: [
-                    const Icon(Icons.business, size: 16, color: Colors.grey),
+                    const Icon(Icons.business, size: 16, color: Colors.white60),
                     const SizedBox(width: 6),
                     Text(
                       job.companyName,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.onSurface.withOpacity(0.7),
+                        color: Colors.white70,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -561,17 +584,15 @@ class _JobUpdateCard extends StatelessWidget {
                               style: Theme.of(context).textTheme.labelMedium
                                   ?.copyWith(
                                     fontWeight: FontWeight.bold,
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.onSurface,
+                                    color: Colors.white,
                                   ),
                             ),
                             Text(
                               '${(progress * 100).toInt()}%',
                               style: TextStyle(
                                 color: progress >= 1.0
-                                    ? Colors.green
-                                    : Colors.blue,
+                                    ? Colors.greenAccent
+                                    : Colors.cyanAccent,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 12,
                               ),
@@ -583,12 +604,10 @@ class _JobUpdateCard extends StatelessWidget {
                           borderRadius: BorderRadius.circular(10),
                           child: LinearProgressIndicator(
                             value: progress,
-                            backgroundColor: Theme.of(
-                              context,
-                            ).dividerColor.withOpacity(0.05),
+                            backgroundColor: Colors.white.withOpacity(0.1),
                             color: progress >= 1.0
-                                ? Colors.green
-                                : Theme.of(context).colorScheme.primary,
+                                ? Colors.greenAccent
+                                : Colors.cyanAccent,
                             minHeight: 8,
                           ),
                         ),

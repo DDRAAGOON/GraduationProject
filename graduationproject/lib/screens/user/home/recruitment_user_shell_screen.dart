@@ -208,7 +208,7 @@ class _RecruitmentUserShellScreenState
           const SizedBox(height: 10),
           ListTile(
             leading: const Icon(Icons.swap_horiz, color: Color(0xFFFF7A2A)),
-            title: Text(isAr ? 'التبديل لوضع الصنايعي' : 'Switch to Tradesman Mode'),
+            title: Text(isAr ? 'التبديل لوضع الحرفي' : 'Switch to Tradesman Mode'),
             onTap: () {
               Navigator.pop(context); // Close Drawer
               _showTradesmanWarningDialog(context, isAr);
@@ -307,7 +307,7 @@ class _RecruitmentUserShellScreenState
           children: [
             Text(
               isAr 
-                ? 'للدخول لوضع الصنايعي واستقبال الطلبات، يجب رفع الفيش الجنائي وتحديد حرفتك أولاً.'
+                ? 'للدخول لوضع الحرفي واستقبال الطلبات، يجب رفع الفيش الجنائي وتحديد حرفتك أولاً.'
                 : 'To enter Tradesman Mode and receive requests, you must upload your fish and select your craft first.',
               textAlign: TextAlign.center,
               style: const TextStyle(fontSize: 15, height: 1.5),

@@ -203,7 +203,7 @@ class _RecruitmentJobApplicationScreenState
             const SizedBox(height: 8),
             Text(
               isAr
-                  ? 'أدخل عنوانك ووصف المشكلة ليصله الصنايعي.'
+                  ? 'أدخل عنوانك ووصف المشكلة ليصله الحرفي.'
                   : 'Enter your address and describe the problem for the tradesman.',
               style: TextStyle(
                 color: theme.colorScheme.onSurface.withValues(alpha: 0.55),
@@ -362,7 +362,7 @@ class _RecruitmentJobApplicationScreenState
                 const SizedBox(width: 6),
                 Text(
                   Localizations.localeOf(context).languageCode == 'ar'
-                      ? 'طلب خدمة من صنايعي'
+                      ? 'طلب خدمة من حرفي'
                       : 'Tradesman service request',
                   style: TextStyle(
                     color: theme.colorScheme.primary,

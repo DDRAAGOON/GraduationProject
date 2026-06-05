@@ -115,14 +115,14 @@ class _CompanySignUpScreenState extends State<CompanySignUpScreen> {
       if (e is DioException) {
         final statusCode = e.response?.statusCode;
         if (statusCode == 409 || statusCode == 400) {
-          msg = t.isAr ? 'البريد الإلكتروني مستخدم بالفعل، جرّب بريداً آخر.' : 'Email already registered. Try a different one.';
+          msg = t.emailAlreadyRegistered;
         } else if (statusCode == null) {
-          msg = t.isAr ? 'تعذّر الاتصال بالخادم، تحقق من الإنترنت.' : 'Cannot reach server. Check your internet.';
+          msg = t.timeoutError;
         } else {
-          msg = t.isAr ? 'فشل التسجيل، حاول مرة أخرى.' : 'Registration failed. Please try again.';
+          msg = t.registrationFailed;
         }
       } else {
-        msg = t.isAr ? 'فشل التسجيل، حاول مرة أخرى.' : 'Registration failed. Please try again.';
+        msg = t.registrationFailed;
       }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(msg)),
@@ -262,15 +262,15 @@ class _CompanySignUpScreenState extends State<CompanySignUpScreen> {
           ),
           const SizedBox(height: 16),
           AppTextField(
-            label: t.tr(en: 'Commercial Register', ar: 'السجل التجاري'),
+            label: t.commercialRegisterLabel,
             controller: _commercialRegister,
-            hint: t.tr(en: 'Enter Commercial Register', ar: 'أدخل السجل التجاري'),
+            hint: t.enterCommercialRegisterHint,
           ),
           const SizedBox(height: 16),
           AppTextField(
-            label: t.tr(en: 'National Number of Official', ar: 'الرقم القومي للمسؤول'),
+            label: t.nationalNumberOfficialLabel,
             controller: _nationalNumber,
-            hint: t.tr(en: 'Enter National Number', ar: 'أدخل الرقم القومي للمسؤول'),
+            hint: t.enterNationalNumberHint,
             keyboardType: TextInputType.number,
           ),
           const SizedBox(height: 12),

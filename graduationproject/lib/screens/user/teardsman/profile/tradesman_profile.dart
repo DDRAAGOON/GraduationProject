@@ -21,9 +21,9 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
     final store = RecruitmentSyncStore.instance;
     final colorScheme = Theme.of(context).colorScheme;
 
-    // Determine role label (صنايعي أو باحث عن عمل)
+    // Determine role label (حرفي أو باحث عن عمل)
     final String statusLabel = store.userRole == 'Tradesman' 
-        ? t.tr(en: "Tradesman", ar: "صنايعي")
+        ? t.tr(en: "Tradesman", ar: "حرفي")
         : t.tr(en: "Job Seeker", ar: "باحث عن عمل");
     
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -85,7 +85,7 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
                 // Profile Avatar Positioned on the Right
                 Positioned(
                   bottom: -60,
-                  right: 24, 
+                  right: 24,
                   child: Container(
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
@@ -97,14 +97,14 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
                       backgroundColor: Theme.of(context).cardColor,
                       backgroundImage: getAppImageProvider(store.profileImage),
                       child: (store.profileImage == null || getAppImageProvider(store.profileImage) == null)
-                          ? const Icon(Icons.person, size: 70, color: Color(0xFF49769F)) 
+                          ? const Icon(Icons.person, size: 70, color: Color(0xFF49769F))
                           : null,
                     ),
                   ),
                 ),
               ],
             ),
-            
+
             const SizedBox(height: 75),
 
             // User Primary Info (Name and Status under the image on the right)
@@ -141,7 +141,7 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
                 ),
               ),
             ),
-            
+
             const SizedBox(height: 35),
 
             // Main Content Area
@@ -431,7 +431,7 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
                       ],
                     ),
                   ),
-                  
+
                   const SizedBox(height: 100),
                 ],
               ),

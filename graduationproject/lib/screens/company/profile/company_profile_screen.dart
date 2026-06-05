@@ -211,12 +211,8 @@ class _CompanyStatsBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     final cs = Theme.of(context).colorScheme;
-    final labelColor = Theme.of(
-      context,
-    ).colorScheme.onSurface.withOpacity(0.65);
-    final iconColor = Theme.of(
-      context,
-    ).colorScheme.onSurface.withOpacity(0.9);
+    const boxColor = Color(0xFF213E75);
+    const textColor = Colors.white;
 
     Widget item({
       required IconData icon,
@@ -230,10 +226,10 @@ class _CompanyStatsBar extends StatelessWidget {
               width: 34,
               height: 34,
               decoration: BoxDecoration(
-                color: cs.primary.withOpacity(0.10),
+                color: Colors.white.withOpacity(0.15),
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, color: iconColor, size: 18),
+              child: Icon(icon, color: Colors.cyanAccent, size: 18),
             ),
             const SizedBox(width: 10),
             Expanded(
@@ -246,7 +242,7 @@ class _CompanyStatsBar extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                      color: labelColor,
+                      color: textColor.withOpacity(0.65),
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -256,7 +252,7 @@ class _CompanyStatsBar extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface,
+                      color: textColor,
                       fontWeight: FontWeight.w800,
                     ),
                   ),
@@ -271,8 +267,17 @@ class _CompanyStatsBar extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(18),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-        color: Colors.transparent,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+        decoration: BoxDecoration(
+          color: boxColor,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -296,7 +301,7 @@ class _CompanyStatsBar extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 18),
             Row(
               children: [
                 item(

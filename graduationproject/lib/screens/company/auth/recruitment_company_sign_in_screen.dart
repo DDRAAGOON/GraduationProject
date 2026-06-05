@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';
+import '../../../shared/l10n/app_localizations.dart';
 import '../../../shared/services/recruitment_sync_service.dart';
 import '../../../shared/services/session_manager.dart';
 import '../../../shared/state/company_store.dart';
@@ -32,11 +33,12 @@ class _RecruitmentCompanySignInScreenState
   }
 
   bool _validate() {
+    final t = AppLocalizations.of(context);
     final mail = _email.text.trim();
     final pass = _password.text;
     setState(() {
-      _emailError = mail.contains('@') ? null : 'Enter a valid email';
-      _passwordError = pass.isNotEmpty ? null : 'Enter your password';
+      _emailError = mail.contains('@') ? null : t.enterValidEmail;
+      _passwordError = pass.isNotEmpty ? null : t.enterYourPassword;
     });
     return _emailError == null && _passwordError == null;
   }
@@ -73,8 +75,9 @@ class _RecruitmentCompanySignInScreenState
       );
     } catch (_) {
       if (!mounted) return;
+      final t = AppLocalizations.of(context);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Invalid company email or password.')),
+        SnackBar(content: Text(t.invalidCredentials)),
       );
     } finally {
       if (mounted) {
@@ -85,6 +88,7 @@ class _RecruitmentCompanySignInScreenState
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
       body: SafeArea(
         child: ListView(
@@ -92,30 +96,30 @@ class _RecruitmentCompanySignInScreenState
           children: [
             const SizedBox(height: 20),
             Text(
-              'Welcome Back Company',
+              t.welcomeBackCompany,
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.w800,
                   ),
             ),
             const SizedBox(height: 8),
             Text(
-              'Sign in with your company account to manage jobs and candidates.',
+              t.signInCompanyAccountSub,
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             const SizedBox(height: 24),
             AppTextField(
-              label: 'Company Email Address',
+              label: t.companyEmailAddress,
               controller: _email,
-              hint: 'Enter your email',
+              hint: t.enterYourEmail,
               keyboardType: TextInputType.emailAddress,
               validatorText: _emailError,
               prefixIcon: Icons.mail_outline_rounded,
             ),
             const SizedBox(height: 14),
             AppTextField(
-              label: 'Password',
+              label: t.password,
               controller: _password,
-              hint: 'Enter your password',
+              hint: t.enterYourPassword,
               obscureText: _obscure,
               validatorText: _passwordError,
               prefixIcon: Icons.lock_outline_rounded,
@@ -125,22 +129,22 @@ class _RecruitmentCompanySignInScreenState
               ),
             ),
             Align(
-              alignment: Alignment.centerRight,
+              alignment: t.isAr ? Alignment.centerLeft : Alignment.centerRight,
               child: TextButton(
                 onPressed: () =>
                     Navigator.of(context).pushNamed(AppRoutes.companyForgotPassword),
-                child: const Text('Forgot password?'),
+                child: Text(t.forgotPassword),
               ),
             ),
             const SizedBox(height: 8),
             AppButton(
-              label: 'Sign In',
+              label: t.signInBtn,
               loading: _loading,
               onPressed: _submit,
             ),
             const SizedBox(height: 10),
             AppButton(
-              label: 'Create Company Account',
+              label: t.createCompanyAccount,
               variant: AppButtonVariant.secondary,
               onPressed: () => Navigator.of(context).pushNamed(AppRoutes.companySignUp),
             ),

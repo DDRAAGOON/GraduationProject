@@ -147,7 +147,7 @@ class _TradesmanVerificationScreenState
                     child: Text(
                       t.tr(
                         en: "Warning: You must complete your data (Criminal Record and Services) to switch to Tradesman Mode.",
-                        ar: "تنبيه: يجب إكمال بياناتك (الصحيفة الجنائية والخدمات) لتتمكن من التبديل لوضع الصنايعي."
+                        ar: "تنبيه: يجب إكمال بياناتك (الصحيفة الجنائية والخدمات) لتتمكن من التبديل لوضع الحرفي."
                       ),
                       style: TextStyle(color: isDark ? Colors.amber[100] : const Color(0xFF856404), fontWeight: FontWeight.w600, height: 1.4),
                     ),

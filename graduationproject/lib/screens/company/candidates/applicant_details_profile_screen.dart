@@ -233,13 +233,18 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
   ) {
     final requiredCount = job.requiredCount > 0 ? job.requiredCount : 1;
 
+    const boxColor = Color(0xFF213E75);
+    const textColor = Colors.white;
+
     return Column(
       children: [
         Card(
-          elevation: 0,
+          elevation: 4,
+          color: boxColor,
+          shadowColor: Colors.black.withOpacity(0.2),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
-            side: BorderSide(color: Colors.grey.withOpacity(0.1)),
+            side: BorderSide(color: Colors.white.withOpacity(0.1)),
           ),
           child: Padding(
             padding: const EdgeInsets.all(20),
@@ -251,11 +256,14 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
                   applicant.fullName,
                   style: Theme.of(
                     context,
-                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                  ).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: textColor,
+                      ),
                 ),
                 Text(
                   applicant.role,
-                  style: const TextStyle(color: Colors.grey),
+                  style: TextStyle(color: textColor.withOpacity(0.7)),
                 ),
                 const SizedBox(height: 24),
 
@@ -263,14 +271,10 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.primary.withOpacity(0.05),
+                    color: Colors.white.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.primary.withOpacity(0.1),
+                      color: Colors.white.withOpacity(0.2),
                     ),
                   ),
                   child: Column(
@@ -279,18 +283,19 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            isAr ? 'تقدم التوظيف' : 'Hiring Progress',
+                            t.isAr ? 'تقدم التوظيف' : 'Hiring Progress',
                             style: const TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
+                              color: textColor,
                             ),
                           ),
                           Text(
                             '$acceptedCount/$requiredCount',
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
-                              color: Theme.of(context).colorScheme.primary,
+                              color: Colors.cyanAccent,
                             ),
                           ),
                         ],
@@ -299,14 +304,16 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
                       LinearProgressIndicator(
                         value: acceptedCount / requiredCount,
                         borderRadius: BorderRadius.circular(4),
+                        backgroundColor: Colors.white.withOpacity(0.1),
+                        color: Colors.cyanAccent,
                         minHeight: 6,
                       ),
                       const SizedBox(height: 6),
                       Text(
                         t.hiredProgressMsg(acceptedCount, requiredCount),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 10,
-                          color: Colors.grey,
+                          color: textColor.withOpacity(0.6),
                         ),
                       ),
                     ],
@@ -318,12 +325,12 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      isAr ? 'اليوم' : 'Today',
-                      style: const TextStyle(color: Colors.grey, fontSize: 12),
+                      t.isAr ? 'اليوم' : 'Today',
+                      style: TextStyle(color: textColor.withOpacity(0.6), fontSize: 12),
                     ),
                     Text(
-                      isAr ? 'الحالة الحالية' : 'Current Status',
-                      style: const TextStyle(color: Colors.grey, fontSize: 12),
+                      t.isAr ? 'الحالة الحالية' : 'Current Status',
+                      style: TextStyle(color: textColor.withOpacity(0.6), fontSize: 12),
                     ),
                   ],
                 ),
@@ -332,8 +339,8 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      isAr ? 'نموت سيف' : 'Namoot Saif',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                      application.userName,
+                      style: const TextStyle(fontWeight: FontWeight.bold, color: textColor),
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(
@@ -341,16 +348,14 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
                         vertical: 2,
                       ),
                       decoration: BoxDecoration(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.primary.withOpacity(0.1),
+                        color: Colors.white.withOpacity(0.15),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        application.status,
-                        style: TextStyle(
+                        _translateStatus(application.status, t.isAr),
+                        style: const TextStyle(
                           fontSize: 11,
-                          color: Theme.of(context).colorScheme.primary,
+                          color: Colors.cyanAccent,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -365,7 +370,7 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
                     Expanded(
                       child: _ActionButton(
                         label: isAr ? 'قبول' : 'Accept',
-                        color: const Color(0xFF4285F4),
+                        color: const Color(0xFF2E7D32),
                         onPressed: () =>
                             _handleStatusChange(context, 'Hired', isAr),
                       ),
@@ -396,10 +401,12 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         Card(
-          elevation: 0,
+          elevation: 4,
+          color: boxColor,
+          shadowColor: Colors.black.withOpacity(0.2),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
-            side: BorderSide(color: Colors.grey.withOpacity(0.1)),
+            side: BorderSide(color: Colors.white.withOpacity(0.1)),
           ),
           child: Padding(
             padding: const EdgeInsets.all(20),
@@ -408,7 +415,7 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
               children: [
                 Text(
                   isAr ? 'بيانات التواصل' : 'Contact Info',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+                  style: const TextStyle(fontWeight: FontWeight.bold, color: textColor),
                 ),
                 const SizedBox(height: 16),
                 SizedBox(
@@ -432,10 +439,11 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
                     icon: const Icon(Icons.chat_bubble_outline, size: 18),
                     label: Text(isAr ? 'مراسلة المتقدم' : 'Message Applicant'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                      backgroundColor: Colors.white.withOpacity(0.15),
+                      foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
+                        side: BorderSide(color: Colors.white.withOpacity(0.3)),
                       ),
                     ),
                   ),
@@ -456,9 +464,9 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
                     ),
                     style: OutlinedButton.styleFrom(
                       side: BorderSide(
-                        color: Theme.of(context).colorScheme.primary,
+                        color: Colors.white.withOpacity(0.5),
                       ),
-                      foregroundColor: Theme.of(context).colorScheme.primary,
+                      foregroundColor: textColor,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -471,12 +479,12 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: Colors.teal.withOpacity(0.1),
+                        color: Colors.tealAccent.withOpacity(0.15),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Icon(
                         Icons.email_outlined,
-                        color: Colors.teal,
+                        color: Colors.tealAccent,
                         size: 20,
                       ),
                     ),
@@ -487,8 +495,8 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
                         children: [
                           Text(
                             isAr ? 'البريد الإلكتروني' : 'Email Address',
-                            style: const TextStyle(
-                              color: Colors.grey,
+                            style: TextStyle(
+                              color: textColor.withOpacity(0.6),
                               fontSize: 10,
                             ),
                           ),
@@ -497,6 +505,7 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
                             style: const TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
+                              color: textColor,
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -654,6 +663,19 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  String _translateStatus(String status, bool isAr) {
+    if (!isAr) return status;
+    final low = status.toLowerCase();
+    if (low.contains('hire') || low.contains('accept')) return 'تم التوظيف';
+    if (low.contains('reject') || low.contains('declin')) return 'مرفوض';
+    if (low.contains('pend')) return 'قيد المراجعة';
+    if (low.contains('appli')) return 'تم التقديم';
+    if (low.contains('wait')) return 'قائمة الانتظار';
+    if (low.contains('review')) return 'قيد المراجعة';
+    if (low.contains('short')) return 'مختصر';
+    return status;
   }
 
   Widget _buildSkills(BuildContext context, String label, bool isAr) {

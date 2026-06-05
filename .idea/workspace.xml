@@ -4,26 +4,32 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="89a40d2e-dee6-4edc-af06-e2e78f633ab0" name="Changes" comment="v2&#10;user&#10;user2&#10;user3&#10;user4&#10;&#10;التعديل قبل الاخير في ال user&#10;اخر نعديل في user من غير API">
+    <list default="true" id="89a40d2e-dee6-4edc-af06-e2e78f633ab0" name="Changes" comment="v2&#10;user&#10;user2&#10;user3&#10;user4&#10;&#10;التعديل قبل الاخير في ال user&#10;اخر نعديل في user من غير API&#10;التعديل قبل الاخير للحرفي">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/constants/app_images.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/constants/app_images.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/profile/profile_login_details_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/profile/profile_login_details_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/Tradesman_Messages/messages_list.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/Tradesman_Messages/messages_list.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/lib/app/theme/app_colors.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/app/theme/app_colors.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/company/auth/forgot_password_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/company/auth/forgot_password_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/company/auth/recruitment_company_sign_in_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/company/auth/recruitment_company_sign_in_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/company/auth/sign_in_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/company/auth/sign_in_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/company/auth/sign_up_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/company/auth/sign_up_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/company/candidates/applicant_details_profile_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/company/candidates/applicant_details_profile_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/company/home/dashboard_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/company/home/dashboard_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/company/jobs/job_applicants_table_view_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/company/jobs/job_applicants_table_view_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/company/jobs/jobs_hub_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/company/jobs/jobs_hub_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/company/jobs/post_job/post_job_step1_information_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/company/jobs/post_job/post_job_step1_information_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/company/onboarding/onboarding_future_starts_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/company/onboarding/onboarding_future_starts_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/company/onboarding/onboarding_next_job_closer_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/company/onboarding/onboarding_next_job_closer_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/company/onboarding/onboarding_smart_search_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/company/onboarding/onboarding_smart_search_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/company/onboarding/recruitment_company_onboarding_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/company/onboarding/recruitment_company_onboarding_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/company/profile/company_profile_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/company/profile/company_profile_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/company/profile/company_ratings_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/company/profile/company_ratings_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/company/profile/profile_settings_overview_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/company/profile/profile_settings_overview_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/home/company_details_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/home/company_details_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/home/recruitment_user_shell_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/home/recruitment_user_shell_screen.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/home/company_public_profile_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/home/company_public_profile_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/home/find_jobs.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/home/find_jobs.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/home/tradesman_apply_job_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/home/tradesman_apply_job_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/home/tradesman_browse_companies_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/home/tradesman_browse_companies_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/home/tradesman_home_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/home/tradesman_home_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/home/tradesman_job_details_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/home/tradesman_job_details_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/home/tradesman_my_apps_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/home/tradesman_my_apps_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/nav_Botton_bar/nav_bottom_bar.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/nav_Botton_bar/nav_bottom_bar.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/post/job_applicants_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/post/job_applicants_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/post/post_job.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/post/post_job.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/post/tradesman_service_requester_profile_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/post/tradesman_service_requester_profile_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/profile/tradesman_edit_profile_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/profile/tradesman_edit_profile_screen.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/profile/tradesman_profile.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/profile/tradesman_profile.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/profile/tradesman_ratings_hub_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/profile/tradesman_ratings_hub_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/shared/services/recruitment_sync_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/shared/services/recruitment_sync_service.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/lib/shared/l10n/app_localizations.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/shared/l10n/app_localizations.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/lib/shared/widgets/app_button.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/shared/widgets/app_button.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -401,7 +407,15 @@
       <option name="project" value="LOCAL؜" />
       <updated>1780617326053</updated>
     </task>
-    <option name="localTasksCounter" value="37" />
+    <task id="LOCAL؜-٠٠٠٣٧" summary="v2&#10;user&#10;user2&#10;user3&#10;user4&#10;&#10;التعديل قبل الاخير في ال user&#10;اخر نعديل في user من غير API&#10;التعديل قبل الاخير للحرفي">
+      <option name="closed" value="true" />
+      <created>1780633533171</created>
+      <option name="number" value="٠٠٠٣٧" />
+      <option name="presentableId" value="LOCAL؜-٠٠٠٣٧" />
+      <option name="project" value="LOCAL؜" />
+      <updated>1780633533172</updated>
+    </task>
+    <option name="localTasksCounter" value="38" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -433,7 +447,8 @@
     <MESSAGE value="v2&#10;user&#10;user2&#10;user3&#10;user4&#10;ع" />
     <MESSAGE value="v2&#10;user&#10;user2&#10;user3&#10;user4&#10;&#10;التعديل قبل الاخير في ال user" />
     <MESSAGE value="v2&#10;user&#10;user2&#10;user3&#10;user4&#10;&#10;التعديل قبل الاخير في ال user&#10;اخر نعديل في user من غير API" />
-    <option name="LAST_COMMIT_MESSAGE" value="v2&#10;user&#10;user2&#10;user3&#10;user4&#10;&#10;التعديل قبل الاخير في ال user&#10;اخر نعديل في user من غير API" />
+    <MESSAGE value="v2&#10;user&#10;user2&#10;user3&#10;user4&#10;&#10;التعديل قبل الاخير في ال user&#10;اخر نعديل في user من غير API&#10;التعديل قبل الاخير للحرفي" />
+    <option name="LAST_COMMIT_MESSAGE" value="v2&#10;user&#10;user2&#10;user3&#10;user4&#10;&#10;التعديل قبل الاخير في ال user&#10;اخر نعديل في user من غير API&#10;التعديل قبل الاخير للحرفي" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
