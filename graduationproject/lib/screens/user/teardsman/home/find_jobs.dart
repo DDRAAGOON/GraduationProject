@@ -128,25 +128,25 @@ class _FindJobsState extends State<FindJobs> {
                   j.category.toLowerCase() == 'service',
             )
             .toList();
+        final bgColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
         return Scaffold(
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          backgroundColor: bgColor,
           body: SafeArea(
             child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Blue banner with search and text
+                  // Banner with search and text
                   Stack(
                     children: [
                       Container(
                         width: double.infinity,
                         height: 220,
                         decoration: const BoxDecoration(
-                          image: DecorationImage(
-                            image: AssetImage(
-                              'assets/tradesman/Screenshot 2026-05-27 032314.png',
-                            ),
-                            fit: BoxFit.cover,
+                          color: Color(0xFF213E75),
+                          borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(32),
+                            bottomRight: Radius.circular(32),
                           ),
                         ),
                       ),
@@ -320,6 +320,29 @@ class _FindJobsState extends State<FindJobs> {
                           ),
                           t,
                         ),
+                        const SizedBox(height: 12),
+                        _buildJobCard(
+                          RecruitmentJob(
+                            id: 'closed-tradesman-job',
+                            title: 'كهربائي منازل',
+                            companyName: 'النور للخدمات',
+                            location: 'الإسكندرية',
+                            salaryRange: '4000-6000 ج.م',
+                            type: 'دوام كامل',
+                            status: 'Closed',
+                            category: 'tradesman',
+                            publishedAt: DateTime.now().subtract(const Duration(days: 5)),
+                            description: 'تم اكتمال العدد المطلوب لهذه الوظيفة.',
+                            responsibilities: const [],
+                            qualifications: const [],
+                            benefits: const [],
+                            acceptedCount: 15,
+                            capacity: 15,
+                            logoIcon: Icons.electric_bolt,
+                            specialTag: 'مكتمل',
+                          ),
+                          t,
+                        ),
                         const SizedBox(height: 20),
                         jobs.isEmpty
                             ? Center(
@@ -395,23 +418,26 @@ class _FindJobsState extends State<FindJobs> {
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
 
     return InkWell(
-      onTap: () {
-        if (!mounted) return;
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => TradesmanJobDetailsScreen(job: job),
-          ),
-        );
-      },
+      onTap: job.acceptedCount < job.capacity
+          ? () {
+              if (!mounted) return;
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => TradesmanJobDetailsScreen(job: job),
+                ),
+              );
+            }
+          : null,
       borderRadius: BorderRadius.circular(16),
       child: Card(
-        color: Theme.of(context).cardColor,
-        elevation: 0,
+        color: const Color(0xFF213E75),
+        elevation: 4,
+        shadowColor: Colors.black.withValues(alpha: 0.2),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
           side: BorderSide(
-            color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
+            color: Colors.white.withValues(alpha: 0.1),
           ),
         ),
         margin: const EdgeInsets.only(bottom: 12),
@@ -426,14 +452,12 @@ class _FindJobsState extends State<FindJobs> {
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.primary.withValues(alpha: 0.1),
+                      color: Colors.white.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(
                       job.logoIcon ?? Icons.work_outline,
-                      color: Theme.of(context).colorScheme.primary,
+                      color: Colors.white,
                       size: 20,
                     ),
                   ),
@@ -443,7 +467,7 @@ class _FindJobsState extends State<FindJobs> {
                       t.translateJobTitle(job.title),
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w700,
-                        color: Theme.of(context).colorScheme.onSurface,
+                        color: Colors.white,
                       ),
                     ),
                   ),
@@ -452,20 +476,16 @@ class _FindJobsState extends State<FindJobs> {
               const SizedBox(height: 12),
               Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.business,
                     size: 16,
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.onSurface.withValues(alpha: 0.54),
+                    color: Colors.white70,
                   ),
                   const SizedBox(width: 4),
                   Text(
                     t.translateCompanyName(job.companyName),
-                    style: TextStyle(
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.onSurface.withValues(alpha: 0.6),
+                    style: const TextStyle(
+                      color: Colors.white,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -509,14 +529,12 @@ class _FindJobsState extends State<FindJobs> {
                       Text(
                         t.tr(
                           en: '${job.acceptedCount} of ${job.capacity} hired',
-                          ar: 'تم قبول ${job.acceptedCount} من أصل ${job.capacity}',
+                          ar: 'المقبولين ${job.acceptedCount} من ${job.capacity}',
                         ),
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.onSurface.withValues(alpha: 0.6),
+                          color: Colors.white70,
                         ),
                       ),
                       Text(
@@ -525,8 +543,8 @@ class _FindJobsState extends State<FindJobs> {
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
                           color: job.acceptedCount >= job.capacity
-                              ? Colors.green
-                              : Colors.blue,
+                              ? Colors.greenAccent
+                              : const Color(0xFFFF7A2A),
                         ),
                       ),
                     ],
@@ -536,12 +554,10 @@ class _FindJobsState extends State<FindJobs> {
                     borderRadius: BorderRadius.circular(10),
                     child: LinearProgressIndicator(
                       value: (job.acceptedCount / job.capacity).clamp(0.0, 1.0),
-                      backgroundColor: Theme.of(
-                        context,
-                      ).dividerColor.withValues(alpha: 0.05),
+                      backgroundColor: Colors.white.withValues(alpha: 0.1),
                       color: job.acceptedCount >= job.capacity
-                          ? Colors.green
-                          : const Color(0xFF00D2B4),
+                          ? Colors.greenAccent
+                          : const Color(0xFFFF7A2A),
                       minHeight: 6,
                     ),
                   ),
@@ -551,16 +567,23 @@ class _FindJobsState extends State<FindJobs> {
               SizedBox(
                 width: double.infinity,
                 child: AppButton(
-                  label: isAr ? 'قدّم الآن' : 'Apply Now',
-                  backgroundColor: const Color(0xFF4A6ED1),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => TradesmanApplyJobScreen(job: job),
-                      ),
-                    );
-                  },
+                  label: job.acceptedCount < job.capacity
+                      ? (isAr ? 'قدّم الآن' : 'Apply Now')
+                      : (isAr ? 'الوظيفة مغلقة' : 'Job Closed'),
+                  backgroundColor: job.acceptedCount < job.capacity
+                      ? const Color(0xFF142C66)
+                      : Colors.grey.shade600,
+                  onPressed: job.acceptedCount < job.capacity
+                      ? () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  TradesmanApplyJobScreen(job: job),
+                            ),
+                          );
+                        }
+                      : null,
                 ),
               ),
             ],

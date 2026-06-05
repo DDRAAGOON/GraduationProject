@@ -96,30 +96,6 @@ class _ProfileLoginDetailsScreenState extends State<ProfileLoginDetailsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start, // Let Directionality handle it
           children: [
-            const SizedBox(height: 20),
-            // Tabs
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  _buildTabItem(t.tr(en: "Profile Setting", ar: "إعدادات الملف"), false, () {
-                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const EditProfileScreen()));
-                  }, isDark, onSurfaceColor),
-                  const SizedBox(width: 20),
-                  _buildTabItem(t.tr(en: "Account Security", ar: "أمان الحساب"), true, () {}, isDark, onSurfaceColor),
-                  const SizedBox(width: 20),
-                  _buildTabItem(t.tr(en: "Notification", ar: "الإشعارات"), false, () {
-                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Notifications()));
-                  }, isDark, onSurfaceColor),
-                  const SizedBox(width: 20),
-                  _buildTabItem(t.tr(en: "Preferences", ar: "التفضيلات"), false, () {
-                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Preferences()));
-                  }, isDark, onSurfaceColor),
-                ],
-              ),
-            ),
-            const SizedBox(height: 10),
-            Divider(color: onSurfaceColor.withValues(alpha: 0.12), height: 1),
             const SizedBox(height: 30),
 
             // Account Security Title
@@ -190,7 +166,7 @@ class _ProfileLoginDetailsScreenState extends State<ProfileLoginDetailsScreen> {
                 child: ElevatedButton(
                   onPressed: _updatePassword,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    backgroundColor: const Color(0xFF142C66),
                     padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                   ),

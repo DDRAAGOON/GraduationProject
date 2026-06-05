@@ -35,8 +35,10 @@ class TradesmanMyAppsScreen extends StatelessWidget {
     final activeCount =
         mockWorks.where((w) => w.status.contains(isAr ? 'نشط' : 'Active')).length;
 
+    final bgColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
+
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: bgColor,
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         child: Column(

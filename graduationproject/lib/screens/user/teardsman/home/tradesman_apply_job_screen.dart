@@ -35,10 +35,13 @@ class _TradesmanApplyJobScreenState extends State<TradesmanApplyJobScreen> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
+
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
+      backgroundColor: bgColor,
       appBar: AppBar(
-        backgroundColor: theme.scaffoldBackgroundColor,
+        backgroundColor: bgColor,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         leading: IconButton(

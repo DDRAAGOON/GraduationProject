@@ -48,12 +48,14 @@ class _MessagesListState extends State<MessagesList> {
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     final store = RecruitmentSyncStore.instance;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
 
     return AnimatedBuilder(
       animation: store,
       builder: (context, _) {
         return Scaffold(
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          backgroundColor: bgColor,
           floatingActionButton: FloatingActionButton(
             onPressed: () {
               Navigator.push(

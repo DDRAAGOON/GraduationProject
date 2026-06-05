@@ -9,6 +9,7 @@ class AppImages {
   static const String companyLogo2 = 'assets/company/icon/Company Logo (2).png';
 
   static const String jobito = 'assets/company/logo/logo.png';
+  static const String jobitoTradesman = 'assets/tradesman/Group 289312.png';
   static const String companyIconVector = 'assets/company/icon/Vector.png';
 
   static const String companiesBackground = 'assets/tradesman/Screenshot 2026-05-27 032314.png';

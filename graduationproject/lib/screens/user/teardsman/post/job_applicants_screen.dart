@@ -413,11 +413,13 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
         final realApplicants = store.applications
             .where((app) => app.jobId == widget.jobId)
             .toList();
+        final isDark = theme.brightness == Brightness.dark;
+        final bgColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
 
         return Scaffold(
-          backgroundColor: theme.scaffoldBackgroundColor,
+          backgroundColor: bgColor,
           appBar: AppBar(
-            backgroundColor: theme.scaffoldBackgroundColor,
+            backgroundColor: bgColor,
             elevation: 0,
             surfaceTintColor: Colors.transparent,
             leading: Padding(
@@ -598,16 +600,11 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
-                  color: theme.cardColor,
+                  color: const Color(0xFF213E75),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: Theme.of(
-                      context,
-                    ).dividerColor.withAlpha((0.12 * 255).toInt()),
-                  ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.03),
+                      color: Colors.black.withValues(alpha: 0.1),
                       blurRadius: 16,
                       offset: const Offset(0, 4),
                     ),
@@ -621,10 +618,10 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                       children: [
                         Text(
                           '${filteredApplicants.length}',
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 46,
                             fontWeight: FontWeight.w900,
-                            color: colorScheme.primary,
+                            color: Colors.white,
                             height: 1,
                           ),
                         ),
@@ -636,8 +633,8 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w700,
-                              color: colorScheme.onSurface.withValues(
-                                alpha: 0.62,
+                              color: Colors.white.withValues(
+                                alpha: 0.7,
                               ),
                             ),
                           ),
@@ -650,15 +647,13 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                               vertical: 6,
                             ),
                             decoration: BoxDecoration(
-                              color: const Color(
-                                0xFFFF7A2A,
-                              ).withValues(alpha: 0.12),
+                              color: Colors.white.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(999),
                             ),
-                            child: Text(
+                            child: const Text(
                               'بيانات تجريبية للمعاينة',
                               style: TextStyle(
-                                color: const Color(0xFFFF7A2A),
+                                color: Colors.white,
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -673,17 +668,17 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                       children: [
                         _chipPill(
                           label: isAr ? 'ملخص' : 'Summary',
-                          color: const Color(0xFF4A80D8),
+                          color: Colors.white,
                           isAr: isAr,
                         ),
                         _chipPill(
                           label: isAr ? 'جاهز للمراجعة' : 'Ready',
-                          color: Colors.green,
+                          color: Colors.greenAccent,
                           isAr: isAr,
                         ),
                         _chipPill(
                           label: isAr ? 'حالات متعددة' : 'Multiple',
-                          color: Colors.orange,
+                          color: Colors.orangeAccent,
                           isAr: isAr,
                         ),
                       ],
@@ -823,7 +818,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
         ),
         confirmDismiss: (_) => _confirmDeleteApplicant(app),
         child: Material(
-          color: theme.cardColor,
+          color: const Color(0xFF213E75),
           borderRadius: BorderRadius.circular(18),
           child: InkWell(
             borderRadius: BorderRadius.circular(18),
@@ -831,14 +826,11 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: theme.cardColor,
+                color: const Color(0xFF213E75),
                 borderRadius: BorderRadius.circular(18),
-                border: Border.all(
-                  color: theme.dividerColor.withValues(alpha: 0.08),
-                ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.03),
+                    color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -854,10 +846,10 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                       Expanded(
                         child: Text(
                           app.userName,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
-                            color: colorScheme.onSurface,
+                            color: Colors.white,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -868,13 +860,13 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: statusColor.withValues(alpha: 0.12),
+                          color: Colors.white.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(999),
                         ),
                         child: Text(
                           statusLabel,
                           style: TextStyle(
-                            color: statusColor,
+                            color: statusColor == Colors.green ? Colors.greenAccent : (statusColor == Colors.red ? Colors.redAccent : Colors.cyanAccent),
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
                           ),
@@ -885,10 +877,10 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                   const SizedBox(height: 12),
                   Text(
                     app.jobTitle,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
-                      color: colorScheme.primary,
+                      color: Colors.orangeAccent,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -900,7 +892,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                         Icon(
                           Icons.report_problem_outlined,
                           size: 15,
-                          color: colorScheme.onSurface.withValues(alpha: 0.5),
+                          color: Colors.white.withValues(alpha: 0.7),
                         ),
                         const SizedBox(width: 6),
                         Expanded(
@@ -911,8 +903,8 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                             style: TextStyle(
                               fontSize: 12.5,
                               fontWeight: FontWeight.w600,
-                              color: colorScheme.onSurface.withValues(
-                                alpha: 0.65,
+                              color: Colors.white.withValues(
+                                alpha: 0.85,
                               ),
                             ),
                           ),
@@ -926,14 +918,14 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                       Icon(
                         Icons.calendar_today_outlined,
                         size: 14,
-                        color: colorScheme.onSurface.withValues(alpha: 0.45),
+                        color: Colors.white.withValues(alpha: 0.5),
                       ),
                       const SizedBox(width: 6),
                       Text(
                         '${t.tr(en: 'Applied on', ar: 'تاريخ التقديم')}: $appliedDate',
                         style: TextStyle(
                           fontSize: 11.5,
-                          color: colorScheme.onSurface.withValues(alpha: 0.5),
+                          color: Colors.white.withValues(alpha: 0.6),
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -942,7 +934,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                   const SizedBox(height: 14),
                   Divider(
                     height: 1,
-                    color: theme.dividerColor.withValues(alpha: 0.1),
+                    color: Colors.white.withValues(alpha: 0.1),
                   ),
                   const SizedBox(height: 12),
                   Row(
@@ -950,7 +942,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                     children: [
                       _buildApplicantActionButton(
                         icon: Icons.phone_outlined,
-                        color: Colors.blue,
+                        color: Colors.cyanAccent,
                         tooltip: isAr ? 'اتصال' : 'Call',
                         onPressed: () {
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -964,7 +956,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                       ),
                       _buildApplicantActionButton(
                         icon: Icons.chat_bubble_outline,
-                        color: colorScheme.primary,
+                        color: Colors.orangeAccent,
                         tooltip: isAr ? 'المحادثة' : 'Chat',
                         onPressed: () {
                           Navigator.push(
@@ -981,7 +973,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                       ),
                       _buildApplicantActionButton(
                         icon: Icons.person_outline,
-                        color: colorScheme.primary,
+                        color: Colors.white,
                         tooltip: isAr ? 'التفاصيل' : 'Details',
                         onPressed: () => _openApplicantProfile(app),
                       ),

@@ -164,11 +164,13 @@ class _PostJobState extends State<PostJob> {
     final t = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+    final bgColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
 
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
+      backgroundColor: bgColor,
       appBar: AppBar(
-        backgroundColor: theme.scaffoldBackgroundColor,
+        backgroundColor: bgColor,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         automaticallyImplyLeading: true,
@@ -185,42 +187,6 @@ class _PostJobState extends State<PostJob> {
           ),
         ),
         centerTitle: true,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10.0),
-            child: TextButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => JobApplicantsScreen(
-                      jobId: "", // Generic view
-                      jobTitle: _titleController.text.isEmpty
-                          ? (t.isAr ? "بدون عنوان" : "Untitled")
-                          : _titleController.text,
-                    ),
-                  ),
-                );
-              },
-              style: TextButton.styleFrom(
-                backgroundColor: colorScheme.primary.withValues(alpha: 0.1),
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              child: Text(
-                t.tr(en: "Applicants", ar: "المتقدمين"),
-                style: TextStyle(
-                  color: colorScheme.primary,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 13,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 16),
-        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
@@ -332,7 +298,7 @@ class _PostJobState extends State<PostJob> {
                           icon: const Icon(Icons.add, size: 18),
                           label: Text(t.tr(en: "Add", ar: "إضافة")),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: colorScheme.primary,
+                            backgroundColor: const Color(0xFF142C66),
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(
                               horizontal: 14,
@@ -609,7 +575,7 @@ class _PostJobState extends State<PostJob> {
                 child: ElevatedButton(
                   onPressed: () => _validateAndPost(t),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: colorScheme.primary,
+                    backgroundColor: const Color(0xFF142C66),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15),
                     ),

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../../../../shared/l10n/app_localizations.dart';
 import '../../../../shared/state/recruitment_sync_store.dart';
 import '../../../../shared/utils/image_helper.dart';
 
@@ -34,468 +36,363 @@ class CompanyPublicProfile {
   });
 }
 
-class CompanyPublicProfileScreen extends StatelessWidget {
+class CompanyPublicProfileScreen extends StatefulWidget {
   final CompanyPublicProfile company;
 
   const CompanyPublicProfileScreen({super.key, required this.company});
 
   @override
+  State<CompanyPublicProfileScreen> createState() => _CompanyPublicProfileScreenState();
+}
+
+class _CompanyPublicProfileScreenState extends State<CompanyPublicProfileScreen> {
+  final TextEditingController _commentController = TextEditingController();
+  final List<Map<String, dynamic>> _mockComments = [
+    {'name': 'أحمد علي', 'text': 'شركة محترمة جداً وبيئة عمل ممتازة.', 'date': '2024-05-10'},
+    {'name': 'سارة محمود', 'text': 'تجربة رائعة مع فريق التوظيف لديهم.', 'date': '2024-05-08'},
+  ];
+
+  @override
+  void dispose() {
+    _commentController.dispose();
+    super.dispose();
+  }
+
+  void _addComment() {
+    final text = _commentController.text.trim();
+    if (text.isEmpty) return;
+    setState(() {
+      _mockComments.insert(0, {
+        'name': RecruitmentSyncStore.instance.currentUserName,
+        'text': text,
+        'date': DateTime.now().toString().split(' ')[0],
+      });
+      _commentController.clear();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
-    final about = isAr ? company.aboutAr : company.aboutEn;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
+    final company = widget.company;
 
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: CustomScrollView(
-        slivers: [
-          // Hero App Bar
-          SliverAppBar(
-            expandedHeight: 220,
-            pinned: true,
-            backgroundColor: const Color(0xFF011931),
-            foregroundColor: Colors.white,
-            flexibleSpace: FlexibleSpaceBar(
-              background: Stack(
-                fit: StackFit.expand,
+      backgroundColor: bgColor,
+      appBar: AppBar(
+        backgroundColor: bgColor,
+        elevation: 0,
+        surfaceTintColor: Colors.transparent,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios, color: isDark ? Colors.white : Colors.black, size: 20),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          isAr ? 'ملف الشركة' : 'Company Profile',
+          style: TextStyle(color: isDark ? Colors.white : Colors.black, fontWeight: FontWeight.bold, fontSize: 18),
+        ),
+        centerTitle: true,
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: isAr ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+          children: [
+            // 1. Header Card (Logo, Name, Info)
+            _buildContainerCard(
+              child: Column(
                 children: [
-                  // Gradient Background
-                  Container(
-                    decoration: const BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [Color(0xFF011931), Color(0xFF49769F)],
+                  Row(
+                    textDirection: isAr ? TextDirection.rtl : TextDirection.ltr,
+                    children: [
+                      Container(
+                        width: 70,
+                        height: 70,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: company.logoUrl != null
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(16),
+                                child: Image(image: getAppImageProvider(company.logoUrl)!, fit: BoxFit.cover),
+                              )
+                            : const Icon(Icons.business_rounded, color: Colors.white, size: 35),
                       ),
-                    ),
-                  ),
-                  // Company Logo + Name
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 80, 24, 20),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: isAr ? CrossAxisAlignment.end : CrossAxisAlignment.start,
                           children: [
-                            // Logo
-                            Container(
-                              width: 72,
-                              height: 72,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(18),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.2),
-                                    blurRadius: 12,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(18),
-                                child: company.logoUrl != null
-                                    ? Image(
-                                        image: getAppImageProvider(
-                                          company.logoUrl,
-                                        )!,
-                                        fit: BoxFit.cover,
-                                        errorBuilder: (_, _, _) => const Icon(
-                                          Icons.business_rounded,
-                                          size: 36,
-                                          color: Color(0xFF49769F),
-                                        ),
-                                      )
-                                    : const Icon(
-                                        Icons.business_rounded,
-                                        size: 36,
-                                        color: Color(0xFF49769F),
-                                      ),
-                              ),
+                            Text(
+                              company.name,
+                              style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
                             ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    company.name,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.w900,
-                                    ),
-                                  ),
-                                  if (company.industry.isNotEmpty)
-                                    Text(
-                                      company.industry,
-                                      style: TextStyle(
-                                        color: Colors.white.withOpacity(0.75),
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                ],
-                              ),
+                            Text(
+                              company.industry,
+                              style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 13),
                             ),
                           ],
                         ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Quick Stats Row
-                  Row(
-                    children: [
-                      if (company.employee.isNotEmpty)
-                        _buildStatChip(
-                          icon: Icons.people_outline,
-                          label: company.employee,
-                          color: const Color(0xFF49769F),
-                        ),
-                      if (company.employee.isNotEmpty)
-                        const SizedBox(width: 10),
-                      if (company.foundedYear > 0)
-                        _buildStatChip(
-                          icon: Icons.calendar_today_outlined,
-                          label:
-                              '${isAr ? 'تأسست' : 'Est.'} ${company.foundedYear}',
-                          color: const Color(0xFF49769F),
-                        ),
-                      if (company.foundedYear > 0) const SizedBox(width: 10),
-                      _buildStatChip(
-                        icon: Icons.work_outline,
-                        label: isAr
-                            ? '${company.jobs.length} وظيفة'
-                            : '${company.jobs.length} Jobs',
-                        color: const Color(0xFFFF7A2A),
                       ),
                     ],
                   ),
-
-                  // About Section
-                  if (about.isNotEmpty) ...[
-                    const SizedBox(height: 28),
-                    _buildSectionTitle(isAr ? 'عن الشركة' : 'About Company'),
-                    const SizedBox(height: 12),
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: Colors.grey.withOpacity(0.08),
-                        ),
-                      ),
-                      child: Text(
-                        about,
-                        style: const TextStyle(
-                          color: Colors.black87,
-                          fontSize: 14,
-                          height: 1.6,
-                        ),
-                      ),
-                    ),
-                  ],
-
-                  // Locations
-                  if (company.locations.isNotEmpty) ...[
-                    const SizedBox(height: 24),
-                    _buildSectionTitle(isAr ? 'المواقع' : 'Locations'),
-                    const SizedBox(height: 12),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: company.locations
-                          .map(
-                            (loc) => _buildTag(
-                              label: loc,
-                              icon: Icons.location_on_outlined,
-                              bgColor: const Color(0xFFF0F7FF),
-                              textColor: const Color(0xFF49769F),
-                            ),
-                          )
-                          .toList(),
-                    ),
-                  ],
-
-                  // Tech Stack
-                  if (company.techStack.isNotEmpty) ...[
-                    const SizedBox(height: 24),
-                    _buildSectionTitle(
-                      isAr ? 'التقنيات المستخدمة' : 'Tech Stack',
-                    ),
-                    const SizedBox(height: 12),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: company.techStack
-                          .map(
-                            (tech) => _buildTag(
-                              label: tech,
-                              icon: Icons.code,
-                              bgColor: const Color(0xFFF0FFF4),
-                              textColor: Colors.green.shade700,
-                            ),
-                          )
-                          .toList(),
-                    ),
-                  ],
-
-                  // Benefits
-                  if (company.benefits.isNotEmpty) ...[
-                    const SizedBox(height: 24),
-                    _buildSectionTitle(isAr ? 'المزايا' : 'Benefits'),
-                    const SizedBox(height: 12),
-                    ...company.benefits.map(
-                      (benefit) => Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 8,
-                              height: 8,
-                              decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Color(0xFF49769F),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Text(
-                                benefit,
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.black87,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-
-                  // Open Jobs
-                  if (company.jobs.isNotEmpty) ...[
-                    const SizedBox(height: 28),
-                    _buildSectionTitle(
-                      isAr ? 'الوظائف المتاحة' : 'Open Positions',
-                    ),
-                    const SizedBox(height: 12),
-                    ...company.jobs.map(
-                      (job) => _buildJobCard(context, job, isAr),
-                    ),
-                  ] else ...[
-                    const SizedBox(height: 28),
-                    _buildSectionTitle(
-                      isAr ? 'الوظائف المتاحة' : 'Open Positions',
-                    ),
-                    const SizedBox(height: 12),
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(24),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Column(
-                        children: [
-                          Icon(
-                            Icons.work_off_outlined,
-                            size: 48,
-                            color: Colors.grey.shade300,
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            isAr
-                                ? 'لا توجد وظائف متاحة حالياً'
-                                : 'No open positions at the moment',
-                            style: TextStyle(
-                              color: Colors.grey.shade500,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-
-                  const SizedBox(height: 100),
+                  const SizedBox(height: 20),
+                  const Divider(color: Colors.white12),
+                  const SizedBox(height: 10),
+                  // Site, Employees, Founded Side by Side
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    textDirection: isAr ? TextDirection.rtl : TextDirection.ltr,
+                    children: [
+                      _buildHeaderVerticalStat(Icons.location_on_outlined, isAr ? 'الموقع' : 'Site', company.locations.isNotEmpty ? company.locations.first : 'N/A'),
+                      _buildHeaderVerticalStat(Icons.people_outline, isAr ? 'الموظفين' : 'Staff', company.employee),
+                      _buildHeaderVerticalStat(Icons.calendar_today_outlined, isAr ? 'التأسيس' : 'Founded', company.foundedYear.toString()),
+                    ],
+                  ),
                 ],
               ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
 
-  Widget _buildStatChip({
-    required IconData icon,
-    required String label,
-    required Color color,
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 14, color: color),
-          const SizedBox(width: 6),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              color: color,
-              fontWeight: FontWeight.w600,
+            const SizedBox(height: 24),
+
+            // 2. Reviews Section
+            _buildSectionTitle(isAr ? 'التعليقات والآراء' : 'Comments & Opinions', isAr, isDark),
+            const SizedBox(height: 12),
+            _buildContainerCard(
+              child: Column(
+                children: [
+                  TextField(
+                    controller: _commentController,
+                    style: const TextStyle(color: Colors.white, fontSize: 14),
+                    textAlign: isAr ? TextAlign.right : TextAlign.left,
+                    decoration: InputDecoration(
+                      hintText: isAr ? 'اكتب تعليقك هنا...' : 'Write your comment...',
+                      hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
+                      filled: true,
+                      fillColor: Colors.black.withOpacity(0.2),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                      suffixIcon: IconButton(
+                        onPressed: _addComment,
+                        icon: const Icon(Icons.send, color: Color(0xFFFF7A2A)),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  ListView.separated(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: _mockComments.length,
+                    separatorBuilder: (_, __) => const Divider(color: Colors.white10, height: 20),
+                    itemBuilder: (context, index) {
+                      final c = _mockComments[index];
+                      return Column(
+                        crossAxisAlignment: isAr ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            textDirection: isAr ? TextDirection.rtl : TextDirection.ltr,
+                            children: [
+                              Text(c['name'], style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+                              Text(c['date'], style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 11)),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          Text(c['text'], style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 13), textAlign: isAr ? TextAlign.right : TextAlign.left),
+                        ],
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
 
-  Widget _buildSectionTitle(String title) {
-    return Text(
-      title,
-      style: const TextStyle(
-        fontSize: 18,
-        fontWeight: FontWeight.w800,
-        color: Color(0xFF011931),
-      ),
-    );
-  }
+            const SizedBox(height: 24),
 
-  Widget _buildTag({
-    required String label,
-    required IconData icon,
-    required Color bgColor,
-    required Color textColor,
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 13, color: textColor),
-          const SizedBox(width: 6),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              color: textColor,
-              fontWeight: FontWeight.w600,
+            // 3. Company About (ملف الشركة)
+            _buildSectionTitle(isAr ? 'ملف الشركة' : 'Company Profile', isAr, isDark),
+            const SizedBox(height: 12),
+            _buildContainerCard(
+              child: Text(
+                isAr ? company.aboutAr : company.aboutEn,
+                style: const TextStyle(color: Colors.white, fontSize: 14, height: 1.6),
+                textAlign: isAr ? TextAlign.right : TextAlign.left,
+              ),
             ),
-          ),
-        ],
+
+            const SizedBox(height: 24),
+
+            // 4. Contact (التواصل)
+            _buildSectionTitle(isAr ? 'التواصل' : 'Contact', isAr, isDark),
+            const SizedBox(height: 12),
+            _buildContainerCard(
+              child: Column(
+                children: [
+                  _buildContactLink(Icons.language, isAr ? 'الموقع الإلكتروني' : 'Website', company.website, isAr),
+                  if (company.website.isNotEmpty) const SizedBox(height: 10),
+                  _buildContactLink(Icons.link, 'Facebook', 'facebook.com/${company.name.replaceAll(' ', '')}', isAr),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 24),
+
+            // 5. Benefits (المميزات)
+            _buildSectionTitle(isAr ? 'المميزات' : 'Benefits', isAr, isDark),
+            const SizedBox(height: 12),
+            _buildContainerCard(
+              child: Wrap(
+                spacing: 10,
+                runSpacing: 10,
+                alignment: isAr ? WrapAlignment.end : WrapAlignment.start,
+                children: company.benefits.map((b) => _buildBadge(b, const Color(0xFFFF7A2A))).toList(),
+              ),
+            ),
+
+            const SizedBox(height: 24),
+
+            // 6. Available Jobs (الوظائف المتاحة)
+            _buildSectionTitle(isAr ? 'الوظائف المتاحة' : 'Available Jobs', isAr, isDark),
+            const SizedBox(height: 12),
+            if (company.jobs.isEmpty)
+              Center(child: Text(isAr ? 'لا توجد وظائف متاحة حالياً' : 'No available jobs', style: TextStyle(color: isDark ? Colors.white54 : Colors.black54)))
+            else
+              ...company.jobs.map((job) => Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: _buildJobCard(job, isAr),
+              )),
+
+            const SizedBox(height: 60),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildJobCard(BuildContext context, RecruitmentJob job, bool isAr) {
+  Widget _buildHeaderVerticalStat(IconData icon, String label, String value) {
+    return Column(
+      children: [
+        Icon(icon, color: const Color(0xFFFF7A2A), size: 20),
+        const SizedBox(height: 6),
+        Text(label, style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 11)),
+        const SizedBox(height: 2),
+        Text(value, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
+      ],
+    );
+  }
+
+  Widget _buildContainerCard({required Widget child}) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
+      width: double.infinity,
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.withOpacity(0.08)),
+        color: const Color(0xFF213E75),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
+          BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 4)),
         ],
+      ),
+      child: child,
+    );
+  }
+
+  Widget _buildSectionTitle(String title, bool isAr, bool isDark) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Align(
+        alignment: isAr ? Alignment.centerRight : Alignment.centerLeft,
+        child: Text(
+          title,
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w900,
+            color: isDark ? Colors.white : const Color(0xFF142C66),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildContactLink(IconData icon, String label, String url, bool isAr) {
+    return InkWell(
+      onTap: () async {
+        final uri = Uri.parse(url.startsWith('http') ? url : 'https://$url');
+        if (await canLaunchUrl(uri)) await launchUrl(uri);
+      },
+      child: Row(
+        textDirection: isAr ? TextDirection.rtl : TextDirection.ltr,
+        children: [
+          Icon(icon, color: Colors.white, size: 18),
+          const SizedBox(width: 10),
+          Text(label, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+          const Spacer(),
+          const Icon(Icons.open_in_new, color: Colors.white30, size: 14),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBadge(String label, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      decoration: BoxDecoration(
+        color: color, 
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 4)],
+      ),
+      child: Text(label, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+    );
+  }
+
+  Widget _buildJobCard(RecruitmentJob job, bool isAr) {
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white12),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: isAr ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
-          Text(
-            job.title,
-            style: const TextStyle(
-              fontWeight: FontWeight.w800,
-              fontSize: 15,
-              color: Color(0xFF011931),
-            ),
-          ),
-          const SizedBox(height: 8),
+          Text(job.title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+          const SizedBox(height: 10),
           Row(
+            textDirection: isAr ? TextDirection.rtl : TextDirection.ltr,
             children: [
               _buildJobMeta(Icons.location_on_outlined, job.location),
               const SizedBox(width: 16),
               _buildJobMeta(Icons.work_outline, job.type),
-              if (job.salaryRange.isNotEmpty) ...[
-                const SizedBox(width: 16),
-                _buildJobMeta(Icons.attach_money, job.salaryRange),
-              ],
             ],
           ),
-          if (job.tags.isNotEmpty) ...[
-            const SizedBox(height: 10),
-            Wrap(
-              spacing: 6,
-              runSpacing: 6,
-              children: job.tags
-                  .where((tag) => tag.trim().toLowerCase() != 'technical')
-                  .take(3)
-                  .map(
-                    (tag) => Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF0F3FF),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        tag,
-                        style: const TextStyle(
-                          fontSize: 11,
-                          color: Color(0xFF49769F),
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  )
-                  .toList(),
+          const SizedBox(height: 12),
+          Align(
+            alignment: isAr ? Alignment.centerLeft : Alignment.centerRight,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFF7A2A),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                isAr ? 'عرض التفاصيل' : 'View Details',
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+              ),
             ),
-          ],
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildJobMeta(IconData icon, String label) {
+  Widget _buildJobMeta(IconData icon, String text) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 13, color: Colors.black45),
-        const SizedBox(width: 4),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 12, color: Colors.black54),
-        ),
+        Icon(icon, size: 14, color: Colors.white70),
+        const SizedBox(width: 6),
+        Text(text, style: const TextStyle(color: Colors.white70, fontSize: 12)),
       ],
     );
   }

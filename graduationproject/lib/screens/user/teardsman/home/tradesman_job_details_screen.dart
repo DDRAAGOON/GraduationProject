@@ -59,364 +59,190 @@ class _TradesmanJobDetailsScreenState extends State<TradesmanJobDetailsScreen> {
         : 'غير محدد';
     final availableCount = (job.capacity - job.acceptedCount).clamp(0, 9999);
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
+    final textColor = isDark ? Colors.white : Colors.black;
+
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: bgColor,
       appBar: AppBar(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        backgroundColor: bgColor,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
-        title: Text(t.tr(en: 'Job Details', ar: 'تفاصيل الوظيفة')),
-        centerTitle: true,
+        automaticallyImplyLeading: false,
+        title: Row(
+          children: [
+            IconButton(
+              icon: Icon(Icons.arrow_back_ios, color: textColor, size: 20),
+              onPressed: () => Navigator.pop(context),
+            ),
+            const Spacer(),
+            Text(
+              t.tr(en: 'Job Details', ar: 'تفاصيل الوظيفة'),
+              style: TextStyle(
+                color: textColor,
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
+            ),
+            const Spacer(),
+            const SizedBox(width: 48), // Balancing the back button
+          ],
+        ),
       ),
       body: AnimatedBuilder(
         animation: store,
         builder: (context, _) {
           return ListView(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             children: [
+              // Header Card
               _buildSectionCard(
                 context,
                 title: 'التصنيف',
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
+                      textDirection: TextDirection.rtl,
                       children: [
-                        CircleAvatar(
-                          radius: 30,
-                          backgroundColor: Theme.of(
-                            context,
-                          ).colorScheme.primary.withValues(alpha: 0.12),
-                          backgroundImage: job.companyLogoUrl != null
-                              ? getAppImageProvider(job.companyLogoUrl!)
-                              : null,
-                          child: job.companyLogoUrl == null
-                              ? Icon(
-                                  job.logoIcon ?? Icons.business,
-                                  color: Theme.of(context).colorScheme.primary,
-                                  size: 26,
+                        Container(
+                          width: 60,
+                          height: 60,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.2),
+                            shape: BoxShape.circle,
+                          ),
+                          child: job.companyLogoUrl != null
+                              ? ClipRRect(
+                                  borderRadius: BorderRadius.circular(30),
+                                  child: Image(image: getAppImageProvider(job.companyLogoUrl!)!, fit: BoxFit.cover),
                                 )
-                              : null,
+                              : Icon(job.logoIcon ?? Icons.business, color: Colors.white, size: 30),
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: 16),
                         Expanded(
                           child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Text(
                                 job.title,
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.onSurface,
-                                ),
+                                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+                                textAlign: TextAlign.right,
                               ),
                               const SizedBox(height: 4),
                               Text(
                                 job.companyName,
-                                style: TextStyle(
-                                  color: Theme.of(context).colorScheme.onSurface
-                                      .withValues(alpha: 0.6),
-                                  fontSize: 13,
-                                ),
+                                style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14),
+                                textAlign: TextAlign.right,
                               ),
                             ],
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 14),
+                    const SizedBox(height: 20),
                     Wrap(
-                      spacing: 10,
-                      runSpacing: 10,
+                      spacing: 8,
+                      runSpacing: 8,
+                      alignment: WrapAlignment.end,
                       children: [
                         _buildBadge(job.category, const Color(0xFF2563EB)),
-                        if (job.specialTag != null &&
-                            job.specialTag!.isNotEmpty)
-                          _buildBadge(job.specialTag!, const Color(0xFFFF7A2A)),
-                        ...job.type
-                            .split(RegExp(r'[•,;]'))
-                            .where((value) => value.trim().isNotEmpty)
-                            .map(
-                              (value) => _buildBadge(
-                                value.trim(),
-                                _getJobTypeColor(value.trim()),
-                              ),
-                            ),
+                        if (job.specialTag != null && job.specialTag!.isNotEmpty)
+                          _buildBadge(job.specialTag!, const Color(0xFF142C66)),
+                        ...job.type.split(RegExp(r'[•,;]')).where((v) => v.trim().isNotEmpty).map(
+                          (v) => _buildBadge(v.trim(), Colors.black26),
+                        ),
                       ],
                     ),
                   ],
                 ),
               ),
+
               const SizedBox(height: 16),
 
+              // Job Details Card
               _buildSectionCard(
                 context,
                 title: 'تفاصيل الوظيفة',
                 child: Column(
                   children: [
-                    _buildSimpleCapacityBar(context, job, availableCount),
-                    const SizedBox(height: 12),
-                    _buildInfoRow(
-                      context,
-                      icon: Icons.calendar_today_outlined,
-                      label: 'تاريخ النشر',
-                      value: publishDate,
-                    ),
-                    _buildInfoRow(
-                      context,
-                      icon: Icons.event_available_outlined,
-                      label: 'الانتهاء',
-                      value: deadlineText,
-                    ),
-                    _buildInfoRow(
-                      context,
-                      icon: Icons.work_outline,
-                      label: 'نوع الوظيفة',
-                      value: job.type,
-                    ),
-                    _buildInfoRow(
-                      context,
-                      icon: Icons.location_on_outlined,
-                      label: 'الموقع',
-                      value: job.location,
-                    ),
-                    _buildInfoRow(
-                      context,
-                      icon: Icons.attach_money,
-                      label: 'الراتب',
-                      value: job.salaryRange,
-                    ),
+                    _buildSimpleCapacityBar(context, job),
+                    const SizedBox(height: 20),
+                    _buildInfoRow(Icons.calendar_today_outlined, 'تاريخ النشر', publishDate),
+                    _buildInfoRow(Icons.event_available_outlined, 'الانتهاء', deadlineText),
+                    _buildInfoRow(Icons.work_outline, 'نوع الوظيفة', job.type),
+                    _buildInfoRow(Icons.location_on_outlined, 'الموقع', job.location),
+                    _buildInfoRow(Icons.attach_money, 'الراتب', job.salaryRange),
                   ],
                 ),
               ),
+
               const SizedBox(height: 16),
 
+              // Skills Card
               _buildSectionCard(
                 context,
                 title: 'المهارات',
                 child: Wrap(
                   spacing: 10,
                   runSpacing: 10,
-                  children:
-                      (job.tags.isNotEmpty ? job.tags : job.qualifications).map(
-                        (item) {
-                          final normalized = item.trim();
-                          if (normalized.isEmpty) {
-                            return const SizedBox.shrink();
-                          }
-                          return Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 8,
-                            ),
-                            decoration: BoxDecoration(
-                              color: const Color(
-                                0xFFFF7A2A,
-                              ).withValues(alpha: 0.12),
-                              borderRadius: BorderRadius.circular(999),
-                            ),
-                            child: Text(
-                              normalized,
-                              style: TextStyle(
-                                color: const Color(0xFFFF7A2A),
-                                fontWeight: FontWeight.w700,
-                                fontSize: 12,
-                              ),
-                            ),
-                          );
-                        },
-                      ).toList(),
+                  alignment: WrapAlignment.end,
+                  children: (job.tags.isNotEmpty ? job.tags : job.qualifications).map((skill) {
+                    return Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        skill.trim(),
+                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                      ),
+                    );
+                  }).toList(),
                 ),
               ),
+
               const SizedBox(height: 16),
 
+              // Reviews Card
               _buildSectionCard(
                 context,
                 title: 'التقييمات والآراء',
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'اضف تقييمك',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: Theme.of(context).colorScheme.onSurface,
-                              ),
-                            ),
-                            Container(
-                              width: 96,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 14,
-                                vertical: 12,
-                              ),
-                              decoration: BoxDecoration(
-                                color: const Color(
-                                  0xFFFF7A2A,
-                                ).withValues(alpha: 0.12),
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: const [
-                                      Icon(
-                                        Icons.star,
-                                        color: Colors.amber,
-                                        size: 18,
-                                      ),
-                                      SizedBox(width: 4),
-                                      Text(
-                                        '2.4',
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                          color: Color(0xFFFF7A2A),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    'تقييم العملاء',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface
-                                          .withValues(alpha: 0.6),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 10),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: List.generate(5, (index) {
-                                      final starIndex = index + 1;
-                                      return IconButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            _selectedRating = starIndex;
-                                          });
-                                        },
-                                        icon: Icon(
-                                          starIndex <= _selectedRating
-                                              ? Icons.star
-                                              : Icons.star_border,
-                                          color: Colors.amber,
-                                          size: 28,
-                                        ),
-                                        padding: EdgeInsets.zero,
-                                        constraints: const BoxConstraints(),
-                                      );
-                                    }),
-                                  ),
-                                  const SizedBox(height: 12),
-                                  SizedBox(
-                                    width: double.infinity,
-                                    height: 120,
-                                    child: TextField(
-                                      controller: _reviewController,
-                                      maxLines: 6,
-                                      minLines: 5,
-                                      textAlignVertical: TextAlignVertical.top,
-                                      decoration: InputDecoration(
-                                        hintText: 'اكتب تعليقك هنا...',
-                                        hintStyle: TextStyle(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onSurface
-                                              .withValues(alpha: 0.45),
-                                        ),
-                                        filled: true,
-                                        fillColor: Theme.of(context)
-                                            .colorScheme
-                                            .surface
-                                            .withValues(alpha: 0.7),
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            14,
-                                          ),
-                                          borderSide: BorderSide.none,
-                                        ),
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                              horizontal: 14,
-                                              vertical: 14,
-                                            ),
-                                        suffixIcon: IconButton(
-                                          onPressed: _submitReview,
-                                          icon: const Icon(
-                                            Icons.arrow_forward_rounded,
-                                            color: Color(0xFF4A6ED1),
-                                            size: 20,
-                                          ),
-                                          tooltip: 'إرسال',
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
+                        _buildRatingBox(),
+                        const Text('اضف تقييمك', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                       ],
                     ),
-                    const SizedBox(height: 18),
-                    Text(
-                      'التعليقات',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
-                    ),
+                    const SizedBox(height: 16),
+                    _buildRatingStars(),
+                    const SizedBox(height: 12),
+                    _buildReviewInput(),
+                    const SizedBox(height: 20),
+                    const Text('التعليقات', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
                     const SizedBox(height: 10),
-                    ..._customerReviews.map(
-                      (review) => _buildReviewCard(review),
-                    ),
+                    ..._customerReviews.map((review) => _buildReviewItem(review)),
                   ],
                 ),
               ),
-              const SizedBox(height: 24),
+
+              const SizedBox(height: 30),
 
               AppButton(
-                label: t.tr(en: 'Apply Now', ar: 'قدّم الآن'),
-                backgroundColor: const Color(0xFF4A6ED1),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => TradesmanApplyJobScreen(job: job),
-                    ),
-                  );
-                },
+                label: job.acceptedCount < job.capacity
+                    ? t.tr(en: 'Apply Now', ar: 'قدّم الآن')
+                    : t.tr(en: 'Job Closed', ar: 'الوظيفة مغلقة'),
+                backgroundColor: job.acceptedCount < job.capacity ? const Color(0xFF142C66) : Colors.grey,
+                onPressed: job.acceptedCount < job.capacity
+                    ? () => Navigator.push(context, MaterialPageRoute(builder: (c) => TradesmanApplyJobScreen(job: job)))
+                    : null,
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 40),
             ],
           );
         },
@@ -424,169 +250,51 @@ class _TradesmanJobDetailsScreenState extends State<TradesmanJobDetailsScreen> {
     );
   }
 
-  Widget _buildSectionCard(
-    BuildContext context, {
-    required String title,
-    required Widget child,
-  }) {
+  Widget _buildSectionCard(BuildContext context, {required String title, required Widget child}) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      width: double.infinity,
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
-        ),
+        color: const Color(0xFF213E75),
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).colorScheme.onSurface,
-            ),
-          ),
-          const SizedBox(height: 12),
+          Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: Colors.white)),
+          const SizedBox(height: 14),
           child,
         ],
       ),
     );
   }
 
-  Widget _buildSimpleCapacityBar(
-    BuildContext context,
-    RecruitmentJob job,
-    int availableCount,
-  ) {
-    final acceptedRatio = job.capacity == 0
-        ? 0.0
-        : (job.acceptedCount / job.capacity).clamp(0.0, 1.0);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          '${job.acceptedCount} تم قبول من ${job.capacity} متاح',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 15,
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
-        ),
-        const SizedBox(height: 8),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(999),
-          child: LinearProgressIndicator(
-            value: acceptedRatio,
-            minHeight: 6,
-            backgroundColor: Theme.of(
-              context,
-            ).dividerColor.withValues(alpha: 0.08),
-            valueColor: AlwaysStoppedAnimation<Color>(
-              acceptedRatio >= 1.0 ? Colors.green : const Color(0xFFFF7A2A),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildReviewCard(Map<String, dynamic> review) {
-    final rating = review['rating'] as int;
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.7),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: Theme.of(context).dividerColor.withValues(alpha: 0.12),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                review['name'] as String,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-              ),
-              Row(
-                children: List.generate(5, (index) {
-                  return Icon(
-                    index < rating ? Icons.star : Icons.star_border,
-                    size: 14,
-                    color: Colors.amber,
-                  );
-                }),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            review['comment'] as String,
-            style: TextStyle(
-              color: Theme.of(
-                context,
-              ).colorScheme.onSurface.withValues(alpha: 0.7),
-              fontSize: 12,
-              height: 1.4,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildInfoRow(
-    BuildContext context, {
-    required IconData icon,
-    required String label,
-    required String value,
-  }) {
+  Widget _buildInfoRow(IconData icon, String label, String value) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.only(bottom: 14),
       child: Row(
+        textDirection: TextDirection.rtl,
         children: [
           Container(
-            width: 34,
-            height: 34,
-            decoration: BoxDecoration(
-              color: const Color(0xFFFF7A2A).withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(icon, color: const Color(0xFFFF7A2A), size: 18),
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(color: Colors.white.withOpacity(0.15), borderRadius: BorderRadius.circular(10)),
+            child: Icon(icon, color: Colors.white, size: 20),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.onSurface.withValues(alpha: 0.5),
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  value,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-                ),
+                Text(label, style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 11, fontWeight: FontWeight.w500)),
+                Text(value, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
               ],
             ),
           ),
@@ -595,39 +303,100 @@ class _TradesmanJobDetailsScreenState extends State<TradesmanJobDetailsScreen> {
     );
   }
 
-  Color _getJobTypeColor(String type) {
-    switch (type.toLowerCase()) {
-      case 'full-time':
-        return Colors.green;
-      case 'part-time':
-        return Colors.blue;
-      case 'remote':
-        return Colors.purple;
-      case 'freelance':
-        return Colors.teal;
-      case 'one-time':
-        return Colors.amber;
-      case 'internship':
-        return Colors.indigo;
-      default:
-        return Colors.grey;
-    }
+  Widget _buildSimpleCapacityBar(BuildContext context, RecruitmentJob job) {
+    final ratio = job.capacity == 0 ? 0.0 : (job.acceptedCount / job.capacity).clamp(0.0, 1.0);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Text(
+          'المقبولين ${job.acceptedCount} من ${job.capacity}',
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Color(0xFFFF7A2A)),
+        ),
+        const SizedBox(height: 8),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: LinearProgressIndicator(
+            value: ratio,
+            minHeight: 8,
+            backgroundColor: Colors.white.withOpacity(0.2),
+            valueColor: AlwaysStoppedAnimation<Color>(ratio >= 1.0 ? Colors.greenAccent : const Color(0xFFFF7A2A)),
+          ),
+        ),
+      ],
+    );
   }
 
   Widget _buildBadge(String label, Color color) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.2),
-        borderRadius: BorderRadius.circular(999),
+      decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(8)),
+      child: Text(label, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 11)),
+    );
+  }
+
+  Widget _buildRatingBox() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(color: Colors.white.withOpacity(0.15), borderRadius: BorderRadius.circular(12)),
+      child: Row(
+        children: const [
+          Icon(Icons.star, color: Colors.amber, size: 18),
+          SizedBox(width: 4),
+          Text('2.4', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+        ],
       ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: color,
-          fontWeight: FontWeight.bold,
-          fontSize: 11,
-        ),
+    );
+  }
+
+  Widget _buildRatingStars() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: List.generate(5, (index) {
+        return IconButton(
+          onPressed: () => setState(() => _selectedRating = index + 1),
+          icon: Icon(index < _selectedRating ? Icons.star : Icons.star_border, color: Colors.amber, size: 28),
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(),
+        );
+      }),
+    );
+  }
+
+  Widget _buildReviewInput() {
+    return TextField(
+      controller: _reviewController,
+      maxLines: 3,
+      textAlign: TextAlign.right,
+      style: const TextStyle(color: Colors.white, fontSize: 14),
+      decoration: InputDecoration(
+        hintText: 'اكتب تعليقك هنا...',
+        hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
+        filled: true,
+        fillColor: Colors.black.withOpacity(0.1),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+        suffixIcon: IconButton(onPressed: _submitReview, icon: const Icon(Icons.send, color: Colors.white, size: 20)),
+      ),
+    );
+  }
+
+  Widget _buildReviewItem(Map<String, dynamic> review) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(color: Colors.white.withOpacity(0.05), borderRadius: BorderRadius.circular(12)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(children: List.generate(5, (i) => Icon(Icons.star, size: 12, color: i < review['rating'] ? Colors.amber : Colors.white24))),
+              Text(review['name'], style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(review['comment'], style: const TextStyle(color: Colors.white70, fontSize: 13), textAlign: TextAlign.right),
+        ],
       ),
     );
   }

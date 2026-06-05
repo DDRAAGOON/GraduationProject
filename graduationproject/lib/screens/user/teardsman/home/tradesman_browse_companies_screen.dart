@@ -112,40 +112,29 @@ class _TradesmanBrowseCompaniesScreenState
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final store = RecruitmentSyncStore.instance;
 
+    final bgColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
+
     return AnimatedBuilder(
       animation: store,
       builder: (context, _) {
         final companies = _getCompanies();
 
         return Scaffold(
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          backgroundColor: bgColor,
           body: ListView(
             padding: EdgeInsets.zero,
             children: [
-              // Header with Background Image
+              // Header with Background Color
               Stack(
                 children: [
                   Container(
                     height: 280,
                     width: double.infinity,
                     decoration: const BoxDecoration(
-                      image: DecorationImage(
-                        image: AssetImage(AppImages.companiesBackground),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                  Container(
-                    height: 280,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.black.withValues(alpha: 0.3),
-                          Colors.black.withValues(alpha: 0.1),
-                        ],
+                      color: Color(0xFF213E75),
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(32),
+                        bottomRight: Radius.circular(32),
                       ),
                     ),
                   ),
@@ -258,6 +247,7 @@ class _TradesmanBrowseCompaniesScreenState
                           child: _buildTypeButton(
                             isAr ? 'تقني' : 'Technical',
                             _isTechnical,
+                            const Color(0xFFFF7A2A), // Orange
                             () => setState(() => _isTechnical = !_isTechnical),
                           ),
                         ),
@@ -266,6 +256,7 @@ class _TradesmanBrowseCompaniesScreenState
                           child: _buildTypeButton(
                             isAr ? 'غير تقني' : 'Non-Technical',
                             _isNonTechnical,
+                            const Color(0xFFFF7A2A), // Orange when active
                             () => setState(
                               () => _isNonTechnical = !_isNonTechnical,
                             ),
@@ -367,7 +358,7 @@ class _TradesmanBrowseCompaniesScreenState
     );
   }
 
-  Widget _buildTypeButton(String label, bool isSelected, VoidCallback onTap) {
+  Widget _buildTypeButton(String label, bool isSelected, Color activeColor, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
@@ -375,21 +366,18 @@ class _TradesmanBrowseCompaniesScreenState
         padding: const EdgeInsets.symmetric(vertical: 14),
         decoration: BoxDecoration(
           color: isSelected
-              ? Theme.of(context).colorScheme.primary
-              : Theme.of(context).cardColor,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: isSelected
-                ? Theme.of(context).colorScheme.primary
-                : Theme.of(context).dividerColor.withValues(alpha: 0.15),
-            width: 1.5,
+              ? activeColor
+              : const Color(0xFF142C66),
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(30),
+            bottomRight: Radius.circular(30),
+            topRight: Radius.circular(4),
+            bottomLeft: Radius.circular(4),
           ),
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.primary.withValues(alpha: 0.3),
+                    color: activeColor.withValues(alpha: 0.3),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
                   ),
@@ -399,12 +387,8 @@ class _TradesmanBrowseCompaniesScreenState
         alignment: Alignment.center,
         child: Text(
           label,
-          style: TextStyle(
-            color: isSelected
-                ? Colors.white
-                : Theme.of(
-                    context,
-                  ).colorScheme.onSurface.withValues(alpha: 0.87),
+          style: const TextStyle(
+            color: Colors.white,
             fontWeight: FontWeight.w600,
             fontSize: 14,
           ),

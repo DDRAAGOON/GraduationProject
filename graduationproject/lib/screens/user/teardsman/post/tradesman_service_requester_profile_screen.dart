@@ -140,12 +140,10 @@ class _TradesmanServiceRequesterProfileScreenState
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Card(
-                  elevation: 0,
+                  elevation: 4,
+                  color: const Color(0xFF213E75),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
-                    side: BorderSide(
-                      color: theme.dividerColor.withValues(alpha: 0.12),
-                    ),
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(20),
@@ -160,6 +158,7 @@ class _TradesmanServiceRequesterProfileScreenState
                           application.userName,
                           style: theme.textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.bold,
+                            color: Colors.white,
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -168,7 +167,7 @@ class _TradesmanServiceRequesterProfileScreenState
                           Text(
                             application.location!,
                             style: TextStyle(
-                              color: colorScheme.onSurface.withValues(alpha: 0.55),
+                              color: Colors.white.withValues(alpha: 0.7),
                             ),
                           ),
                         ],
@@ -179,13 +178,16 @@ class _TradesmanServiceRequesterProfileScreenState
                             Text(
                               t.tr(en: 'Application date', ar: 'تاريخ التقديم'),
                               style: TextStyle(
-                                color: colorScheme.onSurface.withValues(alpha: 0.45),
+                                color: Colors.white.withValues(alpha: 0.6),
                                 fontSize: 12,
                               ),
                             ),
                             Text(
                               appliedDate,
-                              style: const TextStyle(fontWeight: FontWeight.bold),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
                             ),
                           ],
                         ),
@@ -196,7 +198,7 @@ class _TradesmanServiceRequesterProfileScreenState
                             Text(
                               t.tr(en: 'Status', ar: 'الحالة'),
                               style: TextStyle(
-                                color: colorScheme.onSurface.withValues(alpha: 0.45),
+                                color: Colors.white.withValues(alpha: 0.6),
                                 fontSize: 12,
                               ),
                             ),
@@ -206,13 +208,13 @@ class _TradesmanServiceRequesterProfileScreenState
                                 vertical: 4,
                               ),
                               decoration: BoxDecoration(
-                                color: colorScheme.primary.withValues(alpha: 0.1),
+                                color: Colors.white.withValues(alpha: 0.15),
                                 borderRadius: BorderRadius.circular(999),
                               ),
                               child: Text(
                                 statusLabel,
-                                style: TextStyle(
-                                  color: colorScheme.primary,
+                                style: const TextStyle(
+                                  color: Colors.white,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 11,
                                 ),
@@ -227,7 +229,7 @@ class _TradesmanServiceRequesterProfileScreenState
                               child: FilledButton(
                                 onPressed: () => _updateStatus(context, 'Accepted'),
                                 style: FilledButton.styleFrom(
-                                  backgroundColor: const Color(0xFF4285F4),
+                                  backgroundColor: Colors.green,
                                 ),
                                 child: Text(t.tr(en: 'Accept', ar: 'قبول')),
                               ),
@@ -249,8 +251,14 @@ class _TradesmanServiceRequesterProfileScreenState
                           width: double.infinity,
                           child: OutlinedButton.icon(
                             onPressed: () => _openChat(context),
-                            icon: const Icon(Icons.chat_bubble_outline, size: 18),
-                            label: Text(t.tr(en: 'Message', ar: 'مراسلة')),
+                            icon: const Icon(Icons.chat_bubble_outline, size: 18, color: Colors.white),
+                            label: Text(
+                              t.tr(en: 'Message', ar: 'مراسلة'),
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                            style: OutlinedButton.styleFrom(
+                              side: const BorderSide(color: Colors.white30),
+                            ),
                           ),
                         ),
                       ],
@@ -318,24 +326,20 @@ class _InfoTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: theme.cardColor,
+        color: const Color(0xFFB5ADAD),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: theme.dividerColor.withValues(alpha: 0.1),
-        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             label,
-            style: TextStyle(
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.45),
+            style: const TextStyle(
+              color: Colors.black54,
               fontSize: 12,
               fontWeight: FontWeight.w600,
             ),
@@ -347,6 +351,7 @@ class _InfoTile extends StatelessWidget {
               fontSize: 14,
               fontWeight: FontWeight.w600,
               height: 1.4,
+              color: Colors.black87,
             ),
           ),
         ],

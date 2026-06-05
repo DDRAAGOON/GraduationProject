@@ -9,13 +9,15 @@ class TradesmanRatingsHubScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     final isAr = t.isAr;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
 
     return DefaultTabController(
       length: 2,
       child: Scaffold(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        backgroundColor: bgColor,
         appBar: AppBar(
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          backgroundColor: bgColor,
           elevation: 0,
           surfaceTintColor: Colors.transparent,
           title: Text(
@@ -112,11 +114,15 @@ class _RatingsList extends StatelessWidget {
         return Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: theme.cardColor,
+            color: const Color(0xFF213E75),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: theme.dividerColor.withValues(alpha: 0.1),
-            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.1),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -129,6 +135,7 @@ class _RatingsList extends StatelessWidget {
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
+                        color: Colors.white,
                       ),
                     ),
                   ),
@@ -138,7 +145,10 @@ class _RatingsList extends StatelessWidget {
                       const SizedBox(width: 4),
                       Text(
                         entry.rating.toStringAsFixed(1),
-                        style: const TextStyle(fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
                       ),
                     ],
                   ),
@@ -148,9 +158,9 @@ class _RatingsList extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   entry.subtitle!,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 12,
-                    color: colorScheme.primary,
+                    color: Color(0xFFFF7A2A),
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -159,7 +169,7 @@ class _RatingsList extends StatelessWidget {
               Text(
                 entry.comment,
                 style: TextStyle(
-                  color: colorScheme.onSurface.withValues(alpha: 0.7),
+                  color: Colors.white.withValues(alpha: 0.9),
                   height: 1.4,
                 ),
               ),
@@ -168,7 +178,7 @@ class _RatingsList extends StatelessWidget {
                 _formatDate(entry.date),
                 style: TextStyle(
                   fontSize: 11,
-                  color: colorScheme.onSurface.withValues(alpha: 0.4),
+                  color: Colors.white.withValues(alpha: 0.5),
                 ),
               ),
             ],

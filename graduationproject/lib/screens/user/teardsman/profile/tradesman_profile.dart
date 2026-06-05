@@ -26,11 +26,14 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
         ? t.tr(en: "Tradesman", ar: "صنايعي")
         : t.tr(en: "Job Seeker", ar: "باحث عن عمل");
     
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
+
     return AnimatedBuilder(
       animation: store,
       builder: (context, _) {
         return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: bgColor,
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -161,7 +164,24 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
                       ],
                     ),
                   ),
-                  
+
+                  const SizedBox(height: 16),
+
+                  // Contact Details Card
+                  _buildFullWidthCard(
+                    child: Column(
+                      children: [
+                        _buildInfoRow(t.emailAddress, store.currentUserEmail, Icons.email_outlined, isAr),
+                        Divider(height: 32, color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
+                        _buildInfoRow(t.phoneNumber, store.currentUserPhone, Icons.phone_android_outlined, isAr),
+                        Divider(height: 32, color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
+                        _buildInfoRow(t.address, store.currentUserLocation, Icons.location_on_outlined, isAr),
+                        Divider(height: 32, color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
+                        _buildInfoRow(t.tr(en: "Skills", ar: "المهارات"), store.currentUserSkills.join(', '), Icons.psychology_outlined, isAr),
+                      ],
+                    ),
+                  ),
+
                   const SizedBox(height: 16),
 
                   if (store.currentUserExperience.isNotEmpty)
@@ -226,55 +246,6 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
                   if (store.tradesmanServices.isNotEmpty)
                     const SizedBox(height: 16),
 
-                  _buildFullWidthCard(
-                    child: Column(
-                      crossAxisAlignment:
-                          isAr ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-                      children: [
-                        _buildSectionHeader(
-                          t.tr(en: 'Ratings', ar: 'التقييمات'),
-                          Icons.star_outline,
-                          isAr,
-                        ),
-                        const SizedBox(height: 12),
-                        _buildRatingSummaryRow(
-                          context,
-                          isAr
-                              ? 'تقييمات العملاء'
-                              : 'Client ratings',
-                          store.ratingsFromClients.length,
-                          isAr,
-                          () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const TradesmanRatingsHubScreen(),
-                              ),
-                            );
-                          },
-                        ),
-                        const SizedBox(height: 10),
-                        _buildRatingSummaryRow(
-                          context,
-                          isAr ? 'تقييماتي للآخرين' : 'My ratings',
-                          store.ratingsGivenByTradesman.length,
-                          isAr,
-                          () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const TradesmanRatingsHubScreen(),
-                              ),
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
                   if (store.languages.isNotEmpty)
                     _buildFullWidthCard(
                       child: Column(
@@ -295,23 +266,6 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
                       ),
                     ),
                   if (store.languages.isNotEmpty) const SizedBox(height: 16),
-                  
-                  // Contact Details Card
-                  _buildFullWidthCard(
-                    child: Column(
-                      children: [
-                        _buildInfoRow(t.emailAddress, store.currentUserEmail, Icons.email_outlined, isAr),
-                        Divider(height: 32, color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
-                        _buildInfoRow(t.phoneNumber, store.currentUserPhone, Icons.phone_android_outlined, isAr),
-                        Divider(height: 32, color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
-                        _buildInfoRow(t.address, store.currentUserLocation, Icons.location_on_outlined, isAr),
-                        Divider(height: 32, color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
-                        _buildInfoRow(t.tr(en: "Skills", ar: "المهارات"), store.currentUserSkills.join(', '), Icons.psychology_outlined, isAr),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 16),
 
                   // Gallery Section
                   if (store.portfolioImages.isNotEmpty) ...[
@@ -426,7 +380,57 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
                         ],
                       ),
                     ),
+                    const SizedBox(height: 16),
                   ],
+
+                  // Ratings Card (Moved to the end)
+                  _buildFullWidthCard(
+                    child: Column(
+                      crossAxisAlignment:
+                          isAr ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                      children: [
+                        _buildSectionHeader(
+                          t.tr(en: 'Ratings', ar: 'التقييمات'),
+                          Icons.star_outline,
+                          isAr,
+                        ),
+                        const SizedBox(height: 12),
+                        _buildRatingSummaryRow(
+                          context,
+                          isAr
+                              ? 'تقييمات العملاء'
+                              : 'Client ratings',
+                          store.ratingsFromClients.length,
+                          isAr,
+                          () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const TradesmanRatingsHubScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 10),
+                        _buildRatingSummaryRow(
+                          context,
+                          isAr ? 'تقييماتي للآخرين' : 'My ratings',
+                          store.ratingsGivenByTradesman.length,
+                          isAr,
+                          () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const TradesmanRatingsHubScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
                   
                   const SizedBox(height: 100),
                 ],
@@ -439,6 +443,10 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
       },
     );
   }
+
+  // Remove the old Ratings Card placement from around line 230 in your mental map.
+  // I will use multi_replace if needed, but since I can see the structure I will do it precisely.
+
 
   Widget _buildFullWidthCard({required Widget child}) {
     return Container(

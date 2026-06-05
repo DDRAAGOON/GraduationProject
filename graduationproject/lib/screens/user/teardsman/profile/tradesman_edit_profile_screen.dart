@@ -105,7 +105,9 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
   Future<void> _pickImage(bool isBackground) async {
     final image = await _picker.pickImage(source: ImageSource.gallery);
     if (image == null) return;
+    
     final store = RecruitmentSyncStore.instance;
+    
     if (isBackground) {
       store.updateUserProfile(
         fullName: store.currentUserName,
@@ -113,7 +115,15 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
         backgroundImage: image.path,
       );
     } else {
-      await RecruitmentSyncService.instance.updateProfile(photoUrl: image.path);
+      // تحديث محلي فوري ليظهر للمستخدم
+      store.updateCurrentUser(photoUrl: image.path);
+      
+      try {
+        // الرفع للسيرفر في الخلفية
+        await RecruitmentSyncService.instance.updateProfile(photoUrl: image.path);
+      } catch (e) {
+        debugPrint("فشل رفع الصورة للسيرفر: $e");
+      }
     }
     setState(() {});
   }
@@ -205,6 +215,7 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
       district: _district ?? '',
       languages: _languages,
       tradesmanServices: _selectedServices,
+      profileImage: store.profileImage, // نمرر الصورة الحالية لضمان عدم ضياعها
     );
 
     RecruitmentSyncService.instance.updateProfile(
@@ -272,398 +283,404 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
     final t = AppLocalizations.of(context);
     final isAr = t.isAr;
     final store = RecruitmentSyncStore.instance;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final backgroundColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
-    final onSurfaceColor = isDark ? Colors.white : Colors.black;
-    final areas = _governorate == null
-        ? <String>[]
-        : RecruitmentSyncStore.tradesmanGovernorateAreas[_governorate] ?? [];
 
-    return Scaffold(
-      backgroundColor: backgroundColor,
-      appBar: AppBar(
-        title: Text(
-          t.tr(en: 'Edit Profile', ar: 'تعديل الملف الشخصي'),
-          style: TextStyle(fontWeight: FontWeight.bold, color: onSurfaceColor),
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        surfaceTintColor: Colors.transparent,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: onSurfaceColor),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: Form(
-        key: _formKey,
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _sectionTitle(t.tr(en: 'Personal information', ar: 'المعلومات الشخصية'), onSurfaceColor),
-              const SizedBox(height: 12),
-              GestureDetector(
-                onTap: () => _pickImage(true),
-                child: Container(
-                  height: 120,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16),
-                    image: getAppImageProvider(store.backgroundImage) != null
-                        ? DecorationImage(
-                            image: getAppImageProvider(store.backgroundImage)!,
-                            fit: BoxFit.cover,
-                          )
-                        : null,
-                    gradient: store.backgroundImage == null
-                        ? const LinearGradient(
-                            colors: [Color(0xFF011931), Color(0xFF49769F)],
-                          )
-                        : null,
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    t.tr(en: 'Change cover photo', ar: 'تغيير صورة الخلفية'),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
+    return ListenableBuilder(
+      listenable: store,
+      builder: (context, _) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        final backgroundColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
+        final onSurfaceColor = isDark ? Colors.white : Colors.black;
+        final areas = _governorate == null
+            ? <String>[]
+            : RecruitmentSyncStore.tradesmanGovernorateAreas[_governorate] ?? [];
+
+        return Scaffold(
+          backgroundColor: backgroundColor,
+          appBar: AppBar(
+            title: Text(
+              t.tr(en: 'Edit Profile', ar: 'تعديل الملف الشخصي'),
+              style: TextStyle(fontWeight: FontWeight.bold, color: onSurfaceColor),
+            ),
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            surfaceTintColor: Colors.transparent,
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back_ios, color: onSurfaceColor),
+              onPressed: () => Navigator.pop(context),
+            ),
+          ),
+          body: Form(
+            key: _formKey,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _sectionTitle(t.tr(en: 'Personal information', ar: 'المعلومات الشخصية'), onSurfaceColor),
+                  const SizedBox(height: 12),
+                  GestureDetector(
+                    onTap: () => _pickImage(true),
+                    child: Container(
+                      height: 120,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        image: getAppImageProvider(store.backgroundImage) != null
+                            ? DecorationImage(
+                                image: getAppImageProvider(store.backgroundImage)!,
+                                fit: BoxFit.cover,
+                              )
+                            : null,
+                        gradient: store.backgroundImage == null
+                            ? const LinearGradient(
+                                colors: [Color(0xFF011931), Color(0xFF49769F)],
+                              )
+                            : null,
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        t.tr(en: 'Change cover photo', ar: 'تغيير صورة الخلفية'),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Center(
-                child: GestureDetector(
-                  onTap: () => _pickImage(false),
-                  child: CircleAvatar(
-                    radius: 48,
-                    backgroundImage: getAppImageProvider(store.profileImage),
-                    child: store.profileImage == null
-                        ? const Icon(Icons.camera_alt, size: 36)
-                        : null,
+                  const SizedBox(height: 16),
+                  Center(
+                    child: GestureDetector(
+                      onTap: () => _pickImage(false),
+                      child: CircleAvatar(
+                        radius: 48,
+                        backgroundImage: getAppImageProvider(store.profileImage),
+                        child: (store.profileImage == null || getAppImageProvider(store.profileImage) == null)
+                            ? const Icon(Icons.camera_alt, size: 36)
+                            : null,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              _field(
-                context,
-                _fullNameController,
-                t.tr(en: 'Full name', ar: 'الاسم الكامل'),
-                required: true,
-              ),
-              const SizedBox(height: 12),
-              _field(
-                context,
-                _phoneController,
-                t.tr(en: 'Phone number', ar: 'رقم الهاتف'),
-                keyboard: TextInputType.phone,
-                required: true,
-              ),
-              const SizedBox(height: 12),
-              _field(
-                context,
-                _emailController,
-                t.tr(en: 'Email', ar: 'البريد الإلكتروني'),
-                keyboard: TextInputType.emailAddress,
-                required: true,
-              ),
-              const SizedBox(height: 12),
-              _label(t.dob, onSurfaceColor),
-              const SizedBox(height: 6),
-              InkWell(
-                onTap: _pickBirthDate,
-                child: InputDecorator(
-                  decoration: _inputDecoration(context),
-                  child: Text(
-                    _birthDate == null
-                        ? t.tr(en: 'Select date', ar: 'اختر التاريخ')
-                        : '${_birthDate!.year}-${_birthDate!.month.toString().padLeft(2, '0')}-${_birthDate!.day.toString().padLeft(2, '0')}',
+                  const SizedBox(height: 20),
+                  _field(
+                    context,
+                    _fullNameController,
+                    t.tr(en: 'Full name', ar: 'الاسم الكامل'),
+                    required: true,
+                  ),
+                  const SizedBox(height: 12),
+                  _field(
+                    context,
+                    _phoneController,
+                    t.tr(en: 'Phone number', ar: 'رقم الهاتف'),
+                    keyboard: TextInputType.phone,
+                    required: true,
+                  ),
+                  const SizedBox(height: 12),
+                  _field(
+                    context,
+                    _emailController,
+                    t.tr(en: 'Email', ar: 'البريد الإلكتروني'),
+                    keyboard: TextInputType.emailAddress,
+                    required: true,
+                  ),
+                  const SizedBox(height: 12),
+                  _label(t.dob, onSurfaceColor),
+                  const SizedBox(height: 6),
+                  InkWell(
+                    onTap: _pickBirthDate,
+                    child: InputDecorator(
+                      decoration: _inputDecoration(context),
+                      child: Text(
+                        _birthDate == null
+                            ? t.tr(en: 'Select date', ar: 'اختر التاريخ')
+                            : '${_birthDate!.year}-${_birthDate!.month.toString().padLeft(2, '0')}-${_birthDate!.day.toString().padLeft(2, '0')}',
+                        style: TextStyle(color: onSurfaceColor),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  _label(t.gender, onSurfaceColor),
+                  DropdownButtonFormField<String>(
+                    value: _gender,
+                    decoration: _inputDecoration(context),
+                    dropdownColor: isDark ? const Color(0xFF0D2D4D) : Colors.white,
+                    items: [
+                      DropdownMenuItem(value: 'Male', child: Text(t.male, style: TextStyle(color: onSurfaceColor))),
+                      DropdownMenuItem(value: 'Female', child: Text(t.female, style: TextStyle(color: onSurfaceColor))),
+                    ],
+                    onChanged: (v) => setState(() => _gender = v ?? 'Male'),
+                  ),
+                  const SizedBox(height: 12),
+                  _label(t.tr(en: 'Governorate', ar: 'المحافظة'), onSurfaceColor),
+                  DropdownButtonFormField<String>(
+                    value: _governorate,
+                    decoration: _inputDecoration(context),
+                    dropdownColor: isDark ? const Color(0xFF0D2D4D) : Colors.white,
+                    hint: Text(t.tr(en: 'Select governorate', ar: 'اختر المحافظة'), style: TextStyle(color: onSurfaceColor.withOpacity(0.5))),
+                    items: RecruitmentSyncStore.tradesmanGovernorateAreas.keys
+                        .map((g) => DropdownMenuItem(value: g, child: Text(g, style: TextStyle(color: onSurfaceColor))))
+                        .toList(),
+                    onChanged: (v) => setState(() {
+                      _governorate = v;
+                      _district = null;
+                    }),
+                  ),
+                  const SizedBox(height: 12),
+                  _label(t.tr(en: 'Area', ar: 'المنطقة'), onSurfaceColor),
+                  DropdownButtonFormField<String>(
+                    value: _district,
+                    decoration: _inputDecoration(context),
+                    dropdownColor: isDark ? const Color(0xFF0D2D4D) : Colors.white,
+                    hint: Text(t.tr(en: 'Select area', ar: 'اختر المنطقة'), style: TextStyle(color: onSurfaceColor.withOpacity(0.5))),
+                    items: areas
+                        .map((a) => DropdownMenuItem(value: a, child: Text(a, style: TextStyle(color: onSurfaceColor))))
+                        .toList(),
+                    onChanged: (v) => setState(() => _district = v),
+                  ),
+                  const SizedBox(height: 24),
+                  _sectionTitle(t.aboutMe, onSurfaceColor),
+                  _hint(t.tr(
+                    en: 'Briefly describe your skills and experience',
+                    ar: 'صف مهاراتك وخبراتك باختصار',
+                  ), onSurfaceColor),
+                  const SizedBox(height: 8),
+                  TextFormField(
+                    controller: _aboutController,
+                    maxLines: 4,
                     style: TextStyle(color: onSurfaceColor),
+                    validator: (v) =>
+                        (v == null || v.trim().isEmpty) ? t.tr(en: 'Required', ar: 'مطلوب') : null,
+                    decoration: _inputDecoration(
+                      context,
+                      hint: t.tr(en: 'About me', ar: 'نبذة عني'),
+                    ),
                   ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              _label(t.gender, onSurfaceColor),
-              DropdownButtonFormField<String>(
-                value: _gender,
-                decoration: _inputDecoration(context),
-                dropdownColor: isDark ? const Color(0xFF0D2D4D) : Colors.white,
-                items: [
-                  DropdownMenuItem(value: 'Male', child: Text(t.male, style: TextStyle(color: onSurfaceColor))),
-                  DropdownMenuItem(value: 'Female', child: Text(t.female, style: TextStyle(color: onSurfaceColor))),
-                ],
-                onChanged: (v) => setState(() => _gender = v ?? 'Male'),
-              ),
-              const SizedBox(height: 12),
-              _label(t.tr(en: 'Governorate', ar: 'المحافظة'), onSurfaceColor),
-              DropdownButtonFormField<String>(
-                value: _governorate,
-                decoration: _inputDecoration(context),
-                dropdownColor: isDark ? const Color(0xFF0D2D4D) : Colors.white,
-                hint: Text(t.tr(en: 'Select governorate', ar: 'اختر المحافظة'), style: TextStyle(color: onSurfaceColor.withOpacity(0.5))),
-                items: RecruitmentSyncStore.tradesmanGovernorateAreas.keys
-                    .map((g) => DropdownMenuItem(value: g, child: Text(g, style: TextStyle(color: onSurfaceColor))))
-                    .toList(),
-                onChanged: (v) => setState(() {
-                  _governorate = v;
-                  _district = null;
-                }),
-              ),
-              const SizedBox(height: 12),
-              _label(t.tr(en: 'Area', ar: 'المنطقة'), onSurfaceColor),
-              DropdownButtonFormField<String>(
-                value: _district,
-                decoration: _inputDecoration(context),
-                dropdownColor: isDark ? const Color(0xFF0D2D4D) : Colors.white,
-                hint: Text(t.tr(en: 'Select area', ar: 'اختر المنطقة'), style: TextStyle(color: onSurfaceColor.withOpacity(0.5))),
-                items: areas
-                    .map((a) => DropdownMenuItem(value: a, child: Text(a, style: TextStyle(color: onSurfaceColor))))
-                    .toList(),
-                onChanged: (v) => setState(() => _district = v),
-              ),
-              const SizedBox(height: 24),
-              _sectionTitle(t.aboutMe, onSurfaceColor),
-              _hint(t.tr(
-                en: 'Briefly describe your skills and experience',
-                ar: 'صف مهاراتك وخبراتك باختصار',
-              ), onSurfaceColor),
-              const SizedBox(height: 8),
-              TextFormField(
-                controller: _aboutController,
-                maxLines: 4,
-                style: TextStyle(color: onSurfaceColor),
-                validator: (v) =>
-                    (v == null || v.trim().isEmpty) ? t.tr(en: 'Required', ar: 'مطلوب') : null,
-                decoration: _inputDecoration(
-                  context,
-                  hint: t.tr(en: 'About me', ar: 'نبذة عني'),
-                ),
-              ),
-              const SizedBox(height: 24),
-              _sectionWithAdd(
-                t.tr(en: 'Experience', ar: 'الخبرات'),
-                t.tr(en: 'Add your work experience briefly', ar: 'أضف خبراتك العملية باختصار'),
-                onSurfaceColor,
-                () => _showAddDialog(
-                  title: t.tr(en: 'Add experience', ar: 'إضافة خبرة'),
-                  keys: const ['title', 'company', 'duration'],
-                  labels: [
-                    t.tr(en: 'Job title', ar: 'المسمى'),
-                    t.tr(en: 'Company', ar: 'الشركة'),
-                    t.tr(en: 'Duration', ar: 'المدة'),
-                  ],
-                  onSave: (d) => setState(() => _experiences.add(d)),
-                ),
-              ),
-              ..._experiences.map(
-                (e) => _removableTile(
-                  e['title'] ?? '',
-                  e['company'] ?? '',
-                  onSurfaceColor,
-                  () => setState(() => _experiences.remove(e)),
-                ),
-              ),
-              const SizedBox(height: 16),
-              _sectionWithAdd(
-                t.skills,
-                t.tr(en: 'Add your skills', ar: 'أضف مهاراتك'),
-                onSurfaceColor,
-                () {
-                  if (_skillController.text.trim().isEmpty) return;
-                  setState(() {
-                    _skills.add(_skillController.text.trim());
-                    _skillController.clear();
-                  });
-                },
-                addInline: true,
-              ),
-              Row(
-                children: [
-                  Expanded(child: TextField(controller: _skillController, style: TextStyle(color: onSurfaceColor), decoration: _inputDecoration(context, hint: t.tr(en: 'Skill', ar: 'مهارة')))),
-                  IconButton(
-                    icon: const Icon(Icons.add_circle_outline, color: Colors.blueAccent),
-                    onPressed: () {
+                  const SizedBox(height: 24),
+                  _sectionWithAdd(
+                    t.tr(en: 'Experience', ar: 'الخبرات'),
+                    t.tr(en: 'Add your work experience briefly', ar: 'أضف خبراتك العملية باختصار'),
+                    onSurfaceColor,
+                    () => _showAddDialog(
+                      title: t.tr(en: 'Add experience', ar: 'إضافة خبرة'),
+                      keys: const ['title', 'company', 'duration'],
+                      labels: [
+                        t.tr(en: 'Job title', ar: 'المسمى'),
+                        t.tr(en: 'Company', ar: 'الشركة'),
+                        t.tr(en: 'Duration', ar: 'المدة'),
+                      ],
+                      onSave: (d) => setState(() => _experiences.add(d)),
+                    ),
+                  ),
+                  ..._experiences.map(
+                    (e) => _removableTile(
+                      e['title'] ?? '',
+                      e['company'] ?? '',
+                      onSurfaceColor,
+                      () => setState(() => _experiences.remove(e)),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  _sectionWithAdd(
+                    t.skills,
+                    t.tr(en: 'Add your skills', ar: 'أضف مهاراتك'),
+                    onSurfaceColor,
+                    () {
                       if (_skillController.text.trim().isEmpty) return;
                       setState(() {
                         _skills.add(_skillController.text.trim());
                         _skillController.clear();
                       });
                     },
+                    addInline: true,
                   ),
-                ],
-              ),
-              Wrap(
-                spacing: 8,
-                children: _skills
-                    .map((s) => Chip(label: Text(s), onDeleted: () => setState(() => _skills.remove(s))))
-                    .toList(),
-              ),
-              const SizedBox(height: 16),
-              _sectionWithAdd(
-                t.education,
-                t.tr(en: 'Add your education', ar: 'أضف تعليمك'),
-                onSurfaceColor,
-                () => _showAddDialog(
-                  title: t.tr(en: 'Add education', ar: 'إضافة تعليم'),
-                  keys: const ['institution', 'degree', 'duration'],
-                  labels: [
-                    t.tr(en: 'Institution', ar: 'المؤسسة'),
-                    t.tr(en: 'Degree', ar: 'الدرجة'),
-                    t.tr(en: 'Duration', ar: 'المدة'),
-                  ],
-                  onSave: (d) => setState(() => _education.add(d)),
-                ),
-              ),
-              ..._education.map(
-                (e) => _removableTile(
-                  e['institution'] ?? '',
-                  e['degree'] ?? '',
-                  onSurfaceColor,
-                  () => setState(() => _education.remove(e)),
-                ),
-              ),
-              const SizedBox(height: 16),
-              _sectionWithAdd(
-                t.tr(en: 'Languages', ar: 'اللغات'),
-                t.tr(en: 'Add languages you speak', ar: 'أضف اللغات التي تتحدثها'),
-                onSurfaceColor,
-                () {
-                  if (_languageController.text.trim().isEmpty) return;
-                  setState(() {
-                    _languages.add(_languageController.text.trim());
-                    _languageController.clear();
-                  });
-                },
-                addInline: true,
-              ),
-              Row(
-                children: [
-                  Expanded(child: TextField(controller: _languageController, style: TextStyle(color: onSurfaceColor), decoration: _inputDecoration(context, hint: t.tr(en: 'Language', ar: 'لغة')))),
-                  IconButton(
-                    icon: const Icon(Icons.add_circle_outline, color: Colors.blueAccent),
-                    onPressed: () {
+                  Row(
+                    children: [
+                      Expanded(child: TextField(controller: _skillController, style: TextStyle(color: onSurfaceColor), decoration: _inputDecoration(context, hint: t.tr(en: 'Skill', ar: 'مهارة')))),
+                      IconButton(
+                        icon: const Icon(Icons.add_circle_outline, color: Colors.blueAccent),
+                        onPressed: () {
+                          if (_skillController.text.trim().isEmpty) return;
+                          setState(() {
+                            _skills.add(_skillController.text.trim());
+                            _skillController.clear();
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                  Wrap(
+                    spacing: 8,
+                    children: _skills
+                        .map((s) => Chip(label: Text(s), onDeleted: () => setState(() => _skills.remove(s))))
+                        .toList(),
+                  ),
+                  const SizedBox(height: 16),
+                  _sectionWithAdd(
+                    t.education,
+                    t.tr(en: 'Add your education', ar: 'أضف تعليمك'),
+                    onSurfaceColor,
+                    () => _showAddDialog(
+                      title: t.tr(en: 'Add education', ar: 'إضافة تعليم'),
+                      keys: const ['institution', 'degree', 'duration'],
+                      labels: [
+                        t.tr(en: 'Institution', ar: 'المؤسسة'),
+                        t.tr(en: 'Degree', ar: 'الدرجة'),
+                        t.tr(en: 'Duration', ar: 'المدة'),
+                      ],
+                      onSave: (d) => setState(() => _education.add(d)),
+                    ),
+                  ),
+                  ..._education.map(
+                    (e) => _removableTile(
+                      e['institution'] ?? '',
+                      e['degree'] ?? '',
+                      onSurfaceColor,
+                      () => setState(() => _education.remove(e)),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  _sectionWithAdd(
+                    t.tr(en: 'Languages', ar: 'اللغات'),
+                    t.tr(en: 'Add languages you speak', ar: 'أضف اللغات التي تتحدثها'),
+                    onSurfaceColor,
+                    () {
                       if (_languageController.text.trim().isEmpty) return;
                       setState(() {
                         _languages.add(_languageController.text.trim());
                         _languageController.clear();
                       });
                     },
+                    addInline: true,
                   ),
-                ],
-              ),
-              Wrap(
-                spacing: 8,
-                children: _languages
-                    .map((l) => Chip(label: Text(l), onDeleted: () => setState(() => _languages.remove(l))))
-                    .toList(),
-              ),
-              const SizedBox(height: 16),
-              _sectionTitle(t.tr(en: 'Social links', ar: 'روابط التواصل'), onSurfaceColor),
-              _field(context, _facebookController, isAr ? 'فيسبوك' : 'Facebook'),
-              const SizedBox(height: 10),
-              _field(context, _instagramController, isAr ? 'إنستجرام' : 'Instagram'),
-              const SizedBox(height: 10),
-              _field(context, _whatsappController, isAr ? 'واتساب' : 'WhatsApp'),
-              const SizedBox(height: 16),
-              _sectionTitle(t.tr(en: 'Services', ar: 'الخدمات'), onSurfaceColor),
-              _hint(t.tr(en: 'Select your profession', ar: 'اختر مهنتك'), onSurfaceColor),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: RecruitmentSyncStore.tradesmanDefaultServices.map((service) {
-                  final selected = _selectedServices.contains(service);
-                  return FilterChip(
-                    label: Text(service),
-                    selected: selected,
-                    onSelected: (v) {
-                      setState(() {
-                        if (v) {
-                          _selectedServices.add(service);
-                        } else {
-                          _selectedServices.remove(service);
-                        }
-                      });
-                    },
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _customServiceController,
-                      style: TextStyle(color: onSurfaceColor),
-                      decoration: _inputDecoration(
-                        context,
-                        hint: t.tr(en: 'Other profession', ar: 'مهنة أخرى'),
-                      ),
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.add_circle_outline, color: Colors.blueAccent),
-                    onPressed: () {
-                      final custom = _customServiceController.text.trim();
-                      if (custom.isEmpty) return;
-                      setState(() {
-                        _selectedServices.add(custom);
-                        _customServiceController.clear();
-                      });
-                    },
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              _sectionWithAdd(
-                t.tr(en: 'Portfolio', ar: 'المعرض'),
-                t.tr(en: 'Add or remove your work photos', ar: 'أضف أو احذف صور أعمالك'),
-                onSurfaceColor,
-                _pickPortfolioImages,
-              ),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: _portfolioPaths.asMap().entries.map((entry) {
-                  return Stack(
-                    clipBehavior: Clip.none,
+                  Row(
                     children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Image.file(
-                          File(entry.value),
-                          width: 88,
-                          height: 88,
-                          fit: BoxFit.cover,
-                        ),
+                      Expanded(child: TextField(controller: _languageController, style: TextStyle(color: onSurfaceColor), decoration: _inputDecoration(context, hint: t.tr(en: 'Language', ar: 'لغة')))),
+                      IconButton(
+                        icon: const Icon(Icons.add_circle_outline, color: Colors.blueAccent),
+                        onPressed: () {
+                          if (_languageController.text.trim().isEmpty) return;
+                          setState(() {
+                            _languages.add(_languageController.text.trim());
+                            _languageController.clear();
+                          });
+                        },
                       ),
-                      Positioned(
-                        top: -4,
-                        right: -4,
-                        child: GestureDetector(
-                          onTap: () => setState(() => _portfolioPaths.removeAt(entry.key)),
-                          child: const CircleAvatar(
-                            radius: 12,
-                            backgroundColor: Colors.redAccent,
-                            child: Icon(Icons.close, size: 14, color: Colors.white),
+                    ],
+                  ),
+                  Wrap(
+                    spacing: 8,
+                    children: _languages
+                        .map((l) => Chip(label: Text(l), onDeleted: () => setState(() => _languages.remove(l))))
+                        .toList(),
+                  ),
+                  const SizedBox(height: 16),
+                  _sectionTitle(t.tr(en: 'Social links', ar: 'روابط التواصل'), onSurfaceColor),
+                  _field(context, _facebookController, isAr ? 'فيسبوك' : 'Facebook'),
+                  const SizedBox(height: 10),
+                  _field(context, _instagramController, isAr ? 'إنستجرام' : 'Instagram'),
+                  const SizedBox(height: 10),
+                  _field(context, _whatsappController, isAr ? 'واتساب' : 'WhatsApp'),
+                  const SizedBox(height: 16),
+                  _sectionTitle(t.tr(en: 'Services', ar: 'الخدمات'), onSurfaceColor),
+                  _hint(t.tr(en: 'Select your profession', ar: 'اختر مهنتك'), onSurfaceColor),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: RecruitmentSyncStore.tradesmanDefaultServices.map((service) {
+                      final selected = _selectedServices.contains(service);
+                      return FilterChip(
+                        label: Text(service),
+                        selected: selected,
+                        onSelected: (v) {
+                          setState(() {
+                            if (v) {
+                              _selectedServices.add(service);
+                            } else {
+                              _selectedServices.remove(service);
+                            }
+                          });
+                        },
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _customServiceController,
+                          style: TextStyle(color: onSurfaceColor),
+                          decoration: _inputDecoration(
+                            context,
+                            hint: t.tr(en: 'Other profession', ar: 'مهنة أخرى'),
                           ),
                         ),
                       ),
+                      IconButton(
+                        icon: const Icon(Icons.add_circle_outline, color: Colors.blueAccent),
+                        onPressed: () {
+                          final custom = _customServiceController.text.trim();
+                          if (custom.isEmpty) return;
+                          setState(() {
+                            _selectedServices.add(custom);
+                            _customServiceController.clear();
+                          });
+                        },
+                      ),
                     ],
-                  );
-                }).toList(),
+                  ),
+                  const SizedBox(height: 16),
+                  _sectionWithAdd(
+                    t.tr(en: 'Portfolio', ar: 'المعرض'),
+                    t.tr(en: 'Add or remove your work photos', ar: 'أضف أو احذف صور أعمالك'),
+                    onSurfaceColor,
+                    _pickPortfolioImages,
+                  ),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: _portfolioPaths.asMap().entries.map((entry) {
+                      return Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.file(
+                              File(entry.value),
+                              width: 88,
+                              height: 88,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          Positioned(
+                            top: -4,
+                            right: -4,
+                            child: GestureDetector(
+                              onTap: () => setState(() => _portfolioPaths.removeAt(entry.key)),
+                              child: const CircleAvatar(
+                                radius: 12,
+                                backgroundColor: Colors.redAccent,
+                                child: Icon(Icons.close, size: 14, color: Colors.white),
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 32),
+                  AppButton(
+                    label: t.tr(en: 'Save profile', ar: 'حفظ الملف الشخصي'),
+                    onPressed: _save,
+                    backgroundColor: const Color(0xFF142C66),
+                  ),
+                  const SizedBox(height: 40),
+                ],
               ),
-              const SizedBox(height: 32),
-              AppButton(
-                label: t.tr(en: 'Save profile', ar: 'حفظ الملف الشخصي'),
-                onPressed: _save,
-                backgroundColor: const Color(0xFF4A6ED1),
-              ),
-              const SizedBox(height: 40),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 

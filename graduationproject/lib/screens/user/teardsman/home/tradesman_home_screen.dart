@@ -189,14 +189,14 @@ class TradesmanHomeScreen extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
+        color: const Color(0xFF213E75),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: Theme.of(context).dividerColor.withValues(alpha: 0.08),
+          color: Colors.white.withValues(alpha: 0.1),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 12,
             offset: const Offset(0, 5),
           ),
@@ -224,15 +224,13 @@ class TradesmanHomeScreen extends StatelessWidget {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.primary.withValues(alpha: 0.12),
+                    color: const Color(0xFFFF7A2A).withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(999),
                   ),
                   child: Text(
                     badge,
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
+                    style: const TextStyle(
+                      color: Color(0xFFFF7A2A),
                       fontWeight: FontWeight.w800,
                       fontSize: 11,
                     ),
@@ -247,7 +245,7 @@ class TradesmanHomeScreen extends StatelessWidget {
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 12,
-                        color: Colors.black87,
+                        color: Colors.white,
                       ),
                     ),
                   ],
@@ -262,14 +260,12 @@ class TradesmanHomeScreen extends StatelessWidget {
                   width: 44,
                   height: 44,
                   decoration: BoxDecoration(
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.primary.withValues(alpha: 0.1),
+                    color: Colors.white.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
                     job.logoIcon ?? Icons.work_outline,
-                    color: Theme.of(context).colorScheme.primary,
+                    color: Colors.white,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -279,19 +275,17 @@ class TradesmanHomeScreen extends StatelessWidget {
                     children: [
                       Text(
                         title,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontWeight: FontWeight.w900,
                           fontSize: 17,
-                          color: Theme.of(context).colorScheme.onSurface,
+                          color: Colors.white,
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         company,
                         style: TextStyle(
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.primary.withValues(alpha: 0.8),
+                          color: Colors.white.withValues(alpha: 0.8),
                           fontSize: 13,
                           fontWeight: FontWeight.w700,
                         ),
@@ -308,9 +302,7 @@ class TradesmanHomeScreen extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 13,
-                color: Theme.of(
-                  context,
-                ).colorScheme.onSurface.withValues(alpha: 0.65),
+                color: Colors.white.withValues(alpha: 0.7),
                 height: 1.5,
               ),
             ),
@@ -333,20 +325,20 @@ class TradesmanHomeScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.08),
+        color: Colors.white.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(999),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14, color: Theme.of(context).colorScheme.primary),
+          Icon(icon, size: 14, color: Colors.white70),
           const SizedBox(width: 5),
           Text(
             text,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w700,
-              color: Theme.of(context).colorScheme.onSurface,
+              color: Colors.white,
             ),
           ),
         ],

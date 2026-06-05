@@ -102,7 +102,15 @@ class RecruitmentSyncService {
     String? photoUrl,
   }) async {
     _assertAuthenticated();
-    return await _client.updateProfile(name: name, photoUrl: photoUrl);
+    final response = await _client.updateProfile(name: name, photoUrl: photoUrl);
+    
+    // Update local store state so UI updates immediately
+    RecruitmentSyncStore.instance.updateCurrentUser(
+      name: name,
+      photoUrl: photoUrl,
+    );
+    
+    return response;
   }
 
   Future<void> updateStatus({

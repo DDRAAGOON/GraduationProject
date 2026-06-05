@@ -47,56 +47,73 @@ class _NavbottonState extends State<Navbotton> {
     return AnimatedBuilder(
       animation: store,
       builder: (context, _) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        final bgColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
+
         return Scaffold(
           key: _scaffoldKey,
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          backgroundColor: bgColor,
           drawer: _buildTradesmanDrawer(context, store),
           appBar: AppBar(
-            leading: IconButton(
-              icon: Icon(
-                Icons.menu,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-              onPressed: () => _scaffoldKey.currentState?.openDrawer(),
-            ),
-            title: _selectedIndex == 5
-                ? Text(
-                    _isAr ? 'الملف الشخصي' : 'Profile',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
-                  )
-                : Image.asset(AppImages.jobito, height: 200),
-            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            automaticallyImplyLeading: false,
+            titleSpacing: 0,
+            backgroundColor: bgColor,
             surfaceTintColor: Colors.transparent,
-            centerTitle: true,
-            actions: [
-              IconButton(
-                onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const PostJob()),
-                ),
-                icon: Icon(
-                  Icons.add_box_outlined,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-                tooltip: _isAr ? 'نشر وظيفة' : 'Post Job',
-              ),
-              IconButton(
-                onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const NotificationsScreen(),
+            elevation: 0,
+            title: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: Row(
+                children: [
+                  // Icons Row (Menu, Notifications, Post)
+                  // In RTL, this Row starts from the Right.
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: Icon(
+                          Icons.menu,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                        onPressed: () => _scaffoldKey.currentState?.openDrawer(),
+                      ),
+                      IconButton(
+                        onPressed: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const NotificationsScreen(),
+                          ),
+                        ),
+                        icon: Icon(
+                          Icons.notifications_outlined,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const PostJob()),
+                        ),
+                        icon: Icon(
+                          Icons.add_box_outlined,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                        tooltip: _isAr ? 'نشر وظيفة' : 'Post Job',
+                      ),
+                    ],
                   ),
-                ),
-                icon: Icon(
-                  Icons.notifications_outlined,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
+                  const Spacer(),
+                  // Logo on the Far Left (in Arabic RTL)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Image.asset(
+                      AppImages.jobitoTradesman,
+                      height: 50,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(width: 8),
-            ],
+            ),
           ),
           body: _pages[_selectedIndex],
           floatingActionButton:
@@ -230,26 +247,6 @@ class _NavbottonState extends State<Navbotton> {
               Navigator.of(
                 context,
               ).push(MaterialPageRoute(builder: (context) => const Settings()));
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.help_outline),
-            title: Text(isAr ? 'مركز المساعدة' : 'Help Center'),
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const CompanyHelpCenterScreen(),
-                ),
-              );
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.info_outline),
-            title: Text(isAr ? 'عن التطبيق' : 'About'),
-            onTap: () {
-              Navigator.pop(context);
-              _showAboutDialog(context, isAr);
             },
           ),
           const Spacer(),
