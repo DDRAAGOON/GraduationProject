@@ -40,7 +40,39 @@ class RecruitmentSyncService {
     return token != null && token.isNotEmpty;
   }
 
+  Future<Map<String, dynamic>> googleLogin(String idToken) async {
+    try {
+      await _authService.googleLogin(idToken);
+      final user = await _authService.getMe();
+      return {
+        'id': user.id,
+        'role': user.role,
+        'fullName': user.fullName,
+        'email': user.email,
+        'photoUrl': user.photoUrl,
+      };
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<User?> login({
+    required String email,
+    required String password,
+    String? expectedRole,
+  }) async {
+    try {
+      final authResponse = await _authService.login(
+        LoginRequest(email: email, password: password),
+      );
+
+      return authResponse.user;
+    } on DioException catch (e) {
+      throw Exception(_handleDioError(e));
+    }
+  }
+
+  Future<Map<String, dynamic>> loginLegacy({
     required String email,
     required String password,
     String? expectedRole,
@@ -68,7 +100,14 @@ class RecruitmentSyncService {
         await CompanyStore.instance.loadFromSession(fullProfile);
       }
 
-      return user;
+      return {
+        'id': user.id,
+        'role': user.role,
+        'fullName': user.fullName,
+        'name': user.fullName,
+        'email': user.email,
+        'photoUrl': user.photoUrl,
+      };
     } on DioException catch (e) {
       throw Exception(_handleDioError(e));
     }
@@ -79,7 +118,7 @@ class RecruitmentSyncService {
     required String password,
     required String name,
     required String role,
-    required String phone,
+    String phone = '',
   }) async {
     try {
       final authResponse = await _authService.register(

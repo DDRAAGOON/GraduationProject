@@ -53,19 +53,8 @@ class _RecruitmentUserSignInScreenState
     if (!mounted) return;
     setState(() => _loading = false);
 
-    // التحقق هل المستخدم قادم من عملية إنشاء حساب جديد أم لا
-    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-    final bool isNewUser = args?['fromSignUp'] ?? false;
-
-    if (isNewUser) {
-      Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.userCompleteProfile, (route) => false);
-    } else {
-      Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.userWorkspace, (route) => false);
-    }
-    return;
-
     try {
-      final user = await RecruitmentSyncService.instance.login(
+      final user = await RecruitmentSyncService.instance.loginLegacy(
         email: _email.text.trim(),
         password: _password.text,
         expectedRole: 'user',

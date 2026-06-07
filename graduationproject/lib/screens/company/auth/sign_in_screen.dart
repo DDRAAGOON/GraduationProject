@@ -112,7 +112,7 @@ class _CompanySignInScreenState extends State<CompanySignInScreen> {
     setState(() => _loading = true);
 
     try {
-      final userData = await RecruitmentSyncService.instance.login(
+      final userData = await RecruitmentSyncService.instance.loginLegacy(
         email: _email.text.trim(),
         password: _password.text,
         expectedRole: 'company',
