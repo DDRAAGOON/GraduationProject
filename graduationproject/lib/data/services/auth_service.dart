@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:dio/dio.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/network/secure_storage.dart';
 import '../../../core/constants/api_constants.dart';
@@ -28,77 +30,76 @@ class AuthService {
     return authResponse;
   }
 
-  Future<AuthResponse> registerCompany(Map<String, dynamic> data) async {
-    final response = await _apiClient.post(
-      ApiConstants.registerCompany,
-      data: data,
-    );
-    final authResponse = AuthResponse.fromJson(response.data);
-    await SecureStorage.saveToken(authResponse.token);
-    return authResponse;
-  }
-
-  Future<AuthResponse> verifyLogin(String email, String code) async {
-    final response = await _apiClient.post(
-      ApiConstants.verifyLogin,
+  Future<void> verifyEmail(String email, String code) async {
+    await _apiClient.post(
+      ApiConstants.verifyEmail,
       data: {'email': email, 'code': code},
     );
+  }
+
+  Future<void> resendCode(String email) async {
+    await _apiClient.post(
+      ApiConstants.resendCode,
+      data: {'email': email},
+    );
+  }
+
+  Future<void> googleLogin(String token) async {
+    final response = await _apiClient.post(
+      ApiConstants.googleLogin,
+      data: {'token': token},
+    );
     final authResponse = AuthResponse.fromJson(response.data);
     await SecureStorage.saveToken(authResponse.token);
-    return authResponse;
+  }
+
+  Future<String> uploadDocument(File file) async {
+    final formData = FormData.fromMap({
+      'file': await MultipartFile.fromFile(file.path),
+    });
+    final response = await _apiClient.post(
+      ApiConstants.uploadDocument,
+      data: formData,
+      options: Options(contentType: 'multipart/form-data'),
+    );
+    return response.data['url'] ?? '';
   }
 
   Future<void> logout() async {
     await SecureStorage.deleteToken();
   }
 
-  Future<void> forgotPassword(String email) async {
-    await _apiClient.post(
-      ApiConstants.forgotPassword,
-      data: {'email': email},
-    );
-  }
-
-  Future<void> resetPassword(String token, String newPassword) async {
-    await _apiClient.post(
-      ApiConstants.resetPassword,
-      data: {
-        'token': token,
-        'newPassword': newPassword,
-      },
-    );
-  }
-
-  // User Profile & Settings
-  Future<List<User>> getAllUsers() async {
-    final response = await _apiClient.get(ApiConstants.users);
-    final List<dynamic> data = response.data;
-    return data.map((json) => User.fromJson(json)).toList();
-  }
-
-  Future<User> getProfile() async {
-    final response = await _apiClient.get(ApiConstants.userProfile);
+  // User Profile
+  Future<User> getMe() async {
+    final response = await _apiClient.get(ApiConstants.userMe);
     return User.fromJson(response.data);
   }
 
-  Future<User> updateProfile(Map<String, dynamic> data) async {
-    final response = await _apiClient.patch(
-      ApiConstants.userProfile,
+  Future<User> updateMe(Map<String, dynamic> data) async {
+    final response = await _apiClient.put(
+      ApiConstants.userMe,
       data: data,
     );
     return User.fromJson(response.data);
   }
 
-  Future<void> updateSettings(Map<String, dynamic> settings) async {
+  Future<void> updateTheme(String theme) async {
     await _apiClient.patch(
-      ApiConstants.userSettings,
-      data: settings,
+      ApiConstants.userTheme,
+      data: {'theme': theme},
+    );
+  }
+
+  Future<void> updateLanguage(String language) async {
+    await _apiClient.patch(
+      ApiConstants.userLanguage,
+      data: {'language': language},
     );
   }
 
   Future<void> changePassword(String oldPassword, String newPassword) async {
-    await _apiClient.patch(
-      ApiConstants.changePassword,
+    await _apiClient.put(
+      ApiConstants.userPassword,
       data: {
         'oldPassword': oldPassword,
         'newPassword': newPassword,

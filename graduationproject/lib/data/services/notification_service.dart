@@ -1,6 +1,6 @@
 import '../../../core/network/api_client.dart';
 import '../../../core/constants/api_constants.dart';
-import '../notification/notification_models.dart';
+import '../models/notification/notification_models.dart';
 
 class NotificationService {
   final ApiClient _apiClient;

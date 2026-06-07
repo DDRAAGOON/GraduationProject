@@ -1,6 +1,6 @@
 import '../../../core/network/api_client.dart';
 import '../../../core/constants/api_constants.dart';
-import '../company/company_models.dart';
+import '../models/company/company_models.dart';
 
 class CompanyService {
   final ApiClient _apiClient;
@@ -20,7 +20,7 @@ class CompanyService {
   }
 
   Future<Company> getCompanyDetails(String id) async {
-    final response = await _apiClient.get(ApiConstants.companyDetails(id));
+    final response = await _apiClient.get(ApiConstants.companyById(id));
     return Company.fromJson(response.data);
   }
 

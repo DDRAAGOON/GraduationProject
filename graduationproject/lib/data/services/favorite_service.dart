@@ -1,6 +1,6 @@
 import '../../../core/network/api_client.dart';
 import '../../../core/constants/api_constants.dart';
-import '../job/job_models.dart';
+import '../models/job/job_models.dart';
 
 class FavoriteService {
   final ApiClient _apiClient;

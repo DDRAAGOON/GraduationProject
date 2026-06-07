@@ -47,13 +47,13 @@ class RecruitmentSyncService {
   }) async {
     try {
       final authResponse = await _authService.login(
-        LoginRequest(email: email, password: password, role: expectedRole),
+        LoginRequest(email: email, password: password),
       );
 
       final user = authResponse.user;
       
       RecruitmentSyncStore.instance.updateCurrentUser(
-        name: user.name,
+        name: user.fullName ?? '',
         email: user.email,
         photoUrl: user.photoUrl,
       );
@@ -61,7 +61,7 @@ class RecruitmentSyncService {
       if (user.role == 'company') {
         CompanyStore.instance.setRegistrationData(
           companyId: user.id,
-          companyName: user.name,
+          companyName: user.fullName ?? '',
           email: user.email,
         );
         final fullProfile = await SessionManager.getCompanyFullProfile();
@@ -79,10 +79,11 @@ class RecruitmentSyncService {
     required String password,
     required String name,
     required String role,
+    required String phone,
   }) async {
     try {
       final authResponse = await _authService.register(
-        RegisterRequest(email: email, password: password, name: name, role: role),
+        RegisterRequest(email: email, password: password, fullName: name, role: role, phone: phone),
       );
       return authResponse.user;
     } on DioException catch (e) {
@@ -94,13 +95,13 @@ class RecruitmentSyncService {
     String? name,
     String? photoUrl,
   }) async {
-    final user = await _authService.updateProfile({
-      'name': name,
+    final user = await _authService.updateMe({
+      'fullName': name,
       'photoUrl': photoUrl,
     }..removeWhere((_, v) => v == null));
     
     RecruitmentSyncStore.instance.updateCurrentUser(
-      name: user.name,
+      name: user.fullName ?? '',
       photoUrl: user.photoUrl,
     );
     
@@ -241,14 +242,14 @@ class RecruitmentSyncService {
     if (!await isAuthenticated) return;
     try {
       final jobsResponse = await _apiClient.get(ApiConstants.jobs);
-      final appsResponse = await _apiClient.get(ApiConstants.applications);
-      final chatResponse = await _chatService.getChatRooms(); // Using chat rooms as "messages" here or adjust based on old state
+      final appsResponse = await _apiClient.get(ApiConstants.myApplications);
+      final chatResponse = await _chatService.getMyChats('me');
 
       // We still use maps for the store as it seems to expect them
       RecruitmentSyncStore.instance.replaceFromRemote(
         jobs: (jobsResponse.data as List).cast<Map<String, dynamic>>(),
         applications: (appsResponse.data as List).cast<Map<String, dynamic>>(),
-        messages: chatResponse.map((ChatRoom e) => {'id': e.id, 'text': e.lastMessage ?? ''}).toList(),
+        messages: chatResponse.map((e) => {'id': e['id'], 'text': e['lastMessage'] ?? ''}).toList(),
       );
     } catch (_) {}
   }

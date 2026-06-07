@@ -1,6 +1,6 @@
 import '../../../core/network/api_client.dart';
 import '../../../core/constants/api_constants.dart';
-import '../application/application_models.dart';
+import '../models/application/application_models.dart';
 
 class ApplicationService {
   final ApiClient _apiClient;
@@ -28,7 +28,7 @@ class ApplicationService {
   }
 
   Future<JobApplication> getApplicationDetails(String id) async {
-    final response = await _apiClient.get(ApiConstants.applicationDetails(id));
+    final response = await _apiClient.get(ApiConstants.applicationById(id));
     return JobApplication.fromJson(response.data);
   }
 
