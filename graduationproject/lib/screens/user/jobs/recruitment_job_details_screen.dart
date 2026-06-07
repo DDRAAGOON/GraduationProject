@@ -425,6 +425,7 @@ class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScree
                         ),
                         const SizedBox(height: 16),
                         
+                        /*
                         // Rating input section - ONLY visible after application
                         if (_hasApplied) ...[
                           Divider(color: isDark ? Colors.white10 : Colors.black12),
@@ -470,6 +471,7 @@ class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScree
                           Divider(color: isDark ? Colors.white10 : Colors.black12),
                           const SizedBox(height: 16),
                         ],
+                        */
 
                         // List of comments (always visible)
                         ..._mockReviews.map((review) => Padding(

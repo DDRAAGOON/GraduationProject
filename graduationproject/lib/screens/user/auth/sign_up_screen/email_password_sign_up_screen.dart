@@ -77,7 +77,46 @@ class _EmailPasswordSignUpScreenState extends State<EmailPasswordSignUpScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
                 children: [
                   // Title
-                  _buildTitle(t, isDark),
+                  Transform.translate(
+                    offset: const Offset(-70, -10),
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Image.asset(
+                          'assets/tradesman/تسجيل دخول جديد.png',
+                          width: double.infinity,
+                          height: 300,
+                          fit: BoxFit.contain,
+                        ),
+                        Transform.translate(
+                          offset: const Offset(-15, -20),
+                          child: Text.rich(
+                            TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: t.isAr ? 'أنشئ ' : 'Create ',
+                                  style: const TextStyle(color: Colors.orange),
+                                ),
+                                TextSpan(
+                                  text: t.isAr ? 'حسابك\n' : 'your new\n',
+                                  style: const TextStyle(color: Colors.black),
+                                ),
+                                TextSpan(
+                                  text: t.isAr ? 'الجديد' : 'account',
+                                  style: const TextStyle(color: Colors.white),
+                                ),
+                              ],
+                            ),
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                   
                   const SizedBox(height: 48),
 

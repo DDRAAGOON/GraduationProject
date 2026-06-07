@@ -20,6 +20,7 @@ class _PostJobState extends State<PostJob> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _skillController = TextEditingController();
+  final TextEditingController _capacityController = TextEditingController(text: "1");
 
   final List<String> _days = [
     "Saturday",
@@ -73,6 +74,7 @@ class _PostJobState extends State<PostJob> {
     _titleController.dispose();
     _descriptionController.dispose();
     _skillController.dispose();
+    _capacityController.dispose();
     super.dispose();
   }
 
@@ -105,6 +107,7 @@ class _PostJobState extends State<PostJob> {
       final store = RecruitmentSyncStore.instance;
       final selectedLocation =
           _selectedGovernorate ?? store.currentUserLocation;
+      final int capacity = int.tryParse(_capacityController.text) ?? 1;
 
       try {
         final String jobId = await RecruitmentSyncService.instance.postJob(
@@ -121,6 +124,7 @@ class _PostJobState extends State<PostJob> {
           qualifications: [],
           niceToHaves: [],
           benefits: [],
+          requiredCount: capacity,
         );
 
         if (!mounted) return;
@@ -254,6 +258,34 @@ class _PostJobState extends State<PostJob> {
                         en: "Work description is required",
                         ar: "وصف العمل مطلوب",
                       );
+                    }
+                    return null;
+                  },
+                ),
+              ),
+              Divider(
+                color: theme.dividerColor.withValues(alpha: 0.12),
+                height: 40,
+              ),
+
+              // Number of Services (Capacity)
+              _buildSideTitleSection(
+                isVertical: true,
+                title: t.tr(en: "Number of services", ar: "عدد الخدمات"),
+                subtitle: t.tr(
+                  en: "How many clients can you accept for this work?",
+                  ar: "كم عدد العملاء الذين يمكنك قبولهم لهذا العمل؟",
+                ),
+                child: _buildTextField(
+                  controller: _capacityController,
+                  hint: "1",
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return t.tr(en: "Required", ar: "مطلوب");
+                    }
+                    if (int.tryParse(value) == null || int.parse(value) <= 0) {
+                      return t.tr(en: "Invalid number", ar: "رقم غير صالح");
                     }
                     return null;
                   },

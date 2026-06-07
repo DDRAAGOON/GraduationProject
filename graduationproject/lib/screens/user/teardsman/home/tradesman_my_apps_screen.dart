@@ -19,95 +19,122 @@ class TradesmanMyAppsScreen extends StatelessWidget {
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final store = RecruitmentSyncStore.instance;
-    final mockWorks = store.getTradesmanPostedWorksPreview(isAr: isAr).map((work) {
-      final status = store.tradesmanJobStatus(work.id, work.status);
-      return TradesmanPostedWorkRow(
-        id: work.id,
-        title: work.title,
-        rate: work.rate,
-        status: store.translateTradesmanWorkStatus(status, isAr),
-        applicantsCount: work.applicantsCount,
-        postedAt: work.postedAt,
-      );
-    }).toList();
-    final totalApplicants =
-        mockWorks.fold<int>(0, (sum, row) => sum + row.applicantsCount);
-    final activeCount =
-        mockWorks.where((w) => w.status.contains(isAr ? 'نشط' : 'Active')).length;
 
-    final bgColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
+    return AnimatedBuilder(
+      animation: store,
+      builder: (context, _) {
+        final mockWorks = store
+            .getTradesmanPostedWorksPreview(isAr: isAr)
+            .where((work) => !store.isJobDeleted(work.id))
+            .map((work) {
+          final status = store.tradesmanJobStatus(work.id, work.status);
+          return TradesmanPostedWorkRow(
+            id: work.id,
+            title: work.title,
+            rate: work.rate,
+            status: store.translateTradesmanWorkStatus(status, isAr),
+            applicantsCount: work.applicantsCount,
+            postedAt: work.postedAt,
+          );
+        }).toList();
 
-    return Scaffold(
-      backgroundColor: bgColor,
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 10),
-            Text(
-              t.tr(en: 'My posted works', ar: 'قائمة الأعمال'),
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface,
-                fontWeight: FontWeight.w900,
-                fontSize: 22,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              isAr
-                  ? 'معاينة لأعمالك المنشورة وبيانات المتقدمين (بيانات تجريبية)'
-                  : 'Preview of your posted works and applicants (sample data)',
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
-                fontSize: 13,
-                height: 1.5,
-              ),
-            ),
-            const SizedBox(height: 30),
-            Row(
+        // Also add real jobs posted by this tradesman
+        final realJobs = store.jobs
+            .where((j) =>
+                j.companyName == store.currentUserName && !store.isJobDeleted(j.id))
+            .map((j) {
+          return TradesmanPostedWorkRow(
+            id: j.id,
+            title: j.title,
+            rate: "5.0",
+            status: isAr ? "نشط" : "Active",
+            applicantsCount: store.applications.where((a) => a.jobId == j.id).length,
+            postedAt: j.publishedAt,
+          );
+        }).toList();
+
+        final allWorks = [...realJobs, ...mockWorks];
+
+        final totalApplicants =
+            allWorks.fold<int>(0, (sum, row) => sum + row.applicantsCount);
+        final activeCount =
+            allWorks.where((w) => w.status.contains(isAr ? 'نشط' : 'Active')).length;
+
+        final bgColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
+
+        return Scaffold(
+          backgroundColor: bgColor,
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildSimpleStat(
-                  context,
-                  isAr ? 'الأعمال النشطة' : 'Active works',
-                  '$activeCount',
-                  Colors.blue,
+                const SizedBox(height: 10),
+                Text(
+                  t.tr(en: 'My posted works', ar: 'قائمة الأعمال'),
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 22,
+                  ),
                 ),
-                const SizedBox(width: 12),
-                _buildSimpleStat(
-                  context,
-                  isAr ? 'المتقدمين' : 'Applicants',
-                  '$totalApplicants',
-                  Colors.orange,
+                const SizedBox(height: 8),
+                Text(
+                  isAr
+                      ? 'معاينة لأعمالك المنشورة وبيانات المتقدمين'
+                      : 'Preview of your posted works and applicants',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
+                    fontSize: 13,
+                    height: 1.5,
+                  ),
                 ),
+                const SizedBox(height: 30),
+                Row(
+                  children: [
+                    _buildSimpleStat(
+                      context,
+                      isAr ? 'الأعمال النشطة' : 'Active works',
+                      '$activeCount',
+                      Colors.blue,
+                    ),
+                    const SizedBox(width: 12),
+                    _buildSimpleStat(
+                      context,
+                      isAr ? 'المتقدمين' : 'Applicants',
+                      '$totalApplicants',
+                      Colors.orange,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 30),
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.03),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      _buildHeaderCell(
+                        context,
+                        isAr ? 'العمل' : 'WORK',
+                        flex: 2,
+                        align: TextAlign.start,
+                      ),
+                      _buildHeaderCell(context, isAr ? 'الحالة' : 'STATUS'),
+                      _buildHeaderCell(context, isAr ? 'المتقدمين' : 'APPS'),
+                      _buildHeaderCell(context, isAr ? 'حذف' : 'DELETE'),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+                ...allWorks.map((work) => _buildWorkRow(context, work, isAr, isDark)),
               ],
             ),
-            const SizedBox(height: 30),
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.03),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                children: [
-                  _buildHeaderCell(
-                    context,
-                    isAr ? 'العمل' : 'WORK',
-                    flex: 2,
-                    align: TextAlign.start,
-                  ),
-                  _buildHeaderCell(context, isAr ? 'التقييم' : 'RATE'),
-                  _buildHeaderCell(context, isAr ? 'الحالة' : 'STATUS'),
-                  _buildHeaderCell(context, isAr ? 'المتقدمين' : 'APPLICANTS'),
-                ],
-              ),
-            ),
-            const SizedBox(height: 12),
-            ...mockWorks.map((work) => _buildWorkRow(context, work, isAr, isDark)),
-          ],
-        ),
-      ),
+          ),
+        );
+      }
     );
   }
 
@@ -183,22 +210,6 @@ class TradesmanMyAppsScreen extends StatelessWidget {
                   ),
                 ),
                 Expanded(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.star, color: Color(0xFFFFB300), size: 14),
-                      const SizedBox(width: 2),
-                      Text(
-                        work.rate,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
                   child: Text(
                     work.status,
                     textAlign: TextAlign.center,
@@ -219,10 +230,37 @@ class TradesmanMyAppsScreen extends StatelessWidget {
                     ),
                   ),
                 ),
+                IconButton(
+                  icon: const Icon(Icons.delete_outline, color: Colors.red, size: 20),
+                  onPressed: () => _showDeleteDialog(context, work, isAr),
+                ),
               ],
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  void _showDeleteDialog(BuildContext context, TradesmanPostedWorkRow work, bool isAr) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(isAr ? 'حذف العمل' : 'Delete Work'),
+        content: Text(isAr ? 'هل أنت متأكد من حذف هذا العمل؟' : 'Are you sure you want to delete this work?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(isAr ? 'إلغاء' : 'Cancel')),
+          TextButton(
+            onPressed: () {
+              RecruitmentSyncStore.instance.removeJob(work.id);
+              Navigator.pop(ctx);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(isAr ? 'تم الحذف بنجاح' : 'Deleted successfully')),
+              );
+            },
+            child: Text(isAr ? 'حذف' : 'Delete', style: const TextStyle(color: Colors.red)),
+          ),
+        ],
       ),
     );
   }

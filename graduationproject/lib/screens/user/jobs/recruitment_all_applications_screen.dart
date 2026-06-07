@@ -117,8 +117,10 @@ class _RecruitmentAllApplicationsScreenState extends State<RecruitmentAllApplica
                         children: [
                           _buildCardTab(isAr ? 'الكل' : 'All'),
                           _buildCardTab(isAr ? 'تم التوظيف' : 'Hired'),
+                          _buildCardTab(isAr ? 'تم قبولك' : 'Accepted'),
                           _buildCardTab(isAr ? 'قيد المراجعة' : 'Review'),
                           _buildCardTab(isAr ? 'تم التقديم' : 'Applied'),
+                          _buildCardTab(isAr ? 'مرفوض' : 'Rejected'),
                         ],
                       ),
                     ),
@@ -188,73 +190,195 @@ class _RecruitmentAllApplicationsScreenState extends State<RecruitmentAllApplica
                   final app = filteredApps[index];
                   final status = _translateStatus(app.status, isAr);
                   final color = _getStatusColor(app.status);
+                  final isAccepted = app.status.toLowerCase().contains('hire') || 
+                                   app.status.toLowerCase().contains('accept') ||
+                                   status == 'تم التوظيف' ||
+                                   status == 'Hired';
 
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF0D2D4D) : Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 5)],
-                    ),
-                    child: Row(
-                      children: [
-                        // Right: Logo (First child in Row for RTL)
-                        Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: Colors.grey.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(12),
+                  return InkWell(
+                    onTap: isAccepted ? () => _showRatingDialog(context, app, isAr) : null,
+                    borderRadius: BorderRadius.circular(20),
+                    child: Container(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: isDark ? const Color(0xFF0D2D4D) : Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 5)],
+                      ),
+                      child: Row(
+                        children: [
+                          // Right: Logo (First child in Row for RTL)
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Icon(Icons.business, size: 20, color: Color(0xFF49769F)),
                           ),
-                          child: const Icon(Icons.business, size: 20, color: Color(0xFF49769F)),
-                        ),
-                        const SizedBox(width: 12),
-                        // Middle: Job Info
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: isAr ? CrossAxisAlignment.start : CrossAxisAlignment.end,
+                          const SizedBox(width: 12),
+                          // Middle: Job Info
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: isAr ? CrossAxisAlignment.start : CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  app.jobTitle,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                                ),
+                                Text(
+                                  isAr ? 'دوام كامل •' : 'Full Time •',
+                                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Spacer(),
+                          // Left: Date (Top) and Status (Bottom)
+                          Column(
+                            crossAxisAlignment: isAr ? CrossAxisAlignment.end : CrossAxisAlignment.start,
                             children: [
                               Text(
-                                app.jobTitle,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                                '${app.updatedAt.day}/${app.updatedAt.month}/${app.updatedAt.year}',
+                                style: const TextStyle(fontSize: 11, color: Colors.grey),
                               ),
-                              Text(
-                                isAr ? 'دوام كامل •' : 'Full Time •',
-                                style: const TextStyle(fontSize: 12, color: Colors.grey),
+                              const SizedBox(height: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: color.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Text(
+                                  status,
+                                  style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.bold),
+                                ),
                               ),
+                              if (isAccepted)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 6),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFFF7A2A).withValues(alpha: 0.1),
+                                      borderRadius: BorderRadius.circular(20),
+                                      border: Border.all(color: const Color(0xFFFF7A2A).withValues(alpha: 0.5), width: 0.5),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Icon(Icons.star, size: 10, color: Color(0xFFFF7A2A)),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          isAr ? 'تقييم التجربة' : 'Rate Exp',
+                                          style: const TextStyle(
+                                            fontSize: 9,
+                                            color: Color(0xFFFF7A2A),
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
                             ],
                           ),
-                        ),
-                        const Spacer(),
-                        // Left: Date (Top) and Status (Bottom)
-                        Column(
-                          crossAxisAlignment: isAr ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '${app.updatedAt.day}/${app.updatedAt.month}/${app.updatedAt.year}',
-                              style: const TextStyle(fontSize: 11, color: Colors.grey),
-                            ),
-                            const SizedBox(height: 8),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: color.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Text(
-                                status,
-                                style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   );
                 },
               ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showRatingDialog(BuildContext context, RecruitmentApplication app, bool isAr) {
+    int localRating = 0;
+    final controller = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: Text(
+            isAr ? 'تقييم تجربة التوظيف' : 'Rate Your Experience',
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  isAr 
+                    ? 'تهانينا على قبولك في "${app.jobTitle}" مع "${app.companyName}"!\nيرجى تقييم تجربتك:'
+                    : 'Congratulations on being accepted for "${app.jobTitle}" at "${app.companyName}"!\nPlease rate your experience:',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 14),
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(5, (index) => SizedBox(
+                    width: 40,
+                    child: IconButton(
+                      icon: Icon(
+                        localRating > index ? Icons.star : Icons.star_border,
+                        color: Colors.orange,
+                        size: 28,
+                      ),
+                      onPressed: () => setDialogState(() => localRating = index + 1),
+                      padding: EdgeInsets.zero,
+                    ),
+                  )),
+                ),
+                const SizedBox(height: 15),
+                TextField(
+                  controller: controller,
+                  maxLines: 3,
+                  style: const TextStyle(fontSize: 14),
+                  decoration: InputDecoration(
+                    hintText: isAr ? 'اكتب تعليقك هنا...' : 'Write your feedback here...',
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    filled: true,
+                    fillColor: Colors.grey.withOpacity(0.05),
+                    contentPadding: const EdgeInsets.all(12),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(isAr ? 'إلغاء' : 'Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (localRating == 0) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(isAr ? 'يرجى اختيار التقييم أولاً' : 'Please select a rating')),
+                  );
+                  return;
+                }
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(isAr ? 'شكراً لتقييمك!' : 'Thank you for your feedback!'), backgroundColor: Colors.green),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF142C66),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+              child: Text(isAr ? 'إرسال' : 'Submit', style: const TextStyle(color: Colors.white)),
             ),
           ],
         ),

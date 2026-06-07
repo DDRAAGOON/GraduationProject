@@ -321,28 +321,6 @@ class _FindJobsState extends State<FindJobs> {
                           t,
                         ),
                         const SizedBox(height: 12),
-                        _buildJobCard(
-                          RecruitmentJob(
-                            id: 'closed-tradesman-job',
-                            title: 'كهربائي منازل',
-                            companyName: 'النور للخدمات',
-                            location: 'الإسكندرية',
-                            salaryRange: '4000-6000 ج.م',
-                            type: 'دوام كامل',
-                            status: 'Closed',
-                            category: 'tradesman',
-                            publishedAt: DateTime.now().subtract(const Duration(days: 5)),
-                            description: 'تم اكتمال العدد المطلوب لهذه الوظيفة.',
-                            responsibilities: const [],
-                            qualifications: const [],
-                            benefits: const [],
-                            acceptedCount: 15,
-                            capacity: 15,
-                            logoIcon: Icons.electric_bolt,
-                            specialTag: 'مكتمل',
-                          ),
-                          t,
-                        ),
                         const SizedBox(height: 20),
                         jobs.isEmpty
                             ? Center(
@@ -370,18 +348,6 @@ class _FindJobsState extends State<FindJobs> {
                                 },
                               ),
                         const SizedBox(height: 16),
-                        Center(
-                          child: Text(
-                            'اتمام',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.onSurface.withOpacity(0.5),
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
                       ],
                     ),
                   ),

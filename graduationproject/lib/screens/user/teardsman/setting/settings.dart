@@ -133,13 +133,6 @@ class _SettingsState extends State<Settings> {
               isDark: isDark,
               onSurfaceColor: onSurfaceColor,
             ),
-            _buildSettingItem(
-              icon: Icons.help_outline_rounded,
-              title: t.tr(en: "Help Center", ar: "مركز المساعدة"),
-              onTap: () => Navigator.of(context).pushNamed(AppRoutes.userHelpCenter),
-              isDark: isDark,
-              onSurfaceColor: onSurfaceColor,
-            ),
 
             const SizedBox(height: 40),
             _buildSettingItem(

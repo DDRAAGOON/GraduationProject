@@ -49,8 +49,8 @@ class _TradesmanApplyJobScreenState extends State<TradesmanApplyJobScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Image.asset(
-          'assets/company/logo/logo.png',
-          height: 150,
+          'assets/company/logo/لوجو جديد.png',
+          height: 50,
           fit: BoxFit.contain,
         ),
         centerTitle: true,
@@ -96,29 +96,14 @@ class _TradesmanApplyJobScreenState extends State<TradesmanApplyJobScreen> {
             maxLines: 5,
             hint: t.tr(en: 'Explain why you are the best fit...', ar: 'اشرح لماذا أنت الأنسب لهذه الوظيفة...')
           ),
-          _buildTextField(
-            context,
-            t.tr(en: 'Price for this job', ar: 'السعر لهذه الوظيفة'), 
-            _priceController, 
-            Icons.payments_outlined,
-            keyboardType: TextInputType.number,
-            hint: 'Example: 500 EGP'
-          ),
-          _buildTextField(
-            context,
-            t.tr(en: 'Time to Complete', ar: 'الوقت المتوقع للإنجاز'), 
-            _timeController, 
-            Icons.timer_outlined,
-            hint: 'Example: 2 days'
-          ),
           
           const SizedBox(height: 24),
           AppButton(
             label: t.tr(en: 'Submit Application', ar: 'إرسال الطلب'),
             loading: _loading,
-            backgroundColor: const Color(0xFF4A6ED1),
+            backgroundColor: const Color(0xFF142C66),
             onPressed: () async {
-              if (_coverLetterController.text.isEmpty || _priceController.text.isEmpty || _timeController.text.isEmpty) {
+              if (_coverLetterController.text.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text(t.tr(en: 'Please fill all fields', ar: 'يرجى ملء جميع الحقول'))),
                 );

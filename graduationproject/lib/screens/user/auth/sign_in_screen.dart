@@ -68,16 +68,48 @@ class _SignInScreenState extends State<SignInScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 60),
-                  Text(
-                    t.signInToAccount,
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface,
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
+                  const SizedBox(height: 5),
+                  Transform.translate(
+                    offset: const Offset(-70, -10),
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Image.asset(
+                          'assets/tradesman/تسجيل دخول جديد.png',
+                          width: double.infinity,
+                          height: 350,
+                          fit: BoxFit.contain,
+                        ),
+                        Transform.translate(
+                          offset: const Offset(-15, -20),
+                          child: Text.rich(
+                            TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: isAr ? 'تسجيل ' : 'Sign ',
+                                  style: const TextStyle(color: Colors.orange),
+                                ),
+                                TextSpan(
+                                  text: isAr ? 'الدخول إلى\n' : 'in to\n',
+                                  style: const TextStyle(color: Colors.black),
+                                ),
+                                TextSpan(
+                                  text: isAr ? 'حسابك' : 'your Account',
+                                  style: const TextStyle(color: Colors.white),
+                                ),
+                              ],
+                            ),
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [

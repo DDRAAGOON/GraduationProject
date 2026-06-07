@@ -267,6 +267,33 @@ class RecruitmentSyncStore extends ChangeNotifier {
   void _addInitialMockApplications() {
     final mocks = [
       RecruitmentApplication(
+        id: 'test_accepted_service',
+        jobId: 'service_plumber_2',
+        jobTitle: 'سباك لإصلاح أعطال طارئة',
+        companyName: 'الشركة المصرية للصيانة',
+        userName: 'User',
+        status: 'Accepted',
+        updatedAt: DateTime.now(),
+      ),
+      RecruitmentApplication(
+        id: 'test_rejected_app',
+        jobId: 'tech_ui_ux_1',
+        jobTitle: 'UI/UX Designer',
+        companyName: 'وكالة بيكسل الرقمية',
+        userName: 'User',
+        status: 'Rejected',
+        updatedAt: DateTime.now(),
+      ),
+      RecruitmentApplication(
+        id: 'test_accepted_app',
+        jobId: 'tech_flutter_1',
+        jobTitle: 'Junior Flutter Developer',
+        companyName: 'إبداع للبرمجيات',
+        userName: 'User',
+        status: 'Hired',
+        updatedAt: DateTime.now(),
+      ),
+      RecruitmentApplication(
         id: 'mock_app_1',
         jobId: 'mock_company_job_1',
         jobTitle: 'Senior Flutter Developer',
@@ -433,6 +460,7 @@ class RecruitmentSyncStore extends ChangeNotifier {
   final List<TradesmanRatingEntry> _ratingsGivenByTradesman =
       <TradesmanRatingEntry>[];
   final Set<String> _savedJobIds = <String>{};
+  final Set<String> _deletedJobIds = <String>{};
   final List<ServiceRequestPost> _serviceRequests = <ServiceRequestPost>[];
 
   String _currentUserName = 'User';
@@ -528,6 +556,9 @@ class RecruitmentSyncStore extends ChangeNotifier {
   List<RecruitmentJob> get filteredJobs {
     final query = _searchQuery.toLowerCase();
     return _jobs.where((job) {
+      // Hide full jobs
+      if (job.acceptedCount >= job.capacity) return false;
+
       final matchesQuery =
           query.isEmpty ||
           job.title.toLowerCase().contains(query) ||
@@ -691,8 +722,11 @@ class RecruitmentSyncStore extends ChangeNotifier {
   void removeJob(String jobId) {
     _jobs.removeWhere((j) => j.id == jobId);
     _savedJobIds.remove(jobId);
+    _deletedJobIds.add(jobId);
     notifyListeners();
   }
+
+  bool isJobDeleted(String jobId) => _deletedJobIds.contains(jobId);
 
   void companySendMessage(String text) {
     final newMessage = RecruitmentMessage(

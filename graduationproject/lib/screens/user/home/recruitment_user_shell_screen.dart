@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../app/router/app_router.dart';
 import '../../../shared/services/recruitment_sync_service.dart';
 import '../../../shared/state/recruitment_sync_store.dart';
@@ -11,6 +12,7 @@ import '../teardsman/onboarding/tradesman_verification_screen.dart';
 import '../teardsman/setting/settings.dart';
 import '../../company/widgets/glowing_chatbot_fab.dart';
 import '../../../shared/state/theme_controller.dart';
+import '../teardsman/nav_Botton_bar/nav_bottom_bar.dart';
 
 // Import New Public Tabs
 import 'tabs/home_tab.dart';
@@ -101,7 +103,10 @@ class _RecruitmentUserShellScreenState
             actions: [
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Image.asset('assets/tradesman/Group 289312.png', height: 45),
+                child: Image.asset(
+                  isDark ? 'assets/company/logo/لوجو جديد.png' : 'assets/company/logo/لوجو جديد لايت.png',
+                  height: 45,
+                ),
               ),
               const SizedBox(width: 8),
             ],
@@ -209,9 +214,34 @@ class _RecruitmentUserShellScreenState
           ListTile(
             leading: const Icon(Icons.swap_horiz, color: Color(0xFFFF7A2A)),
             title: Text(isAr ? 'التبديل لوضع الحرفي' : 'Switch to Tradesman Mode'),
-            onTap: () {
+            onTap: () async {
               Navigator.pop(context); // Close Drawer
-              _showTradesmanWarningDialog(context, isAr);
+              final store = RecruitmentSyncStore.instance;
+              final prefs = await SharedPreferences.getInstance();
+              
+              // Use email-specific key so new accounts on the same device need to verify
+              final String key = 'is_tradesman_verified_${store.currentUserEmail}';
+              final bool isComplete = prefs.getBool(key) ?? false;
+
+              if (isComplete) {
+                // Switch directly if already completed
+                store.updateUserProfile(
+                  fullName: store.currentUserName,
+                  title: store.currentUserTitle,
+                  role: 'Tradesman',
+                );
+                if (context.mounted) {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const Navbotton()),
+                  );
+                }
+              } else {
+                // Show warning if not completed
+                if (context.mounted) {
+                  _showTradesmanWarningDialog(context, isAr);
+                }
+              }
             },
           ),
           ListTile(
@@ -220,32 +250,6 @@ class _RecruitmentUserShellScreenState
             onTap: () {
               Navigator.pop(context);
               Navigator.of(context).push(MaterialPageRoute(builder: (context) => const Settings()));
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.help_outline, color: Color(0xFF213E75)),
-            title: Text(isAr ? 'المساعدة' : 'Help'),
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.of(context).pushNamed(AppRoutes.userHelpCenter);
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.info_outline, color: Color(0xFF213E75)),
-            title: Text(isAr ? 'عن التطبيق' : 'About App'),
-            onTap: () {
-              Navigator.pop(context);
-              showAboutDialog(
-                context: context,
-                applicationName: 'Jobito',
-                applicationVersion: '1.0.0',
-                applicationIcon: Image.asset('assets/tradesman/Group 289312.png', width: 50),
-                children: [
-                  Text(isAr 
-                    ? 'جوبيتو هو منصتك المفضلة لإيجاد أفضل فرص العمل والمحترفين في مصر.' 
-                    : 'Jobito is your go-to platform for finding the best job opportunities and professionals in Egypt.'),
-                ],
-              );
             },
           ),
           const Spacer(),

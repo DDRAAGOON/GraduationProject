@@ -211,33 +211,10 @@ class _RecruitmentJobApplicationScreenState
               ),
             ),
             const SizedBox(height: 16),
-            _buildDropdown(
-              label: isAr ? 'المحافظة' : 'Governorate',
-              value: _governorate,
-              hint: isAr ? 'اختر المحافظة' : 'Select governorate',
-              items: RecruitmentSyncStore.tradesmanGovernorateAreas.keys
-                  .map((g) => DropdownMenuItem(value: g, child: Text(g)))
-                  .toList(),
-              onChanged: (v) => setState(() {
-                _governorate = v;
-                _district = null;
-              }),
-            ),
-            const SizedBox(height: 12),
-            _buildDropdown(
-              label: isAr ? 'المنطقة' : 'Area',
-              value: _district,
-              hint: isAr ? 'اختر المنطقة' : 'Select area',
-              items: areas
-                  .map((a) => DropdownMenuItem(value: a, child: Text(a)))
-                  .toList(),
-              onChanged: (v) => setState(() => _district = v),
-            ),
-            const SizedBox(height: 12),
             _buildInputField(
               isAr ? 'تفاصيل العنوان' : 'Address details',
               _addressDetail,
-              hint: isAr ? 'الشارع، المبنى، رقم الشقة...' : 'Street, building, apartment...',
+              hint: isAr ? 'المحافظة، المنطقة، الشارع...' : 'Governorate, area, street...',
             ),
             const SizedBox(height: 12),
             _buildInputField(
@@ -252,10 +229,6 @@ class _RecruitmentJobApplicationScreenState
             _buildInputField(
               isAr ? 'رابط معرض الأعمال (Portfolio)' : 'Portfolio URL',
               _portfolio,
-            ),
-            _buildInputField(
-              isAr ? 'رابط LinkedIn' : 'LinkedIn URL',
-              _linkedIn,
             ),
             const SizedBox(height: 8),
             Text(
@@ -315,7 +288,7 @@ class _RecruitmentJobApplicationScreenState
                 ? (isAr ? 'إرسال الطلب' : 'Send request')
                 : (isAr ? 'تقديم الطلب' : 'Submit application'),
             loading: _loading,
-            backgroundColor: const Color(0xFF4A6ED1),
+            backgroundColor: const Color(0xFF142C66),
             onPressed: _loading ? null : () => _submit(isAr),
           ),
           const SizedBox(height: 24),

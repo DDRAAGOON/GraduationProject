@@ -18,6 +18,7 @@ class _ProfileLoginDetailsScreenState extends State<ProfileLoginDetailsScreen> {
   bool _obscureCurrent = true;
   bool _obscureNew = true;
   bool _obscureConfirm = true;
+  bool _isDeletionRequested = false;
 
   @override
   void dispose() {
@@ -59,6 +60,87 @@ class _ProfileLoginDetailsScreenState extends State<ProfileLoginDetailsScreen> {
     _currentPasswordController.clear();
     _newPasswordController.clear();
     _confirmPasswordController.clear();
+  }
+
+  void _showDeleteConfirmation() {
+    final t = AppLocalizations.of(context);
+    final isAr = t.isAr;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text(
+          isAr ? "حذف الحساب" : "Delete Account",
+          style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red),
+        ),
+        content: Text(
+          isAr 
+            ? "هل أنت متأكد من رغبتك في حذف حسابك؟ لا يمكن التراجع عن هذا الإجراء." 
+            : "Are you sure you want to delete your account? This action cannot be undone.",
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(t.cancel, style: const TextStyle(color: Colors.grey)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _processDeletionRequest();
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: Text(isAr ? "نعم، حذف" : "Yes, Delete", style: const TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _processDeletionRequest() {
+    final t = AppLocalizations.of(context);
+    final isAr = t.isAr;
+
+    setState(() => _isDeletionRequested = true);
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Icon(Icons.info_outline, color: Colors.orange, size: 48),
+        content: Text(
+          isAr 
+            ? "تم استلام طلبك. سوف يتم حذف حسابك نهائياً خلال 10 أيام. يمكنك إلغاء الطلب في أي وقت قبل ذلك." 
+            : "Request received. Your account will be permanently deleted within 10 days. You can cancel the request at any time before that.",
+          textAlign: TextAlign.center,
+        ),
+        actions: [
+          Center(
+            child: ElevatedButton(
+              onPressed: () => Navigator.pop(context),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF142C66),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+              child: Text(isAr ? "حسناً" : "OK", style: const TextStyle(color: Colors.white)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _cancelDeletionRequest() {
+    final t = AppLocalizations.of(context);
+    final isAr = t.isAr;
+
+    setState(() => _isDeletionRequested = false);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(isAr ? "تم إلغاء طلب حذف الحساب بنجاح" : "Account deletion request cancelled successfully"),
+        backgroundColor: Colors.green,
+      ),
+    );
   }
 
   void _showError(String message) {
@@ -158,20 +240,49 @@ class _ProfileLoginDetailsScreenState extends State<ProfileLoginDetailsScreen> {
             Divider(color: onSurfaceColor.withValues(alpha: 0.12), height: 1),
             const SizedBox(height: 30),
 
-            // Save Button
+            // Save & Delete Buttons
             SizedBox(
               width: double.infinity,
-              child: Align(
-                alignment: isAr ? Alignment.centerLeft : Alignment.centerRight,
-                child: ElevatedButton(
-                  onPressed: _updatePassword,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF142C66),
-                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+              child: Row(
+                mainAxisAlignment: isAr ? MainAxisAlignment.start : MainAxisAlignment.end,
+                children: [
+                  if (_isDeletionRequested)
+                    ElevatedButton(
+                      onPressed: _cancelDeletionRequest,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                      ),
+                      child: Text(
+                        isAr ? "إلغاء طلب الحذف" : "Cancel Deletion", 
+                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)
+                      ),
+                    )
+                  else
+                    ElevatedButton(
+                      onPressed: _showDeleteConfirmation,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                      ),
+                      child: Text(
+                        isAr ? "حذف الحساب" : "Delete Account", 
+                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)
+                      ),
+                    ),
+                  const SizedBox(width: 12),
+                  ElevatedButton(
+                    onPressed: _updatePassword,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF142C66),
+                      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                    ),
+                    child: Text(t.tr(en: "Save", ar: "حفظ"), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                   ),
-                  child: Text(t.tr(en: "Save", ar: "حفظ"), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                ),
+                ],
               ),
             ),
             const SizedBox(height: 100),

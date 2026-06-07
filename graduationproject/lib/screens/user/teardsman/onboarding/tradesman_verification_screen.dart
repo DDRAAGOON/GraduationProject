@@ -5,6 +5,8 @@ import 'package:graduationproject/shared/l10n/app_localizations.dart';
 import 'package:graduationproject/shared/state/recruitment_sync_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../../app/router/app_router.dart';
+
 class TradesmanVerificationScreen extends StatefulWidget {
   const TradesmanVerificationScreen({super.key});
 
@@ -83,10 +85,12 @@ class _TradesmanVerificationScreenState
     }
 
     setState(() => _isLoading = true);
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('tradesman_verification_complete', true);
-    
     final store = RecruitmentSyncStore.instance;
+    final prefs = await SharedPreferences.getInstance();
+    
+    // Save with email-specific key
+    await prefs.setBool('is_tradesman_verified_${store.currentUserEmail}', true);
+
     store.updateUserProfile(
       fullName: store.currentUserName,
       title: _selectedTrades.join(', '),
@@ -95,6 +99,7 @@ class _TradesmanVerificationScreenState
     );
 
     if (mounted) {
+      setState(() => _isLoading = false);
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const Navbotton()),

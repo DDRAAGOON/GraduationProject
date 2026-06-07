@@ -176,9 +176,48 @@ class _RecruitmentUserSignInScreenState
             child: ListView(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
               children: [
-                const SizedBox(height: 20),
+                const SizedBox(height: 5),
                 // Title
-                _buildTitle(t, isDark),
+                Transform.translate(
+                  offset: const Offset( -70, -10),
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Image.asset(
+                        'assets/tradesman/تسجيل دخول جديد.png',
+                        width: double.infinity,
+                        height: 300,
+                        fit: BoxFit.contain,
+                      ),
+                    Transform.translate(
+                      offset: const Offset(-15, -20),
+                      child: Text.rich(
+                        TextSpan(
+                          children: [
+                            TextSpan(
+                              text: t.isAr ? 'تسجيل ' : 'Sign ',
+                              style: const TextStyle(color: Colors.orange),
+                            ),
+                            TextSpan(
+                              text: t.isAr ? 'الدخول إلى\n' : 'in to\n',
+                              style: const TextStyle(color: Colors.black),
+                            ),
+                            TextSpan(
+                              text: t.isAr ? 'حسابك' : 'your Account',
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                          ],
+                        ),
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    ],
+                  ),
+                ),
                 
                 const SizedBox(height: 60),
 

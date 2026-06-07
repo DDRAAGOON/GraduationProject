@@ -94,17 +94,46 @@ class _RecruitmentCompanySignInScreenState
         child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
-            const SizedBox(height: 20),
-            Text(
-              t.welcomeBackCompany,
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.w800,
+            const SizedBox(height: 5),
+            Transform.translate(
+              offset: const Offset(-70, -10),
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Image.asset(
+                    'assets/tradesman/تسجيل دخول جديد.png',
+                    width: double.infinity,
+                    height: 300,
+                    fit: BoxFit.contain,
                   ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              t.signInCompanyAccountSub,
-              style: Theme.of(context).textTheme.bodyMedium,
+                  Transform.translate(
+                    offset: const Offset(-15, -20),
+                    child: Text.rich(
+                      TextSpan(
+                        children: [
+                          TextSpan(
+                            text: t.isAr ? 'تسجيل ' : 'Sign ',
+                            style: const TextStyle(color: Colors.orange),
+                          ),
+                          TextSpan(
+                            text: t.isAr ? 'الدخول إلى\n' : 'in to\n',
+                            style: const TextStyle(color: Colors.black),
+                          ),
+                          TextSpan(
+                            text: t.isAr ? 'حسابك' : 'your Account',
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                        ],
+                      ),
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 24),
             AppTextField(

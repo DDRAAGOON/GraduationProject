@@ -97,7 +97,9 @@ class _CompanyDashboardScreenState extends State<CompanyDashboardScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Image.asset(
-                AppImages.jobitoTradesman,
+                Theme.of(context).brightness == Brightness.dark 
+                  ? 'assets/company/logo/لوجو جديد.png' 
+                  : 'assets/company/logo/لوجو جديد لايت.png',
                 height: 35,
                 fit: BoxFit.contain,
               ),

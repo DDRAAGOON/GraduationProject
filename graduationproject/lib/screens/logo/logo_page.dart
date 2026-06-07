@@ -62,21 +62,54 @@ class LogoPage extends StatelessWidget {
                         // Main Illustration
                         Center(
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8),
-                            child: ConstrainedBox(
-                              constraints: BoxConstraints(
-                                maxHeight: size.height * 0.85, 
-                              ),
-                              child: Image.asset(
-                                'assets/tradesman/Group 289310.png',
-                                width: size.width,
-                                fit: BoxFit.contain,
-                                errorBuilder: (_, __, ___) => const Icon(
-                                  Icons.auto_awesome_mosaic,
-                                  size: 150,
-                                  color: Colors.grey,
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Image.asset(
+                                  isDark ? 'assets/company/logo/لوجو جديد.png' : 'assets/company/logo/لوجو جديد لايت.png',
+                                  width: size.width * 0.8,
+                                  fit: BoxFit.contain,
+                                  errorBuilder: (_, __, ___) => const Icon(
+                                    Icons.auto_awesome_mosaic,
+                                    size: 150,
+                                    color: Colors.grey,
+                                  ),
                                 ),
-                              ),
+                                const SizedBox(height: 24),
+                                RichText(
+                                  textAlign: TextAlign.center,
+                                  text: TextSpan(
+                                    style: const TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.w900,
+                                      fontFamily: 'Inter',
+                                    ),
+                                    children: [
+                                      TextSpan(
+                                        text: t.isAr ? 'عملك ' : 'Your work ',
+                                        style: TextStyle(color: isDark ? Colors.white : const Color(0xFF142C66)),
+                                      ),
+                                      TextSpan(
+                                        text: t.isAr ? 'مهمتنا' : 'our mission',
+                                        style: const TextStyle(color: Color(0xFFFF7A2A)),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                                Text(
+                                  t.isAr
+                                    ? 'منصة واحدة، احتمالات كثيرة' 
+                                    : 'one platform many possibilities',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                    color: isDark ? const Color(0xFFFF7A2A) : const Color(0xFF213E75),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),

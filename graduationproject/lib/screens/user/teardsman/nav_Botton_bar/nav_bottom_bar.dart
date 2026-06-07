@@ -16,6 +16,8 @@ import '../setting/settings.dart';
 import '../home/tradesman_home_screen.dart';
 import '../post/post_job.dart';
 import '../profile/tradesman_ratings_hub_screen.dart';
+import '../../../company/widgets/glowing_chatbot_fab.dart';
+import '../../messages/chat_thread_screen.dart';
 
 class Navbotton extends StatefulWidget {
   const Navbotton({super.key});
@@ -106,7 +108,7 @@ class _NavbottonState extends State<Navbotton> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8),
                     child: Image.asset(
-                      AppImages.jobitoTradesman,
+                      isDark ? 'assets/company/logo/لوجو جديد.png' : 'assets/company/logo/لوجو جديد لايت.png',
                       height: 50,
                       fit: BoxFit.contain,
                     ),
@@ -116,8 +118,23 @@ class _NavbottonState extends State<Navbotton> {
             ),
           ),
           body: _pages[_selectedIndex],
-          floatingActionButton:
-              null, // Removed Chatbot icon from all pages for Tradesman
+          floatingActionButton: _selectedIndex == 1
+              ? GlowingChatbotFAB(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ChatThreadScreen(
+                          name: _isAr
+                              ? 'مساعد جوبيتو الذكي'
+                              : 'Jobito AI Assistant',
+                          image: AppImages.jobito,
+                        ),
+                      ),
+                    );
+                  },
+                )
+              : null,
           bottomNavigationBar: NavigationBarTheme(
             data: NavigationBarThemeData(
               labelTextStyle: WidgetStateProperty.resolveWith((states) {

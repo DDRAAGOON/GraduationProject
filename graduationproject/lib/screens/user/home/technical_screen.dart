@@ -670,6 +670,7 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
     final List<RecruitmentJob> categoryJobs = store.jobs
         .where(
           (job) =>
+              job.acceptedCount < job.capacity &&
               (job.category.toLowerCase() == _selectedCategory.toLowerCase() ||
                (_selectedCategory.toLowerCase() == 'service' && job.category.toLowerCase() == 'tradesman')) &&
               job.title.toLowerCase().contains(query),
