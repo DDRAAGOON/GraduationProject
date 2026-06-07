@@ -47,7 +47,7 @@ class _RecruitmentCompanySignInScreenState
     if (!_validate()) return;
     setState(() => _loading = true);
     try {
-      final user = await RecruitmentSyncService.instance.login(
+      final user = await RecruitmentSyncService.instance.loginLegacy(
         email: _email.text.trim(),
         password: _password.text,
         expectedRole: 'company',

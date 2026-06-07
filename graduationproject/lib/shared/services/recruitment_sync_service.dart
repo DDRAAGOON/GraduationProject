@@ -1,128 +1,158 @@
 import 'dart:async';
 import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
 
-import '../../data/api/company_api_client.dart';
+import '../../core/constants/api_constants.dart';
+import '../../core/network/api_client.dart';
+import '../../core/network/secure_storage.dart';
+import '../../data/services/auth_service.dart';
+import '../../data/services/job_service.dart';
+import '../../data/services/application_service.dart';
+import '../../data/services/chat_service.dart';
+import '../../data/models/auth/auth_models.dart';
+import '../../data/models/job/job_models.dart';
+import '../../data/models/application/application_models.dart';
+import '../../data/models/chat/chat_models.dart';
 import '../state/company_store.dart';
 import '../state/recruitment_sync_store.dart';
 import 'session_manager.dart';
 
 class RecruitmentSyncService {
-  RecruitmentSyncService._();
+  RecruitmentSyncService._() {
+    _apiClient = ApiClient();
+    _authService = AuthService(_apiClient);
+    _jobService = JobService(_apiClient);
+    _applicationService = ApplicationService(_apiClient);
+    _chatService = ChatService(_apiClient);
+  }
 
   static final RecruitmentSyncService instance = RecruitmentSyncService._();
 
-  final CompanyApiClient _client = CompanyApiClient();
-  Timer? _timer;
-  bool get isAuthenticated => _client.hasToken;
+  late final ApiClient _apiClient;
+  late final AuthService _authService;
+  late final JobService _jobService;
+  late final ApplicationService _applicationService;
+  late final ChatService _chatService;
 
-  Future<Map<String, dynamic>> login({
+  Timer? _timer;
+
+  Future<bool> get isAuthenticated async {
+    final token = await SecureStorage.getToken();
+    return token != null && token.isNotEmpty;
+  }
+
+  Future<Map<String, dynamic>> googleLogin(String idToken) async {
+    try {
+      await _authService.googleLogin(idToken);
+      final user = await _authService.getMe();
+      return {
+        'id': user.id,
+        'role': user.role,
+        'fullName': user.fullName,
+        'email': user.email,
+        'photoUrl': user.photoUrl,
+      };
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<User?> login({
     required String email,
     required String password,
     String? expectedRole,
   }) async {
     try {
-      final auth = await _client.login(
-        email: email.trim(),
-        password: password,
-        role: expectedRole,
+      final authResponse = await _authService.login(
+        LoginRequest(email: email, password: password),
       );
 
-      final user = auth['user'] as Map<String, dynamic>?;
-      final role = user?['role']?.toString().toLowerCase().trim();
-      final token = auth['token']?.toString().trim();
-
-      if (token == null || token.isEmpty) {
-        throw Exception('Login response missing token');
-      }
-      
-      _client.setToken(token);
-
-      if (user != null) {
-        final String name = user['name']?.toString() ?? 'User';
-        RecruitmentSyncStore.instance.updateCurrentUser(
-          name: name,
-          email: user['email']?.toString(),
-          photoUrl: user['photoUrl']?.toString(),
-        );
-
-        if (role == 'company') {
-          CompanyStore.instance.setRegistrationData(
-            companyId: user['id']?.toString(),
-            companyName: name,
-            email: user['email']?.toString(),
-          );
-          final fullProfile = await SessionManager.getCompanyFullProfile();
-          await CompanyStore.instance.loadFromSession(fullProfile);
-        }
-      }
-
-      return user ?? {};
+      return authResponse.user;
     } on DioException catch (e) {
       throw Exception(_handleDioError(e));
     }
   }
 
-  Future<Map<String, dynamic>> googleLogin(String idToken) async {
+  Future<Map<String, dynamic>> loginLegacy({
+    required String email,
+    required String password,
+    String? expectedRole,
+  }) async {
     try {
-      final auth = await _client.googleLogin(idToken: idToken);
-      final token = auth['token']?.toString().trim();
-      if (token != null) _client.setToken(token);
-      return auth;
-    } catch (e) {
-      rethrow;
+      final authResponse = await _authService.login(
+        LoginRequest(email: email, password: password),
+      );
+
+      final user = authResponse.user;
+      
+      RecruitmentSyncStore.instance.updateCurrentUser(
+        name: user.fullName ?? '',
+        email: user.email,
+        photoUrl: user.photoUrl,
+      );
+
+      if (user.role == 'company') {
+        CompanyStore.instance.setRegistrationData(
+          companyId: user.id,
+          companyName: user.fullName ?? '',
+          email: user.email,
+        );
+        final fullProfile = await SessionManager.getCompanyFullProfile();
+        await CompanyStore.instance.loadFromSession(fullProfile);
+      }
+
+      return {
+        'id': user.id,
+        'role': user.role,
+        'fullName': user.fullName,
+        'name': user.fullName,
+        'email': user.email,
+        'photoUrl': user.photoUrl,
+      };
+    } on DioException catch (e) {
+      throw Exception(_handleDioError(e));
     }
   }
 
-  Future<Map<String, dynamic>> register({
+  Future<User> register({
     required String email,
     required String password,
     required String name,
     required String role,
+    String phone = '',
   }) async {
     try {
-      final auth = await _client.register(
-        email: email.trim(),
-        password: password,
-        name: name.trim(),
-        role: role.toLowerCase().trim(),
+      final authResponse = await _authService.register(
+        RegisterRequest(email: email, password: password, fullName: name, role: role, phone: phone),
       );
-
-      final token = auth['token']?.toString().trim();
-      if (token != null) _client.setToken(token);
-
-      return auth;
-    } catch (e) {
-      rethrow;
+      return authResponse.user;
+    } on DioException catch (e) {
+      throw Exception(_handleDioError(e));
     }
   }
 
-  Future<Map<String, dynamic>> updateProfile({
+  Future<User> updateProfile({
     String? name,
     String? photoUrl,
   }) async {
-    _assertAuthenticated();
-    final response = await _client.updateProfile(name: name, photoUrl: photoUrl);
+    final user = await _authService.updateMe({
+      'fullName': name,
+      'photoUrl': photoUrl,
+    }..removeWhere((_, v) => v == null));
     
-    // Update local store state so UI updates immediately
     RecruitmentSyncStore.instance.updateCurrentUser(
-      name: name,
-      photoUrl: photoUrl,
+      name: user.fullName ?? '',
+      photoUrl: user.photoUrl,
     );
     
-    return response;
+    return user;
   }
 
   Future<void> updateStatus({
     required String applicationId,
     required String status,
   }) async {
-    _assertAuthenticated();
     try {
-      await _client.updateApplicationStatus(
-        applicationId: applicationId,
-        status: status,
-      );
+      await _applicationService.updateApplicationStatus(applicationId, status);
       await _pullServerState();
     } catch (_) {}
   }
@@ -145,33 +175,34 @@ class RecruitmentSyncService {
     DateTime? deadline,
     String? status,
   }) async {
-    _assertAuthenticated();
     try {
-      await _client.updateJob(jobId, {
-        'title': title,
-        'companyName': companyName,
-        'location': location,
-        'salaryRange': salaryRange,
-        'type': type,
-        'description': description,
-        'responsibilities': responsibilities,
-        'qualifications': qualifications,
-        'niceToHaves': niceToHaves,
-        'benefits': benefits,
-        'category': category,
-        'tags': tags,
-        'requiredCount': requiredCount,
-        if (deadline != null) 'deadline': deadline.toUtc().toIso8601String(),
-        if (status != null) 'status': status,
-      });
+      await _jobService.updateJob(
+        jobId,
+        CreateJobRequest(
+          title: title,
+          companyName: companyName,
+          location: location,
+          salaryRange: salaryRange,
+          type: type,
+          description: description,
+          responsibilities: responsibilities,
+          qualifications: qualifications,
+          niceToHaves: niceToHaves,
+          benefits: benefits,
+          category: category,
+          tags: tags,
+          requiredCount: requiredCount,
+          deadline: deadline,
+          status: status,
+        ),
+      );
       await _pullServerState();
     } catch (_) {}
   }
 
   Future<void> deleteJob(String jobId) async {
-    _assertAuthenticated();
     try {
-      await _client.deleteJob(jobId);
+      await _jobService.deleteJob(jobId);
       await _pullServerState();
     } catch (_) {}
   }
@@ -192,26 +223,27 @@ class RecruitmentSyncService {
     int requiredCount = 1,
     DateTime? deadline,
   }) async {
-    _assertAuthenticated();
     try {
-      final response = await _client.createJob({
-        'title': title,
-        'companyName': companyName,
-        'location': location,
-        'salaryRange': salaryRange,
-        'type': type,
-        'description': description,
-        'responsibilities': responsibilities,
-        'qualifications': qualifications,
-        'niceToHaves': niceToHaves,
-        'benefits': benefits,
-        'tags': tags,
-        'category': category,
-        'requiredCount': requiredCount,
-        if (deadline != null) 'deadline': deadline.toIso8601String(),
-      });
+      final job = await _jobService.createJob(
+        CreateJobRequest(
+          title: title,
+          companyName: companyName,
+          location: location,
+          salaryRange: salaryRange,
+          type: type,
+          description: description,
+          responsibilities: responsibilities,
+          qualifications: qualifications,
+          niceToHaves: niceToHaves,
+          benefits: benefits,
+          category: category,
+          tags: tags,
+          requiredCount: requiredCount,
+          deadline: deadline,
+        ),
+      );
       await _pullServerState();
-      return response['id']?.toString() ?? '';
+      return job.id;
     } catch (e) {
       throw Exception('فشل نشر الوظيفة');
     }
@@ -221,9 +253,10 @@ class RecruitmentSyncService {
     required String jobId,
     required String userName,
   }) async {
-    _assertAuthenticated();
     try {
-      await _client.createApplication(jobId: jobId, userName: userName);
+      await _applicationService.applyForJob(
+        CreateApplicationRequest(jobId: jobId, userName: userName),
+      );
       await _pullServerState();
     } catch (_) {}
   }
@@ -245,15 +278,17 @@ class RecruitmentSyncService {
   }
 
   Future<void> _pullServerState() async {
-    if (!isAuthenticated) return;
+    if (!await isAuthenticated) return;
     try {
-      final jobs = await _client.fetchJobs();
-      final applications = await _client.fetchApplications();
-      final messages = await _client.fetchMessages();
+      final jobsResponse = await _apiClient.get(ApiConstants.jobs);
+      final appsResponse = await _apiClient.get(ApiConstants.myApplications);
+      final chatResponse = await _chatService.getMyChats('me');
+
+      // We still use maps for the store as it seems to expect them
       RecruitmentSyncStore.instance.replaceFromRemote(
-        jobs: jobs,
-        applications: applications,
-        messages: messages,
+        jobs: (jobsResponse.data as List).cast<Map<String, dynamic>>(),
+        applications: (appsResponse.data as List).cast<Map<String, dynamic>>(),
+        messages: chatResponse.map((e) => {'id': e['id'], 'text': e['lastMessage'] ?? ''}).toList(),
       );
     } catch (_) {}
   }
@@ -266,15 +301,9 @@ class RecruitmentSyncService {
     return 'حدث خطأ غير متوقع';
   }
 
-  void logout() {
-    _client.clearToken();
+  Future<void> logout() async {
+    await _authService.logout();
     stopPolling();
-  }
-
-  void _assertAuthenticated() {
-    if (!isAuthenticated) {
-      throw Exception('Not authenticated. Please login first.');
-    }
   }
 
   // Legacy support
