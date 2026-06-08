@@ -8,11 +8,11 @@
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:flutter/material.dart';
-import 'package:graduationproject/screens/company/auth/sign_in_screen.dart';
+import 'package:graduationproject/screens/company/auth/login_screen.dart';
 
 void main() {
-  testWidgets('Company SignIn boots', (WidgetTester tester) async {
-    await tester.pumpWidget(const MaterialApp(home: CompanySignInScreen()));
+  testWidgets('Company Login boots', (WidgetTester tester) async {
+    await tester.pumpWidget(const MaterialApp(home: CompanyLoginScreen()));
     await tester.pump();
     expect(find.textContaining('Sign in'), findsWidgets);
   });

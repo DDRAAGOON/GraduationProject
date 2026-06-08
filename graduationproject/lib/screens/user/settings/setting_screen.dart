@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../app/router/app_router.dart';
 import '../../../shared/l10n/app_localizations.dart';
+import '../../../shared/services/recruitment_sync_service.dart';
+import '../../../shared/services/session_manager.dart';
 import '../profile/edit_profile_screen.dart';
 import '../profile/profile_login_details_screen.dart';
 import '../profile/setting_profile/notifications.dart';
@@ -36,12 +38,16 @@ class _SettingScreenState extends State<SettingScreen> {
             child: Text(t.cancel, style: const TextStyle(color: Colors.grey)),
           ),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(context); // Close dialog
-              Navigator.of(context).pushNamedAndRemoveUntil(
-                AppRoutes.roleSelection, // Assuming roleSelection is the initial/sign-in entry
-                (route) => false,
-              );
+              await SessionManager.logoutUser();
+              await RecruitmentSyncService.instance.logout();
+              if (context.mounted) {
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                  AppRoutes.roleSelection, // Assuming roleSelection is the initial/sign-in entry
+                      (route) => false,
+                );
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.redAccent,
@@ -88,7 +94,7 @@ class _SettingScreenState extends State<SettingScreen> {
               style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 14, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
-            
+
             _buildSettingItem(
               icon: Icons.person_outline,
               title: t.tr(en: "Profile Setting", ar: "إعدادات الملف الشخصي"),

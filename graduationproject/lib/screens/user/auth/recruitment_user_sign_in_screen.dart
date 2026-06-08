@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:icons_plus/icons_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-
 import '../../../app/router/app_router.dart';
 import '../../../shared/services/session_manager.dart';
 import '../../../shared/services/recruitment_sync_service.dart';
@@ -53,14 +51,25 @@ class _RecruitmentUserSignInScreenState
     if (!mounted) return;
     setState(() => _loading = false);
 
+    // التحقق هل المستخدم قادم من عملية إنشاء حساب جديد أم لا
+    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final bool isNewUser = args?['fromSignUp'] ?? false;
+
+    if (isNewUser) {
+      Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.userCompleteProfile, (route) => false);
+    } else {
+      Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.userWorkspace, (route) => false);
+    }
+    return;
+
     try {
-      final user = await RecruitmentSyncService.instance.loginLegacy(
+      final user = await RecruitmentSyncService.instance.login(
         email: _email.text.trim(),
         password: _password.text,
         expectedRole: 'user',
       );
 
-      final name = user['name']?.toString() ?? 'User';
+      final name = user?.fullName ?? user?.email ?? 'User';
 
       await SessionManager.saveUserSession(
         email: _email.text.trim(),
@@ -286,32 +295,6 @@ class _RecruitmentUserSignInScreenState
     );
   }
 
-  Widget _buildTitle(AppLocalizations t, bool isDark) {
-    return RichText(
-      text: TextSpan(
-        style: const TextStyle(
-          fontSize: 34,
-          fontWeight: FontWeight.bold,
-          height: 1.2,
-          fontFamily: 'Inter',
-        ),
-        children: [
-          TextSpan(
-            text: t.isAr ? 'تسجيل الدخول ' : 'Sign ',
-            style: const TextStyle(color: Color(0xFFF77F32)),
-          ),
-          TextSpan(
-            text: t.isAr ? 'إلى ' : 'in to ',
-            style: TextStyle(color: isDark ? Colors.white : Colors.black),
-          ),
-          TextSpan(
-            text: t.isAr ? 'حسابك' : 'your\nAccount',
-            style: const TextStyle(color: Color(0xFF0051DD)),
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildLabel(String text, Color color) {
     return Text(

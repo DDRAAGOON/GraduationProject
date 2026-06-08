@@ -9,7 +9,6 @@ import 'package:graduationproject/screens/user/home/recruitment_user_shell_scree
 import 'package:graduationproject/shared/state/recruitment_sync_store.dart';
 import 'package:graduationproject/shared/utils/image_helper.dart';
 import 'package:graduationproject/screens/user/notifications/notifications_screen.dart';
-import 'package:graduationproject/screens/company/help/help_center_screen.dart';
 import 'package:graduationproject/app/router/app_router.dart';
 import 'package:graduationproject/shared/services/recruitment_sync_service.dart';
 import '../setting/settings.dart';
@@ -288,35 +287,6 @@ class _NavbottonState extends State<Navbotton> {
     );
   }
 
-  void _showAboutDialog(BuildContext context, bool isAr) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(isAr ? 'عن جوبيتو' : 'About Jobito'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Image.asset(AppImages.jobito, height: 60),
-            const SizedBox(height: 16),
-            Text(
-              isAr
-                  ? 'جوبيتو هو منصتك المثالية للبحث عن وظائف وتوظيف المحترفين في مصر.'
-                  : 'Jobito is your ideal platform for job searching and professional recruitment in Egypt.',
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8),
-            const Text('Version 1.0.0'),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(isAr ? 'رائع' : 'Cool'),
-          ),
-        ],
-      ),
-    );
-  }
 
   void _showLogoutDialog(BuildContext context, bool isAr) {
     showDialog(

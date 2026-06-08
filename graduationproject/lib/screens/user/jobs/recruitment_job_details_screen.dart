@@ -97,31 +97,7 @@ class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScree
     },
   ];
 
-  bool get _hasApplied {
-    return RecruitmentSyncStore.instance.applications.any((a) => a.jobId == widget.job.id);
-  }
 
-  void _addComment() {
-    if (_commentController.text.trim().isNotEmpty && _userRating > 0) {
-      setState(() {
-        _mockReviews.insert(0, {
-          'userName': RecruitmentSyncStore.instance.currentUserName,
-          'rating': _userRating,
-          'comment': _commentController.text.trim(),
-          'date': 'الآن',
-        });
-        _commentController.clear();
-        _userRating = 0;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تم إضافة تقييمك بنجاح!'), backgroundColor: Colors.green),
-      );
-    } else if (_userRating == 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('يرجى اختيار عدد النجوم أولاً'), backgroundColor: Colors.orange),
-      );
-    }
-  }
 
   @override
   void dispose() {

@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../shared/l10n/app_localizations.dart';
 import '../../../shared/state/recruitment_sync_store.dart';
-import '../../../shared/utils/image_helper.dart';
 import '../../../app/router/app_router.dart';
-import '../../../shared/widgets/app_button.dart';
 
 class CompanyDetailsScreen extends StatefulWidget {
   final Map<String, dynamic> company;

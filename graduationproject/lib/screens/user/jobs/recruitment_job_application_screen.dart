@@ -172,9 +172,6 @@ class _RecruitmentJobApplicationScreenState
   Widget build(BuildContext context) {
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
     final theme = Theme.of(context);
-    final areas = _governorate == null
-        ? <String>[]
-        : RecruitmentSyncStore.tradesmanGovernorateAreas[_governorate] ?? [];
 
     return Scaffold(
       appBar: AppBar(
@@ -351,37 +348,6 @@ class _RecruitmentJobApplicationScreenState
     );
   }
 
-  Widget _buildDropdown({
-    required String label,
-    required String? value,
-    required String hint,
-    required List<DropdownMenuItem<String>> items,
-    required ValueChanged<String?> onChanged,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
-          const SizedBox(height: 8),
-          DropdownButtonFormField<String>(
-            value: value,
-            decoration: InputDecoration(
-              hintText: hint,
-              filled: true,
-              fillColor: Theme.of(context).colorScheme.surface,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            items: items,
-            onChanged: onChanged,
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildInputField(
     String label,

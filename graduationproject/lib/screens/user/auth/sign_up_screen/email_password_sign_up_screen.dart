@@ -205,32 +205,6 @@ class _EmailPasswordSignUpScreenState extends State<EmailPasswordSignUpScreen> {
     );
   }
 
-  Widget _buildTitle(AppLocalizations t, bool isDark) {
-    return RichText(
-      text: TextSpan(
-        style: const TextStyle(
-          fontSize: 34,
-          fontWeight: FontWeight.bold,
-          height: 1.2,
-          fontFamily: 'Inter',
-        ),
-        children: [
-          TextSpan(
-            text: t.isAr ? 'أنشئ ' : 'Create ',
-            style: const TextStyle(color: Color(0xFFF77F32)),
-          ),
-          TextSpan(
-            text: t.isAr ? 'حسابك ' : 'your new\n',
-            style: TextStyle(color: isDark ? Colors.white : Colors.black),
-          ),
-          TextSpan(
-            text: t.isAr ? 'الجديد' : 'account',
-            style: const TextStyle(color: Color(0xFF0051DD)),
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildLabel(String text, Color color) {
     return Text(

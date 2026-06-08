@@ -3,11 +3,11 @@
 import 'package:flutter/material.dart';
 
 import '../../screens/company/auth/forgot_password_screen.dart';
+import '../../screens/company/auth/login_screen.dart';
 import '../../screens/company/auth/otp_email_verification_screen.dart';
 import '../../screens/company/auth/password_changed_dialog_screen.dart';
 import '../../screens/company/auth/recruitment_company_sign_in_screen.dart';
 import '../../screens/company/auth/reset_password_screen.dart';
-import '../../screens/company/auth/sign_in_screen.dart';
 import '../../screens/company/auth/sign_up_screen.dart';
 import '../../screens/company/candidates/applicant_details_profile_screen.dart';
 import '../../screens/company/candidates/applicant_details_resume_screen.dart';
@@ -23,7 +23,6 @@ import '../../screens/company/jobs/jobs_hub_screen.dart';
 import '../../screens/company/jobs/post_job/post_job_step1_information_screen.dart';
 import '../../screens/company/jobs/post_job/post_job_step2_requirements_screen.dart';
 import '../../screens/company/jobs/post_job/post_job_step3_benefits_screen.dart';
-import '../../screens/company/jobs/recruitment_post_job_screen.dart';
 import '../../screens/company/messages/chat_thread_candidate_v2_screen.dart';
 import '../../screens/company/messages/chat_thread_screen.dart';
 import '../../screens/company/messages/messages_list_screen.dart';
@@ -105,6 +104,7 @@ final class AppRoutes {
       '/company/onboarding/future_starts';
 
   // --- Company Authentication Routes ---
+  static const companyLogin = '/company/auth/login';
   static const companySignIn = '/company/auth/sign_in';
   static const companySignUp = '/company/auth/sign_up';
   static const companyForgotPassword = '/company/auth/forgot_password';
@@ -247,8 +247,10 @@ final class AppRouter {
         page = const CompanyOnboardingNextJobCloserScreen();
       case AppRoutes.companyOnboardingFutureStarts:
         page = const CompanyOnboardingFutureStartsScreen();
+      case AppRoutes.companyLogin:
+        page = const CompanyLoginScreen();
       case AppRoutes.companySignIn:
-        page = const CompanySignInScreen();
+        page = const CompanyLoginScreen();
       case AppRoutes.companySignUp:
         page = const CompanySignUpScreen();
       case AppRoutes.companyForgotPassword:
@@ -273,8 +275,6 @@ final class AppRouter {
         page = const RecruitmentCompanyOnboardingScreen();
       case AppRoutes.companySignInNew:
         page = const RecruitmentCompanySignInScreen();
-      case AppRoutes.companyPostJobComposer:
-        page = const RecruitmentPostJobScreen();
       case AppRoutes.companyProfileEditor:
         page = const RecruitmentCompanyProfileScreen();
       case AppRoutes.companyCandidateDetails:

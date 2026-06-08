@@ -7,12 +7,22 @@ class DashboardService {
   DashboardService(this._apiClient);
 
   Future<Map<String, dynamic>> getStats() async {
-    final response = await _apiClient.post(ApiConstants.dashboardStats);
-    return response.data;
+    try {
+      final response = await _apiClient.post(ApiConstants.dashboardStats);
+      return response.data ?? {};
+    } catch (_) {
+      // Silent failure for non-critical stats
+      return {};
+    }
   }
 
   Future<Map<String, dynamic>> getApplicantsSummary() async {
-    final response = await _apiClient.post(ApiConstants.applicantsSummary);
-    return response.data;
+    try {
+      final response = await _apiClient.post(ApiConstants.applicantsSummary);
+      return response.data ?? {};
+    } catch (_) {
+      // Silent failure
+      return {};
+    }
   }
 }

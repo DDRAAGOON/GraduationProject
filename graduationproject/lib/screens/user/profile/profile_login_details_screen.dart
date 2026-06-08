@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../shared/l10n/app_localizations.dart';
-import 'edit_profile_screen.dart';
-import 'setting_profile/notifications.dart';
-import 'setting_profile/preferences.dart';
+
 
 class ProfileLoginDetailsScreen extends StatefulWidget {
   const ProfileLoginDetailsScreen({super.key});
@@ -292,30 +290,6 @@ class _ProfileLoginDetailsScreenState extends State<ProfileLoginDetailsScreen> {
     );
   }
 
-  Widget _buildTabItem(String title, bool isActive, VoidCallback onTap, bool isDark, Color onSurfaceColor) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        children: [
-          Text(
-            title,
-            style: TextStyle(
-              color: isActive ? Theme.of(context).colorScheme.primary : onSurfaceColor.withValues(alpha: 0.5), 
-              fontWeight: isActive ? FontWeight.bold : FontWeight.normal, 
-              fontSize: 14,
-            ),
-          ),
-          if (isActive)
-            Container(
-              margin: const EdgeInsets.only(top: 8),
-              height: 2,
-              width: 60,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildPasswordField(BuildContext context, String label, String hint, TextEditingController controller, bool obscure, VoidCallback onToggle, bool isDark, Color onSurfaceColor) {
     return Column(

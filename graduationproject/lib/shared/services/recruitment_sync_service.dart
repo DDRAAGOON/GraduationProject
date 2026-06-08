@@ -1,8 +1,7 @@
 import 'dart:async';
-import 'package:dio/dio.dart';
-
 import '../../core/constants/api_constants.dart';
 import '../../core/network/api_client.dart';
+import '../../core/network/api_error_handler.dart';
 import '../../core/network/secure_storage.dart';
 import '../../data/services/auth_service.dart';
 import '../../data/services/job_service.dart';
@@ -11,7 +10,6 @@ import '../../data/services/chat_service.dart';
 import '../../data/models/auth/auth_models.dart';
 import '../../data/models/job/job_models.dart';
 import '../../data/models/application/application_models.dart';
-import '../../data/models/chat/chat_models.dart';
 import '../state/company_store.dart';
 import '../state/recruitment_sync_store.dart';
 import 'session_manager.dart';
@@ -52,7 +50,7 @@ class RecruitmentSyncService {
         'photoUrl': user.photoUrl,
       };
     } catch (e) {
-      rethrow;
+      throw ErrorHandler.handle(e);
     }
   }
 
@@ -65,10 +63,9 @@ class RecruitmentSyncService {
       final authResponse = await _authService.login(
         LoginRequest(email: email, password: password),
       );
-
       return authResponse.user;
-    } on DioException catch (e) {
-      throw Exception(_handleDioError(e));
+    } catch (e) {
+      throw ErrorHandler.handle(e);
     }
   }
 
@@ -108,8 +105,8 @@ class RecruitmentSyncService {
         'email': user.email,
         'photoUrl': user.photoUrl,
       };
-    } on DioException catch (e) {
-      throw Exception(_handleDioError(e));
+    } catch (e) {
+      throw ErrorHandler.handle(e);
     }
   }
 
@@ -125,8 +122,8 @@ class RecruitmentSyncService {
         RegisterRequest(email: email, password: password, fullName: name, role: role, phone: phone),
       );
       return authResponse.user;
-    } on DioException catch (e) {
-      throw Exception(_handleDioError(e));
+    } catch (e) {
+      throw ErrorHandler.handle(e);
     }
   }
 
@@ -134,17 +131,21 @@ class RecruitmentSyncService {
     String? name,
     String? photoUrl,
   }) async {
-    final user = await _authService.updateMe({
-      'fullName': name,
-      'photoUrl': photoUrl,
-    }..removeWhere((_, v) => v == null));
-    
-    RecruitmentSyncStore.instance.updateCurrentUser(
-      name: user.fullName ?? '',
-      photoUrl: user.photoUrl,
-    );
-    
-    return user;
+    try {
+      final user = await _authService.updateMe({
+        'fullName': name,
+        'photoUrl': photoUrl,
+      }..removeWhere((_, v) => v == null));
+      
+      RecruitmentSyncStore.instance.updateCurrentUser(
+        name: user.fullName ?? '',
+        photoUrl: user.photoUrl,
+      );
+      
+      return user;
+    } catch (e) {
+      throw ErrorHandler.handle(e);
+    }
   }
 
   Future<void> updateStatus({
@@ -245,7 +246,7 @@ class RecruitmentSyncService {
       await _pullServerState();
       return job.id;
     } catch (e) {
-      throw Exception('فشل نشر الوظيفة');
+      throw ErrorHandler.handle(e);
     }
   }
 
@@ -284,21 +285,12 @@ class RecruitmentSyncService {
       final appsResponse = await _apiClient.get(ApiConstants.myApplications);
       final chatResponse = await _chatService.getMyChats('me');
 
-      // We still use maps for the store as it seems to expect them
       RecruitmentSyncStore.instance.replaceFromRemote(
         jobs: (jobsResponse.data as List).cast<Map<String, dynamic>>(),
         applications: (appsResponse.data as List).cast<Map<String, dynamic>>(),
         messages: chatResponse.map((e) => {'id': e['id'], 'text': e['lastMessage'] ?? ''}).toList(),
       );
     } catch (_) {}
-  }
-
-  String _handleDioError(DioException e) {
-    if (e.response?.data is Map) {
-      final data = e.response!.data as Map;
-      return data['message']?.toString() ?? data['error']?.toString() ?? 'حدث خطأ في الطلب';
-    }
-    return 'حدث خطأ غير متوقع';
   }
 
   Future<void> logout() async {

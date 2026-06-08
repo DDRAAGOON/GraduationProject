@@ -1,4 +1,5 @@
 import '../../../core/network/api_client.dart';
+import '../../../core/network/api_error_handler.dart';
 import '../../../core/constants/api_constants.dart';
 import '../models/notification/notification_models.dart';
 
@@ -8,27 +9,47 @@ class NotificationService {
   NotificationService(this._apiClient);
 
   Future<void> subscribe(String fcmToken) async {
-    await _apiClient.post(
-      ApiConstants.subscribeNotifications,
-      data: {'fcmToken': fcmToken},
-    );
+    try {
+      await _apiClient.post(
+        ApiConstants.subscribeNotifications,
+        data: {'fcmToken': fcmToken},
+      );
+    } catch (e) {
+      throw ErrorHandler.handle(e);
+    }
   }
 
   Future<List<AppNotification>> getNotifications() async {
-    final response = await _apiClient.get(ApiConstants.notifications);
-    final List<dynamic> data = response.data;
-    return data.map((json) => AppNotification.fromJson(json)).toList();
+    try {
+      final response = await _apiClient.get(ApiConstants.notifications);
+      final List<dynamic> data = response.data;
+      return data.map((json) => AppNotification.fromJson(json)).toList();
+    } catch (e) {
+      throw ErrorHandler.handle(e);
+    }
   }
 
   Future<void> markAsRead(String id) async {
-    await _apiClient.patch(ApiConstants.readNotification(id));
+    try {
+      await _apiClient.patch(ApiConstants.readNotification(id));
+    } catch (e) {
+      throw ErrorHandler.handle(e);
+    }
   }
 
   Future<void> markAllAsRead() async {
-    await _apiClient.patch(ApiConstants.readAllNotifications);
+    try {
+      await _apiClient.patch(ApiConstants.readAllNotifications);
+    } catch (e) {
+      throw ErrorHandler.handle(e);
+    }
   }
 
   Future<void> deleteNotification(String id) async {
-    await _apiClient.delete(ApiConstants.deleteNotification(id));
+    try {
+      await _apiClient.delete(ApiConstants.deleteNotification(id));
+    } catch (e) {
+      throw ErrorHandler.handle(e);
+    }
   }
 }

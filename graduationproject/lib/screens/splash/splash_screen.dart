@@ -1,42 +1,83 @@
 import 'package:flutter/material.dart';
 import '../../app/router/app_router.dart';
+import '../../core/network/secure_storage.dart';
 import '../../shared/widgets/app_button.dart';
 
-class SplashScreen extends StatelessWidget {
+/// Splash screen shown at launch.
+///
+/// In [initState] we asynchronously check [SecureStorage] for a stored JWT.
+/// - **Token found** → push-replace directly to [CompanyDashboardScreen].
+/// - **No token** → show the normal onboarding / "Get Started" view.
+class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
+
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+  bool _checking = true; // true while we read from SecureStorage
+
+  @override
+  void initState() {
+    super.initState();
+    _checkPersistedSession();
+  }
+
+  Future<void> _checkPersistedSession() async {
+    try {
+      final token = await SecureStorage.getToken();
+      if (!mounted) return;
+
+      if (token != null && token.isNotEmpty) {
+        // A valid-looking token exists → go straight to the dashboard.
+        Navigator.of(context).pushReplacementNamed(AppRoutes.companyDashboard);
+        return;
+      }
+    } catch (_) {
+      // If storage fails for any reason, fall through to the normal splash.
+    }
+
+    // No token found – show the "Get Started" UI.
+    if (mounted) setState(() => _checking = false);
+  }
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
 
+    // While we're checking storage show a minimal loading indicator so the
+    // white screen is never visible for more than a fraction of a second.
+    if (_checking) {
+      return const Scaffold(
+        backgroundColor: Color(0xFFFDFCF9),
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
     return Scaffold(
-      backgroundColor: const Color(0xFFFDFCF9), // لون الخلفية الفاتح (كريمي)
+      backgroundColor: const Color(0xFFFDFCF9),
       body: Column(
         children: [
-          // الصورة الأساسية في أعلى الشاشة تماماً
-          // تم تغليفها بـ Image.asset مع معالجة الخطأ لتجنب الشاشة الحمراء
           Image.asset(
             'assets/company/Onboarding/image 42 1.png',
-            fit: BoxFit.contain, // يضمن ظهور الصورة كاملة داخل المساحة
+            fit: BoxFit.contain,
             width: double.infinity,
-            height: size.height * 0.38, // تقليل الارتفاع قليلاً لتناسب الشاشة
+            height: size.height * 0.38,
             errorBuilder: (context, error, stackTrace) => Container(
               height: size.height * 0.38,
               color: Colors.grey[200],
               child: const Icon(Icons.image_not_supported, size: 50),
             ),
           ),
-
-          //  const SizedBox(height: 0),
-
-          // النصوص التوضيحية والعناصر الزخرفية
           Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 30),
               child: Stack(
                 clipBehavior: Clip.none,
                 children: [
-                  // العناصر الزخرفية (الخطوط)
                   Positioned(
                     top: 120,
                     left: 10,
@@ -64,8 +105,6 @@ class SplashScreen extends StatelessWidget {
                       errorBuilder: (_, _, _) => const SizedBox.shrink(),
                     ),
                   ),
-
-                  // النص الرئيسي باستخدام Text.rich لضمان التوافق
                   Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -115,16 +154,13 @@ class SplashScreen extends StatelessWidget {
               ),
             ),
           ),
-
-          // زر Get Started في الأسفل
           Padding(
             padding: const EdgeInsets.fromLTRB(30, 0, 30, 40),
             child: AppButton(
               label: 'Get Started',
               onPressed: () {
-                Navigator.of(
-                  context,
-                ).pushReplacementNamed(AppRoutes.roleSelection);
+                Navigator.of(context)
+                    .pushReplacementNamed(AppRoutes.roleSelection);
               },
             ),
           ),

@@ -1,3 +1,5 @@
+import '../../../core/constants/api_constants.dart';
+
 class ChatP2PRequest {
   final String? senderId;
   final String recipientId;
@@ -54,15 +56,59 @@ class ChatMessage {
 class UserInfo {
   final String id;
   final String name;
+  final String email;
+  final String? role;
   final String? photoUrl;
 
-  UserInfo({required this.id, required this.name, this.photoUrl});
+  UserInfo({
+    required this.id,
+    required this.name,
+    this.email = '',
+    this.role,
+    this.photoUrl,
+  });
 
   factory UserInfo.fromJson(Map<String, dynamic> json) {
+    final id = json['id']?.toString() ??
+        json['userId']?.toString() ??
+        json['_id']?.toString() ?? '';
+
+    final name = json['fullName'] ??
+        json['name'] ??
+        json['username'] ??
+        'Unknown';
+
+    final email = json['email'] ?? '';
+    final role = json['role']?.toString();
+
+    // ✅ معالجة صحيحة للـ photoUrl باستخدام ApiConstants
+    String? rawPhotoUrl = json['avatarUrl'] ??
+        json['photoUrl'] ??
+        json['picture'] ??
+        json['avatar'];
+
+    String? photoUrl;
+    if (rawPhotoUrl != null && rawPhotoUrl.toString().trim().isNotEmpty) {
+      final url = rawPhotoUrl.toString().trim();
+
+      if (url.startsWith('http://') || url.startsWith('https://')) {
+        // ✅ URL كامل بالفعل
+        photoUrl = url;
+      } else if (url.startsWith('/')) {
+        // ✅ مسار نسبي - نضيف الـ base URL
+        photoUrl = '${ApiConstants.baseUrl}$url';
+      } else {
+        // ✅ مسار بدون / في البداية
+        photoUrl = '${ApiConstants.baseUrl}/$url';
+      }
+    }
+
     return UserInfo(
-      id: json['id']?.toString() ?? json['userId']?.toString() ?? '',
-      name: json['name'] ?? json['fullName'] ?? '',
-      photoUrl: json['photoUrl'] ?? json['picture'],
+      id: id,
+      name: name,
+      email: email,
+      role: role,
+      photoUrl: photoUrl,
     );
   }
 }

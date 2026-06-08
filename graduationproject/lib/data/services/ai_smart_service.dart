@@ -1,4 +1,5 @@
 import '../../../core/network/api_client.dart';
+import '../../../core/network/api_error_handler.dart';
 import '../../../core/constants/api_constants.dart';
 
 class AiSmartService {
@@ -7,26 +8,34 @@ class AiSmartService {
   AiSmartService(this._apiClient);
 
   Future<List<dynamic>> smartSearch(String query, {String? location, String? category}) async {
-    final response = await _apiClient.get(
-      ApiConstants.aiSmartSearch,
-      queryParameters: {
-        'q': query,
-        if (location != null) 'location': location,
-        if (category != null) 'category': category,
-      },
-    );
-    return response.data;
+    try {
+      final response = await _apiClient.get(
+        ApiConstants.aiSmartSearch,
+        queryParameters: {
+          'q': query,
+          if (location != null) 'location': location,
+          if (category != null) 'category': category,
+        },
+      );
+      return response.data;
+    } catch (e) {
+      throw ErrorHandler.handle(e);
+    }
   }
 
   Future<List<String>> autoTag(String title, {String? description}) async {
-    final response = await _apiClient.post(
-      ApiConstants.aiAutoTag,
-      data: {
-        'title': title,
-        if (description != null) 'description': description,
-      },
-    );
-    return List<String>.from(response.data);
+    try {
+      final response = await _apiClient.post(
+        ApiConstants.aiAutoTag,
+        data: {
+          'title': title,
+          if (description != null) 'description': description,
+        },
+      );
+      return List<String>.from(response.data);
+    } catch (e) {
+      throw ErrorHandler.handle(e);
+    }
   }
 
   Future<Map<String, dynamic>> scoreCv({
@@ -35,16 +44,20 @@ class AiSmartService {
     required String jobTitle,
     String? jobDescription,
   }) async {
-    final response = await _apiClient.post(
-      ApiConstants.aiScoreCv,
-      data: {
-        'userSkills': userSkills,
-        if (userBio != null) 'userBio': userBio,
-        'jobTitle': jobTitle,
-        if (jobDescription != null) 'jobDescription': jobDescription,
-      },
-    );
-    return response.data;
+    try {
+      final response = await _apiClient.post(
+        ApiConstants.aiScoreCv,
+        data: {
+          'userSkills': userSkills,
+          if (userBio != null) 'userBio': userBio,
+          'jobTitle': jobTitle,
+          if (jobDescription != null) 'jobDescription': jobDescription,
+        },
+      );
+      return response.data;
+    } catch (e) {
+      throw ErrorHandler.handle(e);
+    }
   }
 
   Future<String> generateJobDescription({
@@ -53,16 +66,20 @@ class AiSmartService {
     String? experience,
     String? location,
   }) async {
-    final response = await _apiClient.post(
-      ApiConstants.aiGenerateJobDesc,
-      data: {
-        'title': title,
-        'category': category,
-        if (experience != null) 'experience': experience,
-        if (location != null) 'location': location,
-      },
-    );
-    return response.data['description'] ?? '';
+    try {
+      final response = await _apiClient.post(
+        ApiConstants.aiGenerateJobDesc,
+        data: {
+          'title': title,
+          'category': category,
+          if (experience != null) 'experience': experience,
+          if (location != null) 'location': location,
+        },
+      );
+      return response.data['description'] ?? '';
+    } catch (e) {
+      throw ErrorHandler.handle(e);
+    }
   }
 
   Future<String> generateCoverLetter({
@@ -71,15 +88,19 @@ class AiSmartService {
     String? userExperience,
     required String jobTitle,
   }) async {
-    final response = await _apiClient.post(
-      ApiConstants.aiCoverLetter,
-      data: {
-        'userName': userName,
-        'userSkills': userSkills,
-        if (userExperience != null) 'userExperience': userExperience,
-        'jobTitle': jobTitle,
-      },
-    );
-    return response.data['coverLetter'] ?? '';
+    try {
+      final response = await _apiClient.post(
+        ApiConstants.aiCoverLetter,
+        data: {
+          'userName': userName,
+          'userSkills': userSkills,
+          if (userExperience != null) 'userExperience': userExperience,
+          'jobTitle': jobTitle,
+        },
+      );
+      return response.data['coverLetter'] ?? '';
+    } catch (e) {
+      throw ErrorHandler.handle(e);
+    }
   }
 }

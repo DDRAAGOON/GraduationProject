@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';
 import '../../../shared/l10n/app_localizations.dart';
+import '../../../shared/services/recruitment_sync_service.dart';
 import '../../../shared/services/session_manager.dart';
 import '../../../shared/widgets/app_scaffold.dart';
 
@@ -21,24 +22,24 @@ class CompanySettingsScreen extends StatelessWidget {
             child: ListView(
               padding: const EdgeInsets.all(16),
               children: [
-          _SettingTile(
-            title: t.profileSettings,
-            icon: Icons.person_outline,
-            onTap: () => Navigator.of(context).pushNamed(AppRoutes.companyProfileOverview),
-          ),
-          const SizedBox(height: 8),
-          _SettingTile(
-            title: t.accountSecurity,
-            icon: Icons.security_outlined,
-            onTap: () => Navigator.of(context).pushNamed(AppRoutes.companyAccountSecurity),
-          ),
-          const SizedBox(height: 8),
-          _SettingTile(
-            title: t.tr(en: 'Appearance', ar: 'المظهر'),
-            icon: Icons.palette_outlined,
-            onTap: () => Navigator.of(context).pushNamed(AppRoutes.companyAppearanceLight),
-          ),
-        ],
+                _SettingTile(
+                  title: t.profileSettings,
+                  icon: Icons.person_outline,
+                  onTap: () => Navigator.of(context).pushNamed(AppRoutes.companyProfileOverview),
+                ),
+                const SizedBox(height: 8),
+                _SettingTile(
+                  title: t.accountSecurity,
+                  icon: Icons.security_outlined,
+                  onTap: () => Navigator.of(context).pushNamed(AppRoutes.companyAccountSecurity),
+                ),
+                const SizedBox(height: 8),
+                _SettingTile(
+                  title: t.tr(en: 'Appearance', ar: 'المظهر'),
+                  icon: Icons.palette_outlined,
+                  onTap: () => Navigator.of(context).pushNamed(AppRoutes.companyAppearanceLight),
+                ),
+              ],
             ),
           ),
           Padding(
@@ -61,6 +62,7 @@ class CompanySettingsScreen extends StatelessWidget {
                 TextButton.icon(
                   onPressed: () async {
                     await SessionManager.logoutCompany();
+                    await RecruitmentSyncService.instance.logout();
                     if (context.mounted) {
                       Navigator.of(context).pushNamedAndRemoveUntil(
                           AppRoutes.roleSelection, (route) => false);

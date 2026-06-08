@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class LoginRequest {
   final String email;
   final String password;
@@ -44,9 +46,33 @@ class AuthResponse {
   AuthResponse({required this.token, required this.user});
 
   factory AuthResponse.fromJson(Map<String, dynamic> json) {
+    String token = json['token'] ?? json['jwtToken'] ?? json['access_token'] ?? json['accessToken'] ?? '';
+
+    Map<String, dynamic> userJson = json['user'] ?? json;
+
+    if (token.isNotEmpty && json['user'] == null) {
+      final parts = token.split('.');
+      if (parts.length == 3) {
+        String payload = parts[1];
+        payload = payload.padRight((payload.length + 3) & ~3, '=');
+        try {
+          final String decoded = utf8.decode(base64Url.decode(payload));
+          final Map<String, dynamic> tokenData = jsonDecode(decoded);
+
+          userJson = {
+            'id': tokenData['sub'] ?? tokenData['id'] ?? '',
+            'email': tokenData['email'] ?? '',
+            'role': tokenData['role'] ?? '',
+            'fullName': tokenData['name'] ?? tokenData['fullName'] ?? '',
+            'photoUrl': tokenData['avatar'] ?? tokenData['picture'],
+          };
+        } catch (_) {}
+      }
+    }
+
     return AuthResponse(
-      token: json['token'] ?? json['jwtToken'] ?? '',
-      user: User.fromJson(json['user'] ?? json),
+      token: token,
+      user: User.fromJson(userJson),
     );
   }
 }

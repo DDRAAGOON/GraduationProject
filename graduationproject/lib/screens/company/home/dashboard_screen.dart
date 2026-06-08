@@ -1,22 +1,14 @@
-// Company home: KPIs, shortcuts, and recent jobs.
-
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-
-import '../../../app/router/app_router.dart';
+import 'package:dio/dio.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../../core/network/secure_storage.dart';
 import '../../../shared/l10n/app_localizations.dart';
-import '../../../shared/models/job.dart';
-import '../../../shared/state/company_store.dart';
-import '../../../shared/services/recruitment_sync_service.dart';
-import '../../../shared/state/recruitment_sync_store.dart';
-import '../../../shared/widgets/app_scaffold.dart';
-import '../../../shared/widgets/section_title.dart';
+import '../../../constants/app_images.dart';
 import '../widgets/company_bottom_nav.dart';
 import '../widgets/glowing_chatbot_fab.dart';
 import '../../user/messages/chat_thread_screen.dart';
-import '../../../constants/app_images.dart';
-import '../../../constants/app_images.dart';
+import '../../../app/router/app_router.dart';
+import '../../../shared/models/job.dart';
 
 class CompanyDashboardScreen extends StatefulWidget {
   const CompanyDashboardScreen({super.key});
@@ -26,600 +18,436 @@ class CompanyDashboardScreen extends StatefulWidget {
 }
 
 class _CompanyDashboardScreenState extends State<CompanyDashboardScreen> {
+  bool _isLoading = true;
+  String? _error;
+
+  Map<String, dynamic>? _companyProfile;
+  Map<String, dynamic>? _dashboardStats;
+  List<dynamic> _latestJobs = [];
+
+  Dio? _dio;
+  String? _token;
+
   @override
   void initState() {
     super.initState();
-    // Always pull fresh data from the server when the dashboard is shown.
-    RecruitmentSyncService.instance.startPolling();
+    _initDashboard();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final companyStore = CompanyStore.instance;
-    return ListenableBuilder(
-      listenable: Listenable.merge([
-        companyStore,
-        RecruitmentSyncStore.instance,
-      ]),
-      builder: (context, _) {
-        return AppScaffold(
-          titleWidget: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              InkWell(
-                onTap: () => Navigator.of(
-                  context,
-                ).pushNamed(AppRoutes.companyProfileOverview),
-                borderRadius: BorderRadius.circular(20),
-                child: ClipOval(
-                  child: companyStore.companyProfileImage == null
-                      ? Container(
-                          width: 40,
-                          height: 40,
-                          color: Theme.of(context).colorScheme.surfaceBright,
-                          child: Icon(
-                            Icons.business,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                        )
-                      : companyStore.companyProfileImage!.startsWith('assets/')
-                      ? Image.asset(
-                          companyStore.companyProfileImage!,
-                          width: 40,
-                          height: 40,
-                          fit: BoxFit.cover,
-                        )
-                      : Image.file(
-                          File(companyStore.companyProfileImage!),
-                          width: 40,
-                          height: 40,
-                          fit: BoxFit.cover,
-                        ),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Flexible(
-                child: Text(
-                  companyStore.companyName,
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w900,
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          showBack: false,
-          centerTitle: false,
-          showAppBarDivider: true,
-          actions: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Image.asset(
-                Theme.of(context).brightness == Brightness.dark 
-                  ? 'assets/company/logo/لوجو جديد.png' 
-                  : 'assets/company/logo/لوجو جديد لايت.png',
-                height: 35,
-                fit: BoxFit.contain,
-              ),
-            ),
-          ],
-          body: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 980),
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final allJobs = RecruitmentSyncStore.instance.jobs;
-                  final companyJobs = allJobs
-                      .where((j) => j.companyName == companyStore.companyName)
-                      .toList();
-                  
-                  // If no real jobs found for this company, show mock jobs for UI preview
-                  final jobs = companyJobs.isNotEmpty 
-                      ? companyJobs 
-                      : allJobs.where((j) => j.id.startsWith('mock_')).toList();
+  Future<void> _initDashboard() async {
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
 
-                  final t = AppLocalizations.of(context);
-                  void onTapNewCandidates() {
-                    if (jobs.isEmpty) {
-                      Navigator.of(context).pushNamed(
-                        AppRoutes.companyApplicantsTable,
-                        arguments: Job.mock(),
-                      );
-                      return;
-                    }
-                    final firstJob = jobs.first;
-                    final appliedCount = RecruitmentSyncStore
-                        .instance
-                        .applications
-                        .where((a) => a.jobId == firstJob.id)
-                        .length;
-                    final hiredCount = RecruitmentSyncStore
-                        .instance
-                        .applications
-                        .where(
-                          (a) =>
-                              a.jobId == firstJob.id &&
-                              a.status.toLowerCase().contains('hire'),
-                        )
-                        .length;
-                    Navigator.of(context).pushNamed(
-                      AppRoutes.companyApplicantsTable,
-                      arguments: Job(
-                        id: firstJob.id,
-                        title: firstJob.title,
-                        companyName: firstJob.companyName,
-                        location: firstJob.location,
-                        employmentType: firstJob.type,
-                        category: firstJob.category,
-                        salaryRange: firstJob.salaryRange,
-                        description: firstJob.description,
-                        responsibilities: firstJob.responsibilities,
-                        niceToHaves: firstJob.niceToHaves,
-                        qualifications: firstJob.qualifications,
-                        benefits: firstJob.benefits
-                            .map((b) => JobBenefit(title: b, description: ''))
-                            .toList(),
-                        tags: firstJob.tags,
-                        appliedCount: appliedCount,
-                        requiredCount: firstJob.capacity,
-                        acceptedCount: hiredCount,
-                        status: firstJob.status,
-                        createdAt: firstJob.publishedAt,
-                      ),
-                    );
-                  }
+    try {
+      _token = await SecureStorage.getToken();
 
-                  return ListView(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: constraints.maxWidth < 400 ? 12 : 16,
-                      vertical: 16,
-                    ),
-                    children: [
-                      _StatsGrid(
-                        availableWidth: constraints.maxWidth,
-                        jobs: jobs,
-                        onTapNewCandidates: onTapNewCandidates,
-                      ),
-                      const SizedBox(height: 18),
-                      SectionTitle(t.jobUpdates),
-                      const SizedBox(height: 10),
-                      ...jobs.map(
-                        (j) =>
-                            _JobUpdateCard(job: j, companyStore: companyStore),
-                      ),
-                      if (jobs.isEmpty)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 14),
-                          child: Text(
-                            t.noJobsYet,
-                            style: Theme.of(context).textTheme.bodyLarge,
-                          ),
-                        ),
-                      const SizedBox(height: 10),
-                    ],
-                  );
-                },
-              ),
-            ),
-          ),
-          bottomNavigationBar: const CompanyBottomNav(current: CompanyTab.home),
-          floatingActionButton: GlowingChatbotFAB(
-            onTap: () {
-              final tLocal = AppLocalizations.of(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ChatThreadScreen(
-                    name: tLocal.isAr ? 'مساعد جوبيتو الذكي' : 'Jobito AI Assistant',
-                    image: AppImages.jobito,
-                  ),
-                ),
-              );
-            },
-          ),
-        );
-      },
-    );
-  }
-}
+      // 1. فحص مبكر للتوكن للتأكد من أن المستخدم مسجل الدخول
+      if (_token == null || _token!.isEmpty) {
+        if (mounted) {
+          setState(() {
+            _error = 'يجب عليك تسجيل الدخول أولاً للوصول إلى لوحة التحكم.';
+            _isLoading = false;
+          });
+          // توجيه المستخدم لشاشة تسجيل الدخول تلقائياً
+          Navigator.of(context).pushReplacementNamed(AppRoutes.companyLogin);
+        }
+        return;
+      }
 
-class _StatsGrid extends StatelessWidget {
-  const _StatsGrid({
-    required this.onTapNewCandidates,
-    required this.availableWidth,
-    required this.jobs,
-  });
+      _dio = Dio(BaseOptions(
+        baseUrl: 'https://jobito-api-production.up.railway.app/api',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $_token',
+        },
+      ));
 
-  final VoidCallback onTapNewCandidates;
-  final double availableWidth;
-  final List<RecruitmentJob> jobs;
+      // 2. Fetch company profile to get companyId
+      final profileResponse = await _dio!.get('/companies/my/profile');
+      final profileData = profileResponse.data;
 
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    final t = AppLocalizations.of(context);
+      final profile = profileData['data'] ?? profileData;
+      final companyId = profile['id'] ?? profile['companyId'] ?? profile['company_id'];
 
-    final int crossAxisCount = availableWidth < 360
-        ? 1
-        : availableWidth >= 700
-        ? 3
-        : 2;
+      if (companyId == null) {
+        throw Exception('Could not find company ID in profile response');
+      }
 
-    final double aspectRatio = availableWidth < 360
-        ? 2.8
-        : availableWidth >= 700
-        ? 1.9
-        : 1.5;
+      // 3. Fetch dashboard summary
+      final statsResponse = await _dio!.get('/companies/my/dashboard-summary');
+      final statsData = statsResponse.data;
+      final stats = statsData['data'] ?? statsData;
 
-    final cards = [
-      _MetricCard(
-        title: t.newCandidates,
-        value: RecruitmentSyncStore.instance.applications
-            .where((app) => jobs.any((j) => j.id == app.jobId))
-            .length
-            .toString(),
-        color: const Color(0xFFB5ADAD),
-        onTap: onTapNewCandidates,
-      ),
-      _MetricCard(
-        title: t.messagesReceived,
-        value: RecruitmentSyncStore.instance.messages.length.toString(),
-        color: const Color(0xFFB5ADAD),
-        onTap: () => Navigator.of(
-          context,
-        ).pushReplacementNamed(AppRoutes.companyMessagesList),
-      ),
-    ];
+      // 4. Fetch latest jobs
+      final jobsResponse = await _dio!.get('/jobs', queryParameters: {
+        'companyId': companyId,
+        'limit': 4,
+      });
+      final jobsData = jobsResponse.data;
+      final jobs = jobsData['data'] ?? jobsData['jobs'] ?? [];
 
-    return GridView.count(
-      crossAxisCount: crossAxisCount,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      crossAxisSpacing: 12,
-      mainAxisSpacing: 12,
-      childAspectRatio: aspectRatio,
-      children: cards,
-    );
-  }
-}
-
-class _MetricCard extends StatelessWidget {
-  const _MetricCard({
-    required this.title,
-    required this.value,
-    required this.color,
-    required this.onTap,
-  });
-
-  final String title;
-  final String value;
-  final Color color;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    const cardColor = Color(0xFFB5ADAD);
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(18),
-      child: Card(
-        color: cardColor,
-        elevation: 4,
-        shadowColor: Colors.black.withOpacity(0.2),
-        child: Padding(
-          padding: const EdgeInsets.all(14),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Flexible(
-                      child: Text(
-                        title,
-                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                              color: const Color(0xFF142C66),
-                              fontWeight: FontWeight.w800,
-                            ),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 2,
-                      ),
-                    ),
-                    FittedBox(
-                      fit: BoxFit.scaleDown,
-                      alignment: AlignmentDirectional.centerStart,
-                      child: Text(
-                        value,
-                        style: Theme.of(context)
-                            .textTheme
-                            .headlineSmall
-                            ?.copyWith(
-                              fontWeight: FontWeight.w900,
-                              color: const Color(0xFF142C66),
-                            ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 8),
-              Container(
-                width: 38,
-                height: 38,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF142C66).withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(Icons.trending_up, size: 20, color: Color(0xFF142C66)),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _JobUpdateCard extends StatelessWidget {
-  const _JobUpdateCard({required this.job, required this.companyStore});
-
-  final RecruitmentJob job;
-  final CompanyStore companyStore;
-
-  Color _getJobTypeColor(String type) {
-    switch (type.toLowerCase().trim()) {
-      case 'full-time':
-        return Colors.green;
-      case 'part-time':
-        return Colors.blue;
-      case 'remote':
-        return Colors.purple;
-      case 'freelance':
-        return Colors.teal;
-      case 'one-time':
-        return Colors.amber;
-      case 'internship':
-        return Colors.indigo;
-      default:
-        return Colors.grey;
+      if (mounted) {
+        setState(() {
+          _companyProfile = profile;
+          _dashboardStats = stats;
+          _latestJobs = List.from(jobs);
+          _isLoading = false;
+        });
+      }
+    } on DioException catch (e) {
+      if (mounted) {
+        setState(() {
+          // التعامل المخصص مع خطأ 401 Unauthorized
+          if (e.response?.statusCode == 401) {
+            _error = 'انتهت صلاحية الجلسة أو ليس لديك صلاحية. برجاء تسجيل الدخول مجدداً.';
+            // توجيه المستخدم لتسجيل الدخول إذا انتهت الجلسة
+            SecureStorage.deleteToken();
+            Navigator.of(context).pushReplacementNamed(AppRoutes.companyLogin);
+          } else {
+            _error = 'Network error: ${e.response?.statusMessage ?? e.message}';
+          }
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _error = 'An error occurred: $e';
+          _isLoading = false;
+        });
+      }
     }
   }
 
+  Future<void> _onRefresh() async {
+    await _initDashboard();
+  }
+
+  int _getStat(Map<String, dynamic>? stats, String camelKey, String snakeKey) {
+    if (stats == null) return 0;
+    return stats[camelKey] ?? stats[snakeKey] ?? 0;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final t = AppLocalizations.of(context);
-    final syncStore = RecruitmentSyncStore.instance;
-    const cardColor = Color(0xFF213E75);
+    final tLocal = AppLocalizations.of(context);
 
-    final appliedCount = syncStore.applications
-        .where((a) => a.jobId == job.id)
-        .length;
-    final hiredCount = syncStore.applications
-        .where(
-          (a) => a.jobId == job.id && a.status.toLowerCase().contains('hire'),
+    return Scaffold(
+      backgroundColor: const Color(0xE8131313),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: _companyProfile != null
+            ? Text(
+          '${tLocal.tr(en: 'Hello', ar: 'مرحباً')}, ${_companyProfile!['name'] ?? _companyProfile!['companyName'] ?? _companyProfile!['company_name'] ?? 'Company'}',
+          style: TextStyle(color: Colors.white, fontSize: 20.sp, fontWeight: FontWeight.bold),
         )
-        .length;
-
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: InkWell(
-        onTap: () => Navigator.of(context).pushNamed(
-          AppRoutes.companyJobDetails,
-          arguments: Job(
-            id: job.id,
-            title: job.title,
-            companyName: job.companyName,
-            location: job.location,
-            employmentType: job.type,
-            category: job.category,
-            salaryRange: job.salaryRange,
-            description: job.description,
-            responsibilities: job.responsibilities,
-            niceToHaves: job.niceToHaves,
-            qualifications: job.qualifications,
-            benefits: job.benefits
-                .map((b) => JobBenefit(title: b, description: ''))
-                .toList(),
-            tags: job.tags,
-            appliedCount: appliedCount,
-            requiredCount: job.capacity,
-            acceptedCount: hiredCount,
-            status: job.status,
-            createdAt: job.publishedAt,
-          ),
-        ),
-        borderRadius: BorderRadius.circular(18),
-        child: Card(
-          elevation: 4,
-          color: cardColor,
-          shadowColor: Colors.black.withOpacity(0.2),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
-            side: BorderSide(
-              color: Colors.white.withOpacity(0.1),
+            : Text(tLocal.tr(en: 'Dashboard', ar: 'لوحة التحكم'), style: const TextStyle(color: Colors.white)),
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
+      body: RefreshIndicator(
+        onRefresh: _onRefresh,
+        color: Colors.blueAccent,
+        backgroundColor: const Color(0xFF222222),
+        child: _buildBody(),
+      ),
+      bottomNavigationBar: const CompanyBottomNav(current: CompanyTab.home),
+      floatingActionButton: GlowingChatbotFAB(
+        onTap: () {
+          final tLocal = AppLocalizations.of(context);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ChatThreadScreen(
+                name: tLocal.isAr ? 'مساعد جوبيتو الذكي' : 'Jobito AI Assistant',
+                image: AppImages.jobito,
+              ),
             ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildBody() {
+    final tLocal = AppLocalizations.of(context);
+
+    if (_isLoading && _companyProfile == null) {
+      return const Center(
+        child: CircularProgressIndicator(color: Colors.blueAccent),
+      );
+    }
+
+    if (_error != null && _companyProfile == null) {
+      return _buildErrorState();
+    }
+
+    final newCandidates = _getStat(_dashboardStats, 'newCandidates', 'new_candidates');
+    final acceptedCandidates = _getStat(_dashboardStats, 'acceptedCandidates', 'accepted_candidates');
+
+    return SafeArea(
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (_error != null) ...[
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.all(12.w),
+                decoration: BoxDecoration(
+                  color: Colors.redAccent.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(8.r),
+                  border: Border.all(color: Colors.redAccent.withOpacity(0.5)),
+                ),
+                child: Text(_error!, style: const TextStyle(color: Colors.redAccent)),
+              ),
+              SizedBox(height: 16.h),
+            ],
+
+            // Statistics Grid
+            Row(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        job.title,
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                          color: Colors.white,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    if (job.status == 'Open')
-                      PopupMenuButton<String>(
-                        icon: const Icon(Icons.more_vert, color: Colors.white70),
-                        onSelected: (val) async {
-                          if (val == 'close') {
-                            try {
-                              await RecruitmentSyncService.instance.updateJob(
-                                jobId: job.id,
-                                title: job.title,
-                                companyName: job.companyName,
-                                location: job.location,
-                                salaryRange: job.salaryRange,
-                                type: job.type,
-                                description: job.description,
-                                responsibilities: job.responsibilities,
-                                qualifications: job.qualifications,
-                                niceToHaves: job.niceToHaves,
-                                benefits: job.benefits,
-                                category: job.category,
-                                tags: job.tags,
-                                requiredCount: job.capacity,
-                                status: 'Closed',
-                              );
-                              if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text(t.isAr ? 'تم إغلاق الوظيفة' : 'Job closed')),
-                                );
-                              }
-                            } catch (e) {
-                              if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('Error closing job: $e')),
-                                );
-                              }
-                            }
-                          }
-                        },
-                        itemBuilder: (context) => [
-                          PopupMenuItem(
-                            value: 'close',
-                            child: Text(t.isAr ? 'إغلاق' : 'Close'),
-                          ),
-                        ],
-                      ),
-                  ],
+                Expanded(
+                  child: _buildStatCard(
+                    title: tLocal.tr(en: 'New Candidates', ar: 'مرشحون جدد'),
+                    value: newCandidates.toString(),
+                    icon: Icons.person_add_alt_1,
+                    color: Colors.blueAccent,
+                  ),
                 ),
-                const SizedBox(height: 6),
-                Row(
-                  children: [
-                    const Icon(Icons.business, size: 16, color: Colors.white60),
-                    const SizedBox(width: 6),
-                    Text(
-                      job.companyName,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Colors.white70,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    // Deduplicate and clean tags
-                    ...[
-                      ...job.type.split(RegExp(r'[•,;]')),
-                      ...job.tags
-                    ].map((t) => t.trim())
-                     .where((t) => t.isNotEmpty && t.toLowerCase() != 'general')
-                     .toSet() // Remove duplicates
-                     .toList()
-                     .map((tTrim) {
-                      final color = _getJobTypeColor(tTrim);
-                      return Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: color,
-                          borderRadius: BorderRadius.circular(8),
-                          boxShadow: [
-                            BoxShadow(
-                              color: color.withOpacity(0.3),
-                              blurRadius: 4,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: Text(
-                          tTrim,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 11,
-                          ),
-                        ),
-                      );
-                    }),
-
-                  ],
-                ),
-                const SizedBox(height: 20),
-                ListenableBuilder(
-                  listenable: syncStore,
-                  builder: (context, _) {
-                    final requiredCount = job.capacity > 0 ? job.capacity : 1;
-                    final progress = (hiredCount / requiredCount).clamp(
-                      0.0,
-                      1.0,
-                    );
-
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              t.hiredProgressMsg(hiredCount, requiredCount),
-                              style: Theme.of(context).textTheme.labelMedium
-                                  ?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                            ),
-                            Text(
-                              '${(progress * 100).toInt()}%',
-                              style: TextStyle(
-                                color: progress >= 1.0
-                                    ? Colors.greenAccent
-                                    : Colors.cyanAccent,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: LinearProgressIndicator(
-                            value: progress,
-                            backgroundColor: Colors.white.withOpacity(0.1),
-                            color: progress >= 1.0
-                                ? Colors.greenAccent
-                                : Colors.cyanAccent,
-                            minHeight: 8,
-                          ),
-                        ),
-                      ],
-                    );
-                  },
+                SizedBox(width: 16.w),
+                Expanded(
+                  child: _buildStatCard(
+                    title: tLocal.tr(en: 'Accepted', ar: 'مقبولين'),
+                    value: acceptedCandidates.toString(),
+                    icon: Icons.check_circle_outline,
+                    color: Colors.greenAccent,
+                  ),
                 ),
               ],
             ),
+
+            SizedBox(height: 32.h),
+
+            // Latest Jobs Section
+            Text(
+              tLocal.tr(en: 'Latest Jobs', ar: 'أحدث الوظائف'),
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18.sp,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 16.h),
+
+            _latestJobs.isEmpty
+                ? Center(
+              child: Padding(
+                padding: EdgeInsets.all(32.w),
+                child: Text(
+                  tLocal.tr(en: 'No jobs posted yet.', ar: 'لا توجد وظائف تم نشرها بعد.'),
+                  style: TextStyle(color: Colors.white54, fontSize: 16.sp),
+                ),
+              ),
+            )
+                : ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: _latestJobs.length,
+              separatorBuilder: (context, index) => SizedBox(height: 12.h),
+              itemBuilder: (context, index) {
+                final job = _latestJobs[index];
+                return _buildJobCard(job);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildErrorState() {
+    final tLocal = AppLocalizations.of(context);
+    return LayoutBuilder(
+      builder: (context, constraints) => SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: constraints.maxHeight),
+          child: Center(
+            child: Padding(
+              padding: EdgeInsets.all(24.w),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.error_outline, color: Colors.redAccent, size: 56.w),
+                  SizedBox(height: 16.h),
+                  Text(
+                    _error ?? tLocal.tr(en: 'An unexpected error occurred.', ar: 'حدث خطأ غير متوقع.'),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.white, fontSize: 16.sp),
+                  ),
+                  SizedBox(height: 24.h),
+                  ElevatedButton.icon(
+                    onPressed: _initDashboard,
+                    icon: const Icon(Icons.refresh),
+                    label: Text(tLocal.tr(en: 'Retry', ar: 'إعادة المحاولة')),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueAccent,
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.r),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatCard({
+    required String title,
+    required String value,
+    required IconData icon,
+    required Color color,
+  }) {
+    return Container(
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1E1E1E),
+        borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(color: Colors.white12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: EdgeInsets.all(8.w),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(8.r),
+            ),
+            child: Icon(icon, color: color, size: 24.w),
+          ),
+          SizedBox(height: 16.h),
+          Text(
+            value,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 24.sp,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          SizedBox(height: 4.h),
+          Text(
+            title,
+            style: TextStyle(
+              color: Colors.white70,
+              fontSize: 14.sp,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildJobCard(dynamic job) {
+    final title = job['title'] ?? 'Unknown Job';
+    final address = job['address'] ?? job['location'] ?? 'Remote';
+    final jobType = job['jobType'] ?? job['job_type'] ?? 'Full-time';
+    final availableSlots = job['availableSlots'] ?? job['available_slots'] ?? job['capacity'] ?? 0;
+
+    return InkWell(
+      onTap: () {
+        Navigator.of(context).pushNamed(
+          AppRoutes.companyJobDetails,
+          arguments: Job.fromMap(job),
+        );
+      },
+      borderRadius: BorderRadius.circular(12.r),
+      child: Container(
+        padding: EdgeInsets.all(16.w),
+        decoration: BoxDecoration(
+          color: const Color(0xFF1E1E1E),
+          borderRadius: BorderRadius.circular(12.r),
+          border: Border.all(color: Colors.white12),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    title,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                SizedBox(width: 12.w),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                  decoration: BoxDecoration(
+                    color: Colors.blueAccent.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(8.r),
+                    border: Border.all(color: Colors.blueAccent.withOpacity(0.3)),
+                  ),
+                  child: Text(
+                    jobType,
+                    style: TextStyle(
+                      color: Colors.blueAccent,
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 12.h),
+            Row(
+              children: [
+                Icon(Icons.location_on_outlined, color: Colors.white54, size: 16.w),
+                SizedBox(width: 4.w),
+                Expanded(
+                  child: Text(
+                    address,
+                    style: TextStyle(color: Colors.white54, fontSize: 13.sp),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                SizedBox(width: 8.w),
+                Icon(Icons.people_outline, color: Colors.white54, size: 16.w),
+                SizedBox(width: 4.w),
+                Text(
+                  '$availableSlots slots',
+                  style: TextStyle(color: Colors.white54, fontSize: 13.sp),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );

@@ -349,7 +349,7 @@ class _CompanyJobsHubScreenState extends State<CompanyJobsHubScreen> {
                                     Wrap(
                                       spacing: 8,
                                       runSpacing: 8,
-                                      children: (j.tags ?? [])
+                                      children: (j.tags)
                                           .map(
                                             (String tag) => Container(
                                               padding:

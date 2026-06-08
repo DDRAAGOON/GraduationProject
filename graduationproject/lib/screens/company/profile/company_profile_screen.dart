@@ -210,7 +210,7 @@ class _CompanyStatsBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
-    final cs = Theme.of(context).colorScheme;
+    final _ = Theme.of(context).colorScheme;
     const boxColor = Color(0xFF213E75);
     const textColor = Colors.white;
 

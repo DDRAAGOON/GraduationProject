@@ -5,7 +5,6 @@ import 'package:graduationproject/shared/l10n/app_localizations.dart';
 import 'package:graduationproject/shared/state/recruitment_sync_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../../app/router/app_router.dart';
 
 class TradesmanVerificationScreen extends StatefulWidget {
   const TradesmanVerificationScreen({super.key});

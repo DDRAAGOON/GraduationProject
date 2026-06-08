@@ -160,7 +160,6 @@ class _SettingsState extends State<Settings> {
     required bool isDark,
     required Color onSurfaceColor,
   }) {
-    final isAr = AppLocalizations.of(context).isAr;
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(

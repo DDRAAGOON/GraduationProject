@@ -398,30 +398,6 @@ class TradesmanHomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildIconText(
-    BuildContext context,
-    IconData icon,
-    String text,
-    Color color,
-  ) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, size: 16, color: color),
-        const SizedBox(width: 6),
-        Text(
-          text,
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-            color: Theme.of(
-              context,
-            ).colorScheme.onSurface.withValues(alpha: 0.7),
-          ),
-        ),
-      ],
-    );
-  }
 
   Widget _buildHowItWorks(BuildContext context, bool isAr, bool isDark) {
     final titleColor = isDark ? Colors.white : Colors.black;

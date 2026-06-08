@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../../constants/app_images.dart';
 import '../../../../shared/state/recruitment_sync_store.dart';
 import '../../../../shared/state/company_store.dart';
 import '../../../../shared/utils/image_helper.dart';

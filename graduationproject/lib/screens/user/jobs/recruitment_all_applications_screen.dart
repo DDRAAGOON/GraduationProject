@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../../shared/state/recruitment_sync_store.dart';
-import '../../../app/router/app_router.dart';
 
 class RecruitmentAllApplicationsScreen extends StatefulWidget {
   const RecruitmentAllApplicationsScreen({super.key});
