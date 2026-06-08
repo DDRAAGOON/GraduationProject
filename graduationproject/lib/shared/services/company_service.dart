@@ -1,4 +1,3 @@
-import 'dart:convert';
 import '../../data/api/api_client.dart';
 
 class CompanyService {
@@ -14,8 +13,11 @@ class CompanyService {
       if (search != null && search.isNotEmpty) {
         queryParams['search'] = search;
       }
-      
-      final response = await ApiClient.get('/companies', queryParams: queryParams);
+
+      final response = await ApiClient.get(
+        '/companies',
+        queryParams: queryParams,
+      );
       final data = await handleResponse(response, (map) => map);
       return data['data'] ?? data['companies'] ?? data ?? [];
     } catch (e) {
@@ -25,7 +27,10 @@ class CompanyService {
 
   Future<Map<String, dynamic>> getCompanyProfile() async {
     try {
-      final response = await ApiClient.get('/companies/my/profile', requiresAuth: true);
+      final response = await ApiClient.get(
+        '/companies/my/profile',
+        requiresAuth: true,
+      );
       return await handleResponse(response, (map) => map);
     } catch (e) {
       rethrow;
@@ -34,7 +39,10 @@ class CompanyService {
 
   Future<Map<String, dynamic>> getDashboardSummary() async {
     try {
-      final response = await ApiClient.get('/companies/my/dashboard-summary', requiresAuth: true);
+      final response = await ApiClient.get(
+        '/companies/my/dashboard-summary',
+        requiresAuth: true,
+      );
       return await handleResponse(response, (map) => map);
     } catch (e) {
       rethrow;

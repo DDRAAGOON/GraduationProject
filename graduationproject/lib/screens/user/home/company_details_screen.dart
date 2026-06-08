@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../shared/l10n/app_localizations.dart';
 import '../../../shared/state/recruitment_sync_store.dart';
+import '../../../shared/services/rating_service.dart';
+import '../../../shared/utils/rating_utils.dart';
 import '../../../shared/utils/image_helper.dart';
 import '../../../app/router/app_router.dart';
 import '../../../shared/widgets/app_button.dart';
@@ -17,13 +19,36 @@ class CompanyDetailsScreen extends StatefulWidget {
 class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
   final TextEditingController _commentController = TextEditingController();
   int _userRating = 0;
-  final List<Map<String, dynamic>> _comments = [
-    {
-      'name': 'أحمد علي', 
-      'text': 'بيئة عمل ممتازة جداً واحترافية عالية.',
-      'rating': 5,
-    },
-  ];
+  List<Map<String, dynamic>> _ratings = [];
+  bool _isLoadingRatings = true;
+  bool _isSubmitting = false;
+
+  int? get _companyId {
+    final raw = widget.company['id'] ?? widget.company['_id'];
+    if (raw == null) return null;
+    return int.tryParse(raw.toString());
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadRatings();
+  }
+
+  Future<void> _loadRatings() async {
+    final companyId = _companyId;
+    if (companyId == null) {
+      if (mounted) setState(() => _isLoadingRatings = false);
+      return;
+    }
+    setState(() => _isLoadingRatings = true);
+    final ratings = await RatingService.instance.getCompanyRatings(companyId);
+    if (!mounted) return;
+    setState(() {
+      _ratings = ratings;
+      _isLoadingRatings = false;
+    });
+  }
 
   @override
   void dispose() {
@@ -31,21 +56,58 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
     super.dispose();
   }
 
-  void _addComment() {
-    if (_commentController.text.trim().isNotEmpty && _userRating > 0) {
-      setState(() {
-        _comments.insert(0, {
-          'name': RecruitmentSyncStore.instance.currentUserName,
-          'text': _commentController.text.trim(),
-          'rating': _userRating,
-        });
-        _commentController.clear();
-        _userRating = 0;
-      });
-    } else if (_userRating == 0) {
+  Future<void> _addComment() async {
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
+    if (_userRating == 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('يرجى اختيار التقييم بالنجوم أولاً')),
+        SnackBar(
+          content: Text(
+            isAr
+                ? 'يرجى اختيار التقييم بالنجوم أولاً'
+                : 'Please select a star rating first',
+          ),
+        ),
       );
+      return;
+    }
+
+    final companyId = _companyId;
+    if (companyId == null) return;
+
+    setState(() => _isSubmitting = true);
+    try {
+      await RatingService.instance.createRating(
+        ratingValue: _userRating,
+        comment: _commentController.text.trim().isEmpty
+            ? null
+            : _commentController.text.trim(),
+        companyId: companyId,
+        raterType: 'user',
+      );
+      _commentController.clear();
+      _userRating = 0;
+      await _loadRatings();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            isAr ? 'تم إضافة تقييمك بنجاح' : 'Your rating was submitted',
+          ),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            isAr ? 'حدث خطأ أثناء إرسال التقييم' : 'Failed to submit rating',
+          ),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _isSubmitting = false);
     }
   }
 
@@ -57,21 +119,45 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final Color textColor = isDark ? const Color(0xFFD9D9D9) : Colors.black;
-    
-    final name = widget.company['name']?.toString() ?? widget.company['companyName']?.toString() ?? 'Company';
-    final companyJobs = store.jobs.where((job) => 
-      job.companyName.trim().toLowerCase() == name.trim().toLowerCase()
-    ).toList();
-    
-    final industry = widget.company['industry']?.toString() ?? widget.company['category']?.toString() ?? '---';
-    final location = widget.company['location']?.toString() ?? widget.company['address']?.toString() ?? (isAr ? 'القاهرة، مصر' : 'Cairo, Egypt');
-    final employees = widget.company['employees']?.toString() ?? widget.company['employeesCount']?.toString() ?? '50 - 200';
-    final founded = widget.company['founded']?.toString() ?? widget.company['foundedYear']?.toString() ?? '2015';
-    
-    final descriptionEn = widget.company['aboutEn']?.toString() ?? widget.company['description']?.toString() ?? 'A leading company providing an amazing work environment.';
-    final descriptionAr = widget.company['aboutAr']?.toString() ?? widget.company['description']?.toString() ?? 'شركة رائدة توفر بيئة عمل ممتازة.';
+
+    final name =
+        widget.company['name']?.toString() ??
+        widget.company['companyName']?.toString() ??
+        'Company';
+    final companyJobs = store.jobs
+        .where(
+          (job) =>
+              job.companyName.trim().toLowerCase() == name.trim().toLowerCase(),
+        )
+        .toList();
+
+    final industry =
+        widget.company['industry']?.toString() ??
+        widget.company['category']?.toString() ??
+        '---';
+    final location =
+        widget.company['location']?.toString() ??
+        widget.company['address']?.toString() ??
+        (isAr ? 'القاهرة، مصر' : 'Cairo, Egypt');
+    final employees =
+        widget.company['employees']?.toString() ??
+        widget.company['employeesCount']?.toString() ??
+        '50 - 200';
+    final founded =
+        widget.company['founded']?.toString() ??
+        widget.company['foundedYear']?.toString() ??
+        '2015';
+
+    final descriptionEn =
+        widget.company['aboutEn']?.toString() ??
+        widget.company['description']?.toString() ??
+        'A leading company providing an amazing work environment.';
+    final descriptionAr =
+        widget.company['aboutAr']?.toString() ??
+        widget.company['description']?.toString() ??
+        'شركة رائدة توفر بيئة عمل ممتازة.';
     final desc = isAr ? descriptionAr : descriptionEn;
-    
+
     List<dynamic> extractList(dynamic value) {
       if (value is List) return value;
       if (value is Map) return [value];
@@ -82,17 +168,25 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
     final socialLinksList = extractList(widget.company['socialLinks']);
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4),
+      backgroundColor: isDark
+          ? const Color(0xFF001E3A)
+          : const Color(0xFFF8FBF4),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: isDark ? Colors.white : Colors.black),
+          icon: Icon(
+            Icons.arrow_back_ios,
+            color: isDark ? Colors.white : Colors.black,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           t.tr(en: 'Company Profile', ar: 'ملف الشركة'),
-          style: TextStyle(color: isDark ? Colors.white : Colors.black, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: isDark ? Colors.white : Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
       body: SingleChildScrollView(
@@ -101,35 +195,65 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
           children: [
             // Header Section
             _buildHeader(context, isDark, isAr, textColor),
-            
+
             Padding(
               padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // 1. Company Basic Info Rows
-                  _buildSectionTitle(t.tr(en: 'Company Information', ar: 'معلومات الشركة'), textColor),
+                  _buildSectionTitle(
+                    t.tr(en: 'Company Information', ar: 'معلومات الشركة'),
+                    textColor,
+                  ),
                   const SizedBox(height: 12),
                   _buildContentCard(
                     isDark,
                     Column(
                       children: [
-                        _buildDetailRow(Icons.category_outlined, t.tr(en: 'Industry', ar: 'مجال العمل'), industry, isDark, textColor),
+                        _buildDetailRow(
+                          Icons.category_outlined,
+                          t.tr(en: 'Industry', ar: 'مجال العمل'),
+                          industry,
+                          isDark,
+                          textColor,
+                        ),
                         const Divider(),
-                        _buildDetailRow(Icons.location_on_outlined, t.tr(en: 'Location', ar: 'الموقع'), location, isDark, textColor),
+                        _buildDetailRow(
+                          Icons.location_on_outlined,
+                          t.tr(en: 'Location', ar: 'الموقع'),
+                          location,
+                          isDark,
+                          textColor,
+                        ),
                         const Divider(),
-                        _buildDetailRow(Icons.groups_outlined, t.tr(en: 'Employees', ar: 'عدد الموظفين'), employees, isDark, textColor),
+                        _buildDetailRow(
+                          Icons.groups_outlined,
+                          t.tr(en: 'Employees', ar: 'عدد الموظفين'),
+                          employees,
+                          isDark,
+                          textColor,
+                        ),
                         const Divider(),
-                        _buildDetailRow(Icons.event_available_outlined, t.tr(en: 'Founded', ar: 'تاريخ التأسيس'), founded, isDark, textColor),
+                        _buildDetailRow(
+                          Icons.event_available_outlined,
+                          t.tr(en: 'Founded', ar: 'تاريخ التأسيس'),
+                          founded,
+                          isDark,
+                          textColor,
+                        ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 24),
 
                   const SizedBox(height: 24),
-                  
+
                   // 2. Reviews & Feedback (Input + List)
-                  _buildSectionTitle(t.tr(en: 'Reviews & Feedback', ar: 'التقييمات والآراء'), textColor),
+                  _buildSectionTitle(
+                    t.tr(en: 'Reviews & Feedback', ar: 'التقييمات والآراء'),
+                    textColor,
+                  ),
                   const SizedBox(height: 12),
                   _buildContentCard(
                     isDark,
@@ -138,21 +262,31 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                       children: [
                         Text(
                           isAr ? 'تقييمك:' : 'Your Rating:',
-                          style: const TextStyle(color: Color(0xFF142C66), fontWeight: FontWeight.bold, fontSize: 14),
+                          style: const TextStyle(
+                            color: Color(0xFF142C66),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
                         ),
                         const SizedBox(height: 4),
                         Row(
                           children: [
-                            ...List.generate(5, (index) => IconButton(
-                              icon: Icon(
-                                index < _userRating ? Icons.star : Icons.star_border,
-                                color: const Color(0xFFFF7A2A),
-                                size: 28,
+                            ...List.generate(
+                              5,
+                              (index) => IconButton(
+                                icon: Icon(
+                                  index < _userRating
+                                      ? Icons.star
+                                      : Icons.star_border,
+                                  color: const Color(0xFFFF7A2A),
+                                  size: 28,
+                                ),
+                                onPressed: () =>
+                                    setState(() => _userRating = index + 1),
+                                padding: const EdgeInsets.only(right: 8),
+                                constraints: const BoxConstraints(),
                               ),
-                              onPressed: () => setState(() => _userRating = index + 1),
-                              padding: const EdgeInsets.only(right: 8),
-                              constraints: const BoxConstraints(),
-                            )),
+                            ),
                           ],
                         ),
                         const SizedBox(height: 12),
@@ -160,60 +294,117 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                           controller: _commentController,
                           style: const TextStyle(color: Color(0xFF142C66)),
                           decoration: InputDecoration(
-                            hintText: isAr ? 'اكتب تعليقك هنا...' : 'Write your comment...',
-                            hintStyle: TextStyle(color: const Color(0xFF142C66).withOpacity(0.5)),
-                            suffixIcon: IconButton(
-                              icon: const Icon(Icons.send, color: Color(0xFFFF7A2A)),
-                              onPressed: _addComment,
+                            hintText: isAr
+                                ? 'اكتب تعليقك هنا...'
+                                : 'Write your comment...',
+                            hintStyle: TextStyle(
+                              color: const Color(0xFF142C66).withOpacity(0.5),
                             ),
+                            suffixIcon: _isSubmitting
+                                ? const Padding(
+                                    padding: EdgeInsets.all(12),
+                                    child: SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                      ),
+                                    ),
+                                  )
+                                : IconButton(
+                                    icon: const Icon(
+                                      Icons.send,
+                                      color: Color(0xFFFF7A2A),
+                                    ),
+                                    onPressed: _addComment,
+                                  ),
                             border: InputBorder.none,
                           ),
                         ),
                         const Divider(color: Colors.white24),
-                        ...((widget.company['reviews'] is List ? widget.company['reviews'] as List : (widget.company['reviews'] is Map ? [widget.company['reviews']] : _comments)) as List<dynamic>).map((c) {
-                          final name = c['name']?.toString() ?? c['userName']?.toString() ?? 'User';
-                          final text = c['text']?.toString() ?? c['comment']?.toString() ?? c['review']?.toString() ?? '';
-                          final rating = int.tryParse(c['rating']?.toString() ?? '5') ?? 5;
-                          
-                          return ListTile(
-                            contentPadding: EdgeInsets.zero,
-                            leading: const CircleAvatar(child: Icon(Icons.person)),
-                            title: Row(
-                              children: [
-                                Text(name, style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF142C66))),
-                                const Spacer(),
-                                Row(
-                                  children: List.generate(5, (index) => Icon(
-                                    Icons.star,
-                                    size: 14,
-                                    color: index < rating ? const Color(0xFFFF7A2A) : Colors.grey[400],
-                                  )),
-                                ),
-                              ],
+                        if (_isLoadingRatings)
+                          const Center(child: CircularProgressIndicator())
+                        else if (_ratings.isEmpty)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            child: Text(
+                              isAr ? 'لا توجد تقييمات بعد' : 'No ratings yet',
+                              style: const TextStyle(color: Color(0xFF142C66)),
                             ),
-                            subtitle: Text(text, style: const TextStyle(color: Color(0xFF142C66))),
-                          );
-                        }),
+                          )
+                        else
+                          ..._ratings.map((c) {
+                              final name = RatingUtils.authorName(c);
+                              final text = RatingUtils.comment(c);
+                              final rating = RatingUtils.value(c).round();
+
+                              return ListTile(
+                                contentPadding: EdgeInsets.zero,
+                                leading: const CircleAvatar(
+                                  child: Icon(Icons.person),
+                                ),
+                                title: Row(
+                                  children: [
+                                    Text(
+                                      name,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Color(0xFF142C66),
+                                      ),
+                                    ),
+                                    const Spacer(),
+                                    Row(
+                                      children: List.generate(
+                                        5,
+                                        (index) => Icon(
+                                          Icons.star,
+                                          size: 14,
+                                          color: index < rating
+                                              ? const Color(0xFFFF7A2A)
+                                              : Colors.grey[400],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                subtitle: Text(
+                                  text,
+                                  style: const TextStyle(
+                                    color: Color(0xFF142C66),
+                                  ),
+                                ),
+                              );
+                            }),
                       ],
                     ),
                   ),
                   const SizedBox(height: 24),
 
                   // 3. About Company (Description)
-                  _buildSectionTitle(t.tr(en: 'About Company', ar: 'عن الشركة'), textColor),
+                  _buildSectionTitle(
+                    t.tr(en: 'About Company', ar: 'عن الشركة'),
+                    textColor,
+                  ),
                   const SizedBox(height: 12),
                   _buildContentCard(
                     isDark,
                     Text(
                       desc,
-                      style: const TextStyle(height: 1.6, color: Color(0xFF142C66), fontWeight: FontWeight.w500),
+                      style: const TextStyle(
+                        height: 1.6,
+                        color: Color(0xFF142C66),
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 24),
 
                   // 4. Social Media Links
                   if (socialLinksList.isNotEmpty) ...[
-                    _buildSectionTitle(t.tr(en: 'Social Media', ar: 'روابط التواصل'), textColor),
+                    _buildSectionTitle(
+                      t.tr(en: 'Social Media', ar: 'روابط التواصل'),
+                      textColor,
+                    ),
                     const SizedBox(height: 12),
                     _buildContentCard(
                       isDark,
@@ -225,11 +416,21 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                           final strLink = link.toString().toLowerCase();
                           IconData icon = Icons.language;
                           Color color = Colors.blue;
-                          if (strLink.contains('facebook')) { icon = Icons.facebook; color = Colors.indigo; }
-                          else if (strLink.contains('linkedin')) { icon = Icons.work; color = Colors.blueAccent; }
-                          else if (strLink.contains('twitter') || strLink.contains('x.com')) { icon = Icons.alternate_email; color = Colors.lightBlue; }
-                          else if (strLink.contains('instagram')) { icon = Icons.camera_alt; color = Colors.pink; }
-                          
+                          if (strLink.contains('facebook')) {
+                            icon = Icons.facebook;
+                            color = Colors.indigo;
+                          } else if (strLink.contains('linkedin')) {
+                            icon = Icons.work;
+                            color = Colors.blueAccent;
+                          } else if (strLink.contains('twitter') ||
+                              strLink.contains('x.com')) {
+                            icon = Icons.alternate_email;
+                            color = Colors.lightBlue;
+                          } else if (strLink.contains('instagram')) {
+                            icon = Icons.camera_alt;
+                            color = Colors.pink;
+                          }
+
                           return _buildSocialIcon(icon, color);
                         }).toList(),
                       ),
@@ -239,14 +440,20 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
 
                   // 5. Benefits/Perks
                   if (benefitsList.isNotEmpty) ...[
-                    _buildSectionTitle(t.tr(en: 'Benefits', ar: 'المميزات'), textColor),
+                    _buildSectionTitle(
+                      t.tr(en: 'Benefits', ar: 'المميزات'),
+                      textColor,
+                    ),
                     const SizedBox(height: 12),
                     Wrap(
                       spacing: 10,
                       runSpacing: 10,
                       children: benefitsList.map((b) {
                         if (b is Map<String, dynamic>) {
-                          return _buildBenefitChip(b['title']?.toString() ?? '', isDark);
+                          return _buildBenefitChip(
+                            b['title']?.toString() ?? '',
+                            isDark,
+                          );
                         } else {
                           return _buildBenefitChip(b.toString(), isDark);
                         }
@@ -256,13 +463,23 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                   ],
 
                   // 6. Open Vacancies
-                  _buildSectionTitle(t.tr(en: 'Open Vacancies', ar: 'الوظائف المتاحة'), textColor),
+                  _buildSectionTitle(
+                    t.tr(en: 'Open Vacancies', ar: 'الوظائف المتاحة'),
+                    textColor,
+                  ),
                   const SizedBox(height: 16),
                   if (companyJobs.isEmpty)
-                    Center(child: Text(t.tr(en: 'No vacancies', ar: 'لا توجد وظائف حالياً'), style: TextStyle(color: textColor)))
+                    Center(
+                      child: Text(
+                        t.tr(en: 'No vacancies', ar: 'لا توجد وظائف حالياً'),
+                        style: TextStyle(color: textColor),
+                      ),
+                    )
                   else
-                    ...companyJobs.map((job) => _buildJobItem(job, context, isDark)),
-                  
+                    ...companyJobs.map(
+                      (job) => _buildJobItem(job, context, isDark),
+                    ),
+
                   const SizedBox(height: 50),
                 ],
               ),
@@ -273,11 +490,25 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
     );
   }
 
-  Widget _buildHeader(BuildContext context, bool isDark, bool isAr, Color textColor) {
+  Widget _buildHeader(
+    BuildContext context,
+    bool isDark,
+    bool isAr,
+    Color textColor,
+  ) {
     const headerColor = Color(0xFF213E75);
-    final name = widget.company['name']?.toString() ?? widget.company['companyName']?.toString() ?? '---';
-    final industry = widget.company['industry']?.toString() ?? widget.company['category']?.toString() ?? '---';
-    final logoUrl = widget.company['logoUrl']?.toString() ?? widget.company['photoUrl']?.toString() ?? widget.company['avatar']?.toString();
+    final name =
+        widget.company['name']?.toString() ??
+        widget.company['companyName']?.toString() ??
+        '---';
+    final industry =
+        widget.company['industry']?.toString() ??
+        widget.company['category']?.toString() ??
+        '---';
+    final logoUrl =
+        widget.company['logoUrl']?.toString() ??
+        widget.company['photoUrl']?.toString() ??
+        widget.company['avatar']?.toString();
 
     return Container(
       width: double.infinity,
@@ -292,18 +523,29 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
           CircleAvatar(
             radius: 50,
             backgroundColor: Colors.white.withOpacity(0.15),
-            backgroundImage: logoUrl != null && logoUrl.isNotEmpty ? NetworkImage(logoUrl) : null,
-            child: logoUrl == null || logoUrl.isEmpty ? const Icon(Icons.business, size: 50, color: Colors.white) : null,
+            backgroundImage: logoUrl != null && logoUrl.isNotEmpty
+                ? NetworkImage(logoUrl)
+                : null,
+            child: logoUrl == null || logoUrl.isEmpty
+                ? const Icon(Icons.business, size: 50, color: Colors.white)
+                : null,
           ),
           const SizedBox(height: 16),
           Text(
             name,
-            style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.white),
+            style: const TextStyle(
+              fontSize: 26,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
           ),
           const SizedBox(height: 8),
           Text(
             industry,
-            style: const TextStyle(color: Colors.cyanAccent, fontWeight: FontWeight.bold),
+            style: const TextStyle(
+              color: Colors.cyanAccent,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ],
       ),
@@ -314,9 +556,9 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
     return Text(
       title,
       style: TextStyle(
-        fontSize: 18, 
-        fontWeight: FontWeight.bold, 
-        color: textColor
+        fontSize: 18,
+        fontWeight: FontWeight.bold,
+        color: textColor,
       ),
     );
   }
@@ -340,7 +582,13 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
     );
   }
 
-  Widget _buildDetailRow(IconData icon, String label, String value, bool isDark, Color textColor) {
+  Widget _buildDetailRow(
+    IconData icon,
+    String label,
+    String value,
+    bool isDark,
+    Color textColor,
+  ) {
     const rowTextColor = Color(0xFF142C66);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
@@ -349,7 +597,7 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
           Icon(icon, size: 20, color: const Color(0xFF142C66)),
           const SizedBox(width: 12),
           Text(
-            label, 
+            label,
             style: TextStyle(
               color: rowTextColor.withOpacity(0.7),
               fontWeight: FontWeight.w600,
@@ -357,9 +605,9 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
           ),
           const Spacer(),
           Text(
-            value, 
+            value,
             style: const TextStyle(
-              fontWeight: FontWeight.bold, 
+              fontWeight: FontWeight.bold,
               color: rowTextColor,
             ),
           ),
@@ -371,7 +619,10 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
   Widget _buildSocialIcon(IconData icon, Color color) {
     return Container(
       padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(color: color.withOpacity(0.1), shape: BoxShape.circle),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        shape: BoxShape.circle,
+      ),
       child: Icon(icon, color: color),
     );
   }
@@ -384,13 +635,22 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: const Color(0xFF4CAF50).withOpacity(0.2)),
       ),
-      child: Text(label, style: const TextStyle(color: Color(0xFF4CAF50), fontWeight: FontWeight.bold, fontSize: 13)),
+      child: Text(
+        label,
+        style: const TextStyle(
+          color: Color(0xFF4CAF50),
+          fontWeight: FontWeight.bold,
+          fontSize: 13,
+        ),
+      ),
     );
   }
 
   Widget _buildJobItem(RecruitmentJob job, BuildContext context, bool isDark) {
     return GestureDetector(
-      onTap: () => Navigator.of(context).pushNamed(AppRoutes.userJobDetails, arguments: job),
+      onTap: () => Navigator.of(
+        context,
+      ).pushNamed(AppRoutes.userJobDetails, arguments: job),
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
@@ -402,7 +662,15 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
           children: [
             const Icon(Icons.work_outline, color: Colors.white70),
             const SizedBox(width: 16),
-            Expanded(child: Text(job.title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
+            Expanded(
+              child: Text(
+                job.title,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
             const Icon(Icons.arrow_forward_ios, color: Colors.white, size: 14),
           ],
         ),
@@ -410,5 +678,3 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
     );
   }
 }
-
-

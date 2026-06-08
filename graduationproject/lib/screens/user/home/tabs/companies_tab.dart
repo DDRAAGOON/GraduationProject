@@ -452,10 +452,9 @@ class _CompaniesTabState extends State<CompaniesTab> {
           Align(
             alignment: isAr ? Alignment.centerLeft : Alignment.centerRight,
             child: TextButton(
-              onPressed: () => Navigator.of(context).pushNamed(
-                AppRoutes.userCompanyDetails,
-                arguments: company,
-              ),
+              onPressed: () => Navigator.of(
+                context,
+              ).pushNamed(AppRoutes.userCompanyDetails, arguments: company),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -497,7 +496,7 @@ class _CompaniesTabState extends State<CompaniesTab> {
               child: Image.network(
                 logoUrl,
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) =>
+                errorBuilder: (_, _, _) =>
                     Icon(fallback, color: const Color(0xFF49769F), size: 30),
               ),
             )

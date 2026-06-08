@@ -37,28 +37,38 @@ class RecruitmentSyncService {
       if (token == null || token.isEmpty) {
         throw Exception('Login response missing token');
       }
-      
+
       _client.setToken(token);
       await ApiClient.saveToken(token);
 
       if (user != null) {
-        final String name = user['fullName']?.toString() ?? user['name']?.toString() ?? 'User';
+        final String name =
+            user['fullName']?.toString() ?? user['name']?.toString() ?? 'User';
+        final id = user['id']?.toString() ?? '';
         final email = user['email']?.toString() ?? '';
-        final photoUrl = ApiClient.resolveImageUrl(user['avatar']?.toString() ?? user['photoUrl']?.toString());
+        final photoUrl = ApiClient.resolveImageUrl(
+          user['avatar']?.toString() ?? user['photoUrl']?.toString(),
+        );
         final bioStr = user['bio']?.toString();
         final locationStr = user['location']?.toString();
         final phoneStr = user['phone']?.toString();
         final roleStr = user['role']?.toString();
-        final titleStr = user['classification']?.toString() ?? user['title']?.toString() ?? '';
-        
+        final titleStr =
+            user['classification']?.toString() ??
+            user['title']?.toString() ??
+            '';
+
         List<String>? tradesmanServices;
         if (user['services'] is List) {
-          tradesmanServices = (user['services'] as List).map((e) => e.toString()).toList();
+          tradesmanServices = (user['services'] as List)
+              .map((e) => e.toString())
+              .toList();
         }
-        
+
         RecruitmentSyncStore.instance.updateUserProfile(
           fullName: name,
           title: titleStr,
+          userId: id,
           email: email,
           phone: phoneStr,
           location: locationStr,
@@ -124,14 +134,17 @@ class RecruitmentSyncService {
     String? photoUrl,
   }) async {
     _assertAuthenticated();
-    final response = await _client.updateProfile(name: name, photoUrl: photoUrl);
-    
+    final response = await _client.updateProfile(
+      name: name,
+      photoUrl: photoUrl,
+    );
+
     // Update local store state so UI updates immediately
     RecruitmentSyncStore.instance.updateCurrentUser(
       name: name,
       photoUrl: photoUrl,
     );
-    
+
     return response;
   }
 
@@ -184,7 +197,7 @@ class RecruitmentSyncService {
         'tags': tags,
         'requiredCount': requiredCount,
         if (deadline != null) 'deadline': deadline.toUtc().toIso8601String(),
-        if (status != null) 'status': status,
+        'status': ?status,
       });
       await _pullServerState();
     } catch (_) {}
@@ -268,7 +281,7 @@ class RecruitmentSyncService {
 
   Future<void> _pullServerState() async {
     if (!isAuthenticated) return;
-    
+
     List<dynamic>? jobs;
     List<dynamic>? applications;
     List<dynamic>? messages;
@@ -295,7 +308,9 @@ class RecruitmentSyncService {
   String _handleDioError(DioException e) {
     if (e.response?.data is Map) {
       final data = e.response!.data as Map;
-      return data['message']?.toString() ?? data['error']?.toString() ?? 'حدث خطأ في الطلب';
+      return data['message']?.toString() ??
+          data['error']?.toString() ??
+          'حدث خطأ في الطلب';
     }
     return 'حدث خطأ غير متوقع';
   }
@@ -312,6 +327,9 @@ class RecruitmentSyncService {
   }
 
   // Legacy support
-  Future<void> verifyEmailOtp({required String email, required String code}) async {}
+  Future<void> verifyEmailOtp({
+    required String email,
+    required String code,
+  }) async {}
   Future<void> resendOtp(String email) async {}
 }

@@ -16,11 +16,15 @@ class Screen2 extends StatelessWidget {
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: ThemeController.instance.themeMode,
       builder: (context, themeMode, _) {
-        final isDark = themeMode == ThemeMode.dark || 
-                      (themeMode == ThemeMode.system && MediaQuery.platformBrightnessOf(context) == Brightness.dark);
-        
+        final isDark =
+            themeMode == ThemeMode.dark ||
+            (themeMode == ThemeMode.system &&
+                MediaQuery.platformBrightnessOf(context) == Brightness.dark);
+
         return Scaffold(
-          backgroundColor: isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4),
+          backgroundColor: isDark
+              ? const Color(0xFF001E3A)
+              : const Color(0xFFF8FBF4),
           body: Stack(
             children: [
               // The diagonal background image
@@ -32,13 +36,13 @@ class Screen2 extends StatelessWidget {
                   'assets/tradesman/Rectangle 4127.png',
                   width: size.width,
                   fit: BoxFit.fitWidth,
-                  errorBuilder: (_, __, ___) => Container(
+                  errorBuilder: (_, _, _) => Container(
                     height: size.height * 0.5,
                     color: const Color(0xFFF17C21),
                   ),
                 ),
               ),
-              
+
               SafeArea(
                 child: Column(
                   children: [
@@ -51,11 +55,12 @@ class Screen2 extends StatelessWidget {
                           'assets/company/Onboarding/Onboarding-2.png',
                           height: size.height * 0.3,
                           fit: BoxFit.contain,
-                          errorBuilder: (context, error, stackTrace) => const Icon(
-                            Icons.search,
-                            size: 100,
-                            color: Colors.white,
-                          ),
+                          errorBuilder: (context, error, stackTrace) =>
+                              const Icon(
+                                Icons.search,
+                                size: 100,
+                                color: Colors.white,
+                              ),
                         ),
                       ),
                     ),
@@ -68,7 +73,8 @@ class Screen2 extends StatelessWidget {
                           Text(
                             t.userTr(
                               'onboarding.title2',
-                              fallbackEn: 'Smart Search & Better\nOpportunities',
+                              fallbackEn:
+                                  'Smart Search & Better\nOpportunities',
                               fallbackAr: 'بحث ذكي وفرص أفضل',
                             ),
                             textAlign: TextAlign.center,
@@ -82,7 +88,8 @@ class Screen2 extends StatelessWidget {
                           Text(
                             t.userTr(
                               'onboarding.subtitle2',
-                              fallbackEn: 'Save time and focus on what \nmatters',
+                              fallbackEn:
+                                  'Save time and focus on what \nmatters',
                               fallbackAr: 'وفر وقتك وركز على ما يهم',
                             ),
                             textAlign: TextAlign.center,
@@ -98,14 +105,19 @@ class Screen2 extends StatelessWidget {
                     const Spacer(flex: 3),
                     // Navigation Area
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 32,
+                      ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Row(
                             children: List.generate(
                               3,
-                              (index) => _buildIndicator(isActive: index == currentPage),
+                              (index) => _buildIndicator(
+                                isActive: index == currentPage,
+                              ),
                             ),
                           ),
                           _buildNextButton(onNext, t),
@@ -129,9 +141,7 @@ class Screen2 extends StatelessWidget {
         backgroundColor: const Color(0xFF142C66),
         foregroundColor: Colors.white,
         padding: const EdgeInsets.symmetric(horizontal: 45, vertical: 16),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(25),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
         elevation: 5,
       ),
       child: Text(

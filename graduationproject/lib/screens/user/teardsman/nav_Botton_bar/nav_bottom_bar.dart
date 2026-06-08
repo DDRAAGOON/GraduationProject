@@ -9,7 +9,6 @@ import 'package:graduationproject/screens/user/home/recruitment_user_shell_scree
 import 'package:graduationproject/shared/state/recruitment_sync_store.dart';
 import 'package:graduationproject/shared/utils/image_helper.dart';
 import 'package:graduationproject/screens/user/notifications/notifications_screen.dart';
-import 'package:graduationproject/screens/company/help/help_center_screen.dart';
 import 'package:graduationproject/app/router/app_router.dart';
 import 'package:graduationproject/shared/services/recruitment_sync_service.dart';
 import '../setting/settings.dart';
@@ -50,7 +49,9 @@ class _NavbottonState extends State<Navbotton> {
       animation: store,
       builder: (context, _) {
         final isDark = Theme.of(context).brightness == Brightness.dark;
-        final bgColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
+        final bgColor = isDark
+            ? const Color(0xFF001E3A)
+            : const Color(0xFFF8FBF4);
 
         return Scaffold(
           key: _scaffoldKey,
@@ -76,7 +77,8 @@ class _NavbottonState extends State<Navbotton> {
                           Icons.menu,
                           color: Theme.of(context).colorScheme.onSurface,
                         ),
-                        onPressed: () => _scaffoldKey.currentState?.openDrawer(),
+                        onPressed: () =>
+                            _scaffoldKey.currentState?.openDrawer(),
                       ),
                       IconButton(
                         onPressed: () => Navigator.push(
@@ -93,7 +95,9 @@ class _NavbottonState extends State<Navbotton> {
                       IconButton(
                         onPressed: () => Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => const PostJob()),
+                          MaterialPageRoute(
+                            builder: (context) => const PostJob(),
+                          ),
                         ),
                         icon: Icon(
                           Icons.add_box_outlined,
@@ -108,7 +112,9 @@ class _NavbottonState extends State<Navbotton> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8),
                     child: Image.asset(
-                      isDark ? 'assets/company/logo/لوجو جديد.png' : 'assets/company/logo/لوجو جديد لايت.png',
+                      isDark
+                          ? 'assets/company/logo/لوجو جديد.png'
+                          : 'assets/company/logo/لوجو جديد لايت.png',
                       height: 50,
                       fit: BoxFit.contain,
                     ),

@@ -72,7 +72,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     }
 
     _dayController = TextEditingController(
-      text: (dobParts.length > 0) ? dobParts[0] : '',
+      text: (dobParts.isNotEmpty) ? dobParts[0] : '',
     );
     _monthController = TextEditingController(
       text: (dobParts.length > 1) ? dobParts[1] : '',
@@ -88,7 +88,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _socialLinkController = TextEditingController();
 
     _selectedGender =
-        (UserProfileData.gender == "أنثى" || UserProfileData.gender == "Female" || store.gender.toLowerCase().contains('female'))
+        (UserProfileData.gender == "أنثى" ||
+            UserProfileData.gender == "Female" ||
+            store.gender.toLowerCase().contains('female'))
         ? "Female"
         : "Male";
 
@@ -194,7 +196,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
     final store = RecruitmentSyncStore.instance;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final backgroundColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
+    final backgroundColor = isDark
+        ? const Color(0xFF001E3A)
+        : const Color(0xFFF8FBF4);
     final onSurfaceColor = isDark ? Colors.white : Colors.black;
 
     return Scaffold(
@@ -287,10 +291,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               ),
             ),
             const SizedBox(height: 10),
-            Divider(
-              color: onSurfaceColor.withValues(alpha: 0.12),
-              height: 1,
-            ),
+            Divider(color: onSurfaceColor.withValues(alpha: 0.12), height: 1),
             const SizedBox(height: 30),
 
             Text(
@@ -312,10 +313,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 fontSize: 13,
               ),
             ),
-            Divider(
-              color: onSurfaceColor.withValues(alpha: 0.12),
-              height: 40,
-            ),
+            Divider(color: onSurfaceColor.withValues(alpha: 0.12), height: 40),
 
             Text(
               t.tr(en: "Background Photo", ar: "صورة الخلفية"),
@@ -333,14 +331,28 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 width: double.infinity,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(16),
-                  color: isDark ? const Color(0xFF0D2D4D) : Colors.grey.withValues(alpha: 0.1),
-                  image: _localBackgroundImage != null && getAppImageProvider(_localBackgroundImage) != null
-                    ? DecorationImage(image: getAppImageProvider(_localBackgroundImage)!, fit: BoxFit.cover)
-                    : null,
+                  color: isDark
+                      ? const Color(0xFF0D2D4D)
+                      : Colors.grey.withValues(alpha: 0.1),
+                  image:
+                      _localBackgroundImage != null &&
+                          getAppImageProvider(_localBackgroundImage) != null
+                      ? DecorationImage(
+                          image: getAppImageProvider(_localBackgroundImage)!,
+                          fit: BoxFit.cover,
+                        )
+                      : null,
                 ),
                 alignment: Alignment.center,
-                child: (_localBackgroundImage == null || getAppImageProvider(_localBackgroundImage) == null) 
-                  ? Icon(Icons.add_photo_alternate_outlined, color: onSurfaceColor.withOpacity(0.5), size: 40) : null,
+                child:
+                    (_localBackgroundImage == null ||
+                        getAppImageProvider(_localBackgroundImage) == null)
+                    ? Icon(
+                        Icons.add_photo_alternate_outlined,
+                        color: onSurfaceColor.withOpacity(0.5),
+                        size: 40,
+                      )
+                    : null,
               ),
             ),
             const SizedBox(height: 30),
@@ -362,7 +374,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     radius: 35,
                     backgroundColor: Colors.grey.withValues(alpha: 0.1),
                     backgroundImage: getAppImageProvider(_localProfileImage),
-                    child: (_localProfileImage == null || getAppImageProvider(_localProfileImage) == null)
+                    child:
+                        (_localProfileImage == null ||
+                            getAppImageProvider(_localProfileImage) == null)
                         ? Icon(
                             Icons.camera_alt,
                             color: onSurfaceColor.withValues(alpha: 0.3),
@@ -404,10 +418,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ],
               ),
             ),
-            Divider(
-              color: onSurfaceColor.withValues(alpha: 0.12),
-              height: 40,
-            ),
+            Divider(color: onSurfaceColor.withValues(alpha: 0.12), height: 40),
 
             _buildTextFieldWithLabel(
               context,
@@ -532,7 +543,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         height: 50,
                         padding: const EdgeInsets.symmetric(horizontal: 12),
                         decoration: BoxDecoration(
-                          color: isDark ? const Color(0xFF0D2D4D) : Colors.white,
+                          color: isDark
+                              ? const Color(0xFF0D2D4D)
+                              : Colors.white,
                           border: Border.all(
                             color: onSurfaceColor.withValues(alpha: 0.2),
                           ),
@@ -541,16 +554,24 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         child: DropdownButtonHideUnderline(
                           child: DropdownButton<String>(
                             value: _selectedGender,
-                            dropdownColor: isDark ? const Color(0xFF0D2D4D) : Colors.white,
+                            dropdownColor: isDark
+                                ? const Color(0xFF0D2D4D)
+                                : Colors.white,
                             isExpanded: true,
                             items: [
                               DropdownMenuItem(
                                 value: "Male",
-                                child: Text(t.male, style: TextStyle(color: onSurfaceColor)),
+                                child: Text(
+                                  t.male,
+                                  style: TextStyle(color: onSurfaceColor),
+                                ),
                               ),
                               DropdownMenuItem(
                                 value: "Female",
-                                child: Text(t.female, style: TextStyle(color: onSurfaceColor)),
+                                child: Text(
+                                  t.female,
+                                  style: TextStyle(color: onSurfaceColor),
+                                ),
                               ),
                             ],
                             onChanged: (val) {
@@ -576,10 +597,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               suffixIcon: Icons.location_on_outlined,
             ),
 
-            Divider(
-              color: onSurfaceColor.withValues(alpha: 0.12),
-              height: 40,
-            ),
+            Divider(color: onSurfaceColor.withValues(alpha: 0.12), height: 40),
 
             Text(
               t.aboutMe,
@@ -597,10 +615,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               onSurfaceColor,
               maxLines: 3,
             ),
-            Divider(
-              color: onSurfaceColor.withValues(alpha: 0.12),
-              height: 40,
-            ),
+            Divider(color: onSurfaceColor.withValues(alpha: 0.12), height: 40),
 
             _buildSectionHeader(t.workExperience, onSurfaceColor, () {
               _showAddItemDialog(
@@ -622,10 +637,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 () => setState(() => _experiences.remove(exp)),
               ),
             ),
-            Divider(
-              color: onSurfaceColor.withValues(alpha: 0.12),
-              height: 40,
-            ),
+            Divider(color: onSurfaceColor.withValues(alpha: 0.12), height: 40),
 
             _buildSectionHeader(t.education, onSurfaceColor, () {
               _showAddItemDialog(
@@ -647,10 +659,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 () => setState(() => _education.remove(edu)),
               ),
             ),
-            Divider(
-              color: onSurfaceColor.withValues(alpha: 0.12),
-              height: 40,
-            ),
+            Divider(color: onSurfaceColor.withValues(alpha: 0.12), height: 40),
 
             Text(
               t.skills,
@@ -667,7 +676,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               children: _skills
                   .map(
                     (skill) => Chip(
-                      label: Text(skill, style: TextStyle(fontSize: 12, color: onSurfaceColor)),
+                      label: Text(
+                        skill,
+                        style: TextStyle(fontSize: 12, color: onSurfaceColor),
+                      ),
                       onDeleted: () => setState(() => _skills.remove(skill)),
                       backgroundColor: Theme.of(
                         context,
@@ -701,23 +713,26 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ),
               ],
             ),
-            Divider(
-              color: onSurfaceColor.withValues(alpha: 0.12),
-              height: 40,
-            ),
+            Divider(color: onSurfaceColor.withValues(alpha: 0.12), height: 40),
 
             _buildSectionHeader(t.socialMedia, onSurfaceColor, () {
               final url = _socialLinkController.text.trim();
               if (url.isEmpty) return;
-              
+
               String platform = "Link";
               final low = url.toLowerCase();
-              if (low.contains("facebook")) platform = isAr ? "فيسبوك" : "Facebook";
-              else if (low.contains("instagram")) platform = isAr ? "إنستجرام" : "Instagram";
-              else if (low.contains("whatsapp") || low.contains("wa.me")) platform = isAr ? "واتساب" : "WhatsApp";
-              else if (low.contains("linkedin")) platform = "LinkedIn";
-              else if (low.contains("twitter") || low.contains("x.com")) platform = "X / Twitter";
-              else if (low.contains("github")) platform = "GitHub";
+              if (low.contains("facebook")) {
+                platform = isAr ? "فيسبوك" : "Facebook";
+              } else if (low.contains("instagram"))
+                platform = isAr ? "إنستجرام" : "Instagram";
+              else if (low.contains("whatsapp") || low.contains("wa.me"))
+                platform = isAr ? "واتساب" : "WhatsApp";
+              else if (low.contains("linkedin"))
+                platform = "LinkedIn";
+              else if (low.contains("twitter") || low.contains("x.com"))
+                platform = "X / Twitter";
+              else if (low.contains("github"))
+                platform = "GitHub";
 
               setState(() {
                 _socialLinks.add({'platform': platform, 'url': url});
@@ -748,15 +763,21 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   onPressed: () {
                     final url = _socialLinkController.text.trim();
                     if (url.isEmpty) return;
-                    
+
                     String platform = "Link";
                     final low = url.toLowerCase();
-                    if (low.contains("facebook")) platform = isAr ? "فيسبوك" : "Facebook";
-                    else if (low.contains("instagram")) platform = isAr ? "إنستجرام" : "Instagram";
-                    else if (low.contains("whatsapp") || low.contains("wa.me")) platform = isAr ? "واتساب" : "WhatsApp";
-                    else if (low.contains("linkedin")) platform = "LinkedIn";
-                    else if (low.contains("twitter") || low.contains("x.com")) platform = "X / Twitter";
-                    else if (low.contains("github")) platform = "GitHub";
+                    if (low.contains("facebook")) {
+                      platform = isAr ? "فيسبوك" : "Facebook";
+                    } else if (low.contains("instagram"))
+                      platform = isAr ? "إنستجرام" : "Instagram";
+                    else if (low.contains("whatsapp") || low.contains("wa.me"))
+                      platform = isAr ? "واتساب" : "WhatsApp";
+                    else if (low.contains("linkedin"))
+                      platform = "LinkedIn";
+                    else if (low.contains("twitter") || low.contains("x.com"))
+                      platform = "X / Twitter";
+                    else if (low.contains("github"))
+                      platform = "GitHub";
 
                     setState(() {
                       _socialLinks.add({'platform': platform, 'url': url});
@@ -767,12 +788,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               ],
             ),
 
-            Divider(
-              color: onSurfaceColor.withValues(alpha: 0.12),
-              height: 40,
-            ),
+            Divider(color: onSurfaceColor.withValues(alpha: 0.12), height: 40),
 
-            _buildSectionHeader(t.tr(en: "Gallery", ar: "المعرض"), onSurfaceColor, _pickPortfolioImages),
+            _buildSectionHeader(
+              t.tr(en: "Gallery", ar: "المعرض"),
+              onSurfaceColor,
+              _pickPortfolioImages,
+            ),
             if (_portfolioPaths.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.only(top: 10),
@@ -781,7 +803,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: _portfolioPaths.length,
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3, crossAxisSpacing: 10, mainAxisSpacing: 10,
+                    crossAxisCount: 3,
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
                   ),
                   itemBuilder: (context, i) {
                     final provider = getAppImageProvider(_portfolioPaths[i]);
@@ -790,13 +814,27 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       children: [
                         ClipRRect(
                           borderRadius: BorderRadius.circular(8),
-                          child: Image(image: provider, fit: BoxFit.cover, width: double.infinity, height: double.infinity),
+                          child: Image(
+                            image: provider,
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                            height: double.infinity,
+                          ),
                         ),
                         Positioned(
-                          right: 0, top: 0,
+                          right: 0,
+                          top: 0,
                           child: GestureDetector(
-                            onTap: () => setState(() => _portfolioPaths.removeAt(i)),
-                            child: Container(color: Colors.black54, child: const Icon(Icons.close, color: Colors.white, size: 16)),
+                            onTap: () =>
+                                setState(() => _portfolioPaths.removeAt(i)),
+                            child: Container(
+                              color: Colors.black54,
+                              child: const Icon(
+                                Icons.close,
+                                color: Colors.white,
+                                size: 16,
+                              ),
+                            ),
                           ),
                         ),
                       ],
@@ -818,7 +856,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
-  Widget _buildTabItem(String label, bool isActive, VoidCallback onTap, bool isDark, Color onSurfaceColor) {
+  Widget _buildTabItem(
+    String label,
+    bool isActive,
+    VoidCallback onTap,
+    bool isDark,
+    Color onSurfaceColor,
+  ) {
     return GestureDetector(
       onTap: onTap,
       child: Column(
@@ -859,7 +903,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       children: [
         Text(
           label,
-          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: onSurfaceColor),
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: onSurfaceColor,
+          ),
         ),
         const SizedBox(height: 8),
         _buildTextField(
@@ -894,23 +942,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       style: TextStyle(color: onSurfaceColor),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: TextStyle(
-          color: onSurfaceColor.withValues(alpha: 0.38),
-        ),
-        suffixIcon: suffixIcon != null ? Icon(suffixIcon, size: 20, color: onSurfaceColor.withOpacity(0.5)) : null,
+        hintStyle: TextStyle(color: onSurfaceColor.withValues(alpha: 0.38)),
+        suffixIcon: suffixIcon != null
+            ? Icon(suffixIcon, size: 20, color: onSurfaceColor.withOpacity(0.5))
+            : null,
         filled: true,
         fillColor: isDark ? const Color(0xFF0D2D4D) : Colors.white,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(
-            color: onSurfaceColor.withValues(alpha: 0.2),
-          ),
+          borderSide: BorderSide(color: onSurfaceColor.withValues(alpha: 0.2)),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(
-            color: onSurfaceColor.withValues(alpha: 0.1),
-          ),
+          borderSide: BorderSide(color: onSurfaceColor.withValues(alpha: 0.1)),
         ),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 12,
@@ -926,7 +970,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       children: [
         Text(
           title,
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: color),
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: color,
+          ),
         ),
         IconButton(
           icon: const Icon(Icons.add_circle_outline, color: Colors.blueAccent),
@@ -943,7 +991,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     VoidCallback onRemove,
   ) {
     return ListTile(
-      title: Text(title, style: TextStyle(fontWeight: FontWeight.bold, color: color)),
+      title: Text(
+        title,
+        style: TextStyle(fontWeight: FontWeight.bold, color: color),
+      ),
       subtitle: Text(subtitle, style: TextStyle(color: color.withOpacity(0.6))),
       trailing: IconButton(
         icon: const Icon(Icons.delete_outline, color: Colors.redAccent),

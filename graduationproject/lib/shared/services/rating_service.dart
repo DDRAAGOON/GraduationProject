@@ -1,32 +1,76 @@
 import 'dart:convert';
+
 import '../../data/api/api_client.dart';
+import '../utils/rating_utils.dart';
 
 class RatingService {
   RatingService._();
   static final RatingService instance = RatingService._();
 
-  Future<List<Map<String, dynamic>>> getCompanyRatings(String companyId) async {
-    try {
-      final response = await ApiClient.get('/ratings/company/$companyId');
-      final data = await handleResponse(response, (map) => map);
-      final List<dynamic> ratings = data['data'] ?? data['ratings'] ?? data ?? [];
-      return ratings.cast<Map<String, dynamic>>();
-    } catch (e) {
-      // If endpoint doesn't exist yet, return empty list instead of crashing
-      return [];
+  Future<void> createRating({
+    required num ratingValue,
+    String? comment,
+    int? companyId,
+    String? targetUserId,
+    int? jobId,
+    String? raterType,
+  }) async {
+    final body = <String, dynamic>{'ratingValue': ratingValue};
+    if (comment != null && comment.isNotEmpty) body['comment'] = comment;
+    if (companyId != null) body['companyId'] = companyId;
+    if (targetUserId != null && targetUserId.isNotEmpty) {
+      body['targetUserId'] = targetUserId;
     }
+    if (jobId != null) body['jobId'] = jobId;
+    if (raterType != null && raterType.isNotEmpty) body['raterType'] = raterType;
+
+    final response = await ApiClient.post(
+      '/ratings',
+      requiresAuth: true,
+      body: body,
+    );
+    await handleResponse(response, (map) => map);
   }
 
-  Future<Map<String, dynamic>> postCompanyRating(String companyId, String text) async {
+  Future<List<Map<String, dynamic>>> getCompanyRatings(dynamic companyId) async {
+    return _fetchList('/ratings/company/$companyId');
+  }
+
+  Future<List<Map<String, dynamic>>> getUserRatings(String userId) async {
+    return _fetchList('/ratings/user/$userId');
+  }
+
+  Future<List<Map<String, dynamic>>> getJobRatings(dynamic jobId) async {
+    return _fetchList('/ratings/job/$jobId');
+  }
+
+  Future<List<Map<String, dynamic>>> getCompanyGivenRatings(
+    dynamic companyId,
+  ) async {
+    return _fetchList('/ratings/company/$companyId/given', requiresAuth: true);
+  }
+
+  Future<List<Map<String, dynamic>>> getUserGivenRatings(String userId) async {
+    return _fetchList('/ratings/user/$userId/given', requiresAuth: true);
+  }
+
+  Future<List<Map<String, dynamic>>> _fetchList(
+    String endpoint, {
+    bool requiresAuth = false,
+  }) async {
     try {
-      final response = await ApiClient.post(
-        '/ratings/company/$companyId',
-        body: {'text': text},
-        requiresAuth: true,
+      final response = await ApiClient.get(
+        endpoint,
+        requiresAuth: requiresAuth,
       );
-      return await handleResponse(response, (map) => map);
-    } catch (e) {
-      rethrow;
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        return [];
+      }
+      if (response.body.isEmpty) return [];
+      final decoded = jsonDecode(response.body);
+      return RatingUtils.parseList(decoded);
+    } catch (_) {
+      return [];
     }
   }
 }

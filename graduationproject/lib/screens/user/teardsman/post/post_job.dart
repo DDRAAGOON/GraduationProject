@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:graduationproject/shared/l10n/app_localizations.dart';
 import 'package:graduationproject/shared/state/recruitment_sync_store.dart';
-import '../../../../shared/services/recruitment_sync_service.dart';
 import '../../../../shared/services/job_service.dart';
 import 'job_applicants_screen.dart';
 
@@ -21,7 +20,9 @@ class _PostJobState extends State<PostJob> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _skillController = TextEditingController();
-  final TextEditingController _capacityController = TextEditingController(text: "1");
+  final TextEditingController _capacityController = TextEditingController(
+    text: "1",
+  );
 
   final List<String> _days = [
     "Saturday",
@@ -158,7 +159,9 @@ class _PostJobState extends State<PostJob> {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('${t.isAr ? 'فشل نشر العمل' : 'Failed to post work'}: $e'),
+            content: Text(
+              '${t.isAr ? 'فشل نشر العمل' : 'Failed to post work'}: $e',
+            ),
             backgroundColor: Colors.redAccent,
           ),
         );

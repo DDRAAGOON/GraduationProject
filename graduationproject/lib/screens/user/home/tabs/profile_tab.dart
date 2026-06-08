@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import '../../../../data/api/api_client.dart';
+import '../../../../shared/services/rating_service.dart';
 import '../../../../shared/state/recruitment_sync_store.dart';
 import '../../../../shared/utils/image_helper.dart';
+import '../../../../shared/utils/rating_utils.dart';
 
 class ProfileTab extends StatelessWidget {
   const ProfileTab({super.key});
@@ -172,36 +175,7 @@ class ProfileTab extends StatelessWidget {
                 ),
 
               _buildSectionHeader(isAr ? 'تقييمات الشركات والعملاء' : 'Company & Client Ratings', isDark),
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: _buildProfileInfoCard(
-                  isDark,
-                  Column(
-                    children: [
-                      Row(
-                        children: [
-                          const Text('4.9', style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Color(0xFFFF7A2A))),
-                          const SizedBox(width: 12),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(children: List.generate(5, (i) => const Icon(Icons.star, color: Color(0xFFFF7A2A), size: 16))),
-                              Text(isAr ? 'بناءً على 15 تقييم' : 'Based on 15 reviews', style: const TextStyle(fontSize: 12, color: Colors.grey)),
-                            ],
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        leading: const CircleAvatar(child: Icon(Icons.business)),
-                        title: Text(isAr ? 'شركة السويدي' : 'Elsewedy Electric', style: const TextStyle(fontWeight: FontWeight.bold)),
-                        subtitle: Text(isAr ? 'شخص ملتزم ومحترف جداً.' : 'Very committed and professional person.'),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+              _UserRatingsSection(isDark: isDark, isAr: isAr),
 
               const SizedBox(height: 100),
             ],
@@ -289,6 +263,141 @@ class ProfileTab extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(20),
       child: Text(text, style: const TextStyle(color: Colors.grey, fontStyle: FontStyle.italic)),
+    );
+  }
+}
+
+class _UserRatingsSection extends StatefulWidget {
+  const _UserRatingsSection({required this.isDark, required this.isAr});
+
+  final bool isDark;
+  final bool isAr;
+
+  @override
+  State<_UserRatingsSection> createState() => _UserRatingsSectionState();
+}
+
+class _UserRatingsSectionState extends State<_UserRatingsSection> {
+  List<Map<String, dynamic>> _ratings = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadRatings();
+  }
+
+  Future<void> _loadRatings() async {
+    final userId =
+        RecruitmentSyncStore.instance.currentUserId.isNotEmpty
+            ? RecruitmentSyncStore.instance.currentUserId
+            : await ApiClient.getUserId() ?? '';
+    if (userId.isEmpty) {
+      if (mounted) setState(() => _isLoading = false);
+      return;
+    }
+    final ratings = await RatingService.instance.getUserRatings(userId);
+    if (!mounted) return;
+    setState(() {
+      _ratings = ratings;
+      _isLoading = false;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = widget.isDark;
+    final isAr = widget.isAr;
+
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF0D2D4D) : Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10),
+          ],
+        ),
+        child: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : _ratings.isEmpty
+            ? Text(
+                isAr ? 'لا توجد تقييمات بعد' : 'No ratings yet',
+                style: const TextStyle(color: Colors.grey),
+              )
+            : Column(
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        RatingUtils.average(_ratings).toStringAsFixed(1),
+                        style: const TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFFFF7A2A),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: List.generate(
+                              5,
+                              (i) => Icon(
+                                Icons.star,
+                                color: i <
+                                        RatingUtils.average(_ratings).round()
+                                    ? const Color(0xFFFF7A2A)
+                                    : Colors.grey.shade300,
+                                size: 16,
+                              ),
+                            ),
+                          ),
+                          Text(
+                            isAr
+                                ? 'بناءً على ${_ratings.length} تقييم'
+                                : 'Based on ${_ratings.length} reviews',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  ..._ratings.take(3).map((rating) {
+                    return ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: const CircleAvatar(
+                        child: Icon(Icons.business),
+                      ),
+                      title: Text(
+                        RatingUtils.authorName(rating),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: Text(RatingUtils.comment(rating)),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.star,
+                            color: Color(0xFFFF7A2A),
+                            size: 16,
+                          ),
+                          Text(RatingUtils.value(rating).toStringAsFixed(1)),
+                        ],
+                      ),
+                    );
+                  }),
+                ],
+              ),
+      ),
     );
   }
 }

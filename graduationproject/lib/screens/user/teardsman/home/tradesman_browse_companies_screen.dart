@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../../constants/app_images.dart';
 import '../../../../shared/services/company_service.dart';
 import '../../../../shared/utils/image_helper.dart';
 import 'company_public_profile_screen.dart';
@@ -59,10 +58,12 @@ class _TradesmanBrowseCompaniesScreenState
 
     if (_query.isNotEmpty) {
       list = list.where((c) {
-        final name = c['name']?.toString().toLowerCase() ??
+        final name =
+            c['name']?.toString().toLowerCase() ??
             c['companyName']?.toString().toLowerCase() ??
             '';
-        final cat = c['cat']?.toString().toLowerCase() ??
+        final cat =
+            c['cat']?.toString().toLowerCase() ??
             c['category']?.toString().toLowerCase() ??
             '';
         return name.contains(_query) || cat.contains(_query);
@@ -71,14 +72,16 @@ class _TradesmanBrowseCompaniesScreenState
 
     if (_isTechnical && !_isNonTechnical) {
       list = list.where((c) {
-        final cat = c['cat']?.toString().toLowerCase() ??
+        final cat =
+            c['cat']?.toString().toLowerCase() ??
             c['category']?.toString().toLowerCase() ??
             '';
         return cat.contains('tech');
       }).toList();
     } else if (_isNonTechnical && !_isTechnical) {
       list = list.where((c) {
-        final cat = c['cat']?.toString().toLowerCase() ??
+        final cat =
+            c['cat']?.toString().toLowerCase() ??
             c['category']?.toString().toLowerCase() ??
             '';
         return !cat.contains('tech');
@@ -228,7 +231,8 @@ class _TradesmanBrowseCompaniesScreenState
                         isAr ? 'غير تقني' : 'Non-Technical',
                         _isNonTechnical,
                         const Color(0xFFFF7A2A),
-                        () => setState(() => _isNonTechnical = !_isNonTechnical),
+                        () =>
+                            setState(() => _isNonTechnical = !_isNonTechnical),
                       ),
                     ),
                   ],
@@ -237,37 +241,36 @@ class _TradesmanBrowseCompaniesScreenState
                 _isLoading
                     ? const Center(child: CircularProgressIndicator())
                     : filteredCompanies.isEmpty
-                        ? Center(
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 40),
-                              child: Text(
-                                isAr
-                                    ? 'لا توجد شركات مطابقة'
-                                    : 'No matching companies',
-                                style: TextStyle(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurface
-                                      .withValues(alpha: 0.6),
-                                  fontSize: 16,
-                                ),
-                              ),
-                            ),
-                          )
-                        : ListView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: filteredCompanies.length,
-                            itemBuilder: (context, index) {
-                              final company = filteredCompanies[index];
-                              return _buildCompanyCard(
+                    ? Center(
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 40),
+                          child: Text(
+                            isAr
+                                ? 'لا توجد شركات مطابقة'
+                                : 'No matching companies',
+                            style: TextStyle(
+                              color: Theme.of(
                                 context,
-                                company,
-                                isAr,
-                                isDark,
-                              );
-                            },
+                              ).colorScheme.onSurface.withValues(alpha: 0.6),
+                              fontSize: 16,
+                            ),
                           ),
+                        ),
+                      )
+                    : ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: filteredCompanies.length,
+                        itemBuilder: (context, index) {
+                          final company = filteredCompanies[index];
+                          return _buildCompanyCard(
+                            context,
+                            company,
+                            isAr,
+                            isDark,
+                          );
+                        },
+                      ),
                 const SizedBox(height: 80),
               ],
             ),
@@ -325,15 +328,18 @@ class _TradesmanBrowseCompaniesScreenState
     bool isAr,
     bool isDark,
   ) {
-    final name = company['name']?.toString() ??
+    final name =
+        company['name']?.toString() ??
         company['companyName']?.toString() ??
         'Company';
     final category =
         company['cat']?.toString() ?? company['category']?.toString() ?? '';
     final logoUrl =
         company['logo']?.toString() ?? company['logoUrl']?.toString();
-    final aboutEn = company['aboutEn']?.toString() ?? company['about']?.toString() ?? '';
-    final aboutAr = company['aboutAr']?.toString() ?? company['about']?.toString() ?? '';
+    final aboutEn =
+        company['aboutEn']?.toString() ?? company['about']?.toString() ?? '';
+    final aboutAr =
+        company['aboutAr']?.toString() ?? company['about']?.toString() ?? '';
     final jobsCount = (company['jobs'] as List?)?.length ?? 0;
 
     return Container(
@@ -361,9 +367,7 @@ class _TradesmanBrowseCompaniesScreenState
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => CompanyPublicProfileScreen(
-                  company: company,
-                ),
+                builder: (_) => CompanyPublicProfileScreen(company: company),
               ),
             );
           },
@@ -387,7 +391,11 @@ class _TradesmanBrowseCompaniesScreenState
                           ? ClipRRect(
                               borderRadius: BorderRadius.circular(14),
                               child: Image(
-                                image: getAppImageProvider(logoUrl) ?? const AssetImage('assets/company/icon/Company Logo.png'),
+                                image:
+                                    getAppImageProvider(logoUrl) ??
+                                    const AssetImage(
+                                      'assets/company/icon/Company Logo.png',
+                                    ),
                                 fit: BoxFit.cover,
                                 errorBuilder: (_, _, _) => Icon(
                                   Icons.business_rounded,
@@ -437,9 +445,7 @@ class _TradesmanBrowseCompaniesScreenState
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
-                        isAr
-                            ? 'وظائف: $jobsCount'
-                            : '$jobsCount Jobs',
+                        isAr ? 'وظائف: $jobsCount' : '$jobsCount Jobs',
                         style: const TextStyle(
                           color: Color(0xFFFF7A2A),
                           fontSize: 10,
@@ -453,10 +459,10 @@ class _TradesmanBrowseCompaniesScreenState
                   const SizedBox(height: 14),
                   Text(
                     isAr
-                        ? (aboutAr.isNotEmpty
-                              ? aboutAr
-                              : aboutEn)
-                        : aboutEn.isNotEmpty ? aboutEn : aboutAr,
+                        ? (aboutAr.isNotEmpty ? aboutAr : aboutEn)
+                        : aboutEn.isNotEmpty
+                        ? aboutEn
+                        : aboutAr,
                     style: TextStyle(
                       color: Theme.of(
                         context,
@@ -501,4 +507,3 @@ class _TradesmanBrowseCompaniesScreenState
     );
   }
 }
-

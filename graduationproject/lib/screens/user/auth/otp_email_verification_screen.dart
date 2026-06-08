@@ -121,7 +121,7 @@ class _OtpEmailVerificationScreenState
     final name = parts[0];
     final domain = parts[1];
     if (name.length <= 4) {
-      return "${name}******@$domain";
+      return "$name******@$domain";
     }
     return "${name.substring(0, 4)}******@$domain";
   }

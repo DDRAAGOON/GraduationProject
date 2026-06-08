@@ -37,9 +37,20 @@ class AiChatbotService {
         .listen(
           (line) {
             if (line.startsWith('data: ')) {
-              final data = line.substring(6);
-              if (data != '[DONE]') {
-                onChunk(data);
+              final data = line.substring(6).trim();
+              if (data != '[DONE]' && data.isNotEmpty) {
+                try {
+                  // محاولة استخراج النص إذا كان الرد JSON
+                  final decoded = jsonDecode(data);
+                  if (decoded is Map && decoded.containsKey('text')) {
+                    onChunk(decoded['text'].toString());
+                  } else {
+                    onChunk(data);
+                  }
+                } catch (e) {
+                  // إذا لم يكن JSON (نص عادي)، نرسله كما هو
+                  onChunk(data);
+                }
               }
             }
           },

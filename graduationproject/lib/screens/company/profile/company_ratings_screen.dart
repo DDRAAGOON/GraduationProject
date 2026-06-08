@@ -20,11 +20,17 @@ class CompanyRatingsScreen extends StatelessWidget {
           children: [
             TabBar(
               labelColor: Theme.of(context).colorScheme.primary,
-              unselectedLabelColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+              unselectedLabelColor: Theme.of(
+                context,
+              ).colorScheme.onSurface.withOpacity(0.5),
               indicatorColor: Theme.of(context).colorScheme.primary,
               tabs: [
-                Tab(text: t.tr(en: 'Candidates', ar: 'تقييمات المرشحين')),
-                Tab(text: t.tr(en: 'My Ratings', ar: 'تقييماتي')),
+                Tab(
+                  text: t.tr(en: 'Candidates', ar: 'تقييمات المرشحين'),
+                ),
+                Tab(
+                  text: t.tr(en: 'My Ratings', ar: 'تقييماتي'),
+                ),
               ],
             ),
             Expanded(
@@ -32,11 +38,15 @@ class CompanyRatingsScreen extends StatelessWidget {
                 children: [
                   _RatingsList(
                     entries: _mockCandidateRatings,
-                    emptyMessage: isAr ? 'لا توجد تقييمات من مرشحين بعد' : 'No candidate ratings yet',
+                    emptyMessage: isAr
+                        ? 'لا توجد تقييمات من مرشحين بعد'
+                        : 'No candidate ratings yet',
                   ),
                   _RatingsList(
                     entries: _mockMyRatings,
-                    emptyMessage: isAr ? 'لم تقيّم أي مرشح بعد' : 'You have not rated any candidate yet',
+                    emptyMessage: isAr
+                        ? 'لم تقيّم أي مرشح بعد'
+                        : 'You have not rated any candidate yet',
                   ),
                 ],
               ),
@@ -64,7 +74,7 @@ class _RatingsList extends StatelessWidget {
     return ListView.separated(
       padding: const EdgeInsets.all(20),
       itemCount: entries.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 12),
+      separatorBuilder: (_, _) => const SizedBox(height: 12),
       itemBuilder: (context, index) {
         final entry = entries[index];
         const cardColor = Color(0xFF213E75);

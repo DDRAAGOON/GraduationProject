@@ -262,8 +262,7 @@ class ServiceRequestPost {
 }
 
 class RecruitmentSyncStore extends ChangeNotifier {
-  RecruitmentSyncStore._() {
-  }
+  RecruitmentSyncStore._();
 
   void _addInitialMockApplications() {
     // Mock applications removed
@@ -377,6 +376,7 @@ class RecruitmentSyncStore extends ChangeNotifier {
   final Set<String> _deletedJobIds = <String>{};
   final List<ServiceRequestPost> _serviceRequests = <ServiceRequestPost>[];
 
+  String _currentUserId = '';
   String _currentUserName = 'User';
   String _currentUserEmail = '';
   String _currentUserPhone = '';
@@ -403,7 +403,8 @@ class RecruitmentSyncStore extends ChangeNotifier {
   List<Map<String, String>> _socialLinks = [];
   List<String> _portfolioImages = [];
 
-  List<RecruitmentJob> get jobs => _jobs.where((j) => !_deletedJobIds.contains(j.id)).toList();
+  List<RecruitmentJob> get jobs =>
+      _jobs.where((j) => !_deletedJobIds.contains(j.id)).toList();
   List<RecruitmentApplication> get applications =>
       List.unmodifiable(_applications);
   List<RecruitmentMessage> get messages => List.unmodifiable(_messages);
@@ -416,6 +417,7 @@ class RecruitmentSyncStore extends ChangeNotifier {
   List<ServiceRequestPost> get serviceRequests =>
       List.unmodifiable(_serviceRequests);
 
+  String get currentUserId => _currentUserId;
   String get currentUserName => _currentUserName;
   String get currentUserEmail => _currentUserEmail;
   String get currentUserPhone => _currentUserPhone;
@@ -490,22 +492,37 @@ class RecruitmentSyncStore extends ChangeNotifier {
       final matchesCategory =
           _filterCategory == 'All' ||
           jobCat == filterCat ||
-          job.tags.any((t) => t.toLowerCase().contains(filterCat) || filterCat.contains(t.toLowerCase())) ||
-          (filterCat == 'technical' && (jobCat.contains('tech') || job.tags.any((t) => t.contains('تقني')))) ||
-          (filterCat == 'non-technical' && (jobCat.contains('non-tech') || job.tags.any((t) => t.contains('غير تقني')))) ||
+          job.tags.any(
+            (t) =>
+                t.toLowerCase().contains(filterCat) ||
+                filterCat.contains(t.toLowerCase()),
+          ) ||
+          (filterCat == 'technical' &&
+              (jobCat.contains('tech') ||
+                  job.tags.any((t) => t.contains('تقني')))) ||
+          (filterCat == 'non-technical' &&
+              (jobCat.contains('non-tech') ||
+                  job.tags.any((t) => t.contains('غير تقني')))) ||
           (filterCat == 'service' &&
-              (jobCat == 'service' || jobCat == 'tradesman' || job.tags.any((t) => t.contains('خدمات'))));
+              (jobCat == 'service' ||
+                  jobCat == 'tradesman' ||
+                  job.tags.any((t) => t.contains('خدمات'))));
       final matchesType =
           _filterType == 'All' ||
           job.type.toLowerCase() == _filterType.toLowerCase();
       final matchesSalary =
           _filterSalaryRange == 'All' ||
           job.salaryRange.toLowerCase() == _filterSalaryRange.toLowerCase();
-      final matchesExceptional = 
-          !_filterExceptional || 
-          job.specialTag != null || 
-          job.tags.any((t) => t.contains('مميز') || t.contains('استثنائي') || t.contains('featured'));
-          
+      final matchesExceptional =
+          !_filterExceptional ||
+          job.specialTag != null ||
+          job.tags.any(
+            (t) =>
+                t.contains('مميز') ||
+                t.contains('استثنائي') ||
+                t.contains('featured'),
+          );
+
       return matchesQuery &&
           matchesLocation &&
           matchesCategory &&
@@ -588,11 +605,7 @@ class RecruitmentSyncStore extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updateNotificationSettings({
-    bool? email,
-    bool? jobs,
-    bool? updates,
-  }) {
+  void updateNotificationSettings({bool? email, bool? jobs, bool? updates}) {
     if (email != null) _emailNotifications = email;
     if (jobs != null) _jobAlerts = jobs;
     if (updates != null) _applicationUpdates = updates;
@@ -614,7 +627,7 @@ class RecruitmentSyncStore extends ChangeNotifier {
           _jobs.add(item);
         }
       }
-      
+
       final ids = <String>{};
       _jobs.retainWhere((j) => ids.add(j.id));
     }
@@ -628,7 +641,7 @@ class RecruitmentSyncStore extends ChangeNotifier {
           _applications.add(item);
         }
       }
-      
+
       final appIds = <String>{};
       _applications.retainWhere((a) => appIds.add(a.id));
     }
@@ -808,7 +821,9 @@ class RecruitmentSyncStore extends ChangeNotifier {
       ),
       TradesmanPostedWorkRow(
         id: 'mock-work-6',
-        title: isAr ? 'تركيب نجف وإضاءة حديثة' : 'Chandelier and modern lighting installation',
+        title: isAr
+            ? 'تركيب نجف وإضاءة حديثة'
+            : 'Chandelier and modern lighting installation',
         rate: '4.9',
         status: isAr ? 'مكتمل' : 'Completed',
         applicantsCount: 12,
@@ -832,7 +847,8 @@ class RecruitmentSyncStore extends ChangeNotifier {
         tags: ['Flutter', 'Clean Architecture', 'Bloc'],
         publishedAt: DateTime.now().subtract(const Duration(hours: 4)),
         logoIcon: Icons.code,
-        description: 'مطلوب مطور فلاتر خبير لقيادة فريق تطوير واجهات المستخدم في مشاريعنا الكبرى.',
+        description:
+            'مطلوب مطور فلاتر خبير لقيادة فريق تطوير واجهات المستخدم في مشاريعنا الكبرى.',
         capacity: 5,
         acceptedCount: 2,
       ),
@@ -848,7 +864,8 @@ class RecruitmentSyncStore extends ChangeNotifier {
         tags: ['Marketing', 'SEO', 'Ads'],
         publishedAt: DateTime.now().subtract(const Duration(days: 2)),
         logoIcon: Icons.campaign,
-        description: 'إدارة حملات التواصل الاجتماعي وتحليل البيانات لزيادة انتشار العلامة التجارية.',
+        description:
+            'إدارة حملات التواصل الاجتماعي وتحليل البيانات لزيادة انتشار العلامة التجارية.',
         capacity: 2,
         acceptedCount: 0,
       ),
@@ -864,7 +881,8 @@ class RecruitmentSyncStore extends ChangeNotifier {
         tags: ['Figma', 'Prototyping'],
         publishedAt: DateTime.now().subtract(const Duration(hours: 12)),
         logoIcon: Icons.design_services,
-        description: 'تصميم تجربة مستخدم مميزة لتطبيقات الهواتف والويب الخاصة بالشركة.',
+        description:
+            'تصميم تجربة مستخدم مميزة لتطبيقات الهواتف والويب الخاصة بالشركة.',
         capacity: 1,
         acceptedCount: 0,
       ),
@@ -1140,7 +1158,8 @@ class RecruitmentSyncStore extends ChangeNotifier {
         tags: ['Plumbing', 'صيانة'],
         publishedAt: DateTime.now().subtract(const Duration(hours: 1)),
         logoIcon: Icons.plumbing,
-        description: 'مطلوب سباك فوراً لإصلاح مجموعة من التسريبات في عقار سكني.',
+        description:
+            'مطلوب سباك فوراً لإصلاح مجموعة من التسريبات في عقار سكني.',
         responsibilities: ['إصلاح التسريبات', 'تغيير المحابس'],
         qualifications: ['خبرة سابقة في أعمال الصيانة السريعة'],
         capacity: 2,
@@ -1157,7 +1176,8 @@ class RecruitmentSyncStore extends ChangeNotifier {
         tags: ['Electrical', 'تركيبات'],
         publishedAt: DateTime.now().subtract(const Duration(hours: 4)),
         logoIcon: Icons.electrical_services,
-        description: 'نبحث عن كهربائي محترف لتركيب وتوصيل لوحة المفاتيح الرئيسية لمحل تجاري.',
+        description:
+            'نبحث عن كهربائي محترف لتركيب وتوصيل لوحة المفاتيح الرئيسية لمحل تجاري.',
         responsibilities: ['توصيل الكابلات', 'اختبار اللوحة'],
         qualifications: ['دقة عالية في العمل'],
         capacity: 1,
@@ -1174,7 +1194,8 @@ class RecruitmentSyncStore extends ChangeNotifier {
         tags: ['Painting', 'نقاشة'],
         publishedAt: DateTime.now().subtract(const Duration(days: 1)),
         logoIcon: Icons.format_paint,
-        description: 'مطلوب نقاش لدهان شقة سكنية صغيرة - وشين نظافة ومعالجة شروخ بسيطة.',
+        description:
+            'مطلوب نقاش لدهان شقة سكنية صغيرة - وشين نظافة ومعالجة شروخ بسيطة.',
         responsibilities: ['معالجة الحوائط', 'الدهان'],
         capacity: 1,
       ),
@@ -1225,7 +1246,8 @@ class RecruitmentSyncStore extends ChangeNotifier {
         tags: ['DevOps', 'AWS', 'Docker'],
         publishedAt: DateTime.now().subtract(const Duration(days: 1)),
         logoIcon: Icons.cloud_done,
-        description: 'إدارة البنية التحتية السحابية وتحسين عمليات النشر التلقائي.',
+        description:
+            'إدارة البنية التحتية السحابية وتحسين عمليات النشر التلقائي.',
         capacity: 1,
       ),
 
@@ -1319,7 +1341,8 @@ class RecruitmentSyncStore extends ChangeNotifier {
         tags: ['Driving', 'سواقة'],
         publishedAt: DateTime.now().subtract(const Duration(days: 1)),
         logoIcon: Icons.drive_eta,
-        description: 'مطلوب سائق خاص ذو خبرة بالقاهرة والجيزة والمناطق الحيوية.',
+        description:
+            'مطلوب سائق خاص ذو خبرة بالقاهرة والجيزة والمناطق الحيوية.',
         capacity: 2,
       ),
       RecruitmentJob(
@@ -1350,12 +1373,14 @@ class RecruitmentSyncStore extends ChangeNotifier {
   }
 
   void updateCurrentUser({
+    String? userId,
     String? name,
     String? email,
     String? phone,
     String? location,
     String? photoUrl,
   }) {
+    if (userId != null) _currentUserId = userId;
     if (name != null) _currentUserName = name;
     if (email != null) _currentUserEmail = email;
     if (phone != null) _currentUserPhone = phone;
@@ -1367,6 +1392,7 @@ class RecruitmentSyncStore extends ChangeNotifier {
   void updateUserProfile({
     required String fullName,
     required String title,
+    String? userId,
     String? email,
     String? phone,
     String? location,
@@ -1388,6 +1414,7 @@ class RecruitmentSyncStore extends ChangeNotifier {
   }) {
     _currentUserName = fullName;
     _currentUserTitle = title;
+    if (userId != null) _currentUserId = userId;
     if (email != null) _currentUserEmail = email;
     if (phone != null) _currentUserPhone = phone;
     if (location != null) _currentUserLocation = location;

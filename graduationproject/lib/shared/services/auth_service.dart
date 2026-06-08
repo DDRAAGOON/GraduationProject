@@ -12,37 +12,36 @@ class AuthService {
     required String password,
   }) async {
     try {
-      final response = await ApiClient.post('/auth/login', body: {
-        'email': email.trim(),
-        'password': password,
-      });
-      
+      final response = await ApiClient.post(
+        '/auth/login',
+        body: {'email': email.trim(), 'password': password},
+      );
+
       final data = await handleResponse(response, (map) => map);
-      final token = data['token']?.toString() ?? data['access_token']?.toString();
+      final token =
+          data['token']?.toString() ?? data['access_token']?.toString();
       final user = data['user'] as Map<String, dynamic>?;
-      
+
       if (token != null) {
         await ApiClient.saveToken(token);
       }
-      
+
       if (user != null) {
         final userId = user['id']?.toString();
         if (userId != null && userId.isNotEmpty) {
           await ApiClient.saveUserId(userId);
         }
 
-        final name = user['fullName']?.toString() ?? user['name']?.toString() ?? 'User';
+        final name =
+            user['fullName']?.toString() ?? user['name']?.toString() ?? 'User';
         final emailStr = user['email']?.toString() ?? '';
-        
+
         RecruitmentSyncStore.instance.updateCurrentUser(
           name: name,
           email: emailStr,
         );
-        
-        await SessionManager.saveUserSession(
-          email: emailStr,
-          name: name,
-        );
+
+        await SessionManager.saveUserSession(email: emailStr, name: name);
       }
       return user ?? {};
     } catch (e) {
@@ -52,14 +51,15 @@ class AuthService {
 
   Future<Map<String, dynamic>> googleLogin(String idToken) async {
     try {
-      final response = await ApiClient.post('/auth/google-login', body: {
-        'token': idToken,
-      });
-      
+      final response = await ApiClient.post(
+        '/auth/google-login',
+        body: {'token': idToken},
+      );
+
       final data = await handleResponse(response, (map) => map);
       final token = data['access_token']?.toString();
       final user = data['user'] as Map<String, dynamic>?;
-      
+
       if (token != null) {
         await ApiClient.saveToken(token);
       }
@@ -70,18 +70,16 @@ class AuthService {
           await ApiClient.saveUserId(userId);
         }
 
-        final name = user['fullName']?.toString() ?? user['name']?.toString() ?? 'User';
+        final name =
+            user['fullName']?.toString() ?? user['name']?.toString() ?? 'User';
         final emailStr = user['email']?.toString() ?? '';
-        
+
         RecruitmentSyncStore.instance.updateCurrentUser(
           name: name,
           email: emailStr,
         );
-        
-        await SessionManager.saveUserSession(
-          email: emailStr,
-          name: name,
-        );
+
+        await SessionManager.saveUserSession(email: emailStr, name: name);
       }
 
       return user ?? {};
@@ -98,14 +96,17 @@ class AuthService {
     String? phone,
   }) async {
     try {
-      final response = await ApiClient.post('/auth/register', body: {
-        'email': email.trim(),
-        'password': password,
-        'fullName': fullName.trim(),
-        'role': role.toLowerCase().trim(),
-        if (phone != null) 'phone': phone,
-      });
-      
+      final response = await ApiClient.post(
+        '/auth/register',
+        body: {
+          'email': email.trim(),
+          'password': password,
+          'fullName': fullName.trim(),
+          'role': role.toLowerCase().trim(),
+          'phone': ?phone,
+        },
+      );
+
       return await handleResponse(response, (map) => map);
     } catch (e) {
       rethrow;
@@ -117,11 +118,10 @@ class AuthService {
     required String otp,
   }) async {
     try {
-      final response = await ApiClient.post('/auth/verify-email', body: {
-        'email': email.trim(),
-        'otp': otp.trim(),
-        'code': otp.trim(),
-      });
+      final response = await ApiClient.post(
+        '/auth/verify-email',
+        body: {'email': email.trim(), 'otp': otp.trim(), 'code': otp.trim()},
+      );
       return await handleResponse(response, (map) => map);
     } catch (e) {
       rethrow;
@@ -130,9 +130,10 @@ class AuthService {
 
   Future<void> forgotPassword(String email) async {
     try {
-      final response = await ApiClient.post('/auth/forgot-password', body: {
-        'email': email.trim(),
-      });
+      final response = await ApiClient.post(
+        '/auth/forgot-password',
+        body: {'email': email.trim()},
+      );
       await handleResponse(response, (map) => map);
     } catch (e) {
       rethrow;
@@ -145,11 +146,14 @@ class AuthService {
     required String newPassword,
   }) async {
     try {
-      final response = await ApiClient.post('/auth/reset-password', body: {
-        'email': email.trim(),
-        'code': code.trim(),
-        'newPassword': newPassword,
-      });
+      final response = await ApiClient.post(
+        '/auth/reset-password',
+        body: {
+          'email': email.trim(),
+          'code': code.trim(),
+          'newPassword': newPassword,
+        },
+      );
       await handleResponse(response, (map) => map);
     } catch (e) {
       rethrow;

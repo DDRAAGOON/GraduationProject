@@ -16,7 +16,8 @@ class TradesmanEditProfileScreen extends StatefulWidget {
       _TradesmanEditProfileScreenState();
 }
 
-class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen> {
+class _TradesmanEditProfileScreenState
+    extends State<TradesmanEditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
   final ImagePicker _picker = ImagePicker();
 
@@ -71,7 +72,9 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
 
     _governorate = store.governorate.isEmpty ? null : store.governorate;
     if (_governorate != null &&
-        !RecruitmentSyncStore.tradesmanGovernorateAreas.containsKey(_governorate)) {
+        !RecruitmentSyncStore.tradesmanGovernorateAreas.containsKey(
+          _governorate,
+        )) {
       _governorate = null;
     }
 
@@ -100,9 +103,9 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
   Future<void> _pickImage(bool isBackground) async {
     final image = await _picker.pickImage(source: ImageSource.gallery);
     if (image == null) return;
-    
+
     final store = RecruitmentSyncStore.instance;
-    
+
     if (isBackground) {
       store.updateUserProfile(
         fullName: store.currentUserName,
@@ -112,10 +115,12 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
     } else {
       // تحديث محلي فوري ليظهر للمستخدم
       store.updateCurrentUser(photoUrl: image.path);
-      
+
       try {
         // الرفع للسيرفر في الخلفية
-        await RecruitmentSyncService.instance.updateProfile(photoUrl: image.path);
+        await RecruitmentSyncService.instance.updateProfile(
+          photoUrl: image.path,
+        );
       } catch (e) {
         debugPrint("فشل رفع الصورة للسيرفر: $e");
       }
@@ -147,7 +152,9 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
     if (_birthDate == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(t.tr(en: 'Birth date is required', ar: 'تاريخ الميلاد مطلوب')),
+          content: Text(
+            t.tr(en: 'Birth date is required', ar: 'تاريخ الميلاد مطلوب'),
+          ),
         ),
       );
       return;
@@ -165,9 +172,7 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
 
     final store = RecruitmentSyncStore.instance;
     final isAr = t.isAr;
-    final locationParts = [
-      if (_governorate != null) _governorate!,
-    ];
+    final locationParts = [?_governorate];
 
     store.updateUserProfile(
       fullName: _fullNameController.text.trim(),
@@ -212,7 +217,10 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
     required List<String> labels,
     required void Function(Map<String, String>) onSave,
   }) {
-    final controllers = List.generate(labels.length, (_) => TextEditingController());
+    final controllers = List.generate(
+      labels.length,
+      (_) => TextEditingController(),
+    );
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -263,7 +271,9 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
       listenable: store,
       builder: (context, _) {
         final isDark = Theme.of(context).brightness == Brightness.dark;
-        final backgroundColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
+        final backgroundColor = isDark
+            ? const Color(0xFF001E3A)
+            : const Color(0xFFF8FBF4);
         final onSurfaceColor = isDark ? Colors.white : Colors.black;
 
         return Scaffold(
@@ -271,7 +281,10 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
           appBar: AppBar(
             title: Text(
               t.tr(en: 'Edit Profile', ar: 'تعديل الملف الشخصي'),
-              style: TextStyle(fontWeight: FontWeight.bold, color: onSurfaceColor),
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: onSurfaceColor,
+              ),
             ),
             backgroundColor: Colors.transparent,
             elevation: 0,
@@ -288,7 +301,10 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _sectionTitle(t.tr(en: 'Personal information', ar: 'المعلومات الشخصية'), onSurfaceColor),
+                  _sectionTitle(
+                    t.tr(en: 'Personal information', ar: 'المعلومات الشخصية'),
+                    onSurfaceColor,
+                  ),
                   const SizedBox(height: 12),
                   GestureDetector(
                     onTap: () => _pickImage(true),
@@ -297,9 +313,12 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
                       width: double.infinity,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(16),
-                        image: getAppImageProvider(store.backgroundImage) != null
+                        image:
+                            getAppImageProvider(store.backgroundImage) != null
                             ? DecorationImage(
-                                image: getAppImageProvider(store.backgroundImage)!,
+                                image: getAppImageProvider(
+                                  store.backgroundImage,
+                                )!,
                                 fit: BoxFit.cover,
                               )
                             : null,
@@ -311,7 +330,10 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
                       ),
                       alignment: Alignment.center,
                       child: Text(
-                        t.tr(en: 'Change cover photo', ar: 'تغيير صورة الخلفية'),
+                        t.tr(
+                          en: 'Change cover photo',
+                          ar: 'تغيير صورة الخلفية',
+                        ),
                         style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -325,8 +347,12 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
                       onTap: () => _pickImage(false),
                       child: CircleAvatar(
                         radius: 48,
-                        backgroundImage: getAppImageProvider(store.profileImage),
-                        child: (store.profileImage == null || getAppImageProvider(store.profileImage) == null)
+                        backgroundImage: getAppImageProvider(
+                          store.profileImage,
+                        ),
+                        child:
+                            (store.profileImage == null ||
+                                getAppImageProvider(store.profileImage) == null)
                             ? const Icon(Icons.camera_alt, size: 36)
                             : null,
                       ),
@@ -373,24 +399,54 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
                   const SizedBox(height: 12),
                   _label(t.gender, onSurfaceColor),
                   DropdownButtonFormField<String>(
-                    value: _gender,
+                    initialValue: _gender,
                     decoration: _inputDecoration(context),
-                    dropdownColor: isDark ? const Color(0xFF0D2D4D) : Colors.white,
+                    dropdownColor: isDark
+                        ? const Color(0xFF0D2D4D)
+                        : Colors.white,
                     items: [
-                      DropdownMenuItem(value: 'Male', child: Text(t.male, style: TextStyle(color: onSurfaceColor))),
-                      DropdownMenuItem(value: 'Female', child: Text(t.female, style: TextStyle(color: onSurfaceColor))),
+                      DropdownMenuItem(
+                        value: 'Male',
+                        child: Text(
+                          t.male,
+                          style: TextStyle(color: onSurfaceColor),
+                        ),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Female',
+                        child: Text(
+                          t.female,
+                          style: TextStyle(color: onSurfaceColor),
+                        ),
+                      ),
                     ],
                     onChanged: (v) => setState(() => _gender = v ?? 'Male'),
                   ),
                   const SizedBox(height: 12),
-                  _label(t.tr(en: 'Governorate', ar: 'المحافظة'), onSurfaceColor),
+                  _label(
+                    t.tr(en: 'Governorate', ar: 'المحافظة'),
+                    onSurfaceColor,
+                  ),
                   DropdownButtonFormField<String>(
-                    value: _governorate,
+                    initialValue: _governorate,
                     decoration: _inputDecoration(context),
-                    dropdownColor: isDark ? const Color(0xFF0D2D4D) : Colors.white,
-                    hint: Text(t.tr(en: 'Select governorate', ar: 'اختر المحافظة'), style: TextStyle(color: onSurfaceColor.withOpacity(0.5))),
+                    dropdownColor: isDark
+                        ? const Color(0xFF0D2D4D)
+                        : Colors.white,
+                    hint: Text(
+                      t.tr(en: 'Select governorate', ar: 'اختر المحافظة'),
+                      style: TextStyle(color: onSurfaceColor.withOpacity(0.5)),
+                    ),
                     items: RecruitmentSyncStore.tradesmanGovernorateAreas.keys
-                        .map((g) => DropdownMenuItem(value: g, child: Text(g, style: TextStyle(color: onSurfaceColor))))
+                        .map(
+                          (g) => DropdownMenuItem(
+                            value: g,
+                            child: Text(
+                              g,
+                              style: TextStyle(color: onSurfaceColor),
+                            ),
+                          ),
+                        )
                         .toList(),
                     onChanged: (v) => setState(() {
                       _governorate = v;
@@ -398,17 +454,21 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
                   ),
                   const SizedBox(height: 24),
                   _sectionTitle(t.aboutMe, onSurfaceColor),
-                  _hint(t.tr(
-                    en: 'Briefly describe your skills and experience',
-                    ar: 'صف مهاراتك وخبراتك باختصار',
-                  ), onSurfaceColor),
+                  _hint(
+                    t.tr(
+                      en: 'Briefly describe your skills and experience',
+                      ar: 'صف مهاراتك وخبراتك باختصار',
+                    ),
+                    onSurfaceColor,
+                  ),
                   const SizedBox(height: 8),
                   TextFormField(
                     controller: _aboutController,
                     maxLines: 4,
                     style: TextStyle(color: onSurfaceColor),
-                    validator: (v) =>
-                        (v == null || v.trim().isEmpty) ? t.tr(en: 'Required', ar: 'مطلوب') : null,
+                    validator: (v) => (v == null || v.trim().isEmpty)
+                        ? t.tr(en: 'Required', ar: 'مطلوب')
+                        : null,
                     decoration: _inputDecoration(
                       context,
                       hint: t.tr(en: 'About me', ar: 'نبذة عني'),
@@ -417,7 +477,10 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
                   const SizedBox(height: 24),
                   _sectionWithAdd(
                     t.tr(en: 'Experience', ar: 'الخبرات'),
-                    t.tr(en: 'Add your work experience briefly', ar: 'أضف خبراتك العملية باختصار'),
+                    t.tr(
+                      en: 'Add your work experience briefly',
+                      ar: 'أضف خبراتك العملية باختصار',
+                    ),
                     onSurfaceColor,
                     () => _showAddDialog(
                       title: t.tr(en: 'Add experience', ar: 'إضافة خبرة'),
@@ -454,9 +517,21 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
                   ),
                   Row(
                     children: [
-                      Expanded(child: TextField(controller: _skillController, style: TextStyle(color: onSurfaceColor), decoration: _inputDecoration(context, hint: t.tr(en: 'Skill', ar: 'مهارة')))),
+                      Expanded(
+                        child: TextField(
+                          controller: _skillController,
+                          style: TextStyle(color: onSurfaceColor),
+                          decoration: _inputDecoration(
+                            context,
+                            hint: t.tr(en: 'Skill', ar: 'مهارة'),
+                          ),
+                        ),
+                      ),
                       IconButton(
-                        icon: const Icon(Icons.add_circle_outline, color: Colors.blueAccent),
+                        icon: const Icon(
+                          Icons.add_circle_outline,
+                          color: Colors.blueAccent,
+                        ),
                         onPressed: () {
                           if (_skillController.text.trim().isEmpty) return;
                           setState(() {
@@ -470,7 +545,12 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
                   Wrap(
                     spacing: 8,
                     children: _skills
-                        .map((s) => Chip(label: Text(s), onDeleted: () => setState(() => _skills.remove(s))))
+                        .map(
+                          (s) => Chip(
+                            label: Text(s),
+                            onDeleted: () => setState(() => _skills.remove(s)),
+                          ),
+                        )
                         .toList(),
                   ),
                   const SizedBox(height: 16),
@@ -500,7 +580,10 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
                   const SizedBox(height: 16),
                   _sectionWithAdd(
                     t.tr(en: 'Languages', ar: 'اللغات'),
-                    t.tr(en: 'Add languages you speak', ar: 'أضف اللغات التي تتحدثها'),
+                    t.tr(
+                      en: 'Add languages you speak',
+                      ar: 'أضف اللغات التي تتحدثها',
+                    ),
                     onSurfaceColor,
                     () {
                       if (_languageController.text.trim().isEmpty) return;
@@ -513,9 +596,21 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
                   ),
                   Row(
                     children: [
-                      Expanded(child: TextField(controller: _languageController, style: TextStyle(color: onSurfaceColor), decoration: _inputDecoration(context, hint: t.tr(en: 'Language', ar: 'لغة')))),
+                      Expanded(
+                        child: TextField(
+                          controller: _languageController,
+                          style: TextStyle(color: onSurfaceColor),
+                          decoration: _inputDecoration(
+                            context,
+                            hint: t.tr(en: 'Language', ar: 'لغة'),
+                          ),
+                        ),
+                      ),
                       IconButton(
-                        icon: const Icon(Icons.add_circle_outline, color: Colors.blueAccent),
+                        icon: const Icon(
+                          Icons.add_circle_outline,
+                          color: Colors.blueAccent,
+                        ),
                         onPressed: () {
                           if (_languageController.text.trim().isEmpty) return;
                           setState(() {
@@ -529,11 +624,20 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
                   Wrap(
                     spacing: 8,
                     children: _languages
-                        .map((l) => Chip(label: Text(l), onDeleted: () => setState(() => _languages.remove(l))))
+                        .map(
+                          (l) => Chip(
+                            label: Text(l),
+                            onDeleted: () =>
+                                setState(() => _languages.remove(l)),
+                          ),
+                        )
                         .toList(),
                   ),
                   const SizedBox(height: 16),
-                  _sectionTitle(t.tr(en: 'Social links', ar: 'روابط التواصل'), onSurfaceColor),
+                  _sectionTitle(
+                    t.tr(en: 'Social links', ar: 'روابط التواصل'),
+                    onSurfaceColor,
+                  ),
                   const SizedBox(height: 8),
                   ..._socialLinks.map(
                     (link) => _removableTile(
@@ -556,22 +660,36 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.add_circle_outline, color: Colors.blueAccent),
+                        icon: const Icon(
+                          Icons.add_circle_outline,
+                          color: Colors.blueAccent,
+                        ),
                         onPressed: () {
                           final url = _socialLinkController.text.trim();
                           if (url.isEmpty) return;
-                          
+
                           String platform = "Link";
                           final low = url.toLowerCase();
-                          if (low.contains("facebook")) platform = isAr ? "فيسبوك" : "Facebook";
-                          else if (low.contains("instagram")) platform = isAr ? "إنستجرام" : "Instagram";
-                          else if (low.contains("whatsapp") || low.contains("wa.me")) platform = isAr ? "واتساب" : "WhatsApp";
-                          else if (low.contains("linkedin")) platform = "LinkedIn";
-                          else if (low.contains("twitter") || low.contains("x.com")) platform = "X / Twitter";
-                          else if (low.contains("github")) platform = "GitHub";
+                          if (low.contains("facebook")) {
+                            platform = isAr ? "فيسبوك" : "Facebook";
+                          } else if (low.contains("instagram"))
+                            platform = isAr ? "إنستجرام" : "Instagram";
+                          else if (low.contains("whatsapp") ||
+                              low.contains("wa.me"))
+                            platform = isAr ? "واتساب" : "WhatsApp";
+                          else if (low.contains("linkedin"))
+                            platform = "LinkedIn";
+                          else if (low.contains("twitter") ||
+                              low.contains("x.com"))
+                            platform = "X / Twitter";
+                          else if (low.contains("github"))
+                            platform = "GitHub";
 
                           setState(() {
-                            _socialLinks.add({'platform': platform, 'url': url});
+                            _socialLinks.add({
+                              'platform': platform,
+                              'url': url,
+                            });
                             _socialLinkController.clear();
                           });
                         },
@@ -579,27 +697,35 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
                     ],
                   ),
                   const SizedBox(height: 16),
-                  _sectionTitle(t.tr(en: 'Services', ar: 'الخدمات'), onSurfaceColor),
-                  _hint(t.tr(en: 'Select your profession', ar: 'اختر مهنتك'), onSurfaceColor),
+                  _sectionTitle(
+                    t.tr(en: 'Services', ar: 'الخدمات'),
+                    onSurfaceColor,
+                  ),
+                  _hint(
+                    t.tr(en: 'Select your profession', ar: 'اختر مهنتك'),
+                    onSurfaceColor,
+                  ),
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
-                    children: RecruitmentSyncStore.tradesmanDefaultServices.map((service) {
-                      final selected = _selectedServices.contains(service);
-                      return FilterChip(
-                        label: Text(service),
-                        selected: selected,
-                        onSelected: (v) {
-                          setState(() {
-                            if (v) {
-                              _selectedServices.add(service);
-                            } else {
-                              _selectedServices.remove(service);
-                            }
-                          });
-                        },
-                      );
-                    }).toList(),
+                    children: RecruitmentSyncStore.tradesmanDefaultServices.map(
+                      (service) {
+                        final selected = _selectedServices.contains(service);
+                        return FilterChip(
+                          label: Text(service),
+                          selected: selected,
+                          onSelected: (v) {
+                            setState(() {
+                              if (v) {
+                                _selectedServices.add(service);
+                              } else {
+                                _selectedServices.remove(service);
+                              }
+                            });
+                          },
+                        );
+                      },
+                    ).toList(),
                   ),
                   const SizedBox(height: 8),
                   Row(
@@ -615,7 +741,10 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.add_circle_outline, color: Colors.blueAccent),
+                        icon: const Icon(
+                          Icons.add_circle_outline,
+                          color: Colors.blueAccent,
+                        ),
                         onPressed: () {
                           final custom = _customServiceController.text.trim();
                           if (custom.isEmpty) return;
@@ -630,7 +759,10 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
                   const SizedBox(height: 16),
                   _sectionWithAdd(
                     t.tr(en: 'Portfolio', ar: 'المعرض'),
-                    t.tr(en: 'Add or remove your work photos', ar: 'أضف أو احذف صور أعمالك'),
+                    t.tr(
+                      en: 'Add or remove your work photos',
+                      ar: 'أضف أو احذف صور أعمالك',
+                    ),
                     onSurfaceColor,
                     _pickPortfolioImages,
                   ),
@@ -654,11 +786,17 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
                             top: -4,
                             right: -4,
                             child: GestureDetector(
-                              onTap: () => setState(() => _portfolioPaths.removeAt(entry.key)),
+                              onTap: () => setState(
+                                () => _portfolioPaths.removeAt(entry.key),
+                              ),
                               child: const CircleAvatar(
                                 radius: 12,
                                 backgroundColor: Colors.redAccent,
-                                child: Icon(Icons.close, size: 14, color: Colors.white),
+                                child: Icon(
+                                  Icons.close,
+                                  size: 14,
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
                           ),
@@ -683,22 +821,19 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
   }
 
   Widget _sectionTitle(String text, Color color) => Text(
-        text,
-        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: color),
-      );
+    text,
+    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: color),
+  );
 
   Widget _hint(String text, Color color) => Text(
-        text,
-        style: TextStyle(
-          fontSize: 12,
-          color: color.withValues(alpha: 0.45),
-        ),
-      );
+    text,
+    style: TextStyle(fontSize: 12, color: color.withValues(alpha: 0.45)),
+  );
 
   Widget _label(String text, Color color) => Text(
-        text,
-        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: color),
-      );
+    text,
+    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: color),
+  );
 
   InputDecoration _inputDecoration(BuildContext context, {String? hint}) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -724,11 +859,15 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
     return TextFormField(
       controller: controller,
       keyboardType: keyboard,
-      style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black),
+      style: TextStyle(
+        color: Theme.of(context).brightness == Brightness.dark
+            ? Colors.white
+            : Colors.black,
+      ),
       validator: required
           ? (v) => (v == null || v.trim().isEmpty)
-              ? AppLocalizations.of(context).tr(en: 'Required', ar: 'مطلوب')
-              : null
+                ? AppLocalizations.of(context).tr(en: 'Required', ar: 'مطلوب')
+                : null
           : null,
       decoration: _inputDecoration(context, hint: label),
     );
@@ -749,7 +888,10 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
             Expanded(child: _sectionTitle(title, color)),
             if (!addInline)
               IconButton(
-                icon: const Icon(Icons.add_circle_outline, color: Colors.blueAccent),
+                icon: const Icon(
+                  Icons.add_circle_outline,
+                  color: Colors.blueAccent,
+                ),
                 onPressed: onAdd,
               ),
           ],
@@ -760,10 +902,18 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
     );
   }
 
-  Widget _removableTile(String title, String subtitle, Color color, VoidCallback onRemove) {
+  Widget _removableTile(
+    String title,
+    String subtitle,
+    Color color,
+    VoidCallback onRemove,
+  ) {
     return ListTile(
       contentPadding: EdgeInsets.zero,
-      title: Text(title, style: TextStyle(fontWeight: FontWeight.bold, color: color)),
+      title: Text(
+        title,
+        style: TextStyle(fontWeight: FontWeight.bold, color: color),
+      ),
       subtitle: Text(subtitle, style: TextStyle(color: color.withOpacity(0.6))),
       trailing: IconButton(
         icon: const Icon(Icons.delete_outline, color: Colors.redAccent),

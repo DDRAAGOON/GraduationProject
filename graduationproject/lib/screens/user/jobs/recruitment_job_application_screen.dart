@@ -101,7 +101,9 @@ class _RecruitmentJobApplicationScreenState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              isAr ? 'تم إرسال طلب الخدمة بنجاح.' : 'Service request sent successfully.',
+              isAr
+                  ? 'تم إرسال طلب الخدمة بنجاح.'
+                  : 'Service request sent successfully.',
             ),
           ),
         );
@@ -111,9 +113,7 @@ class _RecruitmentJobApplicationScreenState
         setState(() => _loading = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-              isAr ? 'خطأ من السيرفر: $e' : 'Server Error: $e',
-            ),
+            content: Text(isAr ? 'خطأ من السيرفر: $e' : 'Server Error: $e'),
           ),
         );
       }
@@ -138,8 +138,12 @@ class _RecruitmentJobApplicationScreenState
       await ApplicationService.instance.applyToJob(
         jobId: widget.job.id,
         coverLetter: _cover.text.trim(),
-        portfolioUrl: _portfolio.text.trim().isNotEmpty ? _portfolio.text.trim() : null,
-        resumeUrl: _selectedCVName != null ? 'https://example.com/cv/$_selectedCVName' : null,
+        portfolioUrl: _portfolio.text.trim().isNotEmpty
+            ? _portfolio.text.trim()
+            : null,
+        resumeUrl: _selectedCVName != null
+            ? 'https://example.com/cv/$_selectedCVName'
+            : null,
       );
       store.applyToJob(widget.job, hasCv: true);
       if (!mounted) return;
@@ -147,7 +151,9 @@ class _RecruitmentJobApplicationScreenState
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            isAr ? 'تم تقديم الطلب بنجاح.' : 'Application submitted successfully.',
+            isAr
+                ? 'تم تقديم الطلب بنجاح.'
+                : 'Application submitted successfully.',
           ),
         ),
       );
@@ -157,9 +163,7 @@ class _RecruitmentJobApplicationScreenState
       setState(() => _loading = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            isAr ? 'خطأ من السيرفر: $e' : 'Server Error: $e',
-          ),
+          content: Text(isAr ? 'خطأ من السيرفر: $e' : 'Server Error: $e'),
         ),
       );
     }
@@ -211,7 +215,9 @@ class _RecruitmentJobApplicationScreenState
             _buildInputField(
               isAr ? 'تفاصيل العنوان' : 'Address details',
               _addressDetail,
-              hint: isAr ? 'المحافظة، المنطقة، الشارع...' : 'Governorate, area, street...',
+              hint: isAr
+                  ? 'المحافظة، المنطقة، الشارع...'
+                  : 'Governorate, area, street...',
             ),
             const SizedBox(height: 12),
             _buildInputField(
@@ -259,7 +265,9 @@ class _RecruitmentJobApplicationScreenState
                                 : 'Upload your CV (PDF, DOC)'),
                         style: TextStyle(
                           color: _selectedCVName == null
-                              ? theme.colorScheme.onSurface.withValues(alpha: 0.5)
+                              ? theme.colorScheme.onSurface.withValues(
+                                  alpha: 0.5,
+                                )
                               : theme.colorScheme.onSurface,
                         ),
                       ),
@@ -300,9 +308,7 @@ class _RecruitmentJobApplicationScreenState
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: theme.dividerColor.withValues(alpha: 0.1),
-        ),
+        border: Border.all(color: theme.dividerColor.withValues(alpha: 0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -363,7 +369,7 @@ class _RecruitmentJobApplicationScreenState
           Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
           const SizedBox(height: 8),
           DropdownButtonFormField<String>(
-            value: value,
+            initialValue: value,
             decoration: InputDecoration(
               hintText: hint,
               filled: true,

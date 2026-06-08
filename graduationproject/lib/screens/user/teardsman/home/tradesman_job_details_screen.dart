@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:graduationproject/shared/l10n/app_localizations.dart';
 import 'package:graduationproject/shared/state/recruitment_sync_store.dart';
 import 'package:graduationproject/shared/utils/image_helper.dart';
+import 'package:graduationproject/shared/services/rating_service.dart';
+import 'package:graduationproject/shared/utils/rating_utils.dart';
 import 'package:graduationproject/shared/widgets/app_button.dart';
 import '../../home/tabs/recruitment_ui_utils.dart';
 import 'tradesman_apply_job_screen.dart';
@@ -22,14 +24,30 @@ class _TradesmanJobDetailsScreenState extends State<TradesmanJobDetailsScreen> {
   String? _selectedReportReason;
   final TextEditingController _reportDetailsController = TextEditingController();
 
-  final List<Map<String, dynamic>> _customerReviews = [
-    {'name': 'محمد', 'rating': 5, 'comment': 'عمل ممتاز وخدمة سريعة جدًا.'},
-    {
-      'name': 'ليلى',
-      'rating': 4,
-      'comment': 'احترافيين في العمل ومراجعة ممتازة.',
-    },
-  ];
+  List<Map<String, dynamic>> _customerReviews = [];
+  bool _isLoadingReviews = true;
+  bool _isSubmittingReview = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadReviews();
+  }
+
+  Future<void> _loadReviews() async {
+    final jobId = int.tryParse(widget.job.id);
+    if (jobId == null) {
+      if (mounted) setState(() => _isLoadingReviews = false);
+      return;
+    }
+    setState(() => _isLoadingReviews = true);
+    final reviews = await RatingService.instance.getJobRatings(jobId);
+    if (!mounted) return;
+    setState(() {
+      _customerReviews = reviews;
+      _isLoadingReviews = false;
+    });
+  }
 
   @override
   void dispose() {
@@ -187,19 +205,50 @@ class _TradesmanJobDetailsScreenState extends State<TradesmanJobDetailsScreen> {
     );
   }
 
-  void _submitReview() {
-    final comment = _reviewController.text.trim();
-    if (comment.isEmpty) return;
+  Future<void> _submitReview() async {
+    if (_selectedRating == 0) return;
+    final jobId = int.tryParse(widget.job.id);
+    if (jobId == null) return;
 
-    setState(() {
-      _customerReviews.insert(0, {
-        'name': 'أنت',
-        'rating': _selectedRating == 0 ? 5 : _selectedRating,
-        'comment': comment,
-      });
+    setState(() => _isSubmittingReview = true);
+    try {
+      await RatingService.instance.createRating(
+        ratingValue: _selectedRating,
+        comment: _reviewController.text.trim().isEmpty
+            ? null
+            : _reviewController.text.trim(),
+        jobId: jobId,
+        raterType: 'tradesman',
+      );
       _reviewController.clear();
       _selectedRating = 0;
-    });
+      await _loadReviews();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(context).isAr
+                ? 'تم إضافة تقييمك بنجاح'
+                : 'Rating submitted successfully',
+          ),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(context).isAr
+                ? 'حدث خطأ أثناء إرسال التقييم'
+                : 'Failed to submit rating',
+          ),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _isSubmittingReview = false);
+    }
   }
 
   @override
@@ -481,7 +530,21 @@ class _TradesmanJobDetailsScreenState extends State<TradesmanJobDetailsScreen> {
                       style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)
                     ),
                     const SizedBox(height: 10),
-                    ..._customerReviews.map((review) => _buildReviewItem(review)),
+                    if (_isLoadingReviews)
+                      const Center(child: CircularProgressIndicator())
+                    else if (_customerReviews.isEmpty)
+                      Text(
+                        t.isAr ? 'لا توجد تعليقات بعد' : 'No comments yet',
+                        style: const TextStyle(color: Colors.white70),
+                      )
+                    else
+                      ..._customerReviews.map(
+                        (review) => _buildReviewItem({
+                          'name': RatingUtils.authorName(review),
+                          'rating': RatingUtils.value(review).round(),
+                          'comment': RatingUtils.comment(review),
+                        }),
+                      ),
                   ],
                 ),
               ),
@@ -592,14 +655,16 @@ class _TradesmanJobDetailsScreenState extends State<TradesmanJobDetailsScreen> {
   }
 
   Widget _buildRatingBox() {
+    final average = RatingUtils.average(_customerReviews);
+    final label = _customerReviews.isEmpty ? '--' : average.toStringAsFixed(1);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(color: Colors.white.withOpacity(0.15), borderRadius: BorderRadius.circular(12)),
       child: Row(
-        children: const [
-          Icon(Icons.star, color: Colors.amber, size: 18),
-          SizedBox(width: 4),
-          Text('2.4', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+        children: [
+          const Icon(Icons.star, color: Colors.amber, size: 18),
+          const SizedBox(width: 4),
+          Text(label, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
         ],
       ),
     );
@@ -631,7 +696,19 @@ class _TradesmanJobDetailsScreenState extends State<TradesmanJobDetailsScreen> {
         filled: true,
         fillColor: Colors.black.withOpacity(0.1),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-        suffixIcon: IconButton(onPressed: _submitReview, icon: const Icon(Icons.send, color: Colors.white, size: 20)),
+        suffixIcon: _isSubmittingReview
+            ? const Padding(
+                padding: EdgeInsets.all(12),
+                child: SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                ),
+              )
+            : IconButton(
+                onPressed: _submitReview,
+                icon: const Icon(Icons.send, color: Colors.white, size: 20),
+              ),
       ),
     );
   }

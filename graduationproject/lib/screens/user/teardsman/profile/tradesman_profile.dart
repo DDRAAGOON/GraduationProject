@@ -4,6 +4,8 @@ import 'package:graduationproject/screens/user/teardsman/profile/tradesman_edit_
 import 'package:graduationproject/screens/user/teardsman/profile/tradesman_ratings_hub_screen.dart';
 import 'package:graduationproject/shared/utils/image_helper.dart';
 import 'package:graduationproject/shared/l10n/app_localizations.dart';
+import 'package:graduationproject/data/api/api_client.dart';
+import 'package:graduationproject/shared/services/rating_service.dart';
 import 'package:graduationproject/shared/state/recruitment_sync_store.dart';
 
 class TradesmanProfile extends StatefulWidget {
@@ -14,6 +16,31 @@ class TradesmanProfile extends StatefulWidget {
 }
 
 class _TradesmanProfileState extends State<TradesmanProfile> {
+  int _receivedCount = 0;
+  int _givenCount = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadRatingCounts();
+  }
+
+  Future<void> _loadRatingCounts() async {
+    final userId =
+        RecruitmentSyncStore.instance.currentUserId.isNotEmpty
+            ? RecruitmentSyncStore.instance.currentUserId
+            : await ApiClient.getUserId() ?? '';
+    if (userId.isEmpty) return;
+
+    final received = await RatingService.instance.getUserRatings(userId);
+    final given = await RatingService.instance.getUserGivenRatings(userId);
+    if (!mounted) return;
+    setState(() {
+      _receivedCount = received.length;
+      _givenCount = given.length;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
@@ -400,32 +427,34 @@ class _TradesmanProfileState extends State<TradesmanProfile> {
                           isAr
                               ? 'تقييمات العملاء'
                               : 'Client ratings',
-                          store.ratingsFromClients.length,
+                          _receivedCount,
                           isAr,
-                          () {
-                            Navigator.push(
+                          () async {
+                            await Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
                                     const TradesmanRatingsHubScreen(),
                               ),
                             );
+                            _loadRatingCounts();
                           },
                         ),
                         const SizedBox(height: 10),
                         _buildRatingSummaryRow(
                           context,
                           isAr ? 'تقييماتي للآخرين' : 'My ratings',
-                          store.ratingsGivenByTradesman.length,
+                          _givenCount,
                           isAr,
-                          () {
-                            Navigator.push(
+                          () async {
+                            await Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
                                     const TradesmanRatingsHubScreen(),
                               ),
                             );
+                            _loadRatingCounts();
                           },
                         ),
                       ],

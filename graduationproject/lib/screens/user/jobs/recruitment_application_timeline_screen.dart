@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../shared/state/recruitment_sync_store.dart';
-import '../../../shared/services/job_service.dart';
+import '../../../shared/services/rating_service.dart';
 
 class RecruitmentApplicationTimelineScreen extends StatefulWidget {
   const RecruitmentApplicationTimelineScreen({
@@ -539,10 +539,13 @@ class _RecruitmentApplicationTimelineScreenState
                 Navigator.pop(context);
 
                 try {
-                  await JobService.instance.submitRating(
+                  await RatingService.instance.createRating(
                     ratingValue: localRating,
-                    comment: controller.text.trim(),
+                    comment: controller.text.trim().isEmpty
+                        ? null
+                        : controller.text.trim(),
                     jobId: int.tryParse(app.jobId),
+                    raterType: 'user',
                   );
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text(isAr ? 'شكراً لتقييمك!' : 'Thank you for your feedback!'), backgroundColor: Colors.green),

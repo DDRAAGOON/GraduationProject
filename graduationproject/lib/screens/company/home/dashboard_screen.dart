@@ -16,7 +16,6 @@ import '../widgets/company_bottom_nav.dart';
 import '../widgets/glowing_chatbot_fab.dart';
 import '../../user/messages/chat_thread_screen.dart';
 import '../../../constants/app_images.dart';
-import '../../../constants/app_images.dart';
 
 class CompanyDashboardScreen extends StatefulWidget {
   const CompanyDashboardScreen({super.key});
@@ -97,9 +96,9 @@ class _CompanyDashboardScreenState extends State<CompanyDashboardScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Image.asset(
-                Theme.of(context).brightness == Brightness.dark 
-                  ? 'assets/company/logo/لوجو جديد.png' 
-                  : 'assets/company/logo/لوجو جديد لايت.png',
+                Theme.of(context).brightness == Brightness.dark
+                    ? 'assets/company/logo/لوجو جديد.png'
+                    : 'assets/company/logo/لوجو جديد لايت.png',
                 height: 35,
                 fit: BoxFit.contain,
               ),
@@ -114,10 +113,10 @@ class _CompanyDashboardScreenState extends State<CompanyDashboardScreen> {
                   final companyJobs = allJobs
                       .where((j) => j.companyName == companyStore.companyName)
                       .toList();
-                  
+
                   // If no real jobs found for this company, show mock jobs for UI preview
-                  final jobs = companyJobs.isNotEmpty 
-                      ? companyJobs 
+                  final jobs = companyJobs.isNotEmpty
+                      ? companyJobs
                       : allJobs.where((j) => j.id.startsWith('mock_')).toList();
 
                   final t = AppLocalizations.of(context);
@@ -212,7 +211,9 @@ class _CompanyDashboardScreenState extends State<CompanyDashboardScreen> {
                 context,
                 MaterialPageRoute(
                   builder: (context) => ChatThreadScreen(
-                    name: tLocal.isAr ? 'مساعد جوبيتو الذكي' : 'Jobito AI Assistant',
+                    name: tLocal.isAr
+                        ? 'مساعد جوبيتو الذكي'
+                        : 'Jobito AI Assistant',
                     image: AppImages.jobito,
                   ),
                 ),
@@ -321,9 +322,9 @@ class _MetricCard extends StatelessWidget {
                       child: Text(
                         title,
                         style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                              color: const Color(0xFF142C66),
-                              fontWeight: FontWeight.w800,
-                            ),
+                          color: const Color(0xFF142C66),
+                          fontWeight: FontWeight.w800,
+                        ),
                         overflow: TextOverflow.ellipsis,
                         maxLines: 2,
                       ),
@@ -333,9 +334,7 @@ class _MetricCard extends StatelessWidget {
                       alignment: AlignmentDirectional.centerStart,
                       child: Text(
                         value,
-                        style: Theme.of(context)
-                            .textTheme
-                            .headlineSmall
+                        style: Theme.of(context).textTheme.headlineSmall
                             ?.copyWith(
                               fontWeight: FontWeight.w900,
                               color: const Color(0xFF142C66),
@@ -353,7 +352,11 @@ class _MetricCard extends StatelessWidget {
                   color: const Color(0xFF142C66).withOpacity(0.15),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(Icons.trending_up, size: 20, color: Color(0xFF142C66)),
+                child: const Icon(
+                  Icons.trending_up,
+                  size: 20,
+                  color: Color(0xFF142C66),
+                ),
               ),
             ],
           ),
@@ -438,9 +441,7 @@ class _JobUpdateCard extends StatelessWidget {
           shadowColor: Colors.black.withOpacity(0.2),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(18),
-            side: BorderSide(
-              color: Colors.white.withOpacity(0.1),
-            ),
+            side: BorderSide(color: Colors.white.withOpacity(0.1)),
           ),
           child: Padding(
             padding: const EdgeInsets.all(20),
@@ -453,17 +454,21 @@ class _JobUpdateCard extends StatelessWidget {
                     Expanded(
                       child: Text(
                         job.title,
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                          color: Colors.white,
-                        ),
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                              color: Colors.white,
+                            ),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     if (job.status == 'Open')
                       PopupMenuButton<String>(
-                        icon: const Icon(Icons.more_vert, color: Colors.white70),
+                        icon: const Icon(
+                          Icons.more_vert,
+                          color: Colors.white70,
+                        ),
                         onSelected: (val) async {
                           if (val == 'close') {
                             try {
@@ -486,13 +491,21 @@ class _JobUpdateCard extends StatelessWidget {
                               );
                               if (context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text(t.isAr ? 'تم إغلاق الوظيفة' : 'Job closed')),
+                                  SnackBar(
+                                    content: Text(
+                                      t.isAr
+                                          ? 'تم إغلاق الوظيفة'
+                                          : 'Job closed',
+                                    ),
+                                  ),
                                 );
                               }
                             } catch (e) {
                               if (context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('Error closing job: $e')),
+                                  SnackBar(
+                                    content: Text('Error closing job: $e'),
+                                  ),
                                 );
                               }
                             }
@@ -527,42 +540,41 @@ class _JobUpdateCard extends StatelessWidget {
                   runSpacing: 8,
                   children: [
                     // Deduplicate and clean tags
-                    ...[
-                      ...job.type.split(RegExp(r'[•,;]')),
-                      ...job.tags
-                    ].map((t) => t.trim())
-                     .where((t) => t.isNotEmpty && t.toLowerCase() != 'general')
-                     .toSet() // Remove duplicates
-                     .toList()
-                     .map((tTrim) {
-                      final color = _getJobTypeColor(tTrim);
-                      return Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: color,
-                          borderRadius: BorderRadius.circular(8),
-                          boxShadow: [
-                            BoxShadow(
-                              color: color.withOpacity(0.3),
-                              blurRadius: 4,
-                              offset: const Offset(0, 2),
+                    ...[...job.type.split(RegExp(r'[•,;]')), ...job.tags]
+                        .map((t) => t.trim())
+                        .where(
+                          (t) => t.isNotEmpty && t.toLowerCase() != 'general',
+                        )
+                        .toSet() // Remove duplicates
+                        .toList()
+                        .map((tTrim) {
+                          final color = _getJobTypeColor(tTrim);
+                          return Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
                             ),
-                          ],
-                        ),
-                        child: Text(
-                          tTrim,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 11,
-                          ),
-                        ),
-                      );
-                    }),
-
+                            decoration: BoxDecoration(
+                              color: color,
+                              borderRadius: BorderRadius.circular(8),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: color.withOpacity(0.3),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Text(
+                              tTrim,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 11,
+                              ),
+                            ),
+                          );
+                        }),
                   ],
                 ),
                 const SizedBox(height: 20),

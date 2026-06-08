@@ -62,6 +62,7 @@ class _TradesmanServiceRequesterProfileScreenState
           context: context,
           personName: widget.application.userName,
           applicationId: widget.application.id,
+          targetUserId: widget.application.userId,
         );
         if (context.mounted) Navigator.pop(context);
         return;

@@ -82,4 +82,51 @@ class ChatService {
       return null;
     }
   }
+
+  // --- Room-based Chat APIs ---
+
+  Future<List<Map<String, dynamic>>> getChatRooms() async {
+    try {
+      final response = await ApiClient.get('/chat/rooms', requiresAuth: true);
+      final data = await handleResponse(response, (map) => map);
+      final list = data['rooms'] ?? data['data'] ?? data ?? [];
+      return (list as List).cast<Map<String, dynamic>>();
+    } catch (e) {
+      return [];
+    }
+  }
+
+  Future<List<RecruitmentMessage>> getRoomMessages(String roomId) async {
+    try {
+      final response = await ApiClient.get('/chat/rooms/$roomId/messages', requiresAuth: true);
+      final data = await handleResponse(response, (map) => map);
+      final list = data['messages'] ?? data['data'] ?? [];
+      
+      final myId = await ApiClient.getUserId() ?? '';
+
+      return (list as List).map((m) {
+        final senderId = m['senderId']?.toString() ?? '';
+        return RecruitmentMessage(
+          id: m['_id']?.toString() ?? m['id']?.toString() ?? '',
+          fromCompany: senderId != myId,
+          text: m['text']?.toString() ?? m['content']?.toString() ?? '',
+          createdAt: DateTime.tryParse(m['createdAt']?.toString() ?? '') ?? DateTime.now(),
+        );
+      }).toList();
+    } catch (e) {
+      return [];
+    }
+  }
+
+  Future<void> sendRoomMessage(String roomId, String text) async {
+    try {
+      final response = await ApiClient.post(
+        '/chat/rooms/$roomId/messages',
+        body: {'text': text},
+      );
+      await handleResponse(response, (map) => map);
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

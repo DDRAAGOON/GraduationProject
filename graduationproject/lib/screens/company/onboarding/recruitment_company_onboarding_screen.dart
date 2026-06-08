@@ -41,7 +41,8 @@ class _RecruitmentCompanyOnboardingScreenState
           _CompanyOnboardingSlide(
             titleEn: 'Post Open Roles Quickly',
             titleAr: 'انشر الوظائف بسرعة',
-            subtitleEn: 'Create jobs with smart fields and reach candidates instantly.',
+            subtitleEn:
+                'Create jobs with smart fields and reach candidates instantly.',
             subtitleAr: 'أنشئ وظائف بحقول ذكية وصل للمرشحين فوراً.',
             image: 'assets/company/Onboarding/Onboarding-1.png',
             icon: Icons.post_add_rounded,
@@ -52,7 +53,8 @@ class _RecruitmentCompanyOnboardingScreenState
             titleEn: 'Manage Candidate Pipeline',
             titleAr: 'إدارة خط توظيف المرشحين',
             subtitleEn: 'Move applicants through review, shortlist, and hire.',
-            subtitleAr: 'انقل المتقدمين عبر المراجعة والقائمة المختصرة والتوظيف.',
+            subtitleAr:
+                'انقل المتقدمين عبر المراجعة والقائمة المختصرة والتوظيف.',
             image: 'assets/company/Onboarding/Onboarding-2.png',
             icon: Icons.groups_2_rounded,
             onNext: _nextPage,
@@ -61,7 +63,8 @@ class _RecruitmentCompanyOnboardingScreenState
           _CompanyOnboardingSlide(
             titleEn: 'Sync Updates With Candidates',
             titleAr: 'مزامنة التحديثات مع المرشحين',
-            subtitleEn: 'Every status update and message appears in candidate timeline.',
+            subtitleEn:
+                'Every status update and message appears in candidate timeline.',
             subtitleAr: 'يظهر كل تحديث للحالة ورسالة في الجدول الزمني للمرشح.',
             image: 'assets/company/Onboarding/Onboarding-3.png',
             icon: Icons.sync_alt_rounded,
@@ -103,11 +106,15 @@ class _CompanyOnboardingSlide extends StatelessWidget {
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: ThemeController.instance.themeMode,
       builder: (context, themeMode, _) {
-        final isDark = themeMode == ThemeMode.dark || 
-                      (themeMode == ThemeMode.system && MediaQuery.platformBrightnessOf(context) == Brightness.dark);
-        
+        final isDark =
+            themeMode == ThemeMode.dark ||
+            (themeMode == ThemeMode.system &&
+                MediaQuery.platformBrightnessOf(context) == Brightness.dark);
+
         return Scaffold(
-          backgroundColor: isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4),
+          backgroundColor: isDark
+              ? const Color(0xFF001E3A)
+              : const Color(0xFFF8FBF4),
           body: Stack(
             children: [
               // The diagonal background image (same as user onboarding)
@@ -119,13 +126,13 @@ class _CompanyOnboardingSlide extends StatelessWidget {
                   'assets/tradesman/Rectangle 4127.png',
                   width: size.width,
                   fit: BoxFit.fitWidth,
-                  errorBuilder: (_, __, ___) => Container(
+                  errorBuilder: (_, _, _) => Container(
                     height: size.height * 0.5,
                     color: const Color(0xFFF17C21),
                   ),
                 ),
               ),
-              
+
               SafeArea(
                 child: Column(
                   children: [
@@ -138,11 +145,8 @@ class _CompanyOnboardingSlide extends StatelessWidget {
                           image,
                           height: size.height * 0.3,
                           fit: BoxFit.contain,
-                          errorBuilder: (context, error, stackTrace) => Icon(
-                            icon,
-                            size: 100,
-                            color: Colors.white,
-                          ),
+                          errorBuilder: (context, error, stackTrace) =>
+                              Icon(icon, size: 100, color: Colors.white),
                         ),
                       ),
                     ),
@@ -177,14 +181,19 @@ class _CompanyOnboardingSlide extends StatelessWidget {
                     const Spacer(flex: 3),
                     // Navigation Area
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 32,
+                      ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Row(
                             children: List.generate(
                               3,
-                              (index) => _buildIndicator(isActive: index == currentPage),
+                              (index) => _buildIndicator(
+                                isActive: index == currentPage,
+                              ),
                             ),
                           ),
                           _buildNextButton(onNext, t),
@@ -208,9 +217,7 @@ class _CompanyOnboardingSlide extends StatelessWidget {
         backgroundColor: const Color(0xFF142C66),
         foregroundColor: Colors.white,
         padding: const EdgeInsets.symmetric(horizontal: 45, vertical: 16),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(25),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
         elevation: 5,
       ),
       child: Text(

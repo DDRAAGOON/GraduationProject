@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:graduationproject/shared/l10n/app_localizations.dart';
+import 'package:graduationproject/shared/services/rating_service.dart';
 import 'package:graduationproject/shared/state/recruitment_sync_store.dart';
 
 /// Acceptance confirmation and delayed star-rating prompt for tradesmen.
@@ -14,6 +15,7 @@ class TradesmanRatingPrompt {
     required BuildContext context,
     required String personName,
     required String applicationId,
+    required String targetUserId,
   }) async {
     final t = AppLocalizations.of(context);
     final isAr = t.isAr;
@@ -82,7 +84,11 @@ class TradesmanRatingPrompt {
     _timers[applicationId] = Timer(delay, () {
       _timers.remove(applicationId);
       if (!context.mounted) return;
-      showRatingDialog(context, personName: personName);
+      showRatingDialog(
+        context,
+        personName: personName,
+        targetUserId: targetUserId,
+      );
       store.consumeDueTradesmanRating();
     });
   }
@@ -90,6 +96,7 @@ class TradesmanRatingPrompt {
   static Future<void> showRatingDialog(
     BuildContext context, {
     required String personName,
+    required String targetUserId,
   }) async {
     final t = AppLocalizations.of(context);
     final isAr = t.isAr;
@@ -141,17 +148,38 @@ class TradesmanRatingPrompt {
                 FilledButton(
                   onPressed: selectedStars == 0
                       ? null
-                      : () {
+                      : () async {
                           Navigator.pop(ctx);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                isAr
-                                    ? 'شكراً! قيّمت $personName بـ $selectedStars نجوم'
-                                    : 'Thanks! You rated $personName $selectedStars stars',
+                          try {
+                            await RatingService.instance.createRating(
+                              ratingValue: selectedStars,
+                              targetUserId: targetUserId,
+                              raterType: 'tradesman',
+                            );
+                            if (!context.mounted) return;
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  isAr
+                                      ? 'شكراً! قيّمت $personName بـ $selectedStars نجوم'
+                                      : 'Thanks! You rated $personName $selectedStars stars',
+                                ),
+                                backgroundColor: Colors.green,
                               ),
-                            ),
-                          );
+                            );
+                          } catch (_) {
+                            if (!context.mounted) return;
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  isAr
+                                      ? 'حدث خطأ أثناء إرسال التقييم'
+                                      : 'Failed to submit rating',
+                                ),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
                         },
                   child: Text(t.tr(en: 'Submit rating', ar: 'إرسال التقييم')),
                 ),

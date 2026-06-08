@@ -10,7 +10,7 @@ class LogoPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
-    
+
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: ThemeController.instance.themeMode,
       builder: (context, themeMode, _) {
@@ -18,11 +18,16 @@ class LogoPage extends StatelessWidget {
           valueListenable: LocaleController.instance.locale,
           builder: (context, locale, _) {
             final t = AppLocalizations.of(context);
-            final isDark = themeMode == ThemeMode.dark || 
-                          (themeMode == ThemeMode.system && MediaQuery.platformBrightnessOf(context) == Brightness.dark);
-            
+            final isDark =
+                themeMode == ThemeMode.dark ||
+                (themeMode == ThemeMode.system &&
+                    MediaQuery.platformBrightnessOf(context) ==
+                        Brightness.dark);
+
             return Scaffold(
-              backgroundColor: isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4),
+              backgroundColor: isDark
+                  ? const Color(0xFF001E3A)
+                  : const Color(0xFFF8FBF4),
               body: Stack(
                 children: [
                   // Main content (Top icons and Illustration)
@@ -31,14 +36,20 @@ class LogoPage extends StatelessWidget {
                       children: [
                         // Top Icons (Mode & Language)
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 10,
+                          ),
                           child: Directionality(
-                            textDirection: TextDirection.ltr, // Keep icons on the right always
+                            textDirection: TextDirection
+                                .ltr, // Keep icons on the right always
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 _CircleIconButton(
-                                  icon: isDark ? Icons.nightlight_outlined : Icons.wb_sunny_outlined,
+                                  icon: isDark
+                                      ? Icons.nightlight_outlined
+                                      : Icons.wb_sunny_outlined,
                                   onPressed: () {
                                     if (isDark) {
                                       ThemeController.instance.setLight();
@@ -50,7 +61,8 @@ class LogoPage extends StatelessWidget {
                                 const SizedBox(width: 12),
                                 _CircleIconButton(
                                   icon: Icons.public,
-                                  onPressed: () => LocaleController.instance.toggle(),
+                                  onPressed: () =>
+                                      LocaleController.instance.toggle(),
                                 ),
                               ],
                             ),
@@ -67,10 +79,12 @@ class LogoPage extends StatelessWidget {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Image.asset(
-                                  isDark ? 'assets/company/logo/لوجو جديد.png' : 'assets/company/logo/لوجو جديد لايت.png',
+                                  isDark
+                                      ? 'assets/company/logo/لوجو جديد.png'
+                                      : 'assets/company/logo/لوجو جديد لايت.png',
                                   width: size.width * 0.8,
                                   fit: BoxFit.contain,
-                                  errorBuilder: (_, __, ___) => const Icon(
+                                  errorBuilder: (_, _, _) => const Icon(
                                     Icons.auto_awesome_mosaic,
                                     size: 150,
                                     color: Colors.grey,
@@ -88,11 +102,17 @@ class LogoPage extends StatelessWidget {
                                     children: [
                                       TextSpan(
                                         text: t.isAr ? 'عملك ' : 'Your work ',
-                                        style: TextStyle(color: isDark ? Colors.white : const Color(0xFF142C66)),
+                                        style: TextStyle(
+                                          color: isDark
+                                              ? Colors.white
+                                              : const Color(0xFF142C66),
+                                        ),
                                       ),
                                       TextSpan(
                                         text: t.isAr ? 'مهمتنا' : 'our mission',
-                                        style: const TextStyle(color: Color(0xFFFF7A2A)),
+                                        style: const TextStyle(
+                                          color: Color(0xFFFF7A2A),
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -100,13 +120,15 @@ class LogoPage extends StatelessWidget {
                                 const SizedBox(height: 10),
                                 Text(
                                   t.isAr
-                                    ? 'منصة واحدة، احتمالات كثيرة' 
-                                    : 'one platform many possibilities',
+                                      ? 'منصة واحدة، احتمالات كثيرة'
+                                      : 'one platform many possibilities',
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w700,
-                                    color: isDark ? const Color(0xFFFF7A2A) : const Color(0xFF213E75),
+                                    color: isDark
+                                        ? const Color(0xFFFF7A2A)
+                                        : const Color(0xFF213E75),
                                   ),
                                 ),
                               ],
@@ -114,7 +136,7 @@ class LogoPage extends StatelessWidget {
                           ),
                         ),
 
-                        const Spacer(flex: 2), 
+                        const Spacer(flex: 2),
                       ],
                     ),
                   ),
@@ -127,21 +149,44 @@ class LogoPage extends StatelessWidget {
                     child: Column(
                       children: [
                         _GradientRoleButton(
-                          text: t.userTr('role.user', fallbackEn: 'User', fallbackAr: 'مستخدم'),
-                          onPressed: () => Navigator.pushNamed(context, AppRoutes.userOnboarding),
-                          colors: const [Color(0xFFF77F32), Color(0xFF3955B1), Color(0xFF0F35B0)],
+                          text: t.userTr(
+                            'role.user',
+                            fallbackEn: 'User',
+                            fallbackAr: 'مستخدم',
+                          ),
+                          onPressed: () => Navigator.pushNamed(
+                            context,
+                            AppRoutes.userOnboarding,
+                          ),
+                          colors: const [
+                            Color(0xFFF77F32),
+                            Color(0xFF3955B1),
+                            Color(0xFF0F35B0),
+                          ],
                         ),
                         const SizedBox(height: 16),
                         _GradientRoleButton(
-                          text: t.companyTr('role.company', fallbackEn: 'Company', fallbackAr: 'شركة'),
-                          onPressed: () => Navigator.pushNamed(context, AppRoutes.companyOnboardingSmartSearch),
-                          colors: const [Color(0xFF0F35B0), Color(0xFF3955B1), Color(0xFFF77F32)],
+                          text: t.companyTr(
+                            'role.company',
+                            fallbackEn: 'Company',
+                            fallbackAr: 'شركة',
+                          ),
+                          onPressed: () => Navigator.pushNamed(
+                            context,
+                            AppRoutes.companyOnboardingSmartSearch,
+                          ),
+                          colors: const [
+                            Color(0xFF0F35B0),
+                            Color(0xFF3955B1),
+                            Color(0xFFF77F32),
+                          ],
                         ),
                       ],
                     ),
                   ),
                 ],
-              ));
+              ),
+            );
           },
         );
       },
@@ -158,7 +203,7 @@ class _CircleIconButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     return Container(
       width: 42,
       height: 42,
@@ -178,7 +223,11 @@ class _CircleIconButton extends StatelessWidget {
         child: InkWell(
           onTap: onPressed,
           borderRadius: BorderRadius.circular(21),
-          child: Icon(icon, color: isDark ? Colors.white70 : const Color(0xFF0F35B0), size: 20),
+          child: Icon(
+            icon,
+            color: isDark ? Colors.white70 : const Color(0xFF0F35B0),
+            size: 20,
+          ),
         ),
       ),
     );

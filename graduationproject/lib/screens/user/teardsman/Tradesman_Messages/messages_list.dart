@@ -3,7 +3,6 @@ import '../../../../shared/l10n/app_localizations.dart';
 import '../../../../shared/state/recruitment_sync_store.dart';
 import '../../../../shared/services/chat_service.dart';
 import '../../../../constants/app_images.dart';
-import '../post/tradesman_rating_prompt.dart';
 import '../../messages/new_chat_screen.dart';
 import 'chat_tradesman.dart';
 
@@ -81,71 +80,90 @@ class _MessagesListState extends State<MessagesList> {
           children: [
             const SizedBox(height: 10),
             Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 10,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               child: _buildSearchBar(context, t),
             ),
             const SizedBox(height: 10),
             Expanded(
-              child: _isLoading 
-                ? const Center(child: CircularProgressIndicator()) 
-                : Builder(
-                builder: (context) {
-                  final filteredChats = _chats.where((chat) {
-                    final participant = chat['participant'] != null && chat['participant'] is Map 
-                        ? chat['participant'] 
-                        : {};
-                    final name = participant['name']?.toString() ?? 'User';
-                    return name.toLowerCase().contains(_searchQuery);
-                  }).toList();
+              child: _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : Builder(
+                      builder: (context) {
+                        final filteredChats = _chats.where((chat) {
+                          final participant =
+                              chat['participant'] != null &&
+                                  chat['participant'] is Map
+                              ? chat['participant']
+                              : {};
+                          final name =
+                              participant['name']?.toString() ?? 'User';
+                          return name.toLowerCase().contains(_searchQuery);
+                        }).toList();
 
-                  if (filteredChats.isEmpty) {
-                    return _buildEmptyState(t);
-                  }
+                        if (filteredChats.isEmpty) {
+                          return _buildEmptyState(t);
+                        }
 
-                  return ListView.separated(
-                    physics: const BouncingScrollPhysics(),
-                    padding: const EdgeInsets.fromLTRB(10, 0, 10, 100),
-                    itemCount: filteredChats.length,
-                    separatorBuilder: (context, index) => Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Divider(
-                        color: Theme.of(
-                          context,
-                        ).dividerColor.withValues(alpha: 0.1),
-                        height: 1,
-                      ),
+                        return ListView.separated(
+                          physics: const BouncingScrollPhysics(),
+                          padding: const EdgeInsets.fromLTRB(10, 0, 10, 100),
+                          itemCount: filteredChats.length,
+                          separatorBuilder: (context, index) => Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: Divider(
+                              color: Theme.of(
+                                context,
+                              ).dividerColor.withValues(alpha: 0.1),
+                              height: 1,
+                            ),
+                          ),
+                          itemBuilder: (context, index) {
+                            final chat = filteredChats[index];
+                            final participant =
+                                chat['participant'] != null &&
+                                    chat['participant'] is Map
+                                ? chat['participant']
+                                : {};
+                            final name =
+                                participant['name']?.toString() ?? 'User';
+                            final image =
+                                participant['photoUrl']?.toString() ??
+                                AppImages.companyProfile1;
+
+                            final lastMessageObj =
+                                chat['lastMessage'] != null &&
+                                    chat['lastMessage'] is Map
+                                ? chat['lastMessage']
+                                : {};
+                            final message =
+                                lastMessageObj['content']?.toString() ?? '...';
+                            final time = lastMessageObj['createdAt'] != null
+                                ? DateTime.tryParse(
+                                            lastMessageObj['createdAt']
+                                                .toString(),
+                                          )
+                                          ?.toLocal()
+                                          .toString()
+                                          .split(' ')[1]
+                                          .substring(0, 5) ??
+                                      ''
+                                : '';
+
+                            return _buildMessageItem(
+                              context,
+                              id:
+                                  participant['_id']?.toString() ??
+                                  participant['id']?.toString() ??
+                                  '',
+                              name: name,
+                              message: message,
+                              time: time,
+                              image: image,
+                            );
+                          },
+                        );
+                      },
                     ),
-                    itemBuilder: (context, index) {
-                      final chat = filteredChats[index];
-                      final participant = chat['participant'] != null && chat['participant'] is Map 
-                          ? chat['participant'] 
-                          : {};
-                      final name = participant['name']?.toString() ?? 'User';
-                      final image = participant['photoUrl']?.toString() ?? AppImages.companyProfile1;
-                      
-                      final lastMessageObj = chat['lastMessage'] != null && chat['lastMessage'] is Map 
-                          ? chat['lastMessage'] 
-                          : {};
-                      final message = lastMessageObj['content']?.toString() ?? '...';
-                      final time = lastMessageObj['createdAt'] != null 
-                          ? DateTime.tryParse(lastMessageObj['createdAt'].toString())?.toLocal().toString().split(' ')[1].substring(0, 5) ?? '' 
-                          : '';
-
-                      return _buildMessageItem(
-                        context,
-                        id: participant['_id']?.toString() ?? participant['id']?.toString() ?? '',
-                        name: name,
-                        message: message,
-                        time: time,
-                        image: image,
-                      );
-                    },
-                  );
-                },
-              ),
             ),
           ],
         ),
@@ -225,7 +243,8 @@ class _MessagesListState extends State<MessagesList> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ChatTradesman(userId: id, name: name, image: image),
+            builder: (context) =>
+                ChatTradesman(userId: id, name: name, image: image),
           ),
         );
       },
