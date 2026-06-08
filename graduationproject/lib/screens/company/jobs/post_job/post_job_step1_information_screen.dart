@@ -10,6 +10,7 @@ import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_scaffold.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../../../../shared/widgets/section_title.dart';
+import '../../../../shared/state/recruitment_sync_store.dart';
 
 class CompanyPostJobStep1InformationScreen extends StatefulWidget {
   const CompanyPostJobStep1InformationScreen({super.key});
@@ -28,6 +29,7 @@ class _CompanyPostJobStep1InformationScreenState
   final _department = TextEditingController();
   DateTime? _deadline = DateTime.now().add(const Duration(days: 30));
   String _category = 'Technical'; // Technical, Non-Technical, Service
+  String _location = RecruitmentSyncStore.egyptGovernorates[1]; // Default to Cairo
   final Set<String> _types = {'Full-Time'};
   final List<String> _skills = [];
   bool _loading = false;
@@ -49,7 +51,10 @@ class _CompanyPostJobStep1InformationScreenState
         _positions.text = args.requiredCount.toString();
         _department.text = args.department;
         _category = args.category;
-        
+        if (RecruitmentSyncStore.egyptGovernorates.contains(args.location)) {
+          _location = args.location;
+        }
+
         _types.clear();
         _types.add(args.employmentType);
 
@@ -62,7 +67,7 @@ class _CompanyPostJobStep1InformationScreenState
         } else {
           _salaryController.text = salary == 'Competitive' ? '' : salary;
         }
-        
+
         _positions.text = args.requiredCount.toString();
         _types.clear();
         _types.addAll(args.employmentType.split(' • '));
@@ -88,7 +93,7 @@ class _CompanyPostJobStep1InformationScreenState
     final t = AppLocalizations.of(context);
     setState(() {
       _titleError = _jobTitle.text.trim().length >= 3 ? null : t.at3Chars;
-      
+
       final posText = _positions.text.trim();
       final posInt = int.tryParse(posText);
       if (posText.isEmpty || posInt == null || posInt < 1) {
@@ -119,6 +124,7 @@ class _CompanyPostJobStep1InformationScreenState
         'department': _department.text.trim(),
         'skills': _skills,
         'deadline': _deadline,
+        'location': _location,
         // Pass existing lists if editing
         'responsibilities': _editingJob?.responsibilities,
         'qualifications': _editingJob?.qualifications,
@@ -271,7 +277,7 @@ class _CompanyPostJobStep1InformationScreenState
             runSpacing: 10,
             children: [
               ..._skills.map(
-                (s) => InputChip(
+                    (s) => InputChip(
                   label: Text(s),
                   onDeleted: () => setState(() => _skills.remove(s)),
                 ),
@@ -333,6 +339,45 @@ class _CompanyPostJobStep1InformationScreenState
           ),
           const Divider(height: 48),
 
+          // Location
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                t.tr(en: 'Location', ar: 'الموقع (المحافظة)'),
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w900, fontSize: 15),
+              ),
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    value: _location,
+                    isExpanded: true,
+                    icon: Icon(Icons.location_on_outlined, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5)),
+                    onChanged: (String? newValue) {
+                      if (newValue != null) {
+                        setState(() => _location = newValue);
+                      }
+                    },
+                    items: RecruitmentSyncStore.egyptGovernorates.where((g) => g != 'All').map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const Divider(height: 48),
+
           // Department
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -373,9 +418,9 @@ class _CompanyPostJobStep1InformationScreenState
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        _deadline == null 
-                          ? t.whenClose
-                          : "${_deadline!.month.toString().padLeft(2, '0')}/${_deadline!.day.toString().padLeft(2, '0')}/${_deadline!.year}",
+                        _deadline == null
+                            ? t.whenClose
+                            : "${_deadline!.month.toString().padLeft(2, '0')}/${_deadline!.day.toString().padLeft(2, '0')}/${_deadline!.year}",
                         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                       ),
                       Icon(Icons.calendar_month_outlined, size: 20, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5)),
@@ -386,7 +431,7 @@ class _CompanyPostJobStep1InformationScreenState
             ],
           ),
           const Divider(height: 48),
-          
+
           AppButton(label: t.nextStep, loading: _loading, onPressed: _next),
           const SizedBox(height: 10),
         ],
@@ -448,7 +493,7 @@ class _TypeChip extends StatelessWidget {
     final color = selected
         ? cs.primary
         : cs.onSurface.withOpacity(0.12);
-    
+
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(14),
@@ -478,7 +523,7 @@ class _CommaTextInputFormatter extends TextInputFormatter {
     if (newValue.text.isEmpty) {
       return newValue;
     }
-    
+
     // Only allow digits for formatting
     final newText = newValue.text.replaceAll(RegExp(r'[^\d]'), '');
     if (newText.isEmpty) return newValue.copyWith(text: '');

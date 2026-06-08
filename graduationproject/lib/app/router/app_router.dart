@@ -175,7 +175,7 @@ final class AppRouter {
             tags: const <String>[],
             publishedAt: DateTime.now(),
             category: 'N/A',
-            benefits: const <String>[],
+            benefits: const <String>[], companyId: '',
           );
 
     Widget page;

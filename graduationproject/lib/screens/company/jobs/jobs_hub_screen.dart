@@ -1,6 +1,7 @@
 // List and search all jobs for the signed-in company.
 
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 
 import '../../../app/router/app_router.dart';
 import '../../../shared/l10n/app_localizations.dart';
@@ -29,7 +30,6 @@ class _CompanyJobsHubScreenState extends State<CompanyJobsHubScreen> {
   @override
   void initState() {
     super.initState();
-    // Pull fresh data from server whenever this tab is opened.
     RecruitmentSyncService.instance.startPolling();
   }
 
@@ -66,23 +66,46 @@ class _CompanyJobsHubScreenState extends State<CompanyJobsHubScreen> {
         ]),
         builder: (context, _) {
           final allJobs = RecruitmentSyncStore.instance.jobs;
-          // Use RecruitmentSyncStore (the live server data) filtered to this company
+
+          // ✅ Logging للتشخيص
+          if (kDebugMode) {
+            debugPrint('📊 Total jobs in store: ${allJobs.length}');
+            debugPrint('🏢 Company ID: ${companyStore.companyId}');
+            debugPrint('🏢 Company Name: ${companyStore.companyName}');
+
+            if (allJobs.isNotEmpty) {
+              final firstJob = allJobs.first;
+              debugPrint('📋 First job:');
+              debugPrint('   - ID: ${firstJob.id}');
+              debugPrint('   - Title: ${firstJob.title}');
+              debugPrint('   - Company ID: ${firstJob.companyId}');
+              debugPrint('   - Company Name: ${firstJob.companyName}');
+            }
+          }
+
+          // ✅ فلترة صحيحة باستخدام companyId
           final companyJobs = allJobs.where((j) {
-            final nameMatch =
-                j.companyName.trim().toLowerCase() ==
-                companyStore.companyName.trim().toLowerCase();
-            return nameMatch;
+            // ✅ التحقق من companyId أولاً
+            if (j.companyId.isNotEmpty && companyStore.companyId.isNotEmpty) {
+              return j.companyId == companyStore.companyId;
+            }
+
+            // ✅ ثم التحقق من اسم الشركة
+            if (j.companyName.isNotEmpty && companyStore.companyName.isNotEmpty) {
+              return j.companyName.trim().toLowerCase() ==
+                  companyStore.companyName.trim().toLowerCase();
+            }
+
+            return false;
           }).toList();
 
-          // Show real company jobs if any, otherwise show mock jobs for UI preview
-          final displayJobs = companyJobs.isNotEmpty 
-              ? companyJobs 
-              : allJobs.where((j) => j.id.startsWith('mock_')).toList();
+          // ✅ عرض وظائف الشركة فقط (بدون mock)
+          final displayJobs = companyJobs;
 
           final filteredJobs = displayJobs.where((j) {
             final matchesStatus =
                 _selectedStatuses.isEmpty ||
-                _selectedStatuses.contains(j.status);
+                    _selectedStatuses.contains(j.status);
             final matchesType =
                 _selectedTypes.isEmpty || _selectedTypes.contains(j.type);
             return matchesStatus && matchesType;
@@ -121,8 +144,6 @@ class _CompanyJobsHubScreenState extends State<CompanyJobsHubScreen> {
                             child: InkWell(
                               borderRadius: BorderRadius.circular(16),
                               onTap: () {
-                                // ... same as before
-                                // Convert RecruitmentJob to Job for the details screen
                                 final jobArg = Job(
                                   id: j.id,
                                   title: j.title,
@@ -138,10 +159,10 @@ class _CompanyJobsHubScreenState extends State<CompanyJobsHubScreen> {
                                   benefits: j.benefits
                                       .map(
                                         (b) => JobBenefit(
-                                          title: b,
-                                          description: '',
-                                        ),
-                                      )
+                                      title: b,
+                                      description: '',
+                                    ),
+                                  )
                                       .toList(),
                                   tags: j.tags,
                                   appliedCount: count,
@@ -160,7 +181,6 @@ class _CompanyJobsHubScreenState extends State<CompanyJobsHubScreen> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    // Company name row
                                     Row(
                                       children: [
                                         const Icon(
@@ -181,10 +201,9 @@ class _CompanyJobsHubScreenState extends State<CompanyJobsHubScreen> {
                                       ],
                                     ),
                                     const SizedBox(height: 8),
-                                    // Title
                                     Row(
                                       mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                      MainAxisAlignment.spaceBetween,
                                       children: [
                                         Expanded(
                                           child: Text(
@@ -193,9 +212,9 @@ class _CompanyJobsHubScreenState extends State<CompanyJobsHubScreen> {
                                                 .textTheme
                                                 .titleMedium
                                                 ?.copyWith(
-                                                  fontWeight: FontWeight.w700,
-                                                  color: Colors.white,
-                                                ),
+                                              fontWeight: FontWeight.w700,
+                                              color: Colors.white,
+                                            ),
                                           ),
                                         ),
                                         if (isOpen)
@@ -210,51 +229,36 @@ class _CompanyJobsHubScreenState extends State<CompanyJobsHubScreen> {
                                                   await RecruitmentSyncService
                                                       .instance
                                                       .updateJob(
-                                                        jobId: j.id,
-                                                        title: j.title,
-                                                        companyName:
-                                                            j.companyName,
-                                                        location: j.location,
-                                                        salaryRange:
-                                                            j.salaryRange,
-                                                        type: j.type,
-                                                        description:
-                                                            j.description,
-                                                        responsibilities:
-                                                            j.responsibilities,
-                                                        qualifications:
-                                                            j.qualifications,
-                                                        niceToHaves:
-                                                            j.niceToHaves,
-                                                        benefits: j.benefits,
-                                                        category: j.category,
-                                                        tags: j.tags,
-                                                        requiredCount:
-                                                            j.capacity,
-                                                        status: 'Closed',
-                                                      );
+                                                    jobId: j.id,
+                                                    title: j.title,
+                                                    companyName: j.companyName,
+                                                    location: j.location,
+                                                    salaryRange: j.salaryRange,
+                                                    type: j.type,
+                                                    description: j.description,
+                                                    responsibilities: j.responsibilities,
+                                                    qualifications: j.qualifications,
+                                                    niceToHaves: j.niceToHaves,
+                                                    benefits: j.benefits,
+                                                    category: j.category,
+                                                    tags: j.tags,
+                                                    requiredCount: j.capacity,
+                                                    status: 'Closed',
+                                                  );
                                                   if (context.mounted) {
-                                                    ScaffoldMessenger.of(
-                                                      context,
-                                                    ).showSnackBar(
+                                                    ScaffoldMessenger.of(context).showSnackBar(
                                                       SnackBar(
                                                         content: Text(
-                                                          isAr
-                                                              ? 'تم إغلاق الوظيفة'
-                                                              : 'Job closed',
+                                                          isAr ? 'تم إغلاق الوظيفة' : 'Job closed',
                                                         ),
                                                       ),
                                                     );
                                                   }
                                                 } catch (e) {
                                                   if (context.mounted) {
-                                                    ScaffoldMessenger.of(
-                                                      context,
-                                                    ).showSnackBar(
+                                                    ScaffoldMessenger.of(context).showSnackBar(
                                                       SnackBar(
-                                                        content: Text(
-                                                          'Error closing job: $e',
-                                                        ),
+                                                        content: Text('Error closing job: $e'),
                                                       ),
                                                     );
                                                   }
@@ -264,64 +268,52 @@ class _CompanyJobsHubScreenState extends State<CompanyJobsHubScreen> {
                                             itemBuilder: (context) => [
                                               PopupMenuItem(
                                                 value: 'close',
-                                                child: Text(
-                                                  isAr ? 'إغلاق' : 'Close',
-                                                ),
+                                                child: Text(isAr ? 'إغلاق' : 'Close'),
                                               ),
                                             ],
                                           ),
                                       ],
                                     ),
                                     const SizedBox(height: 8),
-                                    // Employment type tags
                                     Wrap(
                                       spacing: 8,
                                       runSpacing: 8,
                                       children: j.type
                                           .split(RegExp(r'[•,;]'))
                                           .map((t) {
-                                            final type = t.trim();
-                                            if (type.isEmpty) {
-                                              return const SizedBox.shrink();
-                                            }
-                                            final color = _getJobTypeColor(
-                                              type,
-                                            );
-                                            return Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                    horizontal: 12,
-                                                    vertical: 6,
-                                                  ),
-                                              decoration: BoxDecoration(
-                                                color: color,
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                    color: color.withOpacity(
-                                                      0.3,
-                                                    ),
-                                                    blurRadius: 4,
-                                                    offset: const Offset(0, 2),
-                                                  ),
-                                                ],
+                                        final type = t.trim();
+                                        if (type.isEmpty) {
+                                          return const SizedBox.shrink();
+                                        }
+                                        final color = _getJobTypeColor(type);
+                                        return Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 12,
+                                            vertical: 6,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: color,
+                                            borderRadius: BorderRadius.circular(8),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: color.withOpacity(0.3),
+                                                blurRadius: 4,
+                                                offset: const Offset(0, 2),
                                               ),
-                                              child: Text(
-                                                type,
-                                                style: const TextStyle(
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 12,
-                                                ),
-                                              ),
-                                            );
-                                          })
-                                          .toList(),
+                                            ],
+                                          ),
+                                          child: Text(
+                                            type,
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        );
+                                      }).toList(),
                                     ),
-                                    // Category tag (if present)
-                                    if (j.category.isNotEmpty &&
-                                        j.category != 'General') ...[
+                                    if (j.category.isNotEmpty && j.category != 'General') ...[
                                       const SizedBox(height: 8),
                                       Container(
                                         padding: const EdgeInsets.symmetric(
@@ -330,9 +322,7 @@ class _CompanyJobsHubScreenState extends State<CompanyJobsHubScreen> {
                                         ),
                                         decoration: BoxDecoration(
                                           color: _getCategoryColor(j.category),
-                                          borderRadius: BorderRadius.circular(
-                                            8,
-                                          ),
+                                          borderRadius: BorderRadius.circular(8),
                                         ),
                                         child: Text(
                                           j.category,
@@ -345,42 +335,37 @@ class _CompanyJobsHubScreenState extends State<CompanyJobsHubScreen> {
                                       ),
                                     ],
                                     const SizedBox(height: 12),
-                                    // Tags
                                     Wrap(
                                       spacing: 8,
                                       runSpacing: 8,
                                       children: (j.tags)
                                           .map(
                                             (String tag) => Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                    horizontal: 12,
-                                                    vertical: 6,
-                                                  ),
-                                              decoration: BoxDecoration(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .surfaceContainerHighest
-                                                    .withOpacity(0.15),
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                                border: Border.all(
-                                                  color: Colors.white.withOpacity(0.1),
-                                                ),
-                                              ),
-                                              child: Text(
-                                                tag,
-                                                style: const TextStyle(
-                                                  color: Colors.white70,
-                                                  fontSize: 12,
-                                                ),
-                                              ),
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 12,
+                                            vertical: 6,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .surfaceContainerHighest
+                                                .withOpacity(0.15),
+                                            borderRadius: BorderRadius.circular(8),
+                                            border: Border.all(
+                                              color: Colors.white.withOpacity(0.1),
                                             ),
-                                          )
-                                          .toList(),
+                                          ),
+                                          child: Text(
+                                            tag,
+                                            style: const TextStyle(
+                                              color: Colors.white70,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ),
+                                      ).toList(),
                                     ),
                                     const SizedBox(height: 12),
-                                    // Hiring stats row
                                     Row(
                                       children: [
                                         const Icon(
@@ -404,8 +389,7 @@ class _CompanyJobsHubScreenState extends State<CompanyJobsHubScreen> {
                                                 ? 'تم القبول: ${j.acceptedCount} / المطلوب: ${j.capacity}'
                                                 : 'Accepted: ${j.acceptedCount} / Required: ${j.capacity}',
                                             style: TextStyle(
-                                              color:
-                                                  j.acceptedCount >= j.capacity
+                                              color: j.acceptedCount >= j.capacity
                                                   ? Colors.greenAccent
                                                   : Colors.white,
                                               fontWeight: FontWeight.w600,
@@ -442,9 +426,7 @@ class _CompanyJobsHubScreenState extends State<CompanyJobsHubScreen> {
                                             color: isOpen
                                                 ? Colors.greenAccent.withOpacity(0.2)
                                                 : Colors.white.withOpacity(0.1),
-                                            borderRadius: BorderRadius.circular(
-                                              20,
-                                            ),
+                                            borderRadius: BorderRadius.circular(20),
                                           ),
                                           child: Text(
                                             isOpen
@@ -533,8 +515,7 @@ class _CompanyJobsHubScreenState extends State<CompanyJobsHubScreen> {
           _FilterChip(
             label: isAr ? 'تدريب (Internship)' : 'Internship',
             isSelected: _selectedTypes.contains('Internship'),
-            onChanged: (val) =>
-                _toggleFilter(_selectedTypes, 'Internship', val),
+            onChanged: (val) => _toggleFilter(_selectedTypes, 'Internship', val),
           ),
           const SizedBox(width: 8),
           _FilterChip(

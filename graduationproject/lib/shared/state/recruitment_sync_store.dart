@@ -6,6 +6,7 @@ class RecruitmentJob {
   const RecruitmentJob({
     required this.id,
     required this.title,
+    required this.companyId,
     required this.companyName,
     required this.location,
     required this.salaryRange,
@@ -25,10 +26,12 @@ class RecruitmentJob {
     this.companyLogoUrl,
     this.deadline,
     this.specialTag,
+    this.userId,
   });
 
   final String id;
   final String title;
+  final String companyId;
   final String companyName;
   final String location;
   final String salaryRange;
@@ -48,29 +51,117 @@ class RecruitmentJob {
   final String? companyLogoUrl;
   final TimeOfDay? deadline;
   final String? specialTag;
+  final String? userId;
+
+  static List<String> _parseList(dynamic data) {
+    if (data == null) return [];
+    if (data is List) {
+      return data.map((e) => e.toString()).toList();
+    }
+    return [data.toString()];
+  }
 
   factory RecruitmentJob.fromMap(Map<String, dynamic> map) {
+    // ✅ استخراج بيانات الشركة من company object
+    final companyData = map['company'] as Map<String, dynamic>? ?? {};
+
+    // ✅ معالجة الراتب
+    String parsedSalaryRange = 'غير محدد';
+    if (map['salaryMin'] != null || map['salaryMax'] != null) {
+      final min = map['salaryMin']?.toString() ?? '';
+      final max = map['salaryMax']?.toString() ?? '';
+      if (min.isNotEmpty && max.isNotEmpty) {
+        parsedSalaryRange = '$min - $max';
+      } else if (min.isNotEmpty) {
+        parsedSalaryRange = 'من $min';
+      } else if (max.isNotEmpty) {
+        parsedSalaryRange = 'حتى $max';
+      }
+    } else if (map['salary'] != null) {
+      parsedSalaryRange = map['salary'].toString();
+    } else if (map['salaryRange'] != null) {
+      if (map['salaryRange'] is List) {
+        parsedSalaryRange = (map['salaryRange'] as List).join(' - ');
+      } else {
+        parsedSalaryRange = map['salaryRange'].toString();
+      }
+    }
+
+    // ✅ معالجة نوع الوظيفة
+    String parsedType = 'Full-Time';
+    if (map['jobType'] != null) {
+      if (map['jobType'] is List && (map['jobType'] as List).isNotEmpty) {
+        parsedType = (map['jobType'] as List).join(' • ');
+      } else {
+        parsedType = map['jobType'].toString();
+      }
+    } else if (map['type'] != null) {
+      if (map['type'] is List) {
+        parsedType = (map['type'] as List).join(' • ');
+      } else {
+        parsedType = map['type'].toString();
+      }
+    }
+
+    // ✅ معالجة الحالة
+    String parsedStatus = 'Open';
+    if (map['isActive'] == true) {
+      parsedStatus = 'Open';
+    } else if (map['isActive'] == false) {
+      parsedStatus = 'Closed';
+    } else if (map['status'] != null) {
+      parsedStatus = map['status'].toString();
+    }
+
     return RecruitmentJob(
-      id: map['id']?.toString() ?? '',
+      // ✅ jobId أو id
+      id: map['jobId']?.toString() ?? map['id']?.toString() ?? '',
+
       title: map['title']?.toString() ?? '',
-      companyName: map['companyName']?.toString() ?? '',
-      location: map['location']?.toString() ?? '',
-      salaryRange: map['salaryRange']?.toString() ?? '',
-      type: map['type']?.toString() ?? '',
-      status: map['status']?.toString() ?? 'Open',
-      category: map['category']?.toString() ?? '',
-      tags: List<String>.from(map['tags'] ?? []),
-      publishedAt: map['publishedAt'] != null
+
+      // ✅ companyId من company object
+      companyId: companyData['companyId']?.toString() ??
+          map['companyId']?.toString() ?? '',
+
+      // ✅ companyName من company object
+      companyName: companyData['name']?.toString() ??
+          map['companyName']?.toString() ?? '',
+
+      // ✅ location من address
+      location: map['address']?.toString() ??
+          map['location']?.toString() ?? '',
+
+      salaryRange: parsedSalaryRange,
+      type: parsedType,
+      status: parsedStatus,
+
+      category: map['categoryId']?.toString() ??
+          map['category']?.toString() ??
+          map['classification']?.toString() ?? '',
+
+      tags: _parseList(map['skills'] ?? map['tags']),
+
+      publishedAt: map['createdAt'] != null
+          ? DateTime.tryParse(map['createdAt'].toString()) ?? DateTime.now()
+          : (map['publishedAt'] != null
           ? DateTime.tryParse(map['publishedAt'].toString()) ?? DateTime.now()
-          : DateTime.now(),
+          : DateTime.now()),
+
       description: map['description']?.toString() ?? '',
-      responsibilities: List<String>.from(map['responsibilities'] ?? []),
-      qualifications: List<String>.from(map['qualifications'] ?? []),
-      niceToHaves: List<String>.from(map['niceToHaves'] ?? []),
-      benefits: List<String>.from(map['benefits'] ?? []),
+      responsibilities: _parseList(map['responsibilities']),
+      qualifications: _parseList(map['qualifications']),
+      niceToHaves: _parseList(map['niceToHaves']),
+      benefits: _parseList(map['benefits']),
+
       acceptedCount: int.tryParse(map['acceptedCount']?.toString() ?? '0') ?? 0,
-      capacity: int.tryParse(map['requiredCount']?.toString() ?? '1') ?? 1,
-      companyLogoUrl: map['companyLogoUrl']?.toString(),
+      capacity: map['slotsAvailable'] ??
+          int.tryParse(map['requiredCount']?.toString() ?? '1') ?? 1,
+
+      companyLogoUrl: companyData['logoUrl']?.toString() ??
+          map['companyLogoUrl']?.toString(),
+
+      userId: map['user']?['userId']?.toString() ??
+          map['userId']?.toString(),
     );
   }
 }
@@ -313,7 +404,7 @@ class RecruitmentSyncStore extends ChangeNotifier {
   final List<RecruitmentMessage> _messages = <RecruitmentMessage>[];
   final List<ChatThread> _tradesmanChatThreads = <ChatThread>[];
   final List<PendingTradesmanRating> _pendingTradesmanRatings =
-      <PendingTradesmanRating>[];
+  <PendingTradesmanRating>[];
   final Map<String, String> _tradesmanJobStatusOverrides = <String, String>{};
 
   String? _backgroundImage;
@@ -324,9 +415,9 @@ class RecruitmentSyncStore extends ChangeNotifier {
   List<String> _languages = <String>[];
   List<String> _tradesmanServices = <String>[];
   final List<TradesmanRatingEntry> _ratingsFromClients =
-      <TradesmanRatingEntry>[];
+  <TradesmanRatingEntry>[];
   final List<TradesmanRatingEntry> _ratingsGivenByTradesman =
-      <TradesmanRatingEntry>[];
+  <TradesmanRatingEntry>[];
   final Set<String> _savedJobIds = <String>{};
   final Set<String> _deletedJobIds = <String>{};
   final List<ServiceRequestPost> _serviceRequests = <ServiceRequestPost>[];
@@ -429,24 +520,24 @@ class RecruitmentSyncStore extends ChangeNotifier {
 
       final matchesQuery =
           query.isEmpty ||
-          job.title.toLowerCase().contains(query) ||
-          job.companyName.toLowerCase().contains(query);
+              job.title.toLowerCase().contains(query) ||
+              job.companyName.toLowerCase().contains(query);
       final matchesLocation =
           _filterLocation == 'All' ||
-          job.location.toLowerCase() == _filterLocation.toLowerCase();
+              job.location.toLowerCase() == _filterLocation.toLowerCase();
       final jobCat = job.category.toLowerCase();
       final filterCat = _filterCategory.toLowerCase();
       final matchesCategory =
           _filterCategory == 'All' ||
-          jobCat == filterCat ||
-          (filterCat == 'service' &&
-              (jobCat == 'service' || jobCat == 'tradesman'));
+              jobCat == filterCat ||
+              (filterCat == 'service' &&
+                  (jobCat == 'service' || jobCat == 'tradesman'));
       final matchesType =
           _filterType == 'All' ||
-          job.type.toLowerCase() == _filterType.toLowerCase();
+              job.type.toLowerCase() == _filterType.toLowerCase();
       final matchesSalary =
           _filterSalaryRange == 'All' ||
-          job.salaryRange.toLowerCase() == _filterSalaryRange.toLowerCase();
+              job.salaryRange.toLowerCase() == _filterSalaryRange.toLowerCase();
       return matchesQuery &&
           matchesLocation &&
           matchesCategory &&
@@ -471,13 +562,13 @@ class RecruitmentSyncStore extends ChangeNotifier {
   }
 
   void applyToJob(
-    RecruitmentJob job, {
-    String? about,
-    String? location,
-    String? email,
-    String? phone,
-    bool hasCv = false,
-  }) {
+      RecruitmentJob job, {
+        String? about,
+        String? location,
+        String? email,
+        String? phone,
+        bool hasCv = false,
+      }) {
     final alreadyApplied = _applications.any((a) => a.jobId == job.id);
     if (!alreadyApplied) {
       final newApp = RecruitmentApplication(
@@ -527,37 +618,39 @@ class RecruitmentSyncStore extends ChangeNotifier {
   }
 
   void replaceFromRemote({
-    required List<dynamic> jobs,
-    required List<dynamic> applications,
-    required List<dynamic> messages,
+    List<dynamic>? jobs,
+    List<dynamic>? applications,
+    List<dynamic>? messages,
   }) {
-    _jobs.clear();
-    for (final item in jobs) {
-      if (item is Map<String, dynamic>) {
-        final newJob = RecruitmentJob.fromMap(item);
-        _jobs.add(newJob);
+    if (jobs != null) {
+      _jobs.clear();
+      for (final item in jobs) {
+        if (item is Map<String, dynamic>) {
+          final newJob = RecruitmentJob.fromMap(item);
+          _jobs.add(newJob);
+        }
       }
+      final ids = <String>{};
+      _jobs.retainWhere((j) => ids.add(j.id));
     }
-    
-    // Remove duplicates by ID (keeping the first one found, usually the remote one if it exists)
-    final ids = <String>{};
-    _jobs.retainWhere((j) => ids.add(j.id));
 
-    _applications.clear();
-    for (final item in applications) {
-      if (item is Map<String, dynamic>) {
-        _applications.add(RecruitmentApplication.fromMap(item));
+    if (applications != null) {
+      _applications.clear();
+      for (final item in applications) {
+        if (item is Map<String, dynamic>) {
+          _applications.add(RecruitmentApplication.fromMap(item));
+        }
       }
+      final appIds = <String>{};
+      _applications.retainWhere((a) => appIds.add(a.id));
     }
-    
-    // Remove duplicates by ID
-    final appIds = <String>{};
-    _applications.retainWhere((a) => appIds.add(a.id));
 
-    _messages.clear();
-    for (final item in messages) {
-      if (item is Map<String, dynamic>) {
-        _messages.add(RecruitmentMessage.fromMap(item));
+    if (messages != null) {
+      _messages.clear();
+      for (final item in messages) {
+        if (item is Map<String, dynamic>) {
+          _messages.add(RecruitmentMessage.fromMap(item));
+        }
       }
     }
     notifyListeners();
@@ -642,7 +735,7 @@ class RecruitmentSyncStore extends ChangeNotifier {
     required String applicationId,
   }) {
     _pendingTradesmanRatings.removeWhere(
-      (r) => r.applicationId == applicationId,
+          (r) => r.applicationId == applicationId,
     );
     final random = Random();
     final maxSeconds = 24 * 60 * 60;
@@ -661,7 +754,7 @@ class RecruitmentSyncStore extends ChangeNotifier {
   PendingTradesmanRating? consumeDueTradesmanRating() {
     final now = DateTime.now();
     final index = _pendingTradesmanRatings.indexWhere(
-      (r) => !r.showAt.isAfter(now),
+          (r) => !r.showAt.isAfter(now),
     );
     if (index == -1) return null;
     final rating = _pendingTradesmanRatings.removeAt(index);
@@ -756,6 +849,7 @@ class RecruitmentSyncStore extends ChangeNotifier {
       _jobs[index] = RecruitmentJob(
         id: old.id,
         title: old.title,
+        companyId: old.companyId,  // ✅ إصلاح: بدلاً من companyId: ''
         companyName: old.companyName,
         location: old.location,
         salaryRange: old.salaryRange,
@@ -775,6 +869,7 @@ class RecruitmentSyncStore extends ChangeNotifier {
         companyLogoUrl: old.companyLogoUrl,
         deadline: old.deadline,
         specialTag: old.specialTag,
+        userId: old.userId,
       );
     }
     notifyListeners();

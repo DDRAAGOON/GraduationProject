@@ -316,7 +316,7 @@ class _FindJobsState extends State<FindJobs> {
                             acceptedCount: 12,
                             capacity: 20,
                             logoIcon: Icons.plumbing,
-                            specialTag: 'مميز',
+                            specialTag: 'مميز', companyId: '',
                           ),
                           t,
                         ),

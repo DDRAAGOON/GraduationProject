@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import '../../core/constants/api_constants.dart';
 import '../../core/network/api_client.dart';
 import '../../core/network/api_error_handler.dart';
@@ -80,7 +81,7 @@ class RecruitmentSyncService {
       );
 
       final user = authResponse.user;
-      
+
       RecruitmentSyncStore.instance.updateCurrentUser(
         name: user.fullName ?? '',
         email: user.email,
@@ -136,12 +137,12 @@ class RecruitmentSyncService {
         'fullName': name,
         'photoUrl': photoUrl,
       }..removeWhere((_, v) => v == null));
-      
+
       RecruitmentSyncStore.instance.updateCurrentUser(
         name: user.fullName ?? '',
         photoUrl: user.photoUrl,
       );
-      
+
       return user;
     } catch (e) {
       throw ErrorHandler.handle(e);
@@ -155,7 +156,9 @@ class RecruitmentSyncService {
     try {
       await _applicationService.updateApplicationStatus(applicationId, status);
       await _pullServerState();
-    } catch (_) {}
+    } catch (e) {
+      if (kDebugMode) debugPrint('❌ Error updating status: $e');
+    }
   }
 
   Future<void> updateJob({
@@ -198,14 +201,18 @@ class RecruitmentSyncService {
         ),
       );
       await _pullServerState();
-    } catch (_) {}
+    } catch (e) {
+      if (kDebugMode) debugPrint('❌ Error updating job: $e');
+    }
   }
 
   Future<void> deleteJob(String jobId) async {
     try {
       await _jobService.deleteJob(jobId);
       await _pullServerState();
-    } catch (_) {}
+    } catch (e) {
+      if (kDebugMode) debugPrint('❌ Error deleting job: $e');
+    }
   }
 
   Future<String> postJob({
@@ -259,7 +266,9 @@ class RecruitmentSyncService {
         CreateApplicationRequest(jobId: jobId, userName: userName),
       );
       await _pullServerState();
-    } catch (_) {}
+    } catch (e) {
+      if (kDebugMode) debugPrint('❌ Error applying to job: $e');
+    }
   }
 
   Future<void> startPolling() async {
@@ -278,19 +287,80 @@ class RecruitmentSyncService {
     _timer = null;
   }
 
+  /// ✅ الدالة المصححة - كل طلب يتم معالجته بشكل منفصل
   Future<void> _pullServerState() async {
-    if (!await isAuthenticated) return;
+    if (!await isAuthenticated) {
+      if (kDebugMode) debugPrint('⚠️ Not authenticated, skipping pull');
+      return;
+    }
+
+    if (kDebugMode) debugPrint('🔄 Pulling server state...');
+
+    List<Map<String, dynamic>> jobs = [];
+    List<Map<String, dynamic>> applications = [];
+    List<Map<String, dynamic>> messages = [];
+
+    // ✅ جلب الوظائف - بشكل منفصل
     try {
       final jobsResponse = await _apiClient.get(ApiConstants.jobs);
-      final appsResponse = await _apiClient.get(ApiConstants.myApplications);
-      final chatResponse = await _chatService.getMyChats('me');
+      final jobsData = jobsResponse.data;
 
+      if (jobsData is List) {
+        jobs = jobsData.cast<Map<String, dynamic>>();
+      } else if (jobsData is Map && jobsData['data'] is List) {
+        jobs = (jobsData['data'] as List).cast<Map<String, dynamic>>();
+      }
+
+      if (kDebugMode) debugPrint('✅ Fetched ${jobs.length} jobs');
+    } catch (e) {
+      if (kDebugMode) debugPrint('❌ Error fetching jobs: $e');
+    }
+
+    // ✅ جلب التطبيقات - بشكل منفصل
+    try {
+      final appsResponse = await _apiClient.get(ApiConstants.myApplications);
+      final appsData = appsResponse.data;
+
+      if (appsData is List) {
+        applications = appsData.cast<Map<String, dynamic>>();
+      } else if (appsData is Map && appsData['data'] is List) {
+        applications = (appsData['data'] as List).cast<Map<String, dynamic>>();
+      }
+
+      if (kDebugMode) debugPrint('✅ Fetched ${applications.length} applications');
+    } catch (e) {
+      if (kDebugMode) debugPrint('❌ Error fetching applications: $e');
+      // ✅ نكمل حتى لو فشل هذا الطلب
+    }
+
+    // ✅ جلب المحادثات - بشكل منفصل
+    try {
+      final chatResponse = await _chatService.getMyChats('me');
+      messages = chatResponse.map((e) => {
+        'id': e['id'],
+        'text': e['lastMessage'] ?? ''
+      }).toList();
+
+      if (kDebugMode) debugPrint('✅ Fetched ${messages.length} messages');
+    } catch (e) {
+      if (kDebugMode) debugPrint('❌ Error fetching messages: $e');
+      // ✅ نكمل حتى لو فشل هذا الطلب
+    }
+
+    // ✅ تحديث الـ Store بالبيانات المتاحة (حتى لو بعضها فارغ)
+    try {
       RecruitmentSyncStore.instance.replaceFromRemote(
-        jobs: (jobsResponse.data as List).cast<Map<String, dynamic>>(),
-        applications: (appsResponse.data as List).cast<Map<String, dynamic>>(),
-        messages: chatResponse.map((e) => {'id': e['id'], 'text': e['lastMessage'] ?? ''}).toList(),
+        jobs: jobs,
+        applications: applications,
+        messages: messages,
       );
-    } catch (_) {}
+
+      if (kDebugMode) {
+        debugPrint('✅ Store updated: ${jobs.length} jobs, ${applications.length} apps, ${messages.length} messages');
+      }
+    } catch (e) {
+      if (kDebugMode) debugPrint('❌ Error updating store: $e');
+    }
   }
 
   Future<void> logout() async {

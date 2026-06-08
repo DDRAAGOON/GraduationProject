@@ -44,27 +44,47 @@ class Job {
   });
 
   factory Job.fromJson(Map<String, dynamic> json) {
+    // Map salaryMin and salaryMax back to salaryRange
+    String salaryRange = 'Competitive';
+    if (json['salaryMin'] != null || json['salaryMax'] != null) {
+      final min = json['salaryMin'] != null ? '${json['salaryMin']}' : '';
+      final max = json['salaryMax'] != null ? ' - ${json['salaryMax']}' : '';
+      salaryRange = '$min$max';
+    } else if (json['salaryRange'] != null) {
+      salaryRange = json['salaryRange'].toString();
+    }
+
+    // Map jobType array back to type string
+    String type = 'Full-Time';
+    if (json['jobType'] is List && (json['jobType'] as List).isNotEmpty) {
+      type = (json['jobType'] as List).join(' • ');
+    } else if (json['type'] != null) {
+      type = json['type'].toString();
+    }
+
     return Job(
-      id: json['id'],
-      title: json['title'],
-      companyId: json['companyId'],
-      companyName: json['companyName'],
-      companyLogoUrl: json['companyLogoUrl'],
-      location: json['location'],
-      salaryRange: json['salaryRange'],
-      type: json['type'],
-      description: json['description'],
+      id: json['id']?.toString() ?? '',
+      title: json['title']?.toString() ?? 'Untitled',
+      companyId: json['companyId']?.toString() ?? '',
+      companyName: json['companyName']?.toString() ?? 'Unknown Company',
+      companyLogoUrl: json['companyLogoUrl']?.toString(),
+      location: json['address']?.toString() ?? json['location']?.toString() ?? 'Remote',
+      salaryRange: salaryRange,
+      type: type,
+      description: json['description']?.toString() ?? '',
       responsibilities: List<String>.from(json['responsibilities'] ?? []),
       qualifications: List<String>.from(json['qualifications'] ?? []),
       niceToHaves: List<String>.from(json['niceToHaves'] ?? []),
       benefits: List<String>.from(json['benefits'] ?? []),
-      category: json['category'],
-      tags: List<String>.from(json['tags'] ?? []),
-      createdAt: DateTime.parse(json['createdAt']),
-      requiredCount: json['requiredCount'] ?? 1,
+      category: json['categoryId']?.toString() ?? json['category']?.toString() ?? 'General',
+      tags: List<String>.from(json['skills'] ?? json['tags'] ?? []),
+      createdAt: json['createdAt'] != null ? DateTime.tryParse(json['createdAt'].toString()) ?? DateTime.now() : DateTime.now(),
+      requiredCount: json['slotsAvailable'] ?? json['requiredCount'] ?? 1,
       acceptedCount: json['acceptedCount'] ?? 0,
-      deadline: json['deadline'] != null ? DateTime.parse(json['deadline']) : null,
-      status: json['status'],
+      deadline: json['expiresAt'] != null
+          ? DateTime.tryParse(json['expiresAt'].toString())
+          : (json['deadline'] != null ? DateTime.tryParse(json['deadline'].toString()) : null),
+      status: json['isActive'] == true ? 'Active' : (json['isActive'] == false ? 'Closed' : (json['status']?.toString() ?? 'Active')),
     );
   }
 }
@@ -104,21 +124,42 @@ class CreateJobRequest {
     this.status,
   });
 
-  Map<String, dynamic> toJson() => {
-    'title': title,
-    'companyName': companyName,
-    if (location != null) 'location': location,
-    if (salaryRange != null) 'salaryRange': salaryRange,
-    if (type != null) 'type': type,
-    if (description != null) 'description': description,
-    if (responsibilities != null) 'responsibilities': responsibilities,
-    if (qualifications != null) 'qualifications': qualifications,
-    if (niceToHaves != null) 'niceToHaves': niceToHaves,
-    if (benefits != null) 'benefits': benefits,
-    if (category != null) 'category': category,
-    if (tags != null) 'tags': tags,
-    if (requiredCount != null) 'requiredCount': requiredCount,
-    if (deadline != null) 'deadline': deadline?.toIso8601String(),
-    if (status != null) 'status': status,
-  };
+  Map<String, dynamic> toJson() {
+    int? salaryMin;
+    int? salaryMax;
+    if (salaryRange != null && salaryRange!.isNotEmpty) {
+      // e.g. "10k - 20k" -> min: 10000, max: 20000
+      final parts = salaryRange!.replaceAll(RegExp(r'[kK]'), '000').split('-');
+      if (parts.isNotEmpty) salaryMin = int.tryParse(parts[0].replaceAll(RegExp(r'[^0-9]'), ''));
+      if (parts.length > 1) salaryMax = int.tryParse(parts[1].replaceAll(RegExp(r'[^0-9]'), ''));
+    }
+
+    String finalDesc = description ?? '';
+    if (responsibilities != null && responsibilities!.isNotEmpty) {
+      finalDesc += '\n\nالمهام:\n- ${responsibilities!.join('\n- ')}';
+    }
+    if (qualifications != null && qualifications!.isNotEmpty) {
+      finalDesc += '\n\nالمؤهلات:\n- ${qualifications!.join('\n- ')}';
+    }
+    if (niceToHaves != null && niceToHaves!.isNotEmpty) {
+      finalDesc += '\n\nإضافات مفضلة:\n- ${niceToHaves!.join('\n- ')}';
+    }
+
+    List<String> combinedSkills = [];
+    if (tags != null) combinedSkills.addAll(tags!);
+
+    return {
+      'title': title,
+      if (finalDesc.isNotEmpty) 'description': finalDesc,
+      if (location != null) 'address': location,
+      if (salaryMin != null) 'salaryMin': salaryMin,
+      if (salaryMax != null) 'salaryMax': salaryMax,
+      if (type != null) 'jobType': [type!],
+      if (benefits != null) 'benefits': benefits,
+      if (requiredCount != null) 'slotsAvailable': requiredCount,
+      if (deadline != null) 'expiresAt': deadline?.toIso8601String(),
+      if (status != null) 'isActive': status?.toLowerCase() == 'active' || status?.toLowerCase() == 'نشط',
+      if (combinedSkills.isNotEmpty) 'skills': combinedSkills,
+    };
+  }
 }

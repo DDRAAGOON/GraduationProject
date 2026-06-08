@@ -34,7 +34,7 @@ class _CompanyPostJobStep3BenefitsScreenState
       if (args is Map<String, dynamic>) {
         _jobId = args['jobId'];
         _isEditing = _jobId != null;
-        
+
         final benefits = args['benefits'] as List<JobBenefit>?;
         if (benefits != null && benefits.isNotEmpty) {
           _benefits.clear();
@@ -102,10 +102,10 @@ class _CompanyPostJobStep3BenefitsScreenState
 
   Future<void> _publish() async {
     setState(() => _loading = true);
-    
+
     final args = ModalRoute.of(context)?.settings.arguments;
     final data = args is Map<String, dynamic> ? args : const <String, dynamic>{};
-    
+
     final title = (data['title'] as String?)?.trim() ?? 'Untitled Job';
     final employmentType = (data['employmentType'] as String?)?.trim() ?? 'Full-Time';
     final salaryRange = (data['salaryRange'] as String?)?.trim() ?? 'Competitive';
@@ -125,7 +125,8 @@ class _CompanyPostJobStep3BenefitsScreenState
     ].join('\n');
 
     final companyLocations = CompanyStore.instance.locations;
-    final location = companyLocations.isNotEmpty ? companyLocations.first : 'Remote';
+    final fallbackLocation = companyLocations.isNotEmpty ? companyLocations.first : 'Remote';
+    final location = (data['location'] as String?) ?? fallbackLocation;
 
     try {
       if (_isEditing && _jobId != null) {
@@ -196,7 +197,7 @@ class _CompanyPostJobStep3BenefitsScreenState
             ),
           ),
           const SizedBox(height: 32),
-          
+
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),

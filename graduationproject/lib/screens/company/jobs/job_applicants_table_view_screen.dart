@@ -29,7 +29,7 @@ class _CompanyJobApplicantsTableViewScreenState
   static List<String> _getStageOptions(AppLocalizations t) => [
     t.isAr ? 'تم التقديم' : 'Applied',
     t.isAr ? 'قيد المراجعة' : 'In Review',
-    t.isAr ? 'مختصر' : 'Shortlisted',
+    t.isAr ? 'مختصر' : 'ShortlFisted',
     t.isAr ? 'قائمة الانتظار' : 'Waitlist',
     t.isAr ? 'تم التوظيف' : 'Hired',
     t.isAr ? 'مرفوض' : 'Declined',
@@ -352,3 +352,49 @@ class _ApplicantRow extends StatelessWidget {
     );
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+// [
+// {
+// "applicationId": "1",
+// "jobId": "123",
+// "userId": "uuid-...",
+// "status": "Applied",
+// "appliedAt": "2026-06-08T11:00:00Z",
+// "resumeUrl": "https://...",
+// "coverLetter": "Hello, I am interested...",
+// "user": {
+// "userId": "uuid-...",
+// "firstName": "Ahmed",
+// "lastName": "Mohamed",
+// "email": "ahmed@example.com",
+// "phone": "+201012345678",
+// "applicantProfile": {
+// "address": "Cairo, Egypt",
+// "gender": "Male",
+// "birthDate": "1990-01-01",
+// "about": "I am a skilled plumber...",
+// "skills": ["Plumbing", "Maintenance"],
+// "education": "High School",
+// "experienceYears": 5,
+// "languages": ["Arabic", "English"]
+// }
+// },
+// "job": {
+// "job_id": "123",
+// "title": "سباك",
+// "company": { "companyName": "شركة الصيانة" }
+// }
+// }
+// ]

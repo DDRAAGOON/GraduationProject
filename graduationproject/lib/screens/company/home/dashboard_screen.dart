@@ -368,9 +368,18 @@ class _CompanyDashboardScreenState extends State<CompanyDashboardScreen> {
   }
 
   Widget _buildJobCard(dynamic job) {
-    final title = job['title'] ?? 'Unknown Job';
-    final address = job['address'] ?? job['location'] ?? 'Remote';
-    final jobType = job['jobType'] ?? job['job_type'] ?? 'Full-time';
+    final title = job['title']?.toString() ?? 'Unknown Job';
+    final address = job['address']?.toString() ?? job['location']?.toString() ?? 'Remote';
+
+    // Safely parse jobType since it could be an array in the backend
+    String jobType = 'Full-time';
+    final rawJobType = job['jobType'] ?? job['job_type'];
+    if (rawJobType is List && rawJobType.isNotEmpty) {
+      jobType = rawJobType.join(' • ');
+    } else if (rawJobType != null) {
+      jobType = rawJobType.toString();
+    }
+
     final availableSlots = job['availableSlots'] ?? job['available_slots'] ?? job['capacity'] ?? 0;
 
     return InkWell(
