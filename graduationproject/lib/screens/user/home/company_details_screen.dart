@@ -16,8 +16,13 @@ class CompanyDetailsScreen extends StatefulWidget {
 
 class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
   final TextEditingController _commentController = TextEditingController();
-  final List<Map<String, String>> _comments = [
-    {'name': 'أحمد علي', 'text': 'بيئة عمل ممتازة جداً واحترافية عالية.'},
+  int _userRating = 0;
+  final List<Map<String, dynamic>> _comments = [
+    {
+      'name': 'أحمد علي', 
+      'text': 'بيئة عمل ممتازة جداً واحترافية عالية.',
+      'rating': 5,
+    },
   ];
 
   @override
@@ -27,14 +32,20 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
   }
 
   void _addComment() {
-    if (_commentController.text.trim().isNotEmpty) {
+    if (_commentController.text.trim().isNotEmpty && _userRating > 0) {
       setState(() {
         _comments.insert(0, {
           'name': RecruitmentSyncStore.instance.currentUserName,
           'text': _commentController.text.trim(),
+          'rating': _userRating,
         });
         _commentController.clear();
+        _userRating = 0;
       });
+    } else if (_userRating == 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('يرجى اختيار التقييم بالنجوم أولاً')),
+      );
     }
   }
 
@@ -102,7 +113,28 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                   _buildContentCard(
                     isDark,
                     Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        Text(
+                          isAr ? 'تقييمك:' : 'Your Rating:',
+                          style: const TextStyle(color: Color(0xFF142C66), fontWeight: FontWeight.bold, fontSize: 14),
+                        ),
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            ...List.generate(5, (index) => IconButton(
+                              icon: Icon(
+                                index < _userRating ? Icons.star : Icons.star_border,
+                                color: const Color(0xFFFF7A2A),
+                                size: 28,
+                              ),
+                              onPressed: () => setState(() => _userRating = index + 1),
+                              padding: const EdgeInsets.only(right: 8),
+                              constraints: const BoxConstraints(),
+                            )),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
                         TextField(
                           controller: _commentController,
                           style: const TextStyle(color: Color(0xFF142C66)),
@@ -120,7 +152,20 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                         ..._comments.map((c) => ListTile(
                           contentPadding: EdgeInsets.zero,
                           leading: const CircleAvatar(child: Icon(Icons.person)),
-                          title: Text(c['name']!, style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF142C66))),
+                          title: Row(
+                            children: [
+                              Text(c['name']!, style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF142C66))),
+                              const Spacer(),
+                              if (c['rating'] != null)
+                                Row(
+                                  children: List.generate(5, (index) => Icon(
+                                    Icons.star,
+                                    size: 14,
+                                    color: index < (c['rating'] as int) ? const Color(0xFFFF7A2A) : Colors.grey[400],
+                                  )),
+                                ),
+                            ],
+                          ),
                           subtitle: Text(c['text']!, style: const TextStyle(color: Color(0xFF142C66))),
                         )),
                       ],
