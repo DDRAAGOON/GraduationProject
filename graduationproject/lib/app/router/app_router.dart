@@ -207,6 +207,7 @@ final class AppRouter {
             : RecruitmentApplication(
                 id: 'fallback',
                 jobId: 'fallback',
+                userId: 'fallback',
                 jobTitle: 'Unknown',
                 companyName: 'Unknown',
                 userName: 'Unknown',
@@ -284,6 +285,7 @@ final class AppRouter {
             : RecruitmentApplication(
                 id: 'fallback',
                 jobId: 'fallback',
+                userId: 'fallback',
                 jobTitle: 'Unknown',
                 companyName: 'Unknown',
                 userName: 'Unknown',

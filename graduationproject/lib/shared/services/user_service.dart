@@ -107,6 +107,25 @@ class UserService {
     }
   }
 
+  Future<void> updatePassword({
+    required String oldPassword,
+    required String newPassword,
+  }) async {
+    try {
+      final response = await ApiClient.put(
+        '/users/me/password',
+        requiresAuth: true,
+        body: {
+          'oldPassword': oldPassword,
+          'newPassword': newPassword,
+        },
+      );
+      await handleResponse(response, (map) => map);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<String?> uploadImage(String filePath) async {
     try {
       final response = await ApiClient.multipartRequest(

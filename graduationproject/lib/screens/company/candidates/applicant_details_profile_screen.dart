@@ -37,6 +37,7 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
           orElse: () => RecruitmentApplication(
             id: applicant.id,
             jobId: applicant.jobId,
+            userId: applicant.id,
             jobTitle: applicant.role,
             companyName: '',
             userName: applicant.fullName,

@@ -238,7 +238,7 @@ class _DiscoverTabState extends State<DiscoverTab> {
               children: [
                 if (isAr) ...[
                   Text(
-                    "عدد المتقدمين: ${store.applications.where((a) => a.jobId == job.id).length}",
+                    "عدد المتقدمين: ${job.acceptedCount}",
                     style: const TextStyle(color: Colors.white70, fontSize: 12),
                   ),
                   const Spacer(),
@@ -247,7 +247,7 @@ class _DiscoverTabState extends State<DiscoverTab> {
                   _buildApplyActionBtn(context, job, isAr),
                   const Spacer(),
                   Text(
-                    "Applicants: ${store.applications.where((a) => a.jobId == job.id).length}",
+                    "Applicants: ${job.acceptedCount}",
                     style: const TextStyle(color: Colors.white70, fontSize: 12),
                   ),
                 ],

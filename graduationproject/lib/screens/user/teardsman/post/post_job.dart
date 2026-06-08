@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:graduationproject/shared/l10n/app_localizations.dart';
 import 'package:graduationproject/shared/state/recruitment_sync_store.dart';
 import '../../../../shared/services/recruitment_sync_service.dart';
+import '../../../../shared/services/job_service.dart';
 import 'job_applicants_screen.dart';
 
 class PostJob extends StatefulWidget {
@@ -110,22 +111,24 @@ class _PostJobState extends State<PostJob> {
       final int capacity = int.tryParse(_capacityController.text) ?? 1;
 
       try {
-        final String jobId = await RecruitmentSyncService.instance.postJob(
-          title: _titleController.text,
-          companyName: store.currentUserName,
-          location: selectedLocation,
-          salaryRange:
-              "Negotiable", // Default to Negotiable since price is removed
-          type: 'one-time',
-          category: 'Service',
-          tags: _skills,
-          description: _descriptionController.text,
-          responsibilities: [],
-          qualifications: [],
-          niceToHaves: [],
-          benefits: [],
-          requiredCount: capacity,
-        );
+        final body = {
+          'title': _titleController.text,
+          'companyName': store.currentUserName,
+          'location': selectedLocation,
+          'salaryRange': "Negotiable",
+          'type': 'one-time',
+          'category': 'Service',
+          'tags': _skills,
+          'description': _descriptionController.text,
+          'responsibilities': [],
+          'qualifications': [],
+          'niceToHaves': [],
+          'benefits': [],
+          'requiredCount': capacity,
+        };
+
+        final String jobId = await JobService.instance.createJob(body);
+        await JobService.instance.getJobs();
 
         if (!mounted) return;
 
@@ -155,7 +158,7 @@ class _PostJobState extends State<PostJob> {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(t.isAr ? 'فشل نشر العمل' : 'Failed to post work'),
+            content: Text('${t.isAr ? 'فشل نشر العمل' : 'Failed to post work'}: $e'),
             backgroundColor: Colors.redAccent,
           ),
         );

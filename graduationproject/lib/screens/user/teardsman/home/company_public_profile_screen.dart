@@ -3,41 +3,10 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../shared/l10n/app_localizations.dart';
 import '../../../../shared/state/recruitment_sync_store.dart';
 import '../../../../shared/utils/image_helper.dart';
-
-class CompanyPublicProfile {
-  final String name;
-  final String industry;
-  final String? logoUrl;
-  final String aboutEn;
-  final String aboutAr;
-  final String website;
-  final String employee;
-  final String category;
-  final List<String> locations;
-  final List<String> techStack;
-  final List<String> benefits;
-  final int foundedYear;
-  final List<RecruitmentJob> jobs;
-
-  const CompanyPublicProfile({
-    required this.name,
-    required this.industry,
-    this.logoUrl,
-    required this.aboutEn,
-    required this.aboutAr,
-    required this.website,
-    required this.employee,
-    required this.category,
-    required this.locations,
-    required this.techStack,
-    required this.benefits,
-    required this.foundedYear,
-    required this.jobs,
-  });
-}
+import '../../../../shared/services/rating_service.dart';
 
 class CompanyPublicProfileScreen extends StatefulWidget {
-  final CompanyPublicProfile company;
+  final Map<String, dynamic> company;
 
   const CompanyPublicProfileScreen({super.key, required this.company});
 
@@ -47,10 +16,33 @@ class CompanyPublicProfileScreen extends StatefulWidget {
 
 class _CompanyPublicProfileScreenState extends State<CompanyPublicProfileScreen> {
   final TextEditingController _commentController = TextEditingController();
-  final List<Map<String, dynamic>> _mockComments = [
-    {'name': 'أحمد علي', 'text': 'شركة محترمة جداً وبيئة عمل ممتازة.', 'date': '2024-05-10'},
-    {'name': 'سارة محمود', 'text': 'تجربة رائعة مع فريق التوظيف لديهم.', 'date': '2024-05-08'},
-  ];
+  List<Map<String, dynamic>> _comments = [];
+  bool _isLoadingRatings = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchRatings();
+  }
+
+  Future<void> _fetchRatings() async {
+    final companyId = widget.company['id']?.toString() ?? widget.company['_id']?.toString() ?? '';
+    if (companyId.isEmpty) {
+      setState(() => _isLoadingRatings = false);
+      return;
+    }
+    try {
+      final ratings = await RatingService.instance.getCompanyRatings(companyId);
+      if (mounted) {
+        setState(() {
+          _comments = ratings;
+          _isLoadingRatings = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) setState(() => _isLoadingRatings = false);
+    }
+  }
 
   @override
   void dispose() {
@@ -58,17 +50,29 @@ class _CompanyPublicProfileScreenState extends State<CompanyPublicProfileScreen>
     super.dispose();
   }
 
-  void _addComment() {
+  Future<void> _addComment() async {
     final text = _commentController.text.trim();
     if (text.isEmpty) return;
-    setState(() {
-      _mockComments.insert(0, {
-        'name': RecruitmentSyncStore.instance.currentUserName,
-        'text': text,
-        'date': DateTime.now().toString().split(' ')[0],
+
+    final companyId = widget.company['id']?.toString() ?? widget.company['_id']?.toString() ?? '';
+    if (companyId.isNotEmpty) {
+      try {
+        await RatingService.instance.postCompanyRating(companyId, text);
+        _fetchRatings();
+      } catch (e) {
+        // ignore
+      }
+    } else {
+      // Offline fallback
+      setState(() {
+        _comments.insert(0, {
+          'user': {'name': RecruitmentSyncStore.instance.currentUserName},
+          'text': text,
+          'createdAt': DateTime.now().toIso8601String(),
+        });
       });
-      _commentController.clear();
-    });
+    }
+    _commentController.clear();
   }
 
   @override
@@ -78,6 +82,17 @@ class _CompanyPublicProfileScreenState extends State<CompanyPublicProfileScreen>
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bgColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
     final company = widget.company;
+
+    final name = company['name']?.toString() ?? company['companyName']?.toString() ?? 'Company';
+    final industry = company['cat']?.toString() ?? company['category']?.toString() ?? company['industry']?.toString() ?? 'Industry';
+    final aboutEn = company['aboutEn']?.toString() ?? company['about']?.toString() ?? '';
+    final aboutAr = company['aboutAr']?.toString() ?? company['about']?.toString() ?? '';
+    final website = company['website']?.toString() ?? '';
+    final employee = company['employee']?.toString() ?? '';
+    final locations = company['locations'] as List<dynamic>? ?? [company['location']?.toString() ?? ''];
+    final benefits = company['benefits'] as List<dynamic>? ?? [];
+    final foundedYear = company['foundedYear']?.toString() ?? '';
+    final jobs = company['jobs'] as List<dynamic>? ?? [];
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -100,7 +115,7 @@ class _CompanyPublicProfileScreenState extends State<CompanyPublicProfileScreen>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // 1. Header Section (213E75)
-            _buildHeader(context, isDark, isAr),
+            _buildHeader(context, isDark, isAr, name, industry, company['logo']?.toString() ?? company['logoUrl']?.toString()),
 
             Padding(
               padding: const EdgeInsets.all(20),
@@ -113,13 +128,13 @@ class _CompanyPublicProfileScreenState extends State<CompanyPublicProfileScreen>
                   _buildContentCard(
                     child: Column(
                       children: [
-                        _buildDetailRow(Icons.category_outlined, isAr ? 'مجال العمل' : 'Industry', company.industry),
+                        _buildDetailRow(Icons.category_outlined, isAr ? 'مجال العمل' : 'Industry', industry),
                         const Divider(color: Colors.white24),
-                        _buildDetailRow(Icons.location_on_outlined, isAr ? 'الموقع' : 'Location', company.locations.isNotEmpty ? company.locations.first : 'N/A'),
+                        _buildDetailRow(Icons.location_on_outlined, isAr ? 'الموقع' : 'Location', locations.isNotEmpty ? locations.first.toString() : 'N/A'),
                         const Divider(color: Colors.white24),
-                        _buildDetailRow(Icons.groups_outlined, isAr ? 'عدد الموظفين' : 'Employees', company.employee),
+                        _buildDetailRow(Icons.groups_outlined, isAr ? 'عدد الموظفين' : 'Employees', employee),
                         const Divider(color: Colors.white24),
-                        _buildDetailRow(Icons.event_available_outlined, isAr ? 'تاريخ التأسيس' : 'Founded', company.foundedYear.toString()),
+                        _buildDetailRow(Icons.event_available_outlined, isAr ? 'تاريخ التأسيس' : 'Founded', foundedYear),
                       ],
                     ),
                   ),
@@ -146,71 +161,86 @@ class _CompanyPublicProfileScreenState extends State<CompanyPublicProfileScreen>
                           ),
                         ),
                         const Divider(color: Colors.white24),
-                        ListView.separated(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: _mockComments.length,
-                          separatorBuilder: (_, __) => const Divider(color: Colors.white24),
-                          itemBuilder: (context, index) {
-                            final c = _mockComments[index];
-                            return ListTile(
-                              contentPadding: EdgeInsets.zero,
-                              leading: const CircleAvatar(child: Icon(Icons.person)),
-                              title: Text(c['name'], style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF142C66), fontSize: 14)),
-                              subtitle: Text(c['text'], style: const TextStyle(color: Color(0xFF142C66), fontSize: 13)),
-                            );
-                          },
-                        ),
+                        if (_isLoadingRatings)
+                          const Center(child: CircularProgressIndicator())
+                        else if (_comments.isEmpty)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            child: Center(child: Text(isAr ? 'لا توجد تعليقات بعد' : 'No comments yet', style: const TextStyle(color: Color(0xFF142C66)))),
+                          )
+                        else
+                          ListView.separated(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: _comments.length,
+                            separatorBuilder: (_, __) => const Divider(color: Colors.white24),
+                            itemBuilder: (context, index) {
+                              final c = _comments[index];
+                              final userName = c['user'] != null && c['user'] is Map ? (c['user']['name'] ?? 'User') : (c['name'] ?? 'User');
+                              return ListTile(
+                                contentPadding: EdgeInsets.zero,
+                                leading: const CircleAvatar(child: Icon(Icons.person)),
+                                title: Text(userName.toString(), style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF142C66), fontSize: 14)),
+                                subtitle: Text(c['text']?.toString() ?? '', style: const TextStyle(color: Color(0xFF142C66), fontSize: 13)),
+                              );
+                            },
+                          ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 24),
 
                   // 4. About Company (B5ADAD)
-                  _buildSectionTitle(isAr ? 'عن الشركة' : 'About Company', isAr, isDark),
-                  const SizedBox(height: 12),
-                  _buildContentCard(
-                    child: Text(
-                      isAr ? (company.aboutAr.isNotEmpty ? company.aboutAr : company.aboutEn) : company.aboutEn,
-                      style: const TextStyle(height: 1.6, color: Color(0xFF142C66), fontWeight: FontWeight.w500),
-                      textAlign: isAr ? TextAlign.right : TextAlign.left,
+                  if (aboutEn.isNotEmpty || aboutAr.isNotEmpty) ...[
+                    _buildSectionTitle(isAr ? 'عن الشركة' : 'About Company', isAr, isDark),
+                    const SizedBox(height: 12),
+                    _buildContentCard(
+                      child: Text(
+                        isAr ? (aboutAr.isNotEmpty ? aboutAr : aboutEn) : (aboutEn.isNotEmpty ? aboutEn : aboutAr),
+                        style: const TextStyle(height: 1.6, color: Color(0xFF142C66), fontWeight: FontWeight.w500),
+                        textAlign: isAr ? TextAlign.right : TextAlign.left,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 24),
+                    const SizedBox(height: 24),
+                  ],
 
                   // 5. Contact (B5ADAD)
-                  _buildSectionTitle(isAr ? 'روابط التواصل' : 'Social Media', isAr, isDark),
-                  const SizedBox(height: 12),
-                  _buildContentCard(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        _buildSocialIcon(Icons.language, Colors.blue, company.website),
-                        _buildSocialIcon(Icons.facebook, Colors.indigo, 'https://facebook.com/${company.name.replaceAll(' ', '')}'),
-                        _buildSocialIcon(Icons.link, Colors.blueAccent, company.website),
-                      ],
+                  if (website.isNotEmpty) ...[
+                    _buildSectionTitle(isAr ? 'روابط التواصل' : 'Social Media', isAr, isDark),
+                    const SizedBox(height: 12),
+                    _buildContentCard(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          _buildSocialIcon(Icons.language, Colors.blue, website),
+                          _buildSocialIcon(Icons.facebook, Colors.indigo, 'https://facebook.com/${name.replaceAll(' ', '')}'),
+                          _buildSocialIcon(Icons.link, Colors.blueAccent, website),
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 24),
+                    const SizedBox(height: 24),
+                  ],
 
                   // 6. Benefits (B5ADAD Chips)
-                  _buildSectionTitle(isAr ? 'المميزات' : 'Benefits', isAr, isDark),
-                  const SizedBox(height: 12),
-                  Wrap(
-                    spacing: 10,
-                    runSpacing: 10,
-                    alignment: isAr ? WrapAlignment.end : WrapAlignment.start,
-                    children: company.benefits.map((b) => _buildBenefitChip(b)).toList(),
-                  ),
-                  const SizedBox(height: 32),
+                  if (benefits.isNotEmpty) ...[
+                    _buildSectionTitle(isAr ? 'المميزات' : 'Benefits', isAr, isDark),
+                    const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 10,
+                      runSpacing: 10,
+                      alignment: isAr ? WrapAlignment.end : WrapAlignment.start,
+                      children: benefits.map((b) => _buildBenefitChip(b.toString())).toList(),
+                    ),
+                    const SizedBox(height: 32),
+                  ],
 
                   // 7. Open Vacancies (213E75 Cards)
                   _buildSectionTitle(isAr ? 'الوظائف المتاحة' : 'Open Vacancies', isAr, isDark),
                   const SizedBox(height: 16),
-                  if (company.jobs.isEmpty)
+                  if (jobs.isEmpty)
                     Center(child: Text(isAr ? 'لا توجد وظائف حالياً' : 'No vacancies', style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)))
                   else
-                    ...company.jobs.map((job) => _buildJobItem(job, context)),
+                    ...jobs.map((job) => _buildJobItem(job, context)),
                   
                   const SizedBox(height: 50),
                 ],
@@ -222,7 +252,7 @@ class _CompanyPublicProfileScreenState extends State<CompanyPublicProfileScreen>
     );
   }
 
-  Widget _buildHeader(BuildContext context, bool isDark, bool isAr) {
+  Widget _buildHeader(BuildContext context, bool isDark, bool isAr, String name, String industry, String? logoUrl) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
@@ -236,21 +266,26 @@ class _CompanyPublicProfileScreenState extends State<CompanyPublicProfileScreen>
           CircleAvatar(
             radius: 50,
             backgroundColor: Colors.white.withValues(alpha: 0.15),
-            child: widget.company.logoUrl != null
+            child: logoUrl != null && logoUrl.isNotEmpty
                 ? ClipRRect(
                     borderRadius: BorderRadius.circular(50),
-                    child: Image(image: getAppImageProvider(widget.company.logoUrl)!, fit: BoxFit.cover, width: 100, height: 100),
+                    child: Image(
+                      image: getAppImageProvider(logoUrl) ?? const AssetImage('assets/company/icon/Company Logo.png'), 
+                      fit: BoxFit.cover, 
+                      width: 100, 
+                      height: 100
+                    ),
                   )
                 : const Icon(Icons.business, size: 50, color: Colors.white),
           ),
           const SizedBox(height: 16),
           Text(
-            widget.company.name,
+            name,
             style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.white),
           ),
           const SizedBox(height: 8),
           Text(
-            widget.company.industry,
+            industry,
             style: const TextStyle(color: Colors.cyanAccent, fontWeight: FontWeight.bold),
           ),
         ],
@@ -328,9 +363,21 @@ class _CompanyPublicProfileScreenState extends State<CompanyPublicProfileScreen>
     );
   }
 
-  Widget _buildJobItem(RecruitmentJob job, BuildContext context) {
+  Widget _buildJobItem(dynamic job, BuildContext context) {
+    // Determine if it's a RecruitmentJob or Map
+    String title = 'Job';
+    if (job is RecruitmentJob) {
+      title = job.title;
+    } else if (job is Map) {
+      title = job['title']?.toString() ?? 'Job';
+    }
+
     return GestureDetector(
-      onTap: () => Navigator.of(context).pushNamed('/user/jobs/details', arguments: job),
+      onTap: () {
+         if (job is RecruitmentJob) {
+            Navigator.of(context).pushNamed('/user/jobs/details', arguments: job);
+         }
+      },
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
@@ -342,7 +389,7 @@ class _CompanyPublicProfileScreenState extends State<CompanyPublicProfileScreen>
           children: [
             const Icon(Icons.work_outline, color: Colors.white70),
             const SizedBox(width: 16),
-            Expanded(child: Text(job.title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
+            Expanded(child: Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
             const Icon(Icons.arrow_forward_ios, color: Colors.white, size: 14),
           ],
         ),

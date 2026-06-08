@@ -7,6 +7,7 @@ import '../../data/api/api_client.dart';
 import '../state/company_store.dart';
 import '../state/recruitment_sync_store.dart';
 import 'session_manager.dart';
+import 'company_service.dart';
 
 class RecruitmentSyncService {
   RecruitmentSyncService._();
@@ -267,16 +268,28 @@ class RecruitmentSyncService {
 
   Future<void> _pullServerState() async {
     if (!isAuthenticated) return;
+    
+    List<dynamic>? jobs;
+    List<dynamic>? applications;
+    List<dynamic>? messages;
+    List<dynamic>? companiesList;
+
     try {
-      final jobs = await _client.fetchJobs();
-      final applications = await _client.fetchApplications();
-      final messages = await _client.fetchMessages();
-      RecruitmentSyncStore.instance.replaceFromRemote(
-        jobs: jobs,
-        applications: applications,
-        messages: messages,
-      );
+      jobs = await _client.fetchJobs();
+      applications = await _client.fetchApplications();
+      messages = await _client.fetchMessages();
     } catch (_) {}
+
+    try {
+      companiesList = await CompanyService.instance.getCompanies();
+    } catch (_) {}
+
+    RecruitmentSyncStore.instance.replaceFromRemote(
+      jobs: jobs,
+      applications: applications,
+      messages: messages,
+      companies: companiesList,
+    );
   }
 
   String _handleDioError(DioException e) {

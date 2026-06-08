@@ -282,46 +282,7 @@ class _FindJobsState extends State<FindJobs> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          t.isAr ? 'عرض كل الوظائف' : 'View All Jobs',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.onSurface,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        _buildJobCard(
-                          RecruitmentJob(
-                            id: 'sample-tradesman-job',
-                            title: 'سباك',
-                            companyName: 'شركة الصيانة الذكية',
-                            location: 'القاهرة',
-                            salaryRange: '3000-5000 ج.م',
-                            type: 'دوام كامل',
-                            status: 'Open',
-                            category: 'tradesman',
-                            publishedAt: DateTime.now(),
-                            description:
-                                'نبحث عن سباك ذو مهارة عالية للعمل على مشاريع الصيانة المنزلية والتجارية.',
-                            responsibilities: const [
-                              'تنفيذ أعمال السباكة المختلفة',
-                              'التعامل مع العملاء بحرفية',
-                            ],
-                            qualifications: const [
-                              'خبرة 3 سنوات على الأقل',
-                              'معرفة بأحدث أدوات السباكة',
-                            ],
-                            benefits: const ['راتب تنافسي', 'فرص تدريب وتطوير'],
-                            acceptedCount: 12,
-                            capacity: 20,
-                            logoIcon: Icons.plumbing,
-                            specialTag: 'مميز',
-                          ),
-                          t,
-                        ),
-                        const SizedBox(height: 12),
-                        const SizedBox(height: 20),
+
                         jobs.isEmpty
                             ? Center(
                                 child: Padding(

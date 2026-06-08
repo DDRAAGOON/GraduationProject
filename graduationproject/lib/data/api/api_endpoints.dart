@@ -6,7 +6,7 @@ final class ApiEndpoints {
   // Render deployment URL (can be overridden at build time).
   static const String baseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'https://jobito.runasp.net',
+    defaultValue: 'https://jobito-api-production.up.railway.app',
   );
 
   // Auth

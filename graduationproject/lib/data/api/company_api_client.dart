@@ -119,7 +119,7 @@ final class CompanyApiClient {
   }
 
   Future<Map<String, dynamic>> updateJob(String id, Map<String, dynamic> data) async {
-    final response = await _dio.put<dynamic>('${ApiEndpoints.jobs}/$id', data: data, options: _authOptions);
+    final response = await _dio.patch<dynamic>('${ApiEndpoints.jobs}/$id', data: data, options: _authOptions);
     return _parseMap(response.data);
   }
 

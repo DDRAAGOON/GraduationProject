@@ -3,7 +3,7 @@ import 'package:graduationproject/shared/l10n/app_localizations.dart';
 import 'package:graduationproject/shared/state/recruitment_sync_store.dart';
 import 'package:graduationproject/shared/widgets/app_button.dart';
 import 'package:graduationproject/shared/services/recruitment_sync_service.dart';
-
+import 'package:graduationproject/shared/services/application_service.dart';
 class TradesmanApplyJobScreen extends StatefulWidget {
   const TradesmanApplyJobScreen({super.key, required this.job});
 
@@ -113,9 +113,9 @@ class _TradesmanApplyJobScreenState extends State<TradesmanApplyJobScreen> {
               setState(() => _loading = true);
               try {
                 // Real API Call
-                await RecruitmentSyncService.instance.applyToJob(
+                await ApplicationService.instance.applyToJob(
                   jobId: widget.job.id,
-                  userName: store.currentUserName,
+                  coverLetter: _coverLetterController.text,
                 );
 
                 if (!mounted) return;
@@ -129,7 +129,7 @@ class _TradesmanApplyJobScreenState extends State<TradesmanApplyJobScreen> {
                 
                 String errorMsg = e.toString().contains('already applied') 
                     ? t.tr(en: 'You have already applied for this job', ar: 'لقد قمت بالتقديم لهذه الوظيفة بالفعل')
-                    : t.tr(en: 'Failed to send application', ar: 'فشل إرسال الطلب');
+                    : '${t.tr(en: 'Failed to send application', ar: 'فشل إرسال الطلب')}: $e';
 
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text(errorMsg)),

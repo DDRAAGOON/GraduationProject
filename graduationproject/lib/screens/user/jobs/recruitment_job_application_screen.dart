@@ -89,6 +89,7 @@ class _RecruitmentJobApplicationScreenState
           jobId: widget.job.id,
           address: address,
           coverLetter: _problemDescription.text.trim(),
+          isServiceJob: true,
         );
         store.applyToJob(
           widget.job,
@@ -106,21 +107,15 @@ class _RecruitmentJobApplicationScreenState
         );
         Navigator.of(context).pop();
       } catch (e) {
-        store.applyToJob(
-          widget.job,
-          about: _problemDescription.text.trim(),
-          location: address,
-        );
         if (!mounted) return;
         setState(() => _loading = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              isAr ? 'خطأ من السيرفر: $e. تم الحفظ محلياً.' : 'Server Error: $e. Saved locally.',
+              isAr ? 'خطأ من السيرفر: $e' : 'Server Error: $e',
             ),
           ),
         );
-        Navigator.of(context).pop();
       }
       return;
     }
@@ -158,17 +153,15 @@ class _RecruitmentJobApplicationScreenState
       );
       Navigator.of(context).pop();
     } catch (e) {
-      store.applyToJob(widget.job, hasCv: true);
       if (!mounted) return;
       setState(() => _loading = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            isAr ? 'خطأ من السيرفر: $e. تم الحفظ محلياً.' : 'Server Error: $e. Saved locally.',
+            isAr ? 'خطأ من السيرفر: $e' : 'Server Error: $e',
           ),
         ),
       );
-      Navigator.of(context).pop();
     }
   }
 

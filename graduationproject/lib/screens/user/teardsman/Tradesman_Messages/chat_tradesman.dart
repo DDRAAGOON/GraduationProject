@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import '../../../../shared/l10n/app_localizations.dart';
-import '../../../../shared/state/recruitment_sync_store.dart';
+import '../../../../shared/services/chat_service.dart';
 
 class ChatTradesman extends StatefulWidget {
+  final String userId;
   final String name;
   final String image;
 
   const ChatTradesman({
     super.key,
+    required this.userId,
     required this.name,
     required this.image,
   });
@@ -18,7 +20,36 @@ class ChatTradesman extends StatefulWidget {
 
 class _ChatTradesmanState extends State<ChatTradesman> {
   final TextEditingController _messageController = TextEditingController();
-  final List<Map<String, dynamic>> _messages = []; // تبدأ فارغة للبيانات الحقيقية
+  List<Map<String, dynamic>> _messages = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchHistory();
+  }
+
+  Future<void> _fetchHistory() async {
+    if (widget.userId.isEmpty) {
+      setState(() => _isLoading = false);
+      return;
+    }
+    try {
+      final msgs = await ChatService.instance.getHistory(widget.userId);
+      if (mounted) {
+        setState(() {
+          _messages = msgs.map((m) => {
+            "isMe": !m.fromCompany,
+            "text": m.text,
+            "time": "${m.createdAt.hour}:${m.createdAt.minute.toString().padLeft(2, '0')}",
+          }).toList().reversed.toList();
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
 
   @override
   void dispose() {
@@ -26,24 +57,27 @@ class _ChatTradesmanState extends State<ChatTradesman> {
     super.dispose();
   }
 
-  void _sendMessage() {
+  Future<void> _sendMessage() async {
     final text = _messageController.text.trim();
     if (text.isEmpty) return;
+    
     final time = _getCurrentTime();
     setState(() {
-      _messages.add({
+      _messages.insert(0, {
         "isMe": true,
         "text": text,
         "time": time,
       });
       _messageController.clear();
     });
-    RecruitmentSyncStore.instance.upsertTradesmanChatThread(
-      name: widget.name,
-      image: widget.image,
-      lastMessage: text,
-      time: time,
-    );
+
+    if (widget.userId.isNotEmpty) {
+      try {
+        await ChatService.instance.sendMessage(widget.userId, text);
+      } catch (e) {
+        // ignore
+      }
+    }
   }
 
   String _getCurrentTime() {
@@ -97,11 +131,13 @@ class _ChatTradesmanState extends State<ChatTradesman> {
         children: [
           Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.1), height: 1),
           Expanded(
-            child: _messages.isEmpty 
+            child: _isLoading 
+              ? const Center(child: CircularProgressIndicator()) 
+              : _messages.isEmpty 
               ? _buildEmptyState(t)
               : ListView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                  reverse: false,
+                  reverse: true,
                   itemCount: _messages.length,
                   itemBuilder: (context, index) {
                     final msg = _messages[index];

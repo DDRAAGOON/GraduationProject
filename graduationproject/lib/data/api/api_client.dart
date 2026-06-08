@@ -72,6 +72,7 @@ class ApiClient {
     );
   }
 
+
   static Future<http.Response> delete(
     String endpoint, {
     bool requiresAuth = false,
@@ -114,8 +115,17 @@ class ApiClient {
     await _storage.write(key: 'jwt_token', value: token);
   }
 
+  static Future<void> saveUserId(String userId) async {
+    await _storage.write(key: 'user_id', value: userId);
+  }
+
+  static Future<String?> getUserId() async {
+    return await _storage.read(key: 'user_id');
+  }
+
   static Future<void> clearToken() async {
     await _storage.delete(key: 'jwt_token');
+    await _storage.delete(key: 'user_id');
   }
 
   static String? resolveImageUrl(String? path) {

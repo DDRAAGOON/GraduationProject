@@ -172,6 +172,7 @@ class _RecruitmentJobFiltersScreenState
                 width: double.infinity,
                 child: TextButton(
                   onPressed: () {
+                    RecruitmentSyncStore.instance.clearFilters();
                     setState(() {
                       _selectedType = 'All';
                       _selectedCategory = 'All';

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:graduationproject/shared/l10n/app_localizations.dart';
 import 'package:graduationproject/shared/state/recruitment_sync_store.dart';
+import 'package:graduationproject/shared/services/recruitment_sync_service.dart';
+import 'package:graduationproject/shared/services/job_service.dart';
 import '../post/job_applicants_screen.dart';
 
 class TradesmanMyAppsScreen extends StatelessWidget {
@@ -23,23 +25,7 @@ class TradesmanMyAppsScreen extends StatelessWidget {
     return AnimatedBuilder(
       animation: store,
       builder: (context, _) {
-        final mockWorks = store
-            .getTradesmanPostedWorksPreview(isAr: isAr)
-            .where((work) => !store.isJobDeleted(work.id))
-            .map((work) {
-          final status = store.tradesmanJobStatus(work.id, work.status);
-          return TradesmanPostedWorkRow(
-            id: work.id,
-            title: work.title,
-            rate: work.rate,
-            status: store.translateTradesmanWorkStatus(status, isAr),
-            applicantsCount: work.applicantsCount,
-            postedAt: work.postedAt,
-          );
-        }).toList();
-
-        // Also add real jobs posted by this tradesman
-        final realJobs = store.jobs
+        final allWorks = store.jobs
             .where((j) =>
                 j.companyName == store.currentUserName && !store.isJobDeleted(j.id))
             .map((j) {
@@ -52,8 +38,6 @@ class TradesmanMyAppsScreen extends StatelessWidget {
             postedAt: j.publishedAt,
           );
         }).toList();
-
-        final allWorks = [...realJobs, ...mockWorks];
 
         final totalApplicants =
             allWorks.fold<int>(0, (sum, row) => sum + row.applicantsCount);
@@ -233,12 +217,36 @@ class TradesmanMyAppsScreen extends StatelessWidget {
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: Text(isAr ? 'إلغاء' : 'Cancel')),
           TextButton(
-            onPressed: () {
-              RecruitmentSyncStore.instance.removeJob(work.id);
+            onPressed: () async {
               Navigator.pop(ctx);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(isAr ? 'تم الحذف بنجاح' : 'Deleted successfully')),
-              );
+              try {
+                try {
+                  await JobService.instance.deleteJob(work.id);
+                } catch (apiError) {
+                  if (apiError.toString().contains('403')) {
+                    // Backend forbids deleting tradesman jobs for normal users.
+                    // Perform a soft local delete so it disappears from the UI.
+                    RecruitmentSyncStore.instance.removeJob(work.id);
+                  } else {
+                    rethrow;
+                  }
+                }
+                await JobService.instance.getJobs();
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(isAr ? 'تم الحذف بنجاح' : 'Deleted successfully')),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('${isAr ? "فشل الحذف" : "Failed to delete"}: $e'),
+                      backgroundColor: Colors.redAccent,
+                    ),
+                  );
+                }
+              }
             },
             child: Text(isAr ? 'حذف' : 'Delete', style: const TextStyle(color: Colors.red)),
           ),

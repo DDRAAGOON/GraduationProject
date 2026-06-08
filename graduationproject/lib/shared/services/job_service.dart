@@ -44,8 +44,15 @@ class JobService {
         final jobTypeArr = j['jobType'] as List?;
         final String typeStr = (jobTypeArr != null && jobTypeArr.isNotEmpty) ? jobTypeArr.first.toString() : 'Full-time';
 
-        final categoryMap = j['category'] as Map<String, dynamic>?;
-        final categoryStr = categoryMap?['name']?.toString() ?? (j['classification'] == 'tradesman_work' ? 'Tradesman' : 'General');
+        String categoryStr = 'General';
+        if (j['category'] is String) {
+          categoryStr = j['category'].toString();
+        } else if (j['category'] is Map) {
+          categoryStr = j['category']['name']?.toString() ?? 'General';
+        }
+        if (categoryStr == 'General' && j['classification'] == 'tradesman_work') {
+          categoryStr = 'Tradesman';
+        }
 
         return RecruitmentJob(
           id: j['jobId']?.toString() ?? j['_id']?.toString() ?? j['id']?.toString() ?? '',
@@ -61,8 +68,10 @@ class JobService {
           niceToHaves: (j['niceToHaves'] as List?)?.map((e) => e.toString()).toList() ?? [],
           benefits: (j['benefits'] as List?)?.map((e) => e.toString()).toList() ?? [],
           category: categoryStr,
-          tags: (j['fieldOfWork'] as List?)?.map((e) => e.toString()).toList() ?? [],
+          tags: ((j['fieldOfWork'] as List?)?.map((e) => e.toString()).toList() ?? [])
+            ..add(j['classification']?.toString() ?? ''),
           capacity: j['slotsAvailable'] as int? ?? j['requiredCount'] as int? ?? 1,
+          specialTag: j['specialTag']?.toString() ?? (j['isFeatured'] == true ? 'مميز' : null) ?? (j['isExceptional'] == true ? 'استثنائي' : null),
           publishedAt: j['createdAt'] != null ? DateTime.tryParse(j['createdAt']) ?? DateTime.now() : DateTime.now(),
           status: (j['isActive'] == true) ? 'open' : 'closed',
           acceptedCount: j['acceptedCount'] as int? ?? j['applicantsCount'] as int? ?? 0,
@@ -72,6 +81,37 @@ class JobService {
       RecruitmentSyncStore.instance.replaceFromRemote(jobs: parsedJobs, applications: null, messages: null);
 
       return parsedJobs;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<String> createJob(Map<String, dynamic> body) async {
+    try {
+      final response = await ApiClient.post('/jobs', requiresAuth: true, body: body);
+      final data = await handleResponse(response, (map) => map);
+      
+      // If the backend returns the job object in data['job'] or just the data map
+      final j = data['job'] ?? data;
+      return j['jobId']?.toString() ?? j['_id']?.toString() ?? j['id']?.toString() ?? '';
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> updateJob(String jobId, Map<String, dynamic> body) async {
+    try {
+      final response = await ApiClient.patch('/jobs/$jobId', requiresAuth: true, body: body);
+      await handleResponse(response, (map) => map);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> deleteJob(String jobId) async {
+    try {
+      final response = await ApiClient.delete('/jobs/$jobId', requiresAuth: true);
+      await handleResponse(response, (map) => map);
     } catch (e) {
       rethrow;
     }
@@ -126,6 +166,37 @@ class JobService {
         status: (j['isActive'] == true) ? 'open' : 'closed',
         acceptedCount: j['acceptedCount'] as int? ?? j['applicantsCount'] as int? ?? 0,
       );
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<dynamic>> getNearbyJobs({
+    required double lat,
+    required double lng,
+    int radius = 10,
+  }) async {
+    try {
+      final response = await ApiClient.get('/jobs/nearby', queryParams: {
+        'lat': lat.toString(),
+        'lng': lng.toString(),
+        'radius': radius.toString(),
+      });
+      final data = await handleResponse(response, (map) => map);
+      return data['data'] ?? data['jobs'] ?? [];
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<bool> postJob(Map<String, dynamic> jobData) async {
+    try {
+      final response = await ApiClient.post(
+        '/jobs',
+        requiresAuth: true,
+        body: jobData,
+      );
+      return response.statusCode == 201 || response.statusCode == 200;
     } catch (e) {
       rethrow;
     }

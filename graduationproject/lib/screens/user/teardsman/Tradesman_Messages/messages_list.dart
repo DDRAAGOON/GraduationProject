@@ -1,8 +1,8 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import '../../../../shared/l10n/app_localizations.dart';
 import '../../../../shared/state/recruitment_sync_store.dart';
+import '../../../../shared/services/chat_service.dart';
+import '../../../../constants/app_images.dart';
 import '../post/tradesman_rating_prompt.dart';
 import '../../messages/new_chat_screen.dart';
 import 'chat_tradesman.dart';
@@ -17,7 +17,8 @@ class MessagesList extends StatefulWidget {
 class _MessagesListState extends State<MessagesList> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = "";
-  Timer? _ratingPollTimer;
+  List<Map<String, dynamic>> _chats = [];
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -25,21 +26,25 @@ class _MessagesListState extends State<MessagesList> {
     _searchController.addListener(() {
       setState(() => _searchQuery = _searchController.text.toLowerCase());
     });
-    _ratingPollTimer = Timer.periodic(const Duration(seconds: 2), (_) {
-      if (!mounted) return;
-      final due = RecruitmentSyncStore.instance.consumeDueTradesmanRating();
-      if (due != null) {
-        TradesmanRatingPrompt.showRatingDialog(
-          context,
-          personName: due.personName,
-        );
+    _fetchChats();
+  }
+
+  Future<void> _fetchChats() async {
+    try {
+      final chats = await ChatService.instance.getMyChats();
+      if (mounted) {
+        setState(() {
+          _chats = chats;
+          _isLoading = false;
+        });
       }
-    });
+    } catch (e) {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   @override
   void dispose() {
-    _ratingPollTimer?.cancel();
     _searchController.dispose();
     super.dispose();
   }
@@ -51,89 +56,100 @@ class _MessagesListState extends State<MessagesList> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bgColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
 
-    return AnimatedBuilder(
-      animation: store,
-      builder: (context, _) {
-        return Scaffold(
-          backgroundColor: bgColor,
-          floatingActionButton: FloatingActionButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const NewChatScreen()),
-              );
-            },
-            backgroundColor: Theme.of(
-              context,
-            ).colorScheme.primary.withValues(alpha: 0.1),
-            elevation: 6,
-            child: Icon(
-              Icons.add,
-              color: Theme.of(context).colorScheme.primary,
-              size: 28,
+    return Scaffold(
+      backgroundColor: bgColor,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const NewChatScreen()),
+          );
+        },
+        backgroundColor: Theme.of(
+          context,
+        ).colorScheme.primary.withValues(alpha: 0.1),
+        elevation: 6,
+        child: Icon(
+          Icons.add,
+          color: Theme.of(context).colorScheme.primary,
+          size: 28,
+        ),
+      ),
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 10),
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 10,
+              ),
+              child: _buildSearchBar(context, t),
             ),
-          ),
-          // تم حذف الـ AppBar من هنا ليعتمد التطبيق على الـ AppBar الرئيسي في Navbotton
-          body: SafeArea(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 10),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 10,
-                  ),
-                  child: _buildSearchBar(context, t),
-                ),
-                const SizedBox(height: 10),
-                Expanded(
-                  child: Builder(
-                    builder: (context) {
-                      final threads = store.tradesmanChatThreads
-                          .where(
-                            (thread) => thread.name.toLowerCase().contains(
-                              _searchQuery,
-                            ),
-                          )
-                          .toList();
+            const SizedBox(height: 10),
+            Expanded(
+              child: _isLoading 
+                ? const Center(child: CircularProgressIndicator()) 
+                : Builder(
+                builder: (context) {
+                  final filteredChats = _chats.where((chat) {
+                    final participant = chat['participant'] != null && chat['participant'] is Map 
+                        ? chat['participant'] 
+                        : {};
+                    final name = participant['name']?.toString() ?? 'User';
+                    return name.toLowerCase().contains(_searchQuery);
+                  }).toList();
 
-                      if (threads.isEmpty) {
-                        return _buildEmptyState(t);
-                      }
+                  if (filteredChats.isEmpty) {
+                    return _buildEmptyState(t);
+                  }
 
-                      return ListView.separated(
-                        physics: const BouncingScrollPhysics(),
-                        padding: const EdgeInsets.fromLTRB(10, 0, 10, 100),
-                        itemCount: threads.length,
-                        separatorBuilder: (context, index) => Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: Divider(
-                            color: Theme.of(
-                              context,
-                            ).dividerColor.withValues(alpha: 0.1),
-                            height: 1,
-                          ),
-                        ),
-                        itemBuilder: (context, index) {
-                          final thread = threads[index];
-                          return _buildMessageItem(
-                            context,
-                            name: thread.name,
-                            message: thread.lastMessage,
-                            time: thread.time,
-                            image: thread.image,
-                          );
-                        },
+                  return ListView.separated(
+                    physics: const BouncingScrollPhysics(),
+                    padding: const EdgeInsets.fromLTRB(10, 0, 10, 100),
+                    itemCount: filteredChats.length,
+                    separatorBuilder: (context, index) => Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Divider(
+                        color: Theme.of(
+                          context,
+                        ).dividerColor.withValues(alpha: 0.1),
+                        height: 1,
+                      ),
+                    ),
+                    itemBuilder: (context, index) {
+                      final chat = filteredChats[index];
+                      final participant = chat['participant'] != null && chat['participant'] is Map 
+                          ? chat['participant'] 
+                          : {};
+                      final name = participant['name']?.toString() ?? 'User';
+                      final image = participant['photoUrl']?.toString() ?? AppImages.companyProfile1;
+                      
+                      final lastMessageObj = chat['lastMessage'] != null && chat['lastMessage'] is Map 
+                          ? chat['lastMessage'] 
+                          : {};
+                      final message = lastMessageObj['content']?.toString() ?? '...';
+                      final time = lastMessageObj['createdAt'] != null 
+                          ? DateTime.tryParse(lastMessageObj['createdAt'].toString())?.toLocal().toString().split(' ')[1].substring(0, 5) ?? '' 
+                          : '';
+
+                      return _buildMessageItem(
+                        context,
+                        id: participant['_id']?.toString() ?? participant['id']?.toString() ?? '',
+                        name: name,
+                        message: message,
+                        time: time,
+                        image: image,
                       );
                     },
-                  ),
-                ),
-              ],
+                  );
+                },
+              ),
             ),
-          ),
-        );
-      },
+          ],
+        ),
+      ),
     );
   }
 
@@ -198,6 +214,7 @@ class _MessagesListState extends State<MessagesList> {
 
   Widget _buildMessageItem(
     BuildContext context, {
+    required String id,
     required String name,
     required String message,
     required String time,
@@ -208,7 +225,7 @@ class _MessagesListState extends State<MessagesList> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ChatTradesman(name: name, image: image),
+            builder: (context) => ChatTradesman(userId: id, name: name, image: image),
           ),
         );
       },

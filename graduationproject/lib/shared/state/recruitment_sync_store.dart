@@ -79,6 +79,7 @@ class RecruitmentApplication {
   const RecruitmentApplication({
     required this.id,
     required this.jobId,
+    required this.userId,
     required this.jobTitle,
     required this.companyName,
     required this.userName,
@@ -99,6 +100,7 @@ class RecruitmentApplication {
 
   final String id;
   final String jobId;
+  final String userId;
   final String jobTitle;
   final String companyName;
   final String userName;
@@ -120,6 +122,7 @@ class RecruitmentApplication {
     return RecruitmentApplication(
       id: id,
       jobId: jobId,
+      userId: userId,
       jobTitle: jobTitle,
       companyName: companyName,
       userName: userName,
@@ -143,6 +146,7 @@ class RecruitmentApplication {
     return RecruitmentApplication(
       id: map['id']?.toString() ?? '',
       jobId: map['jobId']?.toString() ?? '',
+      userId: map['userId']?.toString() ?? map['user']?.toString() ?? '',
       jobTitle: map['jobTitle']?.toString() ?? '',
       companyName: map['companyName']?.toString() ?? '',
       userName: map['userName']?.toString() ?? '',
@@ -352,6 +356,7 @@ class RecruitmentSyncStore extends ChangeNotifier {
   final List<RecruitmentJob> _jobs = <RecruitmentJob>[];
   final List<RecruitmentApplication> _applications = <RecruitmentApplication>[];
   final List<RecruitmentMessage> _messages = <RecruitmentMessage>[];
+  final List<Map<String, dynamic>> _companies = <Map<String, dynamic>>[];
   final List<ChatThread> _tradesmanChatThreads = <ChatThread>[];
   final List<PendingTradesmanRating> _pendingTradesmanRatings =
       <PendingTradesmanRating>[];
@@ -385,6 +390,7 @@ class RecruitmentSyncStore extends ChangeNotifier {
   String _filterLocation = 'All';
   String _filterCategory = 'All';
   String _filterSalaryRange = 'All';
+  bool _filterExceptional = false;
 
   // Notification Settings
   bool _emailNotifications = true;
@@ -397,10 +403,11 @@ class RecruitmentSyncStore extends ChangeNotifier {
   List<Map<String, String>> _socialLinks = [];
   List<String> _portfolioImages = [];
 
-  List<RecruitmentJob> get jobs => List.unmodifiable(_jobs);
+  List<RecruitmentJob> get jobs => _jobs.where((j) => !_deletedJobIds.contains(j.id)).toList();
   List<RecruitmentApplication> get applications =>
       List.unmodifiable(_applications);
   List<RecruitmentMessage> get messages => List.unmodifiable(_messages);
+  List<Map<String, dynamic>> get companies => List.unmodifiable(_companies);
   List<ChatThread> get tradesmanChatThreads =>
       List.unmodifiable(_tradesmanChatThreads);
   List<PendingTradesmanRating> get pendingTradesmanRatings =>
@@ -422,6 +429,7 @@ class RecruitmentSyncStore extends ChangeNotifier {
   String get filterLocation => _filterLocation;
   String get filterCategory => _filterCategory;
   String get filterSalaryRange => _filterSalaryRange;
+  bool get filterExceptional => _filterExceptional;
 
   bool get emailNotifications => _emailNotifications;
   bool get jobAlerts => _jobAlerts;
@@ -465,6 +473,8 @@ class RecruitmentSyncStore extends ChangeNotifier {
   List<RecruitmentJob> get filteredJobs {
     final query = _searchQuery.toLowerCase();
     return _jobs.where((job) {
+      // Hide locally deleted jobs
+      if (_deletedJobIds.contains(job.id)) return false;
       // Hide full jobs
       if (job.acceptedCount >= job.capacity) return false;
 
@@ -480,19 +490,28 @@ class RecruitmentSyncStore extends ChangeNotifier {
       final matchesCategory =
           _filterCategory == 'All' ||
           jobCat == filterCat ||
+          job.tags.any((t) => t.toLowerCase().contains(filterCat) || filterCat.contains(t.toLowerCase())) ||
+          (filterCat == 'technical' && (jobCat.contains('tech') || job.tags.any((t) => t.contains('تقني')))) ||
+          (filterCat == 'non-technical' && (jobCat.contains('non-tech') || job.tags.any((t) => t.contains('غير تقني')))) ||
           (filterCat == 'service' &&
-              (jobCat == 'service' || jobCat == 'tradesman'));
+              (jobCat == 'service' || jobCat == 'tradesman' || job.tags.any((t) => t.contains('خدمات'))));
       final matchesType =
           _filterType == 'All' ||
           job.type.toLowerCase() == _filterType.toLowerCase();
       final matchesSalary =
           _filterSalaryRange == 'All' ||
           job.salaryRange.toLowerCase() == _filterSalaryRange.toLowerCase();
+      final matchesExceptional = 
+          !_filterExceptional || 
+          job.specialTag != null || 
+          job.tags.any((t) => t.contains('مميز') || t.contains('استثنائي') || t.contains('featured'));
+          
       return matchesQuery &&
           matchesLocation &&
           matchesCategory &&
           matchesType &&
-          matchesSalary;
+          matchesSalary &&
+          matchesExceptional;
     }).toList();
   }
 
@@ -502,12 +521,24 @@ class RecruitmentSyncStore extends ChangeNotifier {
     String? salaryRange,
     String? location,
     String? searchQuery,
+    bool? isExceptional,
   }) {
     if (type != null) _filterType = type;
     if (category != null) _filterCategory = category;
     if (salaryRange != null) _filterSalaryRange = salaryRange;
     if (location != null) _filterLocation = location;
     if (searchQuery != null) _searchQuery = searchQuery;
+    if (isExceptional != null) _filterExceptional = isExceptional;
+    notifyListeners();
+  }
+
+  void clearFilters() {
+    _filterType = 'All';
+    _filterCategory = 'All';
+    _filterSalaryRange = 'All';
+    _filterLocation = 'All';
+    _searchQuery = '';
+    _filterExceptional = false;
     notifyListeners();
   }
 
@@ -524,6 +555,7 @@ class RecruitmentSyncStore extends ChangeNotifier {
       final newApp = RecruitmentApplication(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         jobId: job.id,
+        userId: 'current_user_id',
         jobTitle: job.title,
         companyName: job.companyName,
         userName: _currentUserName,
@@ -571,6 +603,7 @@ class RecruitmentSyncStore extends ChangeNotifier {
     List<dynamic>? jobs,
     List<dynamic>? applications,
     List<dynamic>? messages,
+    List<dynamic>? companies,
   }) {
     if (jobs != null) {
       _jobs.clear();
@@ -610,6 +643,16 @@ class RecruitmentSyncStore extends ChangeNotifier {
         }
       }
     }
+
+    if (companies != null) {
+      _companies.clear();
+      for (final item in companies) {
+        if (item is Map<String, dynamic>) {
+          _companies.add(item);
+        }
+      }
+    }
+
     notifyListeners();
   }
 

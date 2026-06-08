@@ -137,26 +137,44 @@ class HomeTab extends StatelessWidget {
                   child: Text(isAr ? 'استكشف حسب الفئات' : 'Explore by Categories', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                 ),
                 const SizedBox(height: 16),
-                _buildCategoryTile(context, isAr ? "تقني" : "Technical", isAr ? "5 فرص" : "5 opportunities", Icons.memory, const Color(0xFFD9D9D9), isDark, isAr, () {
-                  store.updateFilters(category: 'Technical');
-                  onTabChange(1);
-                }),
-                _buildCategoryTile(context, isAr ? "غير تقني" : "Non-Technical", isAr ? "3 فرص" : "3 opportunities", Icons.groups, const Color(0xFFD9D9D9), isDark, isAr, () {
-                  store.updateFilters(category: 'Non-Technical');
-                  onTabChange(1);
-                }),
-                _buildCategoryTile(context, isAr ? "خدمات" : "Services", isAr ? "15 فرصة" : "15 opportunities", Icons.handyman, const Color(0xFFD9D9D9), isDark, isAr, () {
-                  store.updateFilters(category: 'Service');
-                  onTabChange(1);
+                Builder(builder: (context) {
+                  final techCount = store.jobs.where((j) => j.category.toLowerCase().contains('tech') || j.category.contains('تقني') || j.category.contains('تطوير') || j.category.contains('برمج')).length;
+                  final nonTechCount = store.jobs.where((j) => j.category.toLowerCase().contains('non-tech') || j.category.contains('غير تقني') || j.category.contains('إداري') || j.category.contains('hr')).length;
+                  final serviceCount = store.jobs.where((j) => j.category.toLowerCase().contains('service') || j.category.contains('خدمات')).length;
+                  
+                  return Column(
+                    children: [
+                      _buildCategoryTile(context, isAr ? "تقني" : "Technical", isAr ? "$techCount فرص" : "$techCount opportunities", Icons.memory, const Color(0xFFD9D9D9), isDark, isAr, () {
+                        store.clearFilters();
+                        store.updateFilters(category: 'Technical');
+                        onTabChange(1);
+                      }),
+                      _buildCategoryTile(context, isAr ? "غير تقني" : "Non-Technical", isAr ? "$nonTechCount فرص" : "$nonTechCount opportunities", Icons.groups, const Color(0xFFD9D9D9), isDark, isAr, () {
+                        store.clearFilters();
+                        store.updateFilters(category: 'Non-Technical');
+                        onTabChange(1);
+                      }),
+                      _buildCategoryTile(context, isAr ? "خدمات" : "Services", isAr ? "$serviceCount فرصة" : "$serviceCount opportunities", Icons.handyman, const Color(0xFFD9D9D9), isDark, isAr, () {
+                        store.clearFilters();
+                        store.updateFilters(category: 'Service');
+                        onTabChange(1);
+                      }),
+                    ],
+                  );
                 }),
                 const SizedBox(height: 32),
-                _buildSectionHeader(context, isAr ? "فرص عمل استثنائية" : "Exceptional Jobs", () => onTabChange(1), isAr),
+                _buildSectionHeader(context, isAr ? "فرص عمل استثنائية" : "Exceptional Jobs", () {
+                  store.clearFilters();
+                  store.updateFilters(isExceptional: true);
+                  onTabChange(1);
+                }, isAr),
                 const SizedBox(height: 16),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
                     children: store.jobs
-                        .where((j) => j.specialTag != null && j.acceptedCount < j.capacity)
+                        .where((j) => j.acceptedCount < j.capacity)
+                        .skip(2)
                         .take(2)
                         .map((j) => _buildExceptionalJobCard(context, j, isAr, isDark))
                         .toList(),

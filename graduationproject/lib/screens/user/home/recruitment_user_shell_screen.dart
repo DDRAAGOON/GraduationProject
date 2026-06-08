@@ -156,7 +156,10 @@ class _RecruitmentUserShellScreenState
         labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
         backgroundColor: isDark ? const Color(0xFF0D1B3E) : Colors.white,
         selectedIndex: _tab,
-        onDestinationSelected: (int value) => setState(() => _tab = value),
+        onDestinationSelected: (int value) {
+          if (value == 1) RecruitmentSyncStore.instance.clearFilters();
+          setState(() => _tab = value);
+        },
         destinations: <NavigationDestination>[
           NavigationDestination(
             icon: Icon(Icons.home_outlined, color: isDark ? Colors.white70 : Colors.black54),

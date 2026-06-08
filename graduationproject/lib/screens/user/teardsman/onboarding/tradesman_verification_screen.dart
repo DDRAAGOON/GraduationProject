@@ -6,6 +6,8 @@ import 'package:graduationproject/shared/state/recruitment_sync_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../app/router/app_router.dart';
+import '../../../../shared/services/auth_service.dart';
+import '../../../../shared/services/user_service.dart';
 
 class TradesmanVerificationScreen extends StatefulWidget {
   const TradesmanVerificationScreen({super.key});
@@ -30,6 +32,7 @@ class _TradesmanVerificationScreenState
   final Set<String> _selectedTrades = <String>{};
   final TextEditingController _customTradeController = TextEditingController();
   String? _fishFileName;
+  String? _fishFilePath;
   bool _isLoading = false;
 
   Future<void> _pickDocument() async {
@@ -44,6 +47,7 @@ class _TradesmanVerificationScreenState
       if (result != null && result.files.isNotEmpty) {
         setState(() {
           _fishFileName = result.files.first.name;
+          _fishFilePath = result.files.first.path;
         });
       }
     } finally {
@@ -88,22 +92,48 @@ class _TradesmanVerificationScreenState
     final store = RecruitmentSyncStore.instance;
     final prefs = await SharedPreferences.getInstance();
     
-    // Save with email-specific key
-    await prefs.setBool('is_tradesman_verified_${store.currentUserEmail}', true);
+    try {
+      String? documentUrl;
+      // Upload the document
+      if (_fishFilePath != null) {
+        documentUrl = await AuthService.instance.uploadDocument(_fishFilePath!);
+      }
 
-    store.updateUserProfile(
-      fullName: store.currentUserName,
-      title: _selectedTrades.join(', '),
-      role: 'Tradesman',
-      tradesmanServices: _selectedTrades.toList(),
-    );
-
-    if (mounted) {
-      setState(() => _isLoading = false);
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const Navbotton()),
+      // Update the user profile on the backend
+      await UserService.instance.updateProfile(
+        services: _selectedTrades.toList(),
+        criminalRecordUrl: documentUrl,
+        classification: 'tradesman_work',
       );
+
+      // Save with email-specific key
+      await prefs.setBool('is_tradesman_verified_${store.currentUserEmail}', true);
+
+      // Update local store
+      store.updateUserProfile(
+        fullName: store.currentUserName,
+        title: _selectedTrades.join(', '),
+        role: 'Tradesman',
+        tradesmanServices: _selectedTrades.toList(),
+      );
+
+      if (mounted) {
+        setState(() => _isLoading = false);
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const Navbotton()),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(t.tr(en: 'Failed to update data: $e', ar: 'حدث خطأ أثناء رفع البيانات: $e')),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+      }
     }
   }
 

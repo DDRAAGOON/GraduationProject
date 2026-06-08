@@ -93,6 +93,7 @@ class _TradesmanServiceRequesterProfileScreenState
       context,
       MaterialPageRoute(
         builder: (context) => ChatTradesman(
+          userId: widget.application.userId,
           name: widget.application.userName,
           image: _defaultChatAvatar,
         ),

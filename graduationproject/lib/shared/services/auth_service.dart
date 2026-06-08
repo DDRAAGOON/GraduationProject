@@ -26,6 +26,11 @@ class AuthService {
       }
       
       if (user != null) {
+        final userId = user['id']?.toString();
+        if (userId != null && userId.isNotEmpty) {
+          await ApiClient.saveUserId(userId);
+        }
+
         final name = user['fullName']?.toString() ?? user['name']?.toString() ?? 'User';
         final emailStr = user['email']?.toString() ?? '';
         
@@ -60,6 +65,11 @@ class AuthService {
       }
 
       if (user != null) {
+        final userId = user['id']?.toString();
+        if (userId != null && userId.isNotEmpty) {
+          await ApiClient.saveUserId(userId);
+        }
+
         final name = user['fullName']?.toString() ?? user['name']?.toString() ?? 'User';
         final emailStr = user['email']?.toString() ?? '';
         
@@ -115,6 +125,49 @@ class AuthService {
       return await handleResponse(response, (map) => map);
     } catch (e) {
       rethrow;
+    }
+  }
+
+  Future<void> forgotPassword(String email) async {
+    try {
+      final response = await ApiClient.post('/auth/forgot-password', body: {
+        'email': email.trim(),
+      });
+      await handleResponse(response, (map) => map);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> resetPassword({
+    required String email,
+    required String code,
+    required String newPassword,
+  }) async {
+    try {
+      final response = await ApiClient.post('/auth/reset-password', body: {
+        'email': email.trim(),
+        'code': code.trim(),
+        'newPassword': newPassword,
+      });
+      await handleResponse(response, (map) => map);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<String?> uploadDocument(String filePath) async {
+    try {
+      final response = await ApiClient.multipartRequest(
+        '/auth/upload-document',
+        method: 'POST',
+        files: {'file': filePath},
+        requiresAuth: true,
+      );
+      final data = await handleResponse(response, (map) => map);
+      return data['url']?.toString() ?? data['imageUrl']?.toString();
+    } catch (e) {
+      return null;
     }
   }
 

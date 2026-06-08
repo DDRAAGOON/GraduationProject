@@ -5,6 +5,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:graduationproject/screens/company/widgets/company_applicant_avatar.dart';
 import 'package:graduationproject/shared/l10n/app_localizations.dart';
 import 'package:graduationproject/shared/services/recruitment_sync_service.dart';
+import 'package:graduationproject/shared/services/job_service.dart';
+import 'package:graduationproject/shared/services/application_service.dart';
 import 'package:graduationproject/shared/state/recruitment_sync_store.dart';
 import 'tradesman_service_requester_profile_screen.dart';
 import '../Tradesman_Messages/chat_tradesman.dart';
@@ -92,9 +94,38 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
       _existingJob?.publishedAt ?? DateTime.now(),
     );
     final jobId = widget.jobId ?? '';
-    _workStatus = jobId.isEmpty
+    final rawStatus = jobId.isEmpty
         ? 'Active'
         : store.tradesmanJobStatus(jobId, _existingJob?.status ?? 'Active');
+        
+    if (rawStatus.toLowerCase() == 'open' || rawStatus.toLowerCase() == 'active') {
+      _workStatus = 'Active';
+    } else if (rawStatus.toLowerCase() == 'closed') {
+      _workStatus = 'Closed';
+    } else if (rawStatus.toLowerCase() == 'inactive') {
+      _workStatus = 'Inactive';
+    } else {
+      _workStatus = 'Active';
+    }
+        
+    if (jobId.isNotEmpty) {
+      // Import ApplicationService to fetch applicants for this job
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        // Safe to call API after first frame
+        try {
+          _fetchApplicants(jobId);
+        } catch (_) {}
+      });
+    }
+  }
+
+  Future<void> _fetchApplicants(String jobId) async {
+    try {
+      await ApplicationService.instance.getJobApplicants(jobId);
+      if (mounted) {
+        setState(() {});
+      }
+    } catch (_) {}
   }
 
   @override
@@ -160,110 +191,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
     return status;
   }
 
-  List<RecruitmentApplication> _buildPreviewApplicants() {
-    return [
-      RecruitmentApplication(
-        id: 'preview-1',
-        jobId: widget.jobId ?? 'preview-job',
-        jobTitle: widget.jobTitle,
-        companyName: 'شركة صناعية عربية',
-        userName: 'أحمد المصري',
-        status: 'Applied',
-        updatedAt: DateTime.now().subtract(const Duration(hours: 3)),
-        gender: 'ذكر',
-        birthDate: '1994-06-12',
-        languages: ['العربية', 'الإنجليزية'],
-        about: 'عطل في نظام التكييف ويحتاج فحص وصيانة عاجلة.',
-        experienceYears: 6,
-        education: 'بكالوريوس هندسة ميكانيكية',
-        skills: ['النجارة', 'اللحام', 'الصيانة'],
-        hasCv: true,
-        email: 'ahmed@example.com',
-        phone: '01000000000',
-        location: 'الجيزة',
-      ),
-      RecruitmentApplication(
-        id: 'preview-2',
-        jobId: widget.jobId ?? 'preview-job',
-        jobTitle: widget.jobTitle,
-        companyName: 'شركة صناعية عربية',
-        userName: 'منى حسن',
-        status: 'Pending',
-        updatedAt: DateTime.now().subtract(const Duration(hours: 9)),
-        gender: 'أنثى',
-        birthDate: '1998-02-20',
-        languages: ['العربية'],
-        about: 'تسريب مياه في الحمام والمطبخ يحتاج إصلاح فوري.',
-        experienceYears: 4,
-        education: 'دبلوم صيانة',
-        skills: ['التشطيب', 'التركيب', 'الأعمال اليدوية'],
-        hasCv: true,
-        email: 'mona@example.com',
-        phone: '01111111111',
-        location: 'القاهرة',
-      ),
-      RecruitmentApplication(
-        id: 'preview-3',
-        jobId: widget.jobId ?? 'preview-job',
-        jobTitle: widget.jobTitle,
-        companyName: 'شركة صناعية عربية',
-        userName: 'يوسف عبد الله',
-        status: 'Accepted',
-        updatedAt: DateTime.now().subtract(const Duration(days: 1)),
-        gender: 'ذكر',
-        birthDate: '1991-11-03',
-        languages: ['العربية', 'الفرنسية'],
-        about: 'مشكلة كهربائية في لوحة التوزيع مع انقطاع متكرر.',
-        experienceYears: 8,
-        education: 'بكالوريوس كهرباء',
-        skills: ['الكهرباء', 'الصيانة', 'القياس'],
-        hasCv: true,
-        email: 'yousef@example.com',
-        phone: '01222222222',
-        location: 'الإسكندرية',
-      ),
-      RecruitmentApplication(
-        id: 'preview-4',
-        jobId: widget.jobId ?? 'preview-job',
-        jobTitle: widget.jobTitle,
-        companyName: 'شركة صناعية عربية',
-        userName: 'سارة علي',
-        status: 'Pending',
-        updatedAt: DateTime.now().subtract(const Duration(days: 2)),
-        gender: 'أنثى',
-        birthDate: '1996-08-15',
-        languages: ['العربية', 'الإنجليزية'],
-        about: 'تركيب شفاط مطبخ جديد مع تمديد الوصلات اللازمة.',
-        experienceYears: 3,
-        education: 'دبلوم فني صيانة',
-        skills: ['الكهرباء', 'التركيب', 'التمديدات'],
-        hasCv: false,
-        email: 'sara@example.com',
-        phone: '01555555555',
-        location: 'المنصورة',
-      ),
-      RecruitmentApplication(
-        id: 'preview-5',
-        jobId: widget.jobId ?? 'preview-job',
-        jobTitle: widget.jobTitle,
-        companyName: 'شركة صناعية عربية',
-        userName: 'محمد محمود',
-        status: 'Applied',
-        updatedAt: DateTime.now().subtract(const Duration(days: 4)),
-        gender: 'ذكر',
-        birthDate: '1985-05-22',
-        languages: ['العربية'],
-        about: 'عزل أسطح ضد المطر والحرارة باستخدام مواد حديثة.',
-        experienceYears: 12,
-        education: 'فني عزل معتمد',
-        skills: ['العزل', 'البناء', 'الترميم'],
-        hasCv: true,
-        email: 'mohamed@example.com',
-        phone: '01011111111',
-        location: 'طنطا',
-      ),
-    ];
-  }
+
 
   List<RecruitmentApplication> _filterApplicants(
     List<RecruitmentApplication> source,
@@ -289,31 +217,33 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
       final jobId = widget.jobId;
       if (jobId != null && jobId.isNotEmpty) {
         try {
-          await RecruitmentSyncService.instance.updateJob(
-            jobId: jobId,
-            title: _titleController.text.trim(),
-            location: _locationController.text.trim(),
-            salaryRange: _existingJob?.salaryRange ?? 'Negotiable',
-            description: _descController.text.trim(),
-            responsibilities: _existingJob?.responsibilities ?? const [],
-            qualifications: _existingJob?.qualifications ?? const [],
-            niceToHaves: _existingJob?.niceToHaves ?? const [],
-            benefits: _existingJob?.benefits ?? const [],
-            category: _existingJob?.category ?? 'Service',
-            companyName: _existingJob?.companyName ??
-                RecruitmentSyncStore.instance.currentUserName,
-            type: _existingJob?.type ?? 'one-time',
-            tags: _editableSkills,
-            requiredCount: _existingJob?.capacity ?? 1,
-            status: _workStatus,
+          await JobService.instance.updateJob(
+            jobId,
+            {
+              'title': _titleController.text.trim(),
+              'location': _locationController.text.trim(),
+              'salaryRange': _existingJob?.salaryRange ?? 'Negotiable',
+              'description': _descController.text.trim(),
+              'responsibilities': _existingJob?.responsibilities ?? [],
+              'qualifications': _existingJob?.qualifications ?? [],
+              'niceToHaves': _existingJob?.niceToHaves ?? [],
+              'benefits': _existingJob?.benefits ?? [],
+              'category': _existingJob?.category ?? 'Service',
+              'companyName': _existingJob?.companyName ?? RecruitmentSyncStore.instance.currentUserName,
+              'type': _existingJob?.type ?? 'one-time',
+              'tags': _editableSkills,
+              'requiredCount': _existingJob?.capacity ?? 1,
+              'status': _workStatus,
+            }
           );
+          await JobService.instance.getJobs();
           RecruitmentSyncStore.instance.setTradesmanJobStatus(jobId, _workStatus);
-        } catch (_) {
+        } catch (e) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
-                  t.tr(en: 'Failed to save changes', ar: 'فشل حفظ التعديلات'),
+                  '${t.tr(en: 'Failed to save changes', ar: 'فشل حفظ التعديلات')}: $e',
                 ),
                 backgroundColor: Colors.redAccent,
               ),
@@ -405,16 +335,40 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
             ),
           ),
           TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              Navigator.pop(context);
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(
-                SnackBar(
-                  content: Text(t.tr(en: "Job deleted", ar: "تم حذف المنشور")),
-                ),
-              );
+            onPressed: () async {
+              try {
+                if (widget.jobId != null && widget.jobId!.isNotEmpty) {
+                  try {
+                    await JobService.instance.deleteJob(widget.jobId!);
+                  } catch (apiError) {
+                    if (apiError.toString().contains('403')) {
+                      // Backend forbids deleting tradesman jobs for normal users.
+                      // Perform a soft local delete so it disappears from the UI.
+                      RecruitmentSyncStore.instance.removeJob(widget.jobId!);
+                    } else {
+                      rethrow;
+                    }
+                  }
+                  await JobService.instance.getJobs();
+                }
+                if (!context.mounted) return;
+                Navigator.pop(context); // Close dialog
+                Navigator.pop(context); // Go back
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(t.tr(en: "Job deleted", ar: "تم حذف المنشور")),
+                  ),
+                );
+              } catch (e) {
+                if (!context.mounted) return;
+                Navigator.pop(context); // Close dialog
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('${t.tr(en: "Failed to delete", ar: "فشل الحذف")}: $e'),
+                    backgroundColor: Colors.redAccent,
+                  ),
+                );
+              }
             },
             child: Text(
               t.tr(en: "Delete", ar: "حذف"),
@@ -610,10 +564,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
   ) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final demoApplicants = _buildPreviewApplicants();
-    final isPreviewMode = applicants.isEmpty;
-    final displayApplicants = isPreviewMode ? demoApplicants : applicants;
-    final filteredApplicants = _filterApplicants(displayApplicants);
+    final filteredApplicants = _filterApplicants(applicants);
 
     return Column(
       children: [
@@ -892,6 +843,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => ChatTradesman(
+                                userId: app.userId,
                                 name: app.userName,
                                 image:
                                     "https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg",
