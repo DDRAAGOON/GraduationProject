@@ -29,139 +29,142 @@ class HomeTab extends StatelessWidget {
     return AnimatedBuilder(
       animation: store,
       builder: (context, _) {
-        return SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(20),
-                  child: Image.asset('assets/tradesman/image 43.png', width: double.infinity, fit: BoxFit.cover),
+        return Directionality(
+          textDirection: isAr ? TextDirection.rtl : TextDirection.ltr,
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: Image.asset('assets/tradesman/image 43.png', width: double.infinity, fit: BoxFit.cover),
+                  ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  crossAxisAlignment: isAr ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-                  children: [
-                    RichText(
-                      textAlign: isAr ? TextAlign.right : TextAlign.left,
-                      text: TextSpan(
-                        style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900),
-                        children: [
-                          TextSpan(text: isAr ? 'جد وظيفة ' : 'Find your ', style: TextStyle(color: isDark ? Colors.white : Colors.black)),
-                          TextSpan(text: isAr ? 'أحلامك ' : 'dream job ', style: const TextStyle(color: Color(0xFF0051DD))),
-                          TextSpan(text: isAr ? 'اليوم' : 'today', style: const TextStyle(color: Color(0xFFFF7A2A))),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      isAr ? 'نربط المحترفين و الموهبين بافضل الفرص في مصر' : 'Connecting professionals and talents with the best opportunities in Egypt',
-                      textAlign: isAr ? TextAlign.right : TextAlign.left,
-                      style: TextStyle(fontSize: 14, color: isDark ? Colors.white60 : Colors.black54),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 32),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Text(
-                  isAr ? 'نثق بهم ويثقون بنا' : 'We trust them, and they trust us',
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-              ),
-              const SizedBox(height: 16),
-              SizedBox(
-                height: 80,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
+                Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
-                  itemCount: topCompanies.length,
-                  itemBuilder: (context, index) => GestureDetector(
-                    onTap: () => onTabChange(3),
-                    child: Container(
-                      width: 80, margin: const EdgeInsets.only(right: 12),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: Theme.of(
-                            context,
-                          ).dividerColor.withValues(alpha: 0.1),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      RichText(
+                        textAlign: TextAlign.start,
+                        text: TextSpan(
+                          style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900),
+                          children: [
+                            TextSpan(text: isAr ? 'جد وظيفة ' : 'Find your ', style: TextStyle(color: isDark ? Colors.white : Colors.black)),
+                            TextSpan(text: isAr ? 'أحلامك ' : 'dream job ', style: const TextStyle(color: Color(0xFF0051DD))),
+                            TextSpan(text: isAr ? 'اليوم' : 'today', style: const TextStyle(color: Color(0xFFFF7A2A))),
+                          ],
                         ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.05),
-                            blurRadius: 5,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
                       ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Image.asset(
-                            topCompanies[index]['logo']!,
-                            fit: BoxFit.contain,
+                      const SizedBox(height: 8),
+                      Text(
+                        isAr ? 'نربط المحترفين و الموهبين بافضل الفرص في مصر' : 'Connecting professionals and talents with the best opportunities in Egypt',
+                        textAlign: TextAlign.start,
+                        style: TextStyle(fontSize: 14, color: isDark ? Colors.white60 : Colors.black54),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 32),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Text(
+                    isAr ? 'نثق بهم ويثقون بنا' : 'We trust them, and they trust us',
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                SizedBox(
+                  height: 80,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    itemCount: topCompanies.length,
+                    itemBuilder: (context, index) => GestureDetector(
+                      onTap: () => onTabChange(3),
+                      child: Container(
+                        width: 80, margin: isAr ? const EdgeInsets.only(left: 12) : const EdgeInsets.only(right: 12),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Theme.of(
+                              context,
+                            ).dividerColor.withValues(alpha: 0.1),
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.05),
+                              blurRadius: 5,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Image.asset(
+                              topCompanies[index]['logo']!,
+                              fit: BoxFit.contain,
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 32),
-              _buildHowItWorks(context, isAr, isDark),
-              const SizedBox(height: 32),
-              _buildSectionHeader(context, isAr ? "الوظائف المتاحة اليوم" : "Jobs Available Today", () => onTabChange(1), isAr),
-              const SizedBox(height: 16),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  children: store.jobs
-                      .where((j) => j.acceptedCount < j.capacity)
-                      .take(2)
-                      .map((j) => _buildCustomJobCard(context, j, isAr, isDark))
-                      .toList(),
+                const SizedBox(height: 32),
+                _buildHowItWorks(context, isAr, isDark),
+                const SizedBox(height: 32),
+                _buildSectionHeader(context, isAr ? "الوظائف المتاحة اليوم" : "Jobs Available Today", () => onTabChange(1), isAr),
+                const SizedBox(height: 16),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    children: store.jobs
+                        .where((j) => j.acceptedCount < j.capacity)
+                        .take(2)
+                        .map((j) => _buildCustomJobCard(context, j, isAr, isDark))
+                        .toList(),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 32),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Text(isAr ? 'استكشف حسب الفئات' : 'Explore by Categories', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-              ),
-              const SizedBox(height: 16),
-              _buildCategoryTile(context, isAr ? "تقني" : "Technical", isAr ? "5 فرص" : "5 opportunities", Icons.memory, const Color(0xFFD9D9D9), isDark, isAr, () {
-                store.updateFilters(category: 'Technical');
-                onTabChange(1);
-              }),
-              _buildCategoryTile(context, isAr ? "غير تقني" : "Non-Technical", isAr ? "3 فرص" : "3 opportunities", Icons.groups, const Color(0xFFD9D9D9), isDark, isAr, () {
-                store.updateFilters(category: 'Non-Technical');
-                onTabChange(1);
-              }),
-              _buildCategoryTile(context, isAr ? "خدمات" : "Services", isAr ? "15 فرصة" : "15 opportunities", Icons.handyman, const Color(0xFFD9D9D9), isDark, isAr, () {
-                store.updateFilters(category: 'Service');
-                onTabChange(1);
-              }),
-              const SizedBox(height: 32),
-              _buildSectionHeader(context, isAr ? "فرص عمل استثنائية" : "Exceptional Jobs", () => onTabChange(1), isAr),
-              const SizedBox(height: 16),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  children: store.jobs
-                      .where((j) => j.specialTag != null && j.acceptedCount < j.capacity)
-                      .take(2)
-                      .map((j) => _buildExceptionalJobCard(context, j, isAr, isDark))
-                      .toList(),
+                const SizedBox(height: 32),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Text(isAr ? 'استكشف حسب الفئات' : 'Explore by Categories', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                 ),
-              ),
-              const SizedBox(height: 100),
-            ],
+                const SizedBox(height: 16),
+                _buildCategoryTile(context, isAr ? "تقني" : "Technical", isAr ? "5 فرص" : "5 opportunities", Icons.memory, const Color(0xFFD9D9D9), isDark, isAr, () {
+                  store.updateFilters(category: 'Technical');
+                  onTabChange(1);
+                }),
+                _buildCategoryTile(context, isAr ? "غير تقني" : "Non-Technical", isAr ? "3 فرص" : "3 opportunities", Icons.groups, const Color(0xFFD9D9D9), isDark, isAr, () {
+                  store.updateFilters(category: 'Non-Technical');
+                  onTabChange(1);
+                }),
+                _buildCategoryTile(context, isAr ? "خدمات" : "Services", isAr ? "15 فرصة" : "15 opportunities", Icons.handyman, const Color(0xFFD9D9D9), isDark, isAr, () {
+                  store.updateFilters(category: 'Service');
+                  onTabChange(1);
+                }),
+                const SizedBox(height: 32),
+                _buildSectionHeader(context, isAr ? "فرص عمل استثنائية" : "Exceptional Jobs", () => onTabChange(1), isAr),
+                const SizedBox(height: 16),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    children: store.jobs
+                        .where((j) => j.specialTag != null && j.acceptedCount < j.capacity)
+                        .take(2)
+                        .map((j) => _buildExceptionalJobCard(context, j, isAr, isDark))
+                        .toList(),
+                  ),
+                ),
+                const SizedBox(height: 100),
+              ],
+            ),
           ),
         );
       }
@@ -191,38 +194,47 @@ class HomeTab extends StatelessWidget {
         decoration: BoxDecoration(
           color: const Color(0xFF213E75),
           borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 buildCompanyLogo(context, job.companyLogoUrl),
-                const Icon(
-                  Icons.arrow_forward_ios,
-                  color: Colors.white,
-                  size: 18,
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        job.title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      Text(
+                        job.companyName,
+                        style: const TextStyle(
+                          color: Color(0xFFFF7A2A),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
-            ),
-            const SizedBox(height: 12),
-            Text(
-              job.title,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 17,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              job.companyName,
-              style: const TextStyle(
-                color: Color(0xFFFF7A2A),
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-              ),
             ),
             const SizedBox(height: 12),
             Text(
@@ -231,41 +243,33 @@ class HomeTab extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(color: Colors.white70, fontSize: 13, height: 1.4),
             ),
-            const SizedBox(height: 12),
-            if (job.benefits.isNotEmpty) ...[
-              Text(
-                isAr ? "مزايا إضافية: ${job.benefits.join(' • ')}" : "Extra Benefits: ${job.benefits.join(' • ')}",
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(color: Color(0xFF4CAF50), fontSize: 12, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 16),
-            ],
+            const SizedBox(height: 16),
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                buildWhiteTag(translateValue(job.location, isAr)),
-                buildWhiteTag(translateValue(job.type, isAr)),
-                buildWhiteTag(isAr ? "1-3 سنوات" : "1-3 exp"),
-              ],
-            ),
-            const SizedBox(height: 24),
-            Row(
-              children: [
-                if (isAr) ...[
-                  Text(
-                    job.salaryRange,
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                // Salary
+                Text(
+                  job.salaryRange.toLowerCase().contains('negotiable') 
+                    ? (isAr ? 'قابل للتفاوض' : 'Negotiable') 
+                    : job.salaryRange,
+                  style: const TextStyle(
+                    color: Colors.white, 
+                    fontWeight: FontWeight.bold, 
+                    fontSize: 14
                   ),
-                  const Spacer(),
-                  _buildJobitoApplyButton(context, job, isAr),
-                ] else ...[
-                  _buildJobitoApplyButton(context, job, isAr),
-                  const Spacer(),
-                  Text(
-                    job.salaryRange,
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+                // Employment Type
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.white10,
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                ],
+                  child: Text(
+                    translateValue(job.type, isAr),
+                    style: const TextStyle(color: Colors.white70, fontSize: 11),
+                  ),
+                ),
               ],
             ),
           ],
@@ -283,6 +287,13 @@ class HomeTab extends StatelessWidget {
         decoration: BoxDecoration(
           color: const Color(0xFF213E75),
           borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -291,10 +302,20 @@ class HomeTab extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 buildCompanyLogo(context, job.companyLogoUrl),
-                const Icon(Icons.arrow_forward_ios, color: Colors.white, size: 18),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.white10,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    translateValue(job.type, isAr),
+                    style: const TextStyle(color: Colors.white70, fontSize: 11),
+                  ),
+                ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
             Text(
               job.title,
               style: const TextStyle(
@@ -312,8 +333,29 @@ class HomeTab extends StatelessWidget {
                 fontWeight: FontWeight.w500,
               ),
             ),
-            const SizedBox(height: 16),
-            buildWhiteTag(translateValue(job.type, isAr)),
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: const Color(0xFF0051DD).withOpacity(0.2),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                () {
+                  // Prioritize specialTag if it's professional, otherwise category
+                  final tag = job.specialTag;
+                  if (tag != null && tag.isNotEmpty && !tag.contains('مميز') && !tag.contains('Featured')) {
+                    return translateValue(tag, isAr);
+                  }
+                  return translateValue(job.category, isAr);
+                }(),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
           ],
         ),
       ),

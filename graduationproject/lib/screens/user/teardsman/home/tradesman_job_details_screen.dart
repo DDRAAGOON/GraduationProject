@@ -3,6 +3,7 @@ import 'package:graduationproject/shared/l10n/app_localizations.dart';
 import 'package:graduationproject/shared/state/recruitment_sync_store.dart';
 import 'package:graduationproject/shared/utils/image_helper.dart';
 import 'package:graduationproject/shared/widgets/app_button.dart';
+import '../../home/tabs/recruitment_ui_utils.dart';
 import 'tradesman_apply_job_screen.dart';
 
 class TradesmanJobDetailsScreen extends StatefulWidget {
@@ -18,6 +19,9 @@ class TradesmanJobDetailsScreen extends StatefulWidget {
 class _TradesmanJobDetailsScreenState extends State<TradesmanJobDetailsScreen> {
   int _selectedRating = 0;
   final TextEditingController _reviewController = TextEditingController();
+  String? _selectedReportReason;
+  final TextEditingController _reportDetailsController = TextEditingController();
+
   final List<Map<String, dynamic>> _customerReviews = [
     {'name': 'محمد', 'rating': 5, 'comment': 'عمل ممتاز وخدمة سريعة جدًا.'},
     {
@@ -30,7 +34,157 @@ class _TradesmanJobDetailsScreenState extends State<TradesmanJobDetailsScreen> {
   @override
   void dispose() {
     _reviewController.dispose();
+    _reportDetailsController.dispose();
     super.dispose();
+  }
+
+  void _showReportBottomSheet(BuildContext context) {
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final reasons = [
+      isAr ? 'وظيفة وهمية أو احتيال (Fake Job/Scam)' : 'Fake Job/Scam',
+      isAr ? 'محتوى غير مرغوب فيه (Spam)' : 'Spam',
+      isAr ? 'محتوى غير لائق (Inappropriate Content)' : 'Inappropriate Content',
+      isAr ? 'معلومات غير صحيحة (Incorrect Info)' : 'Incorrect Info',
+      isAr ? 'أسباب أخرى (Other reasons)' : 'Other reasons',
+    ];
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: isDark ? const Color(0xFF0D1B3E) : Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setModalState) => Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+            left: 20,
+            right: 20,
+            top: 20,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: isAr ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  isAr ? 'إبلاغ عن وظيفة' : 'Report Job',
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  isAr
+                      ? 'يرجى اختيار سبب الإبلاغ لمساعدتنا في تحسين جودة المحتوى.'
+                      : 'Please select a reason for reporting to help us improve content quality.',
+                  textAlign: isAr ? TextAlign.right : TextAlign.left,
+                  style: const TextStyle(color: Colors.grey, fontSize: 14),
+                ),
+                const SizedBox(height: 20),
+                ...reasons.map((reason) => RadioListTile<String>(
+                      title: Text(
+                        reason,
+                        textAlign: isAr ? TextAlign.right : TextAlign.left,
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                      value: reason,
+                      groupValue: _selectedReportReason,
+                      activeColor: Colors.red,
+                      contentPadding: EdgeInsets.zero,
+                      onChanged: (val) => setModalState(() => _selectedReportReason = val),
+                    )),
+                const SizedBox(height: 16),
+                Text(
+                  isAr ? 'تفاصيل إضافية للشكوى' : 'Additional details',
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                ),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: _reportDetailsController,
+                  maxLines: 3,
+                  textAlign: isAr ? TextAlign.right : TextAlign.left,
+                  decoration: InputDecoration(
+                    hintText: isAr ? 'اكتب التفاصيل هنا...' : 'Type details here...',
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    filled: true,
+                    fillColor: isDark ? Colors.white10 : Colors.grey.shade50,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: Text(
+                          isAr ? 'إلغاء' : 'Cancel',
+                          style: const TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          if (_selectedReportReason == null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(isAr ? 'يرجى اختيار سبب الإبلاغ' : 'Please select a reason'),
+                                backgroundColor: Colors.orange,
+                              ),
+                            );
+                            return;
+                          }
+                          if (_reportDetailsController.text.trim().isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(isAr ? 'يرجى كتابة تفاصيل المشكلة' : 'Please provide problem details'),
+                                backgroundColor: Colors.orange,
+                              ),
+                            );
+                            return;
+                          }
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(isAr ? 'تم إرسال إبلاغك بنجاح' : 'Report submitted successfully'),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                        ),
+                        child: Text(
+                          isAr ? 'إرسال إبلاغ' : 'Submit Report',
+                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   void _submitReview() {
@@ -99,62 +253,113 @@ class _TradesmanJobDetailsScreenState extends State<TradesmanJobDetailsScreen> {
               // Header Card
               _buildSectionCard(
                 context,
-                title: 'التصنيف',
+                title: '',
                 child: Column(
                   children: [
                     Row(
                       textDirection: TextDirection.rtl,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // Company Logo (Right)
                         Container(
-                          width: 60,
-                          height: 60,
+                          width: 65,
+                          height: 65,
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
-                            shape: BoxShape.circle,
+                            color: Colors.white.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.white10),
                           ),
                           child: job.companyLogoUrl != null
                               ? ClipRRect(
-                                  borderRadius: BorderRadius.circular(30),
+                                  borderRadius: BorderRadius.circular(12),
                                   child: Image(image: getAppImageProvider(job.companyLogoUrl!)!, fit: BoxFit.cover),
                                 )
                               : Icon(job.logoIcon ?? Icons.business, color: Colors.white, size: 30),
                         ),
-                        const SizedBox(width: 16),
+                        const SizedBox(width: 8),
+                        // Text Info (Middle - Expanded to prevent overflow)
                         Expanded(
                           child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                job.title,
-                                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+                                () {
+                                  String title = t.translateJobTitle(job.title);
+                                  final unwanted = ['خبرة', 'مطلوب', 'محترف', 'experience', 'required', 'professional'];
+                                  for (final w in unwanted) {
+                                    title = title.replaceAll(RegExp(w, caseSensitive: false), '').trim();
+                                  }
+                                  return title.replaceAll(RegExp(r'\s+'), ' ');
+                                }(),
+                                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                                 textAlign: TextAlign.right,
                               ),
                               const SizedBox(height: 4),
                               Text(
                                 job.companyName,
-                                style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14),
+                                style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 13, fontWeight: FontWeight.w400),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                                 textAlign: TextAlign.right,
+                              ),
+                              const SizedBox(height: 8),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  // Rating
+                                  const Icon(Icons.star, color: Colors.amber, size: 14),
+                                  const SizedBox(width: 4),
+                                  const Text(
+                                    '4.8',
+                                    style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  // Job Type
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white10,
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    child: Text(
+                                      translateValue(job.type, t.isAr),
+                                      style: const TextStyle(color: Colors.white70, fontSize: 11),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      alignment: WrapAlignment.end,
-                      children: [
-                        _buildBadge(job.category, const Color(0xFF2563EB)),
-                        if (job.specialTag != null && job.specialTag!.isNotEmpty)
-                          _buildBadge(job.specialTag!, const Color(0xFF142C66)),
-                        ...job.type.split(RegExp(r'[•,;]')).where((v) => v.trim().isNotEmpty).map(
-                          (v) => _buildBadge(v.trim(), Colors.black26),
+                        const SizedBox(width: 8),
+                        // Report Button (Left)
+                        IconButton(
+                          icon: const Icon(Icons.warning_amber_rounded, color: Colors.redAccent, size: 26),
+                          tooltip: t.isAr ? 'إبلاغ' : 'Report',
+                          onPressed: () => _showReportBottomSheet(context),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
                         ),
                       ],
                     ),
                   ],
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              // Description Card
+              _buildSectionCard(
+                context,
+                title: t.isAr ? 'الوصف' : 'Description',
+                child: Text(
+                  job.description.isNotEmpty 
+                      ? job.description 
+                      : (t.isAr ? 'لا يوجد وصف متاح لهذه الوظيفة حالياً.' : 'No description available for this job.'),
+                  style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 14, height: 1.6),
+                  textAlign: t.isAr ? TextAlign.right : TextAlign.left,
                 ),
               ),
 
@@ -169,9 +374,8 @@ class _TradesmanJobDetailsScreenState extends State<TradesmanJobDetailsScreen> {
                     _buildSimpleCapacityBar(context, job),
                     const SizedBox(height: 20),
                     _buildInfoRow(Icons.calendar_today_outlined, 'تاريخ النشر', publishDate),
-                    _buildInfoRow(Icons.event_available_outlined, 'الانتهاء', deadlineText),
-                    _buildInfoRow(Icons.work_outline, 'نوع الوظيفة', job.type),
-                    _buildInfoRow(Icons.location_on_outlined, 'الموقع', job.location),
+                    _buildInfoRow(Icons.location_on_outlined, 'مكان العمل', translateValue(job.location, t.isAr)),
+                    _buildInfoRow(Icons.calendar_month_outlined, 'أيام العمل', t.isAr ? '6 أيام في الأسبوع' : '6 Days / Week'),
                     _buildInfoRow(Icons.attach_money, 'الراتب', job.salaryRange),
                   ],
                 ),
@@ -205,6 +409,32 @@ class _TradesmanJobDetailsScreenState extends State<TradesmanJobDetailsScreen> {
 
               const SizedBox(height: 16),
 
+              // Work Field Card
+              _buildSectionCard(
+                context,
+                title: t.isAr ? 'مجال العمل' : 'Work Field',
+                child: Text(
+                  translateValue(job.category, t.isAr),
+                  style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),
+                  textAlign: t.isAr ? TextAlign.right : TextAlign.left,
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              // Job Type Card
+              _buildSectionCard(
+                context,
+                title: t.isAr ? 'نوع الوظيفة' : 'Job Type',
+                child: Text(
+                  translateValue(job.type, t.isAr),
+                  style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),
+                  textAlign: t.isAr ? TextAlign.right : TextAlign.left,
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
               // Reviews Card
               _buildSectionCard(
                 context,
@@ -216,15 +446,40 @@ class _TradesmanJobDetailsScreenState extends State<TradesmanJobDetailsScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         _buildRatingBox(),
-                        const Text('اضف تقييمك', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                        Text(
+                          t.isAr ? 'اضف تقييمك' : 'Add Rating', 
+                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)
+                        ),
                       ],
                     ),
                     const SizedBox(height: 16),
-                    _buildRatingStars(),
-                    const SizedBox(height: 12),
-                    _buildReviewInput(),
+                    if (store.applications.any((app) => app.jobId == job.id)) ...[
+                      _buildRatingStars(),
+                      const SizedBox(height: 12),
+                      _buildReviewInput(),
+                    ] else ...[
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.05),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.white10),
+                        ),
+                        child: Text(
+                          t.isAr 
+                              ? 'لا يمكنك تقييم هذا العمل إلا بعد التقديم عليه' 
+                              : 'You can only rate this job after applying for it.',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(color: Colors.orangeAccent, fontSize: 13, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
                     const SizedBox(height: 20),
-                    const Text('التعليقات', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                    Text(
+                      t.isAr ? 'التعليقات' : 'Comments', 
+                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)
+                    ),
                     const SizedBox(height: 10),
                     ..._customerReviews.map((review) => _buildReviewItem(review)),
                   ],
@@ -268,8 +523,10 @@ class _TradesmanJobDetailsScreenState extends State<TradesmanJobDetailsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: Colors.white)),
-          const SizedBox(height: 14),
+          if (title.isNotEmpty) ...[
+            Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: Colors.white)),
+            const SizedBox(height: 14),
+          ],
           child,
         ],
       ),

@@ -227,13 +227,18 @@ class _DiscoverTabState extends State<DiscoverTab> {
             if (job.benefits.isNotEmpty)
               _buildPreviewText(isAr ? "مزايا إضافية" : "Extra Benefits", job.benefits.join(' • '), isAr, isBenefit: true),
             const SizedBox(height: 12),
-            buildWhiteTag(translateValue(job.type, isAr)),
+            Row(
+              children: [
+                buildWhiteTag(translateValue(job.type, isAr)),
+                buildWhiteTag(translateValue(job.location, isAr)),
+              ],
+            ),
             const SizedBox(height: 24),
             Row(
               children: [
                 if (isAr) ...[
                   Text(
-                    "المقبولين: ${job.acceptedCount} / ${job.capacity}",
+                    "عدد المتقدمين: ${store.applications.where((a) => a.jobId == job.id).length}",
                     style: const TextStyle(color: Colors.white70, fontSize: 12),
                   ),
                   const Spacer(),
@@ -242,7 +247,7 @@ class _DiscoverTabState extends State<DiscoverTab> {
                   _buildApplyActionBtn(context, job, isAr),
                   const Spacer(),
                   Text(
-                    "Accepted: ${job.acceptedCount} / ${job.capacity}",
+                    "Applicants: ${store.applications.where((a) => a.jobId == job.id).length}",
                     style: const TextStyle(color: Colors.white70, fontSize: 12),
                   ),
                 ],

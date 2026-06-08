@@ -400,7 +400,7 @@ class _SignUpTradesmanState extends State<SignUpTradesman> {
                   prefixText: "+20 ",
                   inputFormatters: [
                     FilteringTextInputFormatter.digitsOnly,
-                    LengthLimitingTextInputFormatter(10),
+                    LengthLimitingTextInputFormatter(11),
                   ],
                 ),
                 const SizedBox(height: 20),

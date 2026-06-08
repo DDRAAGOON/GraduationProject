@@ -39,10 +39,14 @@ String translateValue(String? value, bool isAr) {
   if (low == 'part-time' || low == 'part time') return 'دوام جزئي';
   if (low == 'freelance' || low == 'freelancer') return 'عمل حر';
   if (low == 'internship') return 'تدريب';
-  if (low == 'one-time' || low == 'one time') return 'مرة واحدة';
+  if (low == 'one-time' || low == 'one time') return 'عمل لمرة واحدة';
   if (low == 'service' || low == 'services') return 'خدمة';
   if (low == 'technical') return 'تقني';
   if (low == 'non-technical') return 'غير تقني';
+  if (low == 'engineering') return 'هندسة';
+  if (low == 'administrative' || low == 'management') return 'إدارية';
+  if (low == 'design') return 'تصميم';
+  if (low == 'medical' || low == 'healthcare') return 'طبية';
   if (low == 'general') return 'عام';
 
   if (low.contains('manager')) return 'مدير';

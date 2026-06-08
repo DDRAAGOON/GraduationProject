@@ -26,9 +26,8 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   String? _selectedGovernorate;
   final _aboutMe = TextEditingController();
 
-  final _facebook = TextEditingController();
-  final _instagram = TextEditingController();
-  final _whatsapp = TextEditingController();
+  final List<Map<String, String>> _socialLinksList = [];
+  final _socialLinkController = TextEditingController();
 
   // Error variables for validation
   String? _fullNameError;
@@ -72,7 +71,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   @override
   void dispose() {
     _fullName.dispose(); _phone.dispose(); _email.dispose(); _dob.dispose(); _aboutMe.dispose();
-    _facebook.dispose(); _instagram.dispose(); _whatsapp.dispose();
+    _socialLinkController.dispose();
     _eduInstitution.dispose(); _eduDuration.dispose(); _eduDegree.dispose();
     _expTitle.dispose(); _expDuration.dispose(); _skillController.dispose();
     _otherServiceController.dispose();
@@ -140,6 +139,25 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     }
   }
 
+  void _addSocialLink() {
+    final url = _socialLinkController.text.trim();
+    if (url.isEmpty) return;
+    
+    String platform = "Link";
+    final low = url.toLowerCase();
+    if (low.contains("facebook")) platform = "Facebook";
+    else if (low.contains("instagram")) platform = "Instagram";
+    else if (low.contains("whatsapp") || low.contains("wa.me")) platform = "WhatsApp";
+    else if (low.contains("linkedin")) platform = "LinkedIn";
+    else if (low.contains("twitter") || low.contains("x.com")) platform = "X / Twitter";
+    else if (low.contains("github")) platform = "GitHub";
+
+    setState(() {
+      _socialLinksList.add({'platform': platform, 'url': url});
+      _socialLinkController.clear();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
@@ -169,10 +187,10 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
 
                   // Photos
                   _buildSectionTitle(t.profilePhoto, isDark),
-                  _buildPhotoUploadArea(type: 'profile', file: _profileImage, isDark: isDark),
+                  _buildPhotoUploadArea(type: 'profile', isDark: isDark),
                   const SizedBox(height: 30),
                   _buildSectionTitle(t.tr(en: "Wallpaper", ar: "صورة الغلاف"), isDark),
-                  _buildPhotoUploadArea(type: 'wallpaper', file: _wallpaperImage, isDark: isDark),
+                  _buildPhotoUploadArea(type: 'wallpaper', isDark: isDark),
                   const SizedBox(height: 30),
 
                   // Personal Info
@@ -234,7 +252,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                       style: TextStyle(color: textColor.withOpacity(0.6), fontSize: 13),
                     ),
                     const SizedBox(height: 16),
-                    _buildPhotoUploadArea(type: 'criminal', file: _criminalRecordFile, isDark: isDark),
+                    _buildPhotoUploadArea(type: 'criminal', isDark: isDark),
                     const SizedBox(height: 40),
                     const Divider(color: Colors.black12),
                     const SizedBox(height: 20),
@@ -392,23 +410,78 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                   // Social Links
                   _buildSectionTitle(t.socialLinks, isDark),
                   const SizedBox(height: 16),
-                  _buildLabel("Facebook", textColor),
-                  _buildTextField(_facebook, 'URL', isDark),
-                  const SizedBox(height: 12),
-                  _buildLabel("Instagram", textColor),
-                  _buildTextField(_instagram, 'URL', isDark),
-                  const SizedBox(height: 12),
-                  _buildLabel("WhatsApp", textColor),
-                  _buildTextField(_whatsapp, 'Phone Number', isDark, keyboardType: TextInputType.phone),
-
-                  if (_selectedRole == "Tradesman") ...[
-                    const SizedBox(height: 40),
-                    const Divider(color: Colors.black12),
-                    const SizedBox(height: 20),
-                    _buildSectionTitle(t.yourWork, isDark),
+                  if (_socialLinksList.isNotEmpty) ...[
+                    ..._socialLinksList.map((link) => _buildAddedItem(link['platform']!, link['url']!, isDark, () {
+                      setState(() => _socialLinksList.remove(link));
+                    })),
                     const SizedBox(height: 16),
-                    _buildPhotoUploadArea(type: 'work', file: _workImages.isNotEmpty ? _workImages.first : null, isDark: isDark),
                   ],
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildTextField(
+                          _socialLinkController, 
+                          t.tr(en: "Enter link URL (e.g. facebook.com/...) ", ar: "أدخل رابط (مثال: facebook.com/...)"), 
+                          isDark
+                        )
+                      ),
+                      const SizedBox(width: 16),
+                      _buildActionButton(t.tr(en: "Add", ar: "إضافة"), isDark, _addSocialLink),
+                    ],
+                  ),
+
+                  const SizedBox(height: 40),
+                  const Divider(color: Colors.black12),
+                  const SizedBox(height: 20),
+
+                  // Portfolio / Your Work (Visible for both roles)
+                  _buildSectionTitle(t.yourWork, isDark),
+                  const SizedBox(height: 8),
+                  Text(
+                    t.tr(
+                      en: "Showcase your best work samples, projects, or certificates.",
+                      ar: "اعرض أفضل نماذج أعمالك، مشاريعك، أو شهاداتك الخبرة."
+                    ),
+                    style: TextStyle(color: textColor.withOpacity(0.6), fontSize: 13),
+                  ),
+                  const SizedBox(height: 16),
+                  if (_workImages.isNotEmpty) ...[
+                    SizedBox(
+                      height: 100,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: _workImages.length,
+                        itemBuilder: (context, index) {
+                          return Stack(
+                            children: [
+                              Container(
+                                margin: const EdgeInsets.only(right: 12),
+                                width: 100,
+                                height: 100,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                  image: DecorationImage(image: FileImage(_workImages[index]), fit: BoxFit.cover),
+                                ),
+                              ),
+                              Positioned(
+                                top: 4, right: 16,
+                                child: GestureDetector(
+                                  onTap: () => setState(() => _workImages.removeAt(index)),
+                                  child: const CircleAvatar(
+                                    radius: 10, 
+                                    backgroundColor: Colors.redAccent, 
+                                    child: Icon(Icons.close, size: 12, color: Colors.white)
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                  _buildPhotoUploadArea(type: 'work', isDark: isDark),
 
                   const SizedBox(height: 50),
                   Align(alignment: Alignment.centerRight, child: _buildSaveButton(t)),
@@ -573,16 +646,21 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     );
   }
 
-  Widget _buildPhotoUploadArea({required String type, File? file, required bool isDark}) {
+  Widget _buildPhotoUploadArea({required String type, required bool isDark}) {
     final t = AppLocalizations.of(context);
+    File? displayFile;
+    if (type == 'profile') displayFile = _profileImage;
+    if (type == 'wallpaper') displayFile = _wallpaperImage;
+    if (type == 'criminal') displayFile = _criminalRecordFile;
+
     return GestureDetector(
       onTap: () => _pickImage(type),
       child: Container(
         width: double.infinity,
         height: 100,
         decoration: BoxDecoration(color: isDark ? Colors.white.withOpacity(0.05) : Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFF0051DD).withOpacity(0.3), width: 1)),
-        child: file != null 
-          ? ClipRRect(borderRadius: BorderRadius.circular(12), child: Image.file(file, fit: BoxFit.cover))
+        child: displayFile != null 
+          ? ClipRRect(borderRadius: BorderRadius.circular(12), child: Image.file(displayFile, fit: BoxFit.cover))
           : Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -590,10 +668,8 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                 const SizedBox(height: 8),
                 RichText(text: TextSpan(style: TextStyle(fontSize: 13, color: isDark ? Colors.white70 : Colors.black54), children: [
                   TextSpan(text: t.tr(en: 'Click to ', ar: 'اضغط لـ '), style: const TextStyle(color: Color(0xFF0051DD), decoration: TextDecoration.underline)),
-                  TextSpan(text: t.tr(en: 'replace', ar: 'الاستبدال'), style: const TextStyle(color: Color(0xFF0051DD), decoration: TextDecoration.underline)),
-                  TextSpan(text: t.tr(en: ' or drag and drop', ar: ' أو السحب والإفلات')),
+                  TextSpan(text: t.tr(en: 'upload', ar: 'الرفع'), style: const TextStyle(color: Color(0xFF0051DD), decoration: TextDecoration.underline)),
                 ])),
-                Text("(SVG, PNG, JPG or GIF (max. 400 x 400px))", style: TextStyle(color: isDark ? Colors.white38 : Colors.grey, fontSize: 10))
               ],
             ),
       ),
@@ -629,89 +705,110 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   }
 
   Widget _buildSaveButton(AppLocalizations t) {
-    return ElevatedButton(
-      onPressed: () async {
-        setState(() {
-          _fullNameError = _fullName.text.isEmpty ? t.required : null;
-          _phoneError = _phone.text.isEmpty ? t.required : null;
-          _emailError = _email.text.isEmpty ? t.required : null;
-          _dobError = _dob.text.isEmpty ? t.required : null;
-          _governorateError = _selectedGovernorate == null ? t.required : null;
-        });
-
-        if (_fullNameError != null ||
-            _phoneError != null ||
-            _emailError != null ||
-            _dobError != null ||
-            _governorateError != null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(t.tr(
-                en: "Please fill all basic information fields",
-                ar: "يرجى ملء جميع حقول المعلومات الأساسية",
-              )),
-              backgroundColor: Colors.redAccent,
+    return Row(
+      children: [
+        Expanded(
+          child: OutlinedButton(
+            onPressed: () {
+              Navigator.of(context).pushNamedAndRemoveUntil(
+                AppRoutes.userSignInNew,
+                (route) => false,
+              );
+            },
+            style: OutlinedButton.styleFrom(
+              side: const BorderSide(color: Colors.redAccent),
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
             ),
-          );
-          return;
-        }
+            child: Text(
+              t.tr(en: "Delete", ar: "حذف"),
+              style: const TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          flex: 2,
+          child: ElevatedButton(
+            onPressed: () async {
+              setState(() {
+                _fullNameError = _fullName.text.isEmpty ? t.required : null;
+                _phoneError = _phone.text.isEmpty ? t.required : null;
+                _emailError = _email.text.isEmpty ? t.required : null;
+                _dobError = _dob.text.isEmpty ? t.required : null;
+                _governorateError = _selectedGovernorate == null ? t.required : null;
+              });
 
-        // Save data to Store
-        final store = RecruitmentSyncStore.instance;
-        
-        // Prepare social links
-        final List<Map<String, String>> socialLinks = [];
-        if (_facebook.text.isNotEmpty) socialLinks.add({'platform': 'Facebook', 'url': _facebook.text});
-        if (_instagram.text.isNotEmpty) socialLinks.add({'platform': 'Instagram', 'url': _instagram.text});
-        if (_whatsapp.text.isNotEmpty) socialLinks.add({'platform': 'WhatsApp', 'url': _whatsapp.text});
+              if (_fullNameError != null ||
+                  _phoneError != null ||
+                  _emailError != null ||
+                  _dobError != null ||
+                  _governorateError != null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(t.tr(
+                      en: "Please fill all basic information fields",
+                      ar: "يرجى ملء جميع حقول المعلومات الأساسية",
+                    )),
+                    backgroundColor: Colors.redAccent,
+                  ),
+                );
+                return;
+              }
 
-        // Update Store
-        store.updateUserProfile(
-          fullName: _fullName.text,
-          title: _selectedRole == "Tradesman" ? (_selectedServices.isNotEmpty ? _selectedServices.join(", ") : "Tradesman") : "Job Seeker",
-          email: _email.text,
-          phone: _phone.text,
-          location: _selectedGovernorate ?? "",
-          about: _aboutMe.text,
-          skills: _skillsList,
-          education: _educationList,
-          experience: _experienceList,
-          socialLinks: socialLinks,
-          role: _selectedRole,
-          backgroundImage: _wallpaperImage?.path,
-          profileImage: _profileImage?.path,
-          portfolioImages: _workImages.map((e) => e.path).toList(),
-          birthDate: _dob.text,
-          gender: _selectedGender,
-          governorate: _selectedGovernorate ?? "",
-          tradesmanServices: _selectedServices,
-        );
+              // Save data to Store
+              final store = RecruitmentSyncStore.instance;
+              
+              // Update Store
+              store.updateUserProfile(
+                fullName: _fullName.text,
+                title: _selectedRole == "Tradesman" ? (_selectedServices.isNotEmpty ? _selectedServices.join(", ") : "Tradesman") : "Job Seeker",
+                email: _email.text,
+                phone: _phone.text,
+                location: _selectedGovernorate ?? "",
+                about: _aboutMe.text,
+                skills: _skillsList,
+                education: _educationList,
+                experience: _experienceList,
+                socialLinks: _socialLinksList,
+                role: _selectedRole,
+                backgroundImage: _wallpaperImage?.path,
+                profileImage: _profileImage?.path,
+                portfolioImages: _workImages.map((e) => e.path).toList(),
+                birthDate: _dob.text,
+                gender: _selectedGender,
+                governorate: _selectedGovernorate ?? "",
+                tradesmanServices: _selectedServices,
+              );
 
-        // Sync with Service (optional depending on your backend state)
-        RecruitmentSyncService.instance.updateProfile(
-          name: _fullName.text,
-          photoUrl: _profileImage?.path,
-        );
+              // Sync with Service (optional depending on your backend state)
+              RecruitmentSyncService.instance.updateProfile(
+                name: _fullName.text,
+                photoUrl: _profileImage?.path,
+              );
 
-        // Save to static legacy data if needed
-        UserProfileData.dob = _dob.text;
-        UserProfileData.gender = _selectedGender;
+              // Save to static legacy data if needed
+              UserProfileData.dob = _dob.text;
+              UserProfileData.gender = _selectedGender;
 
-        if (_selectedRole == "Tradesman") {
-          Navigator.of(context).pushReplacementNamed(AppRoutes.tradesmanWorkspace);
-        } else {
-          Navigator.of(context).pushReplacementNamed(AppRoutes.userWorkspace);
-        }
-      },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFF142C66),
-        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-      ),
-      child: Text(
-        t.tr(en: "Save Profile", ar: "حفظ الملف الشخصي"),
-        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-      ),
+              if (_selectedRole == "Tradesman") {
+                Navigator.of(context).pushReplacementNamed(AppRoutes.tradesmanWorkspace);
+              } else {
+                Navigator.of(context).pushReplacementNamed(AppRoutes.userWorkspace);
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF142C66),
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+            ),
+            child: Text(
+              t.tr(en: "Save Profile", ar: "حفظ الملف الشخصي"),
+              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../shared/l10n/app_localizations.dart';
 import '../../../../shared/state/recruitment_sync_store.dart';
+import '../../home/tabs/recruitment_ui_utils.dart';
 import 'tradesman_job_details_screen.dart';
 
 class TradesmanHomeScreen extends StatelessWidget {
@@ -221,14 +222,27 @@ class TradesmanHomeScreen extends StatelessWidget {
     RecruitmentJob job,
     AppLocalizations l10n,
   ) {
-    final title = l10n.translateJobTitle(job.title);
+    String title = l10n.translateJobTitle(job.title);
     final company = l10n.translateCompanyName(job.companyName);
     final location = l10n.translateLocation(job.location);
-    final salary = l10n.translateSalary(job.salaryRange);
-    final badge = job.specialTag?.isNotEmpty == true ? job.specialTag! : 'مميز';
+    
+    // Filter unwanted words from title and badge
+    final unwanted = ['خبرة', 'مطلوب', 'محترف', 'experience', 'required', 'professional'];
+    for (final w in unwanted) {
+      title = title.replaceAll(RegExp(w, caseSensitive: false), '').trim();
+    }
+    title = title.replaceAll(RegExp(r'\s+'), ' ');
+
+    String badge = job.specialTag?.isNotEmpty == true ? job.specialTag! : (l10n.isAr ? 'مميز' : 'Featured');
+    if (unwanted.any((w) => badge.toLowerCase().contains(w.toLowerCase()))) {
+      badge = "";
+    }
+
     final snippet = job.description.isNotEmpty
         ? job.description
-        : 'توظيف متميز مع بيئة عمل احترافية وفرص تطوير مستمرة.';
+        : (l10n.isAr 
+            ? 'فرصة عمل مميزة في منطقتك مع إمكانية التواصل المباشر.' 
+            : 'Great job opportunity in your area with direct communication.');
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -263,24 +277,27 @@ class TradesmanHomeScreen extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFF7A2A).withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(999),
-                  ),
-                  child: Text(
-                    badge,
-                    style: const TextStyle(
-                      color: Color(0xFFFF7A2A),
-                      fontWeight: FontWeight.w800,
-                      fontSize: 11,
+                if (badge.isNotEmpty)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
                     ),
-                  ),
-                ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFF7A2A).withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: Text(
+                      badge,
+                      style: const TextStyle(
+                        color: Color(0xFFFF7A2A),
+                        fontWeight: FontWeight.w800,
+                        fontSize: 11,
+                      ),
+                    ),
+                  )
+                else
+                  const SizedBox.shrink(),
                 Row(
                   children: const [
                     Icon(Icons.star, color: Colors.amber, size: 16),
@@ -357,7 +374,7 @@ class TradesmanHomeScreen extends StatelessWidget {
               runSpacing: 8,
               children: [
                 _buildMiniTag(context, Icons.location_on_outlined, location),
-                _buildMiniTag(context, Icons.attach_money, salary),
+                _buildMiniTag(context, Icons.access_time, translateValue(job.type, l10n.isAr)),
                 _buildMiniTag(
                   context, 
                   Icons.people_outline, 
@@ -429,27 +446,27 @@ class TradesmanHomeScreen extends StatelessWidget {
 
     final steps = [
       {
-        'title': isAr ? '1. ابحث عن تخصص' : '1. Search Speciality',
-        'desc': isAr ? 'تصفح آلاف الحرفيين والشركات في مختلف التخصصات والمجالات.' : 'Browse thousands of tradesmen and companies in various specialties.',
-        'icon': Icons.description_outlined,
+        'title': isAr ? 'أنشئ حسابك المهني' : 'Create Professional Account',
+        'desc': isAr ? 'سجل بياناتك، حدد مهنتك، واكتب خبراتك ليراك آلاف العملاء يومياً في منطقتك.' : 'Register your info, select your craft, and list your experience to be seen by thousands daily.',
+        'icon': Icons.person_add_outlined,
         'color': const Color(0xFF4A90E2),
       },
       {
-        'title': isAr ? '2. قارن واختر' : '2. Compare & Select',
-        'desc': isAr ? 'شاهد التقييمات والأعمال السابقة واختر الأنسب لاحتياجاتك وميزانيتك.' : 'See reviews and previous work and choose the best fit for your needs.',
-        'icon': Icons.compare_arrows_rounded,
+        'title': isAr ? 'اعرض مهاراتك' : 'Showcase Your Skills',
+        'desc': isAr ? 'ارفع صوراً لأعمالك السابقة وحدد مناطق خدمتك وأسعارك التقديرية لجذب العملاء.' : 'Upload photos of your work, set service areas and estimated prices to attract clients.',
+        'icon': Icons.auto_awesome_mosaic_outlined,
         'color': const Color(0xFFFFD700),
       },
       {
-        'title': isAr ? '3. تواصل فوراً' : '3. Connect Instantly',
-        'desc': isAr ? 'تواصل مباشرة مع الحرفي أو الشركة عبر الهاتف أو الرسائل للاتفاق.' : 'Directly contact the tradesman or company via phone or messages.',
+        'title': isAr ? 'تواصل مباشر' : 'Direct Connection',
+        'desc': isAr ? 'استقبل اتصالات ورسائل مباشرة من العملاء المهتمين بخدماتك دون أي وسيط أو عمولة.' : 'Receive direct calls and messages from interested clients without any middleman.',
         'icon': Icons.chat_bubble_outline_rounded,
         'color': const Color(0xFFFF7A2A),
       },
       {
-        'title': isAr ? '4. قيم تجربتك' : '4. Rate Your Experience',
-        'desc': isAr ? 'شارك تقييمك بعد انتهاء العمل لمساعدة الآخرين في اختيار الأفضل.' : 'Share your review after completion to help others choose the best.',
-        'icon': Icons.star_outline_rounded,
+        'title': isAr ? 'ابنِ سمعتك وضاعف أرباحك' : 'Build Your Reputation',
+        'desc': isAr ? 'احصل على تقييمات ممتازة من عملائك لتتصدر نتائج البحث وتضمن زيادة أرباحك وعملك باستمرار.' : 'Get excellent reviews to top search results and ensure continuous growth of your profits.',
+        'icon': Icons.trending_up_rounded,
         'color': const Color(0xFF4CAF50),
       },
     ];
@@ -468,7 +485,7 @@ class TradesmanHomeScreen extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Text(
-                  isAr ? 'خطوات بسيطة للوصول إلى أفضل المحترفين والشركات لإنجاز أعمالك بأعلى جودة' : 'Simple steps to reach the best professionals and companies',
+                  isAr ? 'خطوات بسيطة لبناء ملف شخصي قوي وجذب مئات العملاء لخدماتك' : 'Simple steps to build a strong profile and attract hundreds of clients',
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 12, color: subColor),
                 ),

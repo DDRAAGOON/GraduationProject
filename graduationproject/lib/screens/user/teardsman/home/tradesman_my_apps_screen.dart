@@ -89,25 +89,7 @@ class TradesmanMyAppsScreen extends StatelessWidget {
                     height: 1.5,
                   ),
                 ),
-                const SizedBox(height: 30),
-                Row(
-                  children: [
-                    _buildSimpleStat(
-                      context,
-                      isAr ? 'الأعمال النشطة' : 'Active works',
-                      '$activeCount',
-                      Colors.blue,
-                    ),
-                    const SizedBox(width: 12),
-                    _buildSimpleStat(
-                      context,
-                      isAr ? 'المتقدمين' : 'Applicants',
-                      '$totalApplicants',
-                      Colors.orange,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 30),
+                const SizedBox(height: 10),
                 Container(
                   padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
                   decoration: BoxDecoration(

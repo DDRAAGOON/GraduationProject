@@ -29,6 +29,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   late TextEditingController _yearController;
   late TextEditingController _locationController;
   late TextEditingController _skillController;
+  late TextEditingController _socialLinkController;
 
   String _selectedGender = "Male";
   final ImagePicker _picker = ImagePicker();
@@ -55,33 +56,47 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _emailController = TextEditingController(text: store.currentUserEmail);
 
     // Parse DOB into Day, Month, Year
-    String currentDob = UserProfileData.dob.isNotEmpty ? UserProfileData.dob : (store.birthDate.isNotEmpty ? store.birthDate : '01/01/1995');
-    List<String> dobParts = currentDob.split('/');
+    String currentDob = UserProfileData.dob.isNotEmpty
+        ? UserProfileData.dob
+        : (store.birthDate.isNotEmpty ? store.birthDate : '01/01/1995');
+
+    List<String> dobParts = [];
+    if (currentDob.contains('/')) {
+      dobParts = currentDob.split('/');
+    } else if (currentDob.contains('-')) {
+      final isoParts = currentDob.split('-');
+      if (isoParts.length == 3) {
+        // yyyy-mm-dd -> dd, mm, yyyy
+        dobParts = [isoParts[2], isoParts[1], isoParts[0]];
+      }
+    }
+
     _dayController = TextEditingController(
-      text: dobParts.isNotEmpty ? dobParts[0] : '',
+      text: (dobParts.length > 0) ? dobParts[0] : '',
     );
     _monthController = TextEditingController(
-      text: dobParts.length > 1 ? dobParts[1] : '',
+      text: (dobParts.length > 1) ? dobParts[1] : '',
     );
     _yearController = TextEditingController(
-      text: dobParts.length > 2 ? dobParts[2] : '',
+      text: (dobParts.length > 2) ? dobParts[2] : '',
     );
 
     _locationController = TextEditingController(
       text: store.currentUserLocation,
     );
     _skillController = TextEditingController();
+    _socialLinkController = TextEditingController();
 
     _selectedGender =
         (UserProfileData.gender == "أنثى" || UserProfileData.gender == "Female" || store.gender.toLowerCase().contains('female'))
         ? "Female"
         : "Male";
 
-    _experiences = List.from(store.currentUserExperience);
-    _education = List.from(store.currentUserEducation);
-    _skills = List.from(store.currentUserSkills);
-    _socialLinks = List.from(store.socialLinks);
-    _portfolioPaths = List.from(store.portfolioImages);
+    _experiences = List<Map<String, String>>.from(store.currentUserExperience);
+    _education = List<Map<String, String>>.from(store.currentUserEducation);
+    _skills = List<String>.from(store.currentUserSkills);
+    _socialLinks = List<Map<String, String>>.from(store.socialLinks);
+    _portfolioPaths = List<String>.from(store.portfolioImages);
     _localBackgroundImage = store.backgroundImage;
     _localProfileImage = store.profileImage;
   }
@@ -98,6 +113,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _yearController.dispose();
     _locationController.dispose();
     _skillController.dispose();
+    _socialLinkController.dispose();
     super.dispose();
   }
 
@@ -687,15 +703,22 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             ),
 
             _buildSectionHeader(t.socialMedia, onSurfaceColor, () {
-              _showAddItemDialog(
-                title: t.tr(en: "Add Social Link", ar: "إضافة رابط تواصل"),
-                fieldKeys: ["platform", "url"],
-                fieldLabels: [
-                  t.tr(en: "Platform", ar: "المنصة"),
-                  t.tr(en: "URL", ar: "الرابط"),
-                ],
-                onSave: (data) => setState(() => _socialLinks.add(data)),
-              );
+              final url = _socialLinkController.text.trim();
+              if (url.isEmpty) return;
+              
+              String platform = "Link";
+              final low = url.toLowerCase();
+              if (low.contains("facebook")) platform = isAr ? "فيسبوك" : "Facebook";
+              else if (low.contains("instagram")) platform = isAr ? "إنستجرام" : "Instagram";
+              else if (low.contains("whatsapp") || low.contains("wa.me")) platform = isAr ? "واتساب" : "WhatsApp";
+              else if (low.contains("linkedin")) platform = "LinkedIn";
+              else if (low.contains("twitter") || low.contains("x.com")) platform = "X / Twitter";
+              else if (low.contains("github")) platform = "GitHub";
+
+              setState(() {
+                _socialLinks.add({'platform': platform, 'url': url});
+                _socialLinkController.clear();
+              });
             }),
             ..._socialLinks.map(
               (link) => _buildRemovableItem(
@@ -704,6 +727,40 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 onSurfaceColor,
                 () => setState(() => _socialLinks.remove(link)),
               ),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildTextField(
+                    context,
+                    _socialLinkController,
+                    t.tr(en: "Add Link URL", ar: "إضافة رابط"),
+                    onSurfaceColor,
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.add_circle, color: Colors.blueAccent),
+                  onPressed: () {
+                    final url = _socialLinkController.text.trim();
+                    if (url.isEmpty) return;
+                    
+                    String platform = "Link";
+                    final low = url.toLowerCase();
+                    if (low.contains("facebook")) platform = isAr ? "فيسبوك" : "Facebook";
+                    else if (low.contains("instagram")) platform = isAr ? "إنستجرام" : "Instagram";
+                    else if (low.contains("whatsapp") || low.contains("wa.me")) platform = isAr ? "واتساب" : "WhatsApp";
+                    else if (low.contains("linkedin")) platform = "LinkedIn";
+                    else if (low.contains("twitter") || low.contains("x.com")) platform = "X / Twitter";
+                    else if (low.contains("github")) platform = "GitHub";
+
+                    setState(() {
+                      _socialLinks.add({'platform': platform, 'url': url});
+                      _socialLinkController.clear();
+                    });
+                  },
+                ),
+              ],
             ),
 
             Divider(

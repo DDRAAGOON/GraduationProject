@@ -9,11 +9,13 @@ import '../../../shared/state/theme_controller.dart';
 class OtpEmailVerificationScreen extends StatefulWidget {
   final String email;
   final String? password;
+  final String? name;
   final bool isForgotPassword;
   const OtpEmailVerificationScreen({
     super.key, 
     required this.email, 
     this.password,
+    this.name,
     this.isForgotPassword = false,
   });
 
@@ -56,7 +58,7 @@ class _OtpEmailVerificationScreenState extends State<OtpEmailVerificationScreen>
       await RecruitmentSyncService.instance.register(
         email: widget.email,
         password: widget.password ?? "12345678",
-        name: "User",
+        name: widget.name ?? "User",
         role: "user",
       );
       if (!mounted) return;

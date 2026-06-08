@@ -39,7 +39,7 @@ class TranslationHelper {
     if (low == 'part-time' || low == 'part time') return 'دوام جزئي';
     if (low == 'freelance' || low == 'freelancer') return 'عمل حر';
     if (low == 'internship') return 'تدريب';
-    if (low == 'one-time' || low == 'one time') return 'مرة واحدة';
+    if (low == 'one-time' || low == 'one time') return 'عمل لمرة واحدة';
     if (low == 'service' || low == 'services') return 'خدمة';
     if (low == 'technical') return 'تقني';
     if (low == 'non-technical') return 'غير تقني';

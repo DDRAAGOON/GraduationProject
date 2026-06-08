@@ -27,6 +27,9 @@ class _RecruitmentJobFiltersScreenState
       'Full-time',
       'Part-time',
       'Remote',
+      'Freelance',
+      'Internship',
+      'One-time',
     ]);
     _selectedCategory = _ensureValueExists(
       store.filterCategory,
@@ -57,6 +60,13 @@ class _RecruitmentJobFiltersScreenState
         return 'دوام جزئي';
       case 'remote':
         return 'عن بعد';
+      case 'freelance':
+        return 'عمل حر';
+      case 'internship':
+        return 'تدريب';
+      case 'one-time':
+      case 'one time':
+        return 'عمل لمرة واحدة';
       case 'technical':
         return 'تقني';
       case 'non-technical':
@@ -108,7 +118,15 @@ class _RecruitmentJobFiltersScreenState
               const SizedBox(height: 10),
               _buildDropdown(
                 value: _selectedType,
-                items: ['All', 'Full-time', 'Part-time', 'Remote'],
+                items: [
+                  'All',
+                  'Full-time',
+                  'Part-time',
+                  'Remote',
+                  'Freelance',
+                  'Internship',
+                  'One-time',
+                ],
                 isAr: isAr,
                 onChanged: (value) =>
                     setState(() => _selectedType = value ?? 'All'),

@@ -27,14 +27,11 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
   late TextEditingController _skillController;
   late TextEditingController _languageController;
   late TextEditingController _customServiceController;
-  late TextEditingController _facebookController;
-  late TextEditingController _instagramController;
-  late TextEditingController _whatsappController;
+  late TextEditingController _socialLinkController;
 
   DateTime? _birthDate;
   String _gender = 'Male';
   String? _governorate;
-  String? _district;
 
   late List<Map<String, String>> _experiences;
   late List<Map<String, String>> _education;
@@ -42,6 +39,7 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
   late List<String> _languages;
   late List<String> _selectedServices;
   late List<String> _portfolioPaths;
+  late List<Map<String, String>> _socialLinks;
 
   @override
   void initState() {
@@ -54,37 +52,36 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
     _skillController = TextEditingController();
     _languageController = TextEditingController();
     _customServiceController = TextEditingController();
-    _facebookController = TextEditingController();
-    _instagramController = TextEditingController();
-    _whatsappController = TextEditingController();
+    _socialLinkController = TextEditingController();
 
     if (store.birthDate.isNotEmpty) {
       _birthDate = DateTime.tryParse(store.birthDate);
+      if (_birthDate == null && store.birthDate.contains('/')) {
+        final parts = store.birthDate.split('/');
+        if (parts.length == 3) {
+          _birthDate = DateTime.tryParse(
+            '${parts[2]}-${parts[1].padLeft(2, '0')}-${parts[0].padLeft(2, '0')}',
+          );
+        }
+      }
     }
     _gender = store.gender.contains('أنثى') || store.gender == 'Female'
         ? 'Female'
         : 'Male';
+
     _governorate = store.governorate.isEmpty ? null : store.governorate;
-    _district = store.district.isEmpty ? null : store.district;
-
-    _experiences = List.from(store.currentUserExperience);
-    _education = List.from(store.currentUserEducation);
-    _skills = List.from(store.currentUserSkills);
-    _languages = List.from(store.languages);
-    _selectedServices = List.from(store.tradesmanServices);
-    _portfolioPaths = List.from(store.portfolioImages);
-
-    for (final link in store.socialLinks) {
-      final platform = (link['platform'] ?? '').toLowerCase();
-      final url = link['url'] ?? '';
-      if (platform.contains('facebook') || platform.contains('فيس')) {
-        _facebookController.text = url;
-      } else if (platform.contains('insta') || platform.contains('انست')) {
-        _instagramController.text = url;
-      } else if (platform.contains('whats') || platform.contains('واتس')) {
-        _whatsappController.text = url;
-      }
+    if (_governorate != null &&
+        !RecruitmentSyncStore.tradesmanGovernorateAreas.containsKey(_governorate)) {
+      _governorate = null;
     }
+
+    _experiences = List<Map<String, String>>.from(store.currentUserExperience);
+    _education = List<Map<String, String>>.from(store.currentUserEducation);
+    _skills = List<String>.from(store.currentUserSkills);
+    _languages = List<String>.from(store.languages);
+    _selectedServices = List<String>.from(store.tradesmanServices);
+    _portfolioPaths = List<String>.from(store.portfolioImages);
+    _socialLinks = List<Map<String, String>>.from(store.socialLinks);
   }
 
   @override
@@ -96,9 +93,7 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
     _skillController.dispose();
     _languageController.dispose();
     _customServiceController.dispose();
-    _facebookController.dispose();
-    _instagramController.dispose();
-    _whatsappController.dispose();
+    _socialLinkController.dispose();
     super.dispose();
   }
 
@@ -157,11 +152,11 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
       );
       return;
     }
-    if (_governorate == null || _district == null) {
+    if (_governorate == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            t.tr(en: 'Governorate and area are required', ar: 'المحافظة والمنطقة مطلوبان'),
+            t.tr(en: 'Governorate is required', ar: 'المحافظة مطلوبة'),
           ),
         ),
       );
@@ -172,27 +167,7 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
     final isAr = t.isAr;
     final locationParts = [
       if (_governorate != null) _governorate!,
-      if (_district != null) _district!,
     ];
-    final socialLinks = <Map<String, String>>[];
-    if (_facebookController.text.trim().isNotEmpty) {
-      socialLinks.add({
-        'platform': isAr ? 'فيسبوك' : 'Facebook',
-        'url': _facebookController.text.trim(),
-      });
-    }
-    if (_instagramController.text.trim().isNotEmpty) {
-      socialLinks.add({
-        'platform': isAr ? 'إنستجرام' : 'Instagram',
-        'url': _instagramController.text.trim(),
-      });
-    }
-    if (_whatsappController.text.trim().isNotEmpty) {
-      socialLinks.add({
-        'platform': isAr ? 'واتساب' : 'WhatsApp',
-        'url': _whatsappController.text.trim(),
-      });
-    }
 
     store.updateUserProfile(
       fullName: _fullNameController.text.trim(),
@@ -204,7 +179,7 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
       skills: _skills,
       education: _education,
       experience: _experiences,
-      socialLinks: socialLinks,
+      socialLinks: _socialLinks,
       role: 'Tradesman',
       portfolioImages: _portfolioPaths,
       birthDate: _birthDate?.toIso8601String().split('T').first ?? '',
@@ -212,7 +187,7 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
           ? (isAr ? 'أنثى' : 'Female')
           : (isAr ? 'ذكر' : 'Male'),
       governorate: _governorate ?? '',
-      district: _district ?? '',
+      district: '',
       languages: _languages,
       tradesmanServices: _selectedServices,
       profileImage: store.profileImage, // نمرر الصورة الحالية لضمان عدم ضياعها
@@ -290,9 +265,6 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
         final isDark = Theme.of(context).brightness == Brightness.dark;
         final backgroundColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
         final onSurfaceColor = isDark ? Colors.white : Colors.black;
-        final areas = _governorate == null
-            ? <String>[]
-            : RecruitmentSyncStore.tradesmanGovernorateAreas[_governorate] ?? [];
 
         return Scaffold(
           backgroundColor: backgroundColor,
@@ -422,20 +394,7 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
                         .toList(),
                     onChanged: (v) => setState(() {
                       _governorate = v;
-                      _district = null;
                     }),
-                  ),
-                  const SizedBox(height: 12),
-                  _label(t.tr(en: 'Area', ar: 'المنطقة'), onSurfaceColor),
-                  DropdownButtonFormField<String>(
-                    value: _district,
-                    decoration: _inputDecoration(context),
-                    dropdownColor: isDark ? const Color(0xFF0D2D4D) : Colors.white,
-                    hint: Text(t.tr(en: 'Select area', ar: 'اختر المنطقة'), style: TextStyle(color: onSurfaceColor.withOpacity(0.5))),
-                    items: areas
-                        .map((a) => DropdownMenuItem(value: a, child: Text(a, style: TextStyle(color: onSurfaceColor))))
-                        .toList(),
-                    onChanged: (v) => setState(() => _district = v),
                   ),
                   const SizedBox(height: 24),
                   _sectionTitle(t.aboutMe, onSurfaceColor),
@@ -575,11 +534,50 @@ class _TradesmanEditProfileScreenState extends State<TradesmanEditProfileScreen>
                   ),
                   const SizedBox(height: 16),
                   _sectionTitle(t.tr(en: 'Social links', ar: 'روابط التواصل'), onSurfaceColor),
-                  _field(context, _facebookController, isAr ? 'فيسبوك' : 'Facebook'),
-                  const SizedBox(height: 10),
-                  _field(context, _instagramController, isAr ? 'إنستجرام' : 'Instagram'),
-                  const SizedBox(height: 10),
-                  _field(context, _whatsappController, isAr ? 'واتساب' : 'WhatsApp'),
+                  const SizedBox(height: 8),
+                  ..._socialLinks.map(
+                    (link) => _removableTile(
+                      link['platform'] ?? '',
+                      link['url'] ?? '',
+                      onSurfaceColor,
+                      () => setState(() => _socialLinks.remove(link)),
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _socialLinkController,
+                          style: TextStyle(color: onSurfaceColor),
+                          decoration: _inputDecoration(
+                            context,
+                            hint: t.tr(en: 'Link URL', ar: 'رابط الموقع'),
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.add_circle_outline, color: Colors.blueAccent),
+                        onPressed: () {
+                          final url = _socialLinkController.text.trim();
+                          if (url.isEmpty) return;
+                          
+                          String platform = "Link";
+                          final low = url.toLowerCase();
+                          if (low.contains("facebook")) platform = isAr ? "فيسبوك" : "Facebook";
+                          else if (low.contains("instagram")) platform = isAr ? "إنستجرام" : "Instagram";
+                          else if (low.contains("whatsapp") || low.contains("wa.me")) platform = isAr ? "واتساب" : "WhatsApp";
+                          else if (low.contains("linkedin")) platform = "LinkedIn";
+                          else if (low.contains("twitter") || low.contains("x.com")) platform = "X / Twitter";
+                          else if (low.contains("github")) platform = "GitHub";
+
+                          setState(() {
+                            _socialLinks.add({'platform': platform, 'url': url});
+                            _socialLinkController.clear();
+                          });
+                        },
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: 16),
                   _sectionTitle(t.tr(en: 'Services', ar: 'الخدمات'), onSurfaceColor),
                   _hint(t.tr(en: 'Select your profession', ar: 'اختر مهنتك'), onSurfaceColor),

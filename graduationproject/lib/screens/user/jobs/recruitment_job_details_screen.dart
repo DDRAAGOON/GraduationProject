@@ -1,73 +1,10 @@
 import 'package:flutter/material.dart';
-
 import '../../../app/router/app_router.dart';
 import '../../../shared/utils/image_helper.dart';
 import '../../../shared/state/recruitment_sync_store.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/l10n/app_localizations.dart';
-
-// Translation Helper consistent with the one in shell screen
-String _translateValue(String? value, bool isAr) {
-  if (value == null || value.isEmpty || !isAr) return value ?? "";
-  final low = value.trim().toLowerCase();
-
-  // Egyptian Governorates
-  if (low == 'all') return 'الكل';
-  if (low == 'cairo') return 'القاهرة';
-  if (low == 'giza') return 'الجيزة';
-  if (low == 'alexandria') return 'الإسكندرية';
-  if (low == 'dakahlia') return 'الدقهلية';
-  if (low == 'red sea') return 'البحر الأحمر';
-  if (low == 'beheira') return 'البحيرة';
-  if (low == 'fayoum') return 'الفيوم';
-  if (low == 'gharbia') return 'الغربية';
-  if (low == 'ismailia') return 'الإسماعيلية';
-  if (low == 'monufia') return 'المنوفية';
-  if (low == 'minya') return 'المنيا';
-  if (low == 'qalyubia') return 'القليوبية';
-  if (low == 'new valley') return 'الوادي الجديد';
-  if (low == 'sharqia') return 'الشرقية';
-  if (low == 'suez') return 'السويس';
-  if (low == 'aswan') return 'أسوان';
-  if (low == 'assiut') return 'أسيوط';
-  if (low == 'beni suef') return 'بني سويف';
-  if (low == 'port said') return 'بورسعيد';
-  if (low == 'damietta') return 'دمياط';
-  if (low == 'south sinai') return 'جنوب سيناء';
-  if (low == 'kafr el sheikh') return 'كفر الشيخ';
-  if (low == 'matrouh') return 'مطروح';
-  if (low == 'luxor') return 'الأقصر';
-  if (low == 'qena') return 'قنا';
-  if (low == 'sohag') return 'سوهاج';
-  if (low == 'north sinai') return 'شمال سيناء';
-  if (low == 'remote') return 'عن بعد';
-
-  // Job Types, Categories & Industries
-  if (low == 'full-time' || low == 'full time') return 'دوام كامل';
-  if (low == 'part-time' || low == 'part time') return 'دوام جزئي';
-  if (low == 'freelance' || low == 'freelancer') return 'عمل حر';
-  if (low == 'internship') return 'تدريب';
-  if (low == 'one-time' || low == 'one time') return 'مرة واحدة';
-  if (low == 'service' || low == 'services') return 'خدمة';
-  if (low == 'technical') return 'تقني';
-  if (low == 'non-technical') return 'غير تقني';
-  if (low == 'general') return 'عام';
-
-  // Job Titles
-  if (low.contains('manager')) return 'مدير';
-  if (low.contains('developer')) return 'مطور';
-  if (low.contains('engineer')) return 'مهندس';
-  if (low.contains('designer')) return 'مصمم';
-  if (low.contains('accountant')) return 'محاسب';
-  if (low.contains('technician')) return 'فني';
-  if (low.contains('teacher')) return 'مدرس';
-  if (low.contains('doctor')) return 'طبيب';
-  if (low.contains('assistant')) return 'مساعد';
-  if (low.contains('specialist')) return 'أخصائي';
-  if (low.contains('programmer')) return 'مطور برمجيات';
-
-  return value;
-}
+import '../home/tabs/recruitment_ui_utils.dart';
 
 class RecruitmentJobDetailsScreen extends StatefulWidget {
   const RecruitmentJobDetailsScreen({super.key, required this.job});
@@ -80,25 +17,130 @@ class RecruitmentJobDetailsScreen extends StatefulWidget {
 
 class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScreen> {
   final TextEditingController _commentController = TextEditingController();
+  final TextEditingController _reportDetailsController = TextEditingController();
+  String? _selectedReportReason;
   int _userRating = 0; 
   
   final List<Map<String, dynamic>> _mockReviews = [
     {
-      'userName': 'أحمد محمد',
+      'userName': 'محمد',
       'rating': 5,
-      'comment': 'شركة ممتازة جداً وبيئة عمل محفزة.',
+      'comment': 'عمل ممتاز وخدمة سريعة جدًا.',
       'date': 'منذ يومين',
-    },
-    {
-      'userName': 'Sara Smith',
-      'rating': 4,
-      'comment': 'Good opportunities and professional management.',
-      'date': '3 days ago',
     },
   ];
 
   bool get _hasApplied {
-    return RecruitmentSyncStore.instance.applications.any((a) => a.jobId == widget.job.id);
+    final store = RecruitmentSyncStore.instance;
+    return store.applications.any((a) => 
+      a.jobId == widget.job.id && 
+      a.userName == store.currentUserName && 
+      (a.status.toLowerCase().contains('accept') || a.status.toLowerCase().contains('hire'))
+    );
+  }
+
+  void _showReportBottomSheet(BuildContext context) {
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final reasons = [
+      isAr ? 'وظيفة وهمية أو احتيال (Fake Job/Scam)' : 'Fake Job/Scam',
+      isAr ? 'محتوى غير مرغوب فيه (Spam)' : 'Spam',
+      isAr ? 'محتوى غير لائق (Inappropriate Content)' : 'Inappropriate Content',
+      isAr ? 'معلومات غير صحيحة (Incorrect Info)' : 'Incorrect Info',
+      isAr ? 'أسباب أخرى (Other reasons)' : 'Other reasons',
+    ];
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: isDark ? const Color(0xFF0D1B3E) : Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setModalState) => Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+            left: 20,
+            right: 20,
+            top: 20,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: isAr ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40, height: 4,
+                    decoration: BoxDecoration(color: Colors.grey.withOpacity(0.3), borderRadius: BorderRadius.circular(2)),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Text(isAr ? 'إبلاغ عن وظيفة' : 'Report Job', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
+                Text(
+                  isAr ? 'يرجى اختيار سبب الإبلاغ لمساعدتنا في تحسين جودة المحتوى.' : 'Please select a reason for reporting.',
+                  textAlign: isAr ? TextAlign.right : TextAlign.left,
+                  style: const TextStyle(color: Colors.grey, fontSize: 14),
+                ),
+                const SizedBox(height: 20),
+                ...reasons.map((reason) => RadioListTile<String>(
+                  title: Text(reason, textAlign: isAr ? TextAlign.right : TextAlign.left, style: const TextStyle(fontSize: 14)),
+                  value: reason,
+                  groupValue: _selectedReportReason,
+                  activeColor: Colors.red,
+                  contentPadding: EdgeInsets.zero,
+                  onChanged: (val) => setModalState(() => _selectedReportReason = val),
+                )),
+                const SizedBox(height: 16),
+                Text(isAr ? 'تفاصيل إضافية للشكوى' : 'Additional details', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: _reportDetailsController,
+                  maxLines: 3,
+                  textAlign: isAr ? TextAlign.right : TextAlign.left,
+                  decoration: InputDecoration(
+                    hintText: isAr ? 'اكتب التفاصيل هنا...' : 'Type details here...',
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    filled: true,
+                    fillColor: isDark ? Colors.white10 : Colors.grey.shade50,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: Text(isAr ? 'إلغاء' : 'Cancel', style: const TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          if (_selectedReportReason == null || _reportDetailsController.text.trim().isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(isAr ? 'يرجى إكمال بيانات الإبلاغ' : 'Please complete report details'), backgroundColor: Colors.orange));
+                            return;
+                          }
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(isAr ? 'تم إرسال إبلاغك بنجاح' : 'Report submitted'), backgroundColor: Colors.green));
+                        },
+                        style: ElevatedButton.styleFrom(backgroundColor: Colors.red, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), padding: const EdgeInsets.symmetric(vertical: 14)),
+                        child: Text(isAr ? 'إرسال إبلاغ' : 'Submit Report', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   void _addComment() {
@@ -113,30 +155,23 @@ class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScree
         _commentController.clear();
         _userRating = 0;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تم إضافة تقييمك بنجاح!'), backgroundColor: Colors.green),
-      );
-    } else if (_userRating == 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('يرجى اختيار عدد النجوم أولاً'), backgroundColor: Colors.orange),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم إضافة تقييمك بنجاح!'), backgroundColor: Colors.green));
     }
   }
 
   @override
   void dispose() {
     _commentController.dispose();
+    _reportDetailsController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
-    final isAr = t.isAr;
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final primaryColor = Theme.of(context).primaryColor;
     final backgroundColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
-    final cardColor = isDark ? const Color(0xFF0D2D4D) : Colors.white;
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -145,502 +180,294 @@ class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScree
         centerTitle: true,
         backgroundColor: backgroundColor,
         elevation: 0,
+        surfaceTintColor: Colors.transparent,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: isDark ? Colors.white : Colors.black),
+          icon: Icon(Icons.arrow_back_ios, color: isDark ? Colors.white : Colors.black, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // Header Card
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: cardColor,
-                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(32)),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Column(
-                children: [
-                  CircleAvatar(
-                    radius: 40,
-                    backgroundColor: primaryColor.withValues(alpha: 0.1),
-                    backgroundImage: widget.job.companyLogoUrl != null ? getAppImageProvider(widget.job.companyLogoUrl!) : null,
-                    child: widget.job.companyLogoUrl == null
-                        ? Icon(Icons.business, size: 40, color: primaryColor)
-                        : null,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    _translateValue(widget.job.title, isAr),
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.w900,
-                          color: isDark ? Colors.white : Colors.black,
-                        ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    widget.job.companyName,
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: isDark ? Colors.white70 : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Wrap(
-                    spacing: 8,
-                    alignment: WrapAlignment.center,
+      body: ListenableBuilder(
+        listenable: RecruitmentSyncStore.instance,
+        builder: (context, _) {
+          return SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            child: Column(
+              children: [
+                // 1. Header Card
+                _buildSectionCard(
+                  context,
+                  title: '',
+                  child: Row(
+                    textDirection: TextDirection.rtl,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildHeaderTag(context, Icons.location_on_outlined, _translateValue(widget.job.location, isAr), isDark),
-                      _buildHeaderTag(context, Icons.work_outline, _translateValue(widget.job.type, isAr), isDark),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Merged About Job & Description Container
-                  _buildSectionTitle(context, t.tr(en: 'About the Job', ar: 'عن الوظيفة'), primaryColor, isDark),
-                  const SizedBox(height: 12),
-                  _buildContentContainer(
-                    context,
-                    isDark,
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Description at the top if exists
-                        if (widget.job.description.trim().isNotEmpty) ...[
-                          Text(
-                            t.descriptionSection,
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                              color: isDark ? Colors.white : Colors.black,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            widget.job.description,
-                            style: TextStyle(
-                              fontSize: 15,
-                              height: 1.6,
-                              color: isDark ? Colors.white70 : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          Divider(color: isDark ? Colors.white10 : Colors.black12),
-                          const SizedBox(height: 20),
-                        ],
-                        _buildJobInfoRow(
-                          context, 
-                          Icons.people_outline, 
-                          t.tr(en: 'Seats (Accepted / Required)', ar: 'المقاعد (مقبول / مطلوب)'), 
-                          '${widget.job.acceptedCount} / ${widget.job.capacity}', 
-                          primaryColor,
-                          isDark
-                        ),
-                        Divider(height: 32, color: isDark ? Colors.white10 : Colors.black12),
-                        _buildJobInfoRow(
-                          context, 
-                          Icons.calendar_today_outlined, 
-                          t.tr(en: 'Published Date', ar: 'تاريخ النشر'), 
-                          '${widget.job.publishedAt.day}/${widget.job.publishedAt.month}/${widget.job.publishedAt.year}', 
-                          primaryColor,
-                          isDark
-                        ),
-                        Divider(height: 32, color: isDark ? Colors.white10 : Colors.black12),
-                        _buildJobInfoRow(
-                          context, 
-                          Icons.work_outline, 
-                          t.jobTypeLabel, 
-                          _translateValue(widget.job.type, isAr), 
-                          primaryColor,
-                          isDark
-                        ),
-                        Divider(height: 32, color: isDark ? Colors.white10 : Colors.black12),
-                        _buildJobInfoRow(
-                          context, 
-                          Icons.location_on_outlined, 
-                          t.locationLabel, 
-                          _translateValue(widget.job.location, isAr), 
-                          primaryColor,
-                          isDark
-                        ),
-                        Divider(height: 32, color: isDark ? Colors.white10 : Colors.black12),
-                        _buildJobInfoRow(
-                          context, 
-                          Icons.payments_outlined, 
-                          t.salaryLabel, 
-                          widget.job.salaryRange, 
-                          primaryColor,
-                          isDark
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Job Category (Field) Container
-                  if (widget.job.category.isNotEmpty) ...[
-                    _buildSectionTitle(context, t.tr(en: 'Job Field', ar: 'مجال العمل'), primaryColor, isDark),
-                    const SizedBox(height: 12),
-                    _buildContentContainer(
-                      context,
-                      isDark,
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: primaryColor.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Icon(Icons.category_outlined, color: primaryColor, size: 20),
-                          ),
-                          const SizedBox(width: 16),
-                          Text(
-                            _translateValue(widget.job.category, isAr),
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: isDark ? Colors.white : Theme.of(context).colorScheme.onSurface,
-                            ),
-                          ),
-                        ],
+                      Container(
+                        width: 65, height: 65,
+                        decoration: BoxDecoration(color: Colors.white.withOpacity(0.1), borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.white10)),
+                        child: widget.job.companyLogoUrl != null
+                            ? ClipRRect(borderRadius: BorderRadius.circular(12), child: Image(image: getAppImageProvider(widget.job.companyLogoUrl!)!, fit: BoxFit.cover))
+                            : Icon(widget.job.logoIcon ?? Icons.business, color: Colors.white, size: 30),
                       ),
-                    ),
-                    const SizedBox(height: 24),
-                  ],
-
-                  // Tags / Skills Container
-                  if (widget.job.tags.isNotEmpty) ...[
-                    _buildSectionTitle(context, t.requiredSkills, primaryColor, isDark),
-                    const SizedBox(height: 12),
-                    _buildContentContainer(
-                      context,
-                      isDark,
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
-                        children: widget.job.tags.map((tag) => Chip(
-                          label: Text(_translateValue(tag, isAr)),
-                          backgroundColor: isDark ? Colors.white.withValues(alpha: 0.1) : primaryColor.withValues(alpha: 0.1),
-                          side: BorderSide.none,
-                          labelStyle: TextStyle(color: isDark ? Colors.white : primaryColor, fontWeight: FontWeight.bold),
-                        )).toList(),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                  ],
-
-                  // Responsibilities
-                  if (widget.job.responsibilities.isNotEmpty) ...[
-                    _buildSectionTitle(context, t.responsibilities, primaryColor, isDark),
-                    const SizedBox(height: 12),
-                    ...widget.job.responsibilities.map((item) => _buildBulletPoint(context, item, primaryColor, isDark)),
-                    const SizedBox(height: 24),
-                  ],
-
-                  // Qualifications
-                  if (widget.job.qualifications.isNotEmpty) ...[
-                    _buildSectionTitle(context, t.qualifications, primaryColor, isDark),
-                    const SizedBox(height: 12),
-                    ...widget.job.qualifications.map((item) => _buildBulletPoint(context, item, primaryColor, isDark)),
-                    const SizedBox(height: 24),
-                  ],
-
-                  // Benefits
-                  if (widget.job.benefits.isNotEmpty) ...[
-                    _buildSectionTitle(context, t.perksAndBenefits, primaryColor, isDark),
-                    const SizedBox(height: 12),
-                    Wrap(
-                      spacing: 10,
-                      runSpacing: 10,
-                      children: widget.job.benefits.map((item) => Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: Colors.green.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.green.withValues(alpha: 0.2)),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Icon(Icons.check_circle, size: 16, color: Colors.green),
-                            const SizedBox(width: 8),
-                            Text(item, style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
-                          ],
-                        ),
-                      )).toList(),
-                    ),
-                    const SizedBox(height: 32),
-                  ],
-
-                  // Reviews & Feedback Section - MOVED TO BOTTOM
-                  _buildSectionTitle(context, t.tr(en: 'Reviews & Feedback', ar: 'التقييمات والآراء'), primaryColor, isDark),
-                  const SizedBox(height: 12),
-                  _buildContentContainer(
-                    context,
-                    isDark,
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Rating Summary Header
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const SizedBox(), 
+                            Text(
+                              _cleanTitle(t.translateJobTitle(widget.job.title)),
+                              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                              maxLines: 1, overflow: TextOverflow.ellipsis, textAlign: TextAlign.right,
+                            ),
+                            const SizedBox(height: 4),
+                            Text(widget.job.companyName, style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 13), textAlign: TextAlign.right),
+                            const SizedBox(height: 8),
                             Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
                               children: [
-                                Text(
-                                  '4.8',
-                                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.orange[700]),
-                                ),
-                                const SizedBox(width: 8),
-                                Row(
-                                  children: List.generate(5, (index) => Icon(
-                                    Icons.star, 
-                                    color: index < 4 ? Colors.orange[700] : Colors.grey[300], 
-                                    size: 20
-                                  )),
+                                const Icon(Icons.star, color: Colors.amber, size: 14),
+                                const SizedBox(width: 4),
+                                const Text('4.8', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+                                const SizedBox(width: 12),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                  decoration: BoxDecoration(color: Colors.white10, borderRadius: BorderRadius.circular(6)),
+                                  child: Text(translateValue(widget.job.type, isAr), style: const TextStyle(color: Colors.white70, fontSize: 11)),
                                 ),
                               ],
                             ),
                           ],
                         ),
-                        const SizedBox(height: 16),
-                        
-                        /*
-                        // Rating input section - ONLY visible after application
-                        if (_hasApplied) ...[
-                          Divider(color: isDark ? Colors.white10 : Colors.black12),
-                          const SizedBox(height: 16),
-                          Text(
-                            t.tr(en: 'Rate the company', ar: 'قيم الشركة:'),
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: isDark ? Colors.white : Colors.black),
-                          ),
-                          const SizedBox(height: 8),
-                          Row(
-                            children: List.generate(5, (index) => IconButton(
-                              icon: Icon(
-                                _userRating > index ? Icons.star : Icons.star_border,
-                                color: Colors.orange[700],
-                                size: 28,
-                              ),
-                              onPressed: () => setState(() => _userRating = index + 1),
-                              padding: EdgeInsets.zero,
-                              constraints: const BoxConstraints(),
-                            )),
-                          ),
-                          const SizedBox(height: 12),
-                          TextField(
-                            controller: _commentController,
-                            style: TextStyle(color: isDark ? Colors.white : Colors.black, fontSize: 14),
-                            decoration: InputDecoration(
-                              hintText: t.tr(en: 'Write your experience...', ar: 'اكتب تجربتك هنا...'),
-                              hintStyle: TextStyle(color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.4)),
-                              suffixIcon: IconButton(
-                                icon: Icon(Icons.send, color: primaryColor),
-                                onPressed: _addComment,
-                              ),
-                              filled: true,
-                              fillColor: isDark ? Colors.white.withValues(alpha: 0.05) : Theme.of(context).scaffoldBackgroundColor,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide.none,
-                              ),
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                            ),
-                          ),
-                          const SizedBox(height: 24),
-                          Divider(color: isDark ? Colors.white10 : Colors.black12),
-                          const SizedBox(height: 16),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.warning_amber_rounded, color: Colors.redAccent, size: 26),
+                        onPressed: () => _showReportBottomSheet(context),
+                        padding: EdgeInsets.zero, constraints: const BoxConstraints(),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                // 2. Description Card
+                _buildSectionCard(
+                  context,
+                  title: isAr ? 'الوصف' : 'Description',
+                  child: Text(
+                    widget.job.description.isNotEmpty ? widget.job.description : (isAr ? 'لا يوجد وصف متاح.' : 'No description available.'),
+                    style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 14, height: 1.6),
+                    textAlign: isAr ? TextAlign.right : TextAlign.left,
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                // 3. Job Details Card
+                _buildSectionCard(
+                  context,
+                  title: isAr ? 'تفاصيل الوظيفة' : 'Job Details',
+                  child: Column(
+                    children: [
+                      _buildSimpleCapacityBar(context, widget.job),
+                      const SizedBox(height: 20),
+                      _buildInfoRow(Icons.calendar_today_outlined, isAr ? 'تاريخ النشر' : 'Posted Date', '${widget.job.publishedAt.year}-${widget.job.publishedAt.month.toString().padLeft(2, '0')}-${widget.job.publishedAt.day.toString().padLeft(2, '0')}'),
+                      _buildInfoRow(Icons.location_on_outlined, isAr ? 'مكان العمل' : 'Location', translateValue(widget.job.location, isAr)),
+                      _buildInfoRow(Icons.work_outline, isAr ? 'نوع الوظيفة' : 'Job Type', translateValue(widget.job.type, isAr)),
+                      _buildInfoRow(Icons.calendar_month_outlined, isAr ? 'أيام العمل' : 'Work Days', isAr ? '6 أيام في الأسبوع' : '6 Days / Week'),
+                      _buildInfoRow(Icons.attach_money, isAr ? 'الراتب' : 'Salary', widget.job.salaryRange),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                // 4. Skills Card
+                _buildSectionCard(
+                  context,
+                  title: isAr ? 'المهارات' : 'Skills',
+                  child: Container(
+                    width: double.infinity,
+                    alignment: isAr ? Alignment.centerRight : Alignment.centerLeft,
+                    child: Wrap(
+                      spacing: 10, runSpacing: 10,
+                      children: (widget.job.tags.isNotEmpty ? widget.job.tags : widget.job.qualifications).map((skill) => Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                        decoration: BoxDecoration(color: Colors.white.withOpacity(0.15), borderRadius: BorderRadius.circular(10)),
+                        child: Text(skill.trim(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+                      )).toList(),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                // 5. Work Field Card
+                _buildSectionCard(
+                  context,
+                  title: isAr ? 'مجال العمل' : 'Work Field',
+                  child: Container(width: double.infinity, child: Text(translateValue(widget.job.category, isAr), style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold), textAlign: isAr ? TextAlign.right : TextAlign.left)),
+                ),
+
+                const SizedBox(height: 16),
+
+                // 6. Reviews Card
+                _buildSectionCard(
+                  context,
+                  title: isAr ? 'التقييمات والآراء' : 'Reviews',
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          _buildRatingBox(),
+                          Text(isAr ? 'اضف تقييمك' : 'Add Rating', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                         ],
-                        */
-
-                        // List of comments (always visible)
-                        ..._mockReviews.map((review) => Padding(
-                          padding: const EdgeInsets.only(bottom: 16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    review['userName'],
-                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: isDark ? Colors.white : Colors.black),
-                                  ),
-                                  Text(
-                                    review['date'],
-                                    style: TextStyle(fontSize: 11, color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.5)),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 4),
-                              Row(
-                                children: List.generate(5, (index) => Icon(
-                                  Icons.star, 
-                                  size: 14, 
-                                  color: index < review['rating'] ? Colors.orange[700] : Colors.grey[300],
-                                )),
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                review['comment'],
-                                style: TextStyle(fontSize: 13, color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.8)),
-                              ),
-                              if (_mockReviews.last != review)
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 12),
-                                  child: Divider(height: 1, color: isDark ? Colors.white10 : Theme.of(context).dividerColor.withValues(alpha: 0.05)),
-                                ),
-                            ],
-                          ),
-                        )),
+                      ),
+                      const SizedBox(height: 16),
+                      if (_hasApplied) ...[
+                        _buildRatingStars(),
+                        const SizedBox(height: 12),
+                        _buildReviewInput(),
+                      ] else ...[
+                        Container(
+                          padding: const EdgeInsets.all(16), width: double.infinity,
+                          decoration: BoxDecoration(color: Colors.white.withOpacity(0.05), borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.white10)),
+                          child: Text(isAr ? 'لا يمكنك تقييم هذا العمل إلا بعد التقديم عليه' : 'Rate only after applying.', textAlign: TextAlign.center, style: const TextStyle(color: Colors.orangeAccent, fontSize: 13, fontWeight: FontWeight.bold)),
+                        ),
                       ],
-                    ),
+                      const SizedBox(height: 20),
+                      Container(width: double.infinity, child: Text(isAr ? 'التعليقات' : 'Comments', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16), textAlign: isAr ? TextAlign.right : TextAlign.left)),
+                      const SizedBox(height: 10),
+                      ..._mockReviews.map((review) => _buildReviewItem(review, isAr)),
+                    ],
                   ),
-                  const SizedBox(height: 32),
+                ),
 
-                  AppButton(
-                    label: t.tr(en: 'Apply for this Job', ar: 'قدّم طلبك الآن'),
-                    backgroundColor: const Color(0xFF142C66),
-                    onPressed: () => Navigator.of(context).pushNamed(
-                      AppRoutes.userJobApplication,
-                      arguments: widget.job,
-                    ),
-                  ),
-                  const SizedBox(height: 40),
-                ],
-              ),
+                const SizedBox(height: 30),
+                AppButton(
+                  label: isAr ? 'قدّم طلبك الآن' : 'Apply Now',
+                  backgroundColor: const Color(0xFF142C66),
+                  onPressed: () => Navigator.of(context).pushNamed(AppRoutes.userJobApplication, arguments: widget.job),
+                ),
+                const SizedBox(height: 40),
+              ],
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
 
-  Widget _buildContentContainer(BuildContext context, bool isDark, Widget child) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF0D2D4D) : Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: isDark ? Colors.white10 : Theme.of(context).dividerColor.withValues(alpha: 0.1)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.02),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: child,
-    );
+  String _cleanTitle(String title) {
+    final unwanted = ['خبرة', 'مطلوب', 'محترف', 'experience', 'required', 'professional'];
+    for (final w in unwanted) {
+      title = title.replaceAll(RegExp(w, caseSensitive: false), '').trim();
+    }
+    return title.replaceAll(RegExp(r'\s+'), ' ');
   }
 
-  Widget _buildHeaderTag(BuildContext context, IconData icon, String label, bool isDark) {
+  Widget _buildSectionCard(BuildContext context, {required String title, required Widget child}) {
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: isDark ? Colors.white.withValues(alpha: 0.05) : Theme.of(context).dividerColor.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
+      width: double.infinity, padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(color: const Color(0xFF213E75), borderRadius: BorderRadius.circular(24), boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 4))]),
+      child: Column(
+        crossAxisAlignment: isAr ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 16, color: isDark ? Colors.white60 : Colors.grey),
-          const SizedBox(width: 4),
-          Text(label, style: TextStyle(fontSize: 13, color: isDark ? Colors.white60 : Colors.grey)),
+          if (title.isNotEmpty) ...[
+            Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: Colors.white)),
+            const SizedBox(height: 14),
+          ],
+          child,
         ],
       ),
     );
   }
 
-  Widget _buildSectionTitle(BuildContext context, String title, Color color, bool isDark) {
-    return Text(
-      title,
-      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: isDark ? const Color(0xFFFF7A2A) : color,
-          ),
+  Widget _buildInfoRow(IconData icon, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: Row(
+        textDirection: TextDirection.rtl,
+        children: [
+          Container(width: 38, height: 38, decoration: BoxDecoration(color: Colors.white.withOpacity(0.15), borderRadius: BorderRadius.circular(10)), child: Icon(icon, color: Colors.white, size: 20)),
+          const SizedBox(width: 14),
+          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+            Text(label, style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 11, fontWeight: FontWeight.w500)),
+            Text(value, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
+          ])),
+        ],
+      ),
     );
   }
 
-  Widget _buildJobInfoRow(BuildContext context, IconData icon, String title, String value, Color color, bool isDark) {
-    return Row(
+  Widget _buildSimpleCapacityBar(BuildContext context, RecruitmentJob job) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Icon(icon, color: color, size: 20),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title, 
-                style: TextStyle(
-                  color: isDark ? Colors.white60 : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5), 
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                )
-              ),
-              const SizedBox(height: 2),
-              Text(
-                value, 
-                style: TextStyle(
-                  fontSize: 14, 
-                  fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : Colors.black,
-                )
-              ),
-            ],
+        Text(t.tr(en: 'Accepted ${job.acceptedCount} of ${job.capacity}', ar: 'المقبولين ${job.acceptedCount} من ${job.capacity}'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Color(0xFFFF7A2A))),
+        const SizedBox(height: 8),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: LinearProgressIndicator(
+            value: job.capacity == 0 ? 0 : (job.acceptedCount / job.capacity).clamp(0.0, 1.0),
+            minHeight: 8, backgroundColor: Colors.white.withOpacity(0.2),
+            valueColor: AlwaysStoppedAnimation<Color>(job.acceptedCount >= job.capacity ? Colors.greenAccent : const Color(0xFFFF7A2A)),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildBulletPoint(BuildContext context, String text, Color color, bool isDark) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+  AppLocalizations get t => AppLocalizations.of(context);
+
+  Widget _buildRatingBox() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(color: Colors.white.withOpacity(0.15), borderRadius: BorderRadius.circular(12)),
+      child: Row(children: const [Icon(Icons.star, color: Colors.amber, size: 18), SizedBox(width: 4), Text('4.8', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16))]),
+    );
+  }
+
+  Widget _buildRatingStars() {
+    return Row(mainAxisAlignment: MainAxisAlignment.end, children: List.generate(5, (index) => IconButton(
+      onPressed: () => setState(() => _userRating = index + 1),
+      icon: Icon(index < _userRating ? Icons.star : Icons.star_border, color: Colors.amber, size: 28),
+      padding: EdgeInsets.zero, constraints: const BoxConstraints(),
+    )));
+  }
+
+  Widget _buildReviewInput() {
+    return TextField(
+      controller: _commentController, maxLines: 3, textAlign: TextAlign.right,
+      style: const TextStyle(color: Colors.white, fontSize: 14),
+      decoration: InputDecoration(
+        hintText: t.isAr ? 'اكتب تعليقك هنا...' : 'Write your comment...',
+        hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
+        filled: true, fillColor: Colors.black.withOpacity(0.1),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+        suffixIcon: IconButton(onPressed: _addComment, icon: const Icon(Icons.send, color: Colors.white, size: 20)),
+      ),
+    );
+  }
+
+  Widget _buildReviewItem(Map<String, dynamic> review, bool isAr) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10), padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(color: Colors.white.withOpacity(0.05), borderRadius: BorderRadius.circular(12)),
+      child: Column(
+        crossAxisAlignment: isAr ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 6),
-            child: Icon(Icons.circle, size: 6, color: color),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(children: List.generate(5, (i) => Icon(Icons.star, size: 12, color: i < review['rating'] ? Colors.amber : Colors.white24))),
+              Text(review['userName'], style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            ],
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              text,
-              style: TextStyle(fontSize: 15, height: 1.4, color: isDark ? Colors.white70 : Colors.black87),
-            ),
-          ),
+          const SizedBox(height: 6),
+          Text(review['comment'], style: const TextStyle(color: Colors.white70, fontSize: 13), textAlign: isAr ? TextAlign.right : TextAlign.left),
         ],
       ),
     );

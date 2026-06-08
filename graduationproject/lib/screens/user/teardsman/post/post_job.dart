@@ -271,7 +271,7 @@ class _PostJobState extends State<PostJob> {
               // Number of Services (Capacity)
               _buildSideTitleSection(
                 isVertical: true,
-                title: t.tr(en: "Number of services", ar: "عدد الخدمات"),
+                title: t.tr(en: "Number required", ar: "عدد المطلوب"),
                 subtitle: t.tr(
                   en: "How many clients can you accept for this work?",
                   ar: "كم عدد العملاء الذين يمكنك قبولهم لهذا العمل؟",

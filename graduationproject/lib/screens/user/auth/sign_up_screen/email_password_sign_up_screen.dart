@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../../../shared/l10n/app_localizations.dart';
 import '../../../../shared/state/theme_controller.dart';
 import '../otp_email_verification_screen.dart';
@@ -13,7 +14,9 @@ class EmailPasswordSignUpScreen extends StatefulWidget {
 
 class _EmailPasswordSignUpScreenState extends State<EmailPasswordSignUpScreen> {
   final _formKey = GlobalKey<FormState>();
+  final TextEditingController _fullNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
@@ -24,7 +27,9 @@ class _EmailPasswordSignUpScreenState extends State<EmailPasswordSignUpScreen> {
 
   @override
   void dispose() {
+    _fullNameController.dispose();
     _emailController.dispose();
+    _phoneController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
@@ -34,18 +39,18 @@ class _EmailPasswordSignUpScreenState extends State<EmailPasswordSignUpScreen> {
     if (!_formKey.currentState!.validate()) {
       return;
     }
-    if (!_agreeToTerms) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context).acceptTermsMsg)),
-      );
-      return;
-    }
 
     final email = _emailController.text.trim();
+    final name = _fullNameController.text.trim();
+
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => OtpEmailVerificationScreen(email: email),
+        builder: (_) => OtpEmailVerificationScreen(
+          email: email,
+          password: _passwordController.text,
+          name: name,
+        ),
       ),
     );
   }
@@ -120,6 +125,22 @@ class _EmailPasswordSignUpScreenState extends State<EmailPasswordSignUpScreen> {
                   
                   const SizedBox(height: 48),
 
+                  // Full Name
+                  _buildLabel(t.fullName, textColorPrimary),
+                  const SizedBox(height: 8),
+                  _buildTextField(
+                    controller: _fullNameController,
+                    hint: t.tr(en: 'Enter your full name', ar: 'اكتب اسمك بالكامل'),
+                    isDark: isDark,
+                    validator: (v) {
+                      if (v == null || v.isEmpty) return t.required;
+                      if (v.trim().split(' ').length < 2) return t.tr(en: 'Enter at least two names', ar: 'ادخل اسمين على الأقل');
+                      return null;
+                    },
+                  ),
+
+                  const SizedBox(height: 20),
+
                   // Email Address
                   _buildLabel(t.emailAddress, textColorPrimary),
                   const SizedBox(height: 8),
@@ -131,6 +152,27 @@ class _EmailPasswordSignUpScreenState extends State<EmailPasswordSignUpScreen> {
                     validator: (v) {
                       if (v == null || v.isEmpty) return t.required;
                       if (!v.contains('@')) return t.enterValidEmail;
+                      return null;
+                    },
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // Phone Number
+                  _buildLabel(t.phoneNumber, textColorPrimary),
+                  const SizedBox(height: 8),
+                  _buildTextField(
+                    controller: _phoneController,
+                    hint: '01xxxxxxxxx',
+                    isDark: isDark,
+                    keyboardType: TextInputType.phone,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                      LengthLimitingTextInputFormatter(11),
+                    ],
+                    validator: (v) {
+                      if (v == null || v.isEmpty) return t.required;
+                      if (v.length < 11) return t.isAr ? "رقم الهاتف غير صحيح" : "Invalid phone number";
                       return null;
                     },
                   ),
@@ -184,11 +226,6 @@ class _EmailPasswordSignUpScreenState extends State<EmailPasswordSignUpScreen> {
                       return null;
                     },
                   ),
-
-                  const SizedBox(height: 24),
-
-                  // Terms Agreement
-                  _buildTermsCheckbox(t, isDark),
 
                   const SizedBox(height: 40),
 
@@ -250,6 +287,7 @@ class _EmailPasswordSignUpScreenState extends State<EmailPasswordSignUpScreen> {
     bool obscureText = false,
     Widget? suffixIcon,
     TextInputType? keyboardType,
+    List<TextInputFormatter>? inputFormatters,
     String? Function(String?)? validator,
   }) {
     final borderColor = isDark ? Colors.white30 : Colors.black26;
@@ -258,6 +296,7 @@ class _EmailPasswordSignUpScreenState extends State<EmailPasswordSignUpScreen> {
       controller: controller,
       obscureText: obscureText,
       keyboardType: keyboardType,
+      inputFormatters: inputFormatters,
       validator: validator,
       style: TextStyle(color: isDark ? Colors.white : Colors.black),
       decoration: InputDecoration(

@@ -29,7 +29,7 @@ class _PreferencesState extends State<Preferences> {
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         title: Text(
-          t.tr(en: "Edit Profile", ar: "تعديل الملف الشخصي"),
+          t.preferences,
           style: TextStyle(color: onSurfaceColor, fontSize: 20, fontWeight: FontWeight.bold),
         ),
         centerTitle: false,
@@ -43,30 +43,6 @@ class _PreferencesState extends State<Preferences> {
         child: Column(
           crossAxisAlignment: isAr ? CrossAxisAlignment.end : CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 20),
-            // Tabs
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  _buildTabItem(t.tr(en: "Profile Setting", ar: "إعدادات الملف"), false, () {
-                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const EditProfileScreen()));
-                  }, isDark, onSurfaceColor),
-                  const SizedBox(width: 20),
-                  _buildTabItem(t.tr(en: "Account Security", ar: "أمان الحساب"), false, () {
-                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const ProfileLoginDetailsScreen()));
-                  }, isDark, onSurfaceColor),
-                  const SizedBox(width: 20),
-                  _buildTabItem(t.tr(en: "Notification", ar: "الإشعارات"), false, () {
-                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Notifications()));
-                  }, isDark, onSurfaceColor),
-                  const SizedBox(width: 20),
-                  _buildTabItem(t.tr(en: "Preferences", ar: "التفضيلات"), true, () {}, isDark, onSurfaceColor),
-                ],
-              ),
-            ),
-            const SizedBox(height: 10),
-            Divider(color: onSurfaceColor.withValues(alpha: 0.12), height: 1),
             const SizedBox(height: 30),
 
             // App Settings

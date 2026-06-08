@@ -371,7 +371,7 @@ class _SignUpSeeker extends State<SignUpSeeker> {
                   prefixText: "+20 ",
                   inputFormatters: [
                     FilteringTextInputFormatter.digitsOnly,
-                    LengthLimitingTextInputFormatter(10),
+                    LengthLimitingTextInputFormatter(11),
                   ],
                 ),
                 const SizedBox(height: 20),

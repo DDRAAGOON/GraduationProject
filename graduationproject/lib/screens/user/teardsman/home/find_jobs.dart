@@ -283,7 +283,7 @@ class _FindJobsState extends State<FindJobs> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'عرض وظيفة صنايعي',
+                          t.isAr ? 'عرض كل الوظائف' : 'View All Jobs',
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -294,7 +294,7 @@ class _FindJobsState extends State<FindJobs> {
                         _buildJobCard(
                           RecruitmentJob(
                             id: 'sample-tradesman-job',
-                            title: 'سباك محترف',
+                            title: 'سباك',
                             companyName: 'شركة الصيانة الذكية',
                             location: 'القاهرة',
                             salaryRange: '3000-5000 ج.م',
@@ -430,7 +430,14 @@ class _FindJobsState extends State<FindJobs> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      t.translateJobTitle(job.title),
+                      () {
+                        String title = t.translateJobTitle(job.title);
+                        final unwanted = ['خبرة', 'مطلوب', 'محترف', 'experience', 'required', 'professional'];
+                        for (final w in unwanted) {
+                          title = title.replaceAll(RegExp(w, caseSensitive: false), '').trim();
+                        }
+                        return title.replaceAll(RegExp(r'\s+'), ' ');
+                      }(),
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
@@ -450,6 +457,20 @@ class _FindJobsState extends State<FindJobs> {
                   const SizedBox(width: 4),
                   Text(
                     t.translateCompanyName(job.companyName),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  const Icon(
+                    Icons.location_on_outlined,
+                    size: 16,
+                    color: Colors.white70,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    t.translateLocation(job.location),
                     style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w600,
