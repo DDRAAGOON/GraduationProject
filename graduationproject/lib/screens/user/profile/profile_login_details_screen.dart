@@ -110,8 +110,8 @@ class _ProfileLoginDetailsScreenState extends State<ProfileLoginDetailsScreen> {
         title: const Icon(Icons.info_outline, color: Colors.orange, size: 48),
         content: Text(
           isAr 
-            ? "تم استلام طلبك. سوف يتم حذف حسابك نهائياً خلال 10 أيام. يمكنك إلغاء الطلب في أي وقت قبل ذلك." 
-            : "Request received. Your account will be permanently deleted within 10 days. You can cancel the request at any time before that.",
+            ? "تم استلام طلبك. سوف يتم حذف حسابك نهائياً خلال يومين. يمكنك إلغاء الطلب في أي وقت قبل ذلك." 
+            : "Request received. Your account will be permanently deleted within 2 days. You can cancel the request at any time before that.",
           textAlign: TextAlign.center,
         ),
         actions: [

@@ -4,29 +4,9 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="89a40d2e-dee6-4edc-af06-e2e78f633ab0" name="Changes" comment="v2&#10;user&#10;user2&#10;user3&#10;user4&#10;&#10;التعديل قبل الاخير في ال user&#10;اخر نعديل في user من غير API&#10;التعديل قبل الاخير للحرفي&#10;&#10;اخر تعديل حرفي و شركة من غير API&#10;اخر تعديل في ال ui">
+    <list default="true" id="89a40d2e-dee6-4edc-af06-e2e78f633ab0" name="Changes" comment="v2&#10;user&#10;user2&#10;user3&#10;user4&#10;&#10;التعديل قبل الاخير في ال user&#10;&#10;اخر نعديل في user من غير API&#10;اخر تعديل ان شاء الله&#10;التعديل قبل الاخير للحرفي&#10;&#10;اخر تعديل حرفي و شركة من غير API&#10;اخر تعديل في ال ui&#10;اخر تعديل ان شاء الله 2">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/auth/otp_email_verification_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/auth/otp_email_verification_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/auth/sign_up_screen/email_password_sign_up_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/auth/sign_up_screen/email_password_sign_up_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/auth/sign_up_screen/sign_up_seeker.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/auth/sign_up_screen/sign_up_seeker.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/auth/sign_up_screen/sign_up_tradesman.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/auth/sign_up_screen/sign_up_tradesman.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/home/tabs/discover_tab.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/home/tabs/discover_tab.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/home/tabs/home_tab.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/home/tabs/home_tab.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/home/tabs/recruitment_ui_utils.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/home/tabs/recruitment_ui_utils.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/jobs/recruitment_job_details_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/jobs/recruitment_job_details_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/jobs/recruitment_job_filters_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/jobs/recruitment_job_filters_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/profile/complete_profile_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/profile/complete_profile_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/profile/edit_profile_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/profile/edit_profile_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/profile/setting_profile/notifications.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/profile/setting_profile/notifications.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/profile/setting_profile/preferences.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/profile/setting_profile/preferences.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/home/find_jobs.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/home/find_jobs.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/home/tradesman_home_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/home/tradesman_home_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/home/tradesman_job_details_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/home/tradesman_job_details_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/home/tradesman_my_apps_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/home/tradesman_my_apps_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/post/job_applicants_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/post/job_applicants_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/post/post_job.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/post/post_job.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/profile/tradesman_edit_profile_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/profile/tradesman_edit_profile_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/shared/utils/translation_helper.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/shared/utils/translation_helper.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/profile/profile_login_details_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/profile/profile_login_details_screen.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -429,7 +409,23 @@
       <option name="project" value="LOCAL؜" />
       <updated>1780801880006</updated>
     </task>
-    <option name="localTasksCounter" value="40" />
+    <task id="LOCAL؜-٠٠٠٤٠" summary="v2&#10;user&#10;user2&#10;user3&#10;user4&#10;&#10;التعديل قبل الاخير في ال user&#10;&#10;اخر نعديل في user من غير API&#10;اخر تعديل ان شاء الله&#10;التعديل قبل الاخير للحرفي&#10;&#10;اخر تعديل حرفي و شركة من غير API&#10;اخر تعديل في ال ui">
+      <option name="closed" value="true" />
+      <created>1780877884819</created>
+      <option name="number" value="٠٠٠٤٠" />
+      <option name="presentableId" value="LOCAL؜-٠٠٠٤٠" />
+      <option name="project" value="LOCAL؜" />
+      <updated>1780877884820</updated>
+    </task>
+    <task id="LOCAL؜-٠٠٠٤١" summary="v2&#10;user&#10;user2&#10;user3&#10;user4&#10;&#10;التعديل قبل الاخير في ال user&#10;&#10;اخر نعديل في user من غير API&#10;اخر تعديل ان شاء الله&#10;التعديل قبل الاخير للحرفي&#10;&#10;اخر تعديل حرفي و شركة من غير API&#10;اخر تعديل في ال ui&#10;اخر تعديل ان شاء الله 2">
+      <option name="closed" value="true" />
+      <created>1780878232929</created>
+      <option name="number" value="٠٠٠٤١" />
+      <option name="presentableId" value="LOCAL؜-٠٠٠٤١" />
+      <option name="project" value="LOCAL؜" />
+      <updated>1780878232930</updated>
+    </task>
+    <option name="localTasksCounter" value="42" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -464,7 +460,9 @@
     <MESSAGE value="v2&#10;user&#10;user2&#10;user3&#10;user4&#10;&#10;التعديل قبل الاخير في ال user&#10;اخر نعديل في user من غير API&#10;التعديل قبل الاخير للحرفي" />
     <MESSAGE value="v2&#10;user&#10;user2&#10;user3&#10;user4&#10;&#10;التعديل قبل الاخير في ال user&#10;اخر نعديل في user من غير API&#10;التعديل قبل الاخير للحرفي&#10;اخر تعديل حرفي و شركة من غير API" />
     <MESSAGE value="v2&#10;user&#10;user2&#10;user3&#10;user4&#10;&#10;التعديل قبل الاخير في ال user&#10;اخر نعديل في user من غير API&#10;التعديل قبل الاخير للحرفي&#10;&#10;اخر تعديل حرفي و شركة من غير API&#10;اخر تعديل في ال ui" />
-    <option name="LAST_COMMIT_MESSAGE" value="v2&#10;user&#10;user2&#10;user3&#10;user4&#10;&#10;التعديل قبل الاخير في ال user&#10;اخر نعديل في user من غير API&#10;التعديل قبل الاخير للحرفي&#10;&#10;اخر تعديل حرفي و شركة من غير API&#10;اخر تعديل في ال ui" />
+    <MESSAGE value="v2&#10;user&#10;user2&#10;user3&#10;user4&#10;&#10;التعديل قبل الاخير في ال user&#10;&#10;اخر نعديل في user من غير API&#10;اخر تعديل ان شاء الله&#10;التعديل قبل الاخير للحرفي&#10;&#10;اخر تعديل حرفي و شركة من غير API&#10;اخر تعديل في ال ui" />
+    <MESSAGE value="v2&#10;user&#10;user2&#10;user3&#10;user4&#10;&#10;التعديل قبل الاخير في ال user&#10;&#10;اخر نعديل في user من غير API&#10;اخر تعديل ان شاء الله&#10;التعديل قبل الاخير للحرفي&#10;&#10;اخر تعديل حرفي و شركة من غير API&#10;اخر تعديل في ال ui&#10;اخر تعديل ان شاء الله 2" />
+    <option name="LAST_COMMIT_MESSAGE" value="v2&#10;user&#10;user2&#10;user3&#10;user4&#10;&#10;التعديل قبل الاخير في ال user&#10;&#10;اخر نعديل في user من غير API&#10;اخر تعديل ان شاء الله&#10;التعديل قبل الاخير للحرفي&#10;&#10;اخر تعديل حرفي و شركة من غير API&#10;اخر تعديل في ال ui&#10;اخر تعديل ان شاء الله 2" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
