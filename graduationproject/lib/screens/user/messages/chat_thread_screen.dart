@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import '../../../shared/l10n/app_localizations.dart';
 
+import '../../../shared/services/chat_service.dart';
+
 class ChatThreadScreen extends StatefulWidget {
   final String name;
   final String image;
+  final String? receiverId; // Added for API
 
   const ChatThreadScreen({
     super.key,
     required this.name,
     required this.image,
+    this.receiverId,
   });
 
   @override
@@ -20,21 +24,55 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
   final List<Map<String, dynamic>> _messages = []; // تبدأ فارغة دائماً
 
   @override
+  void initState() {
+    super.initState();
+    if (widget.receiverId != null) {
+      _loadHistory();
+    }
+  }
+
+  Future<void> _loadHistory() async {
+    try {
+      final history = await ChatService.instance.getHistory(widget.receiverId!);
+      setState(() {
+        _messages.clear();
+        for (var msg in history) {
+          _messages.add({
+            "isMe": !msg.fromCompany,
+            "text": msg.text,
+            "time": "${msg.createdAt.hour}:${msg.createdAt.minute.toString().padLeft(2, '0')}",
+          });
+        }
+      });
+    } catch (e) {
+      // Handle error or ignore
+    }
+  }
+
+  @override
   void dispose() {
     _messageController.dispose();
     super.dispose();
   }
 
-  void _sendMessage() {
-    if (_messageController.text.trim().isNotEmpty) {
+  void _sendMessage() async {
+    final text = _messageController.text.trim();
+    if (text.isNotEmpty) {
       setState(() {
         _messages.add({
           "isMe": true,
-          "text": _messageController.text.trim(),
+          "text": text,
           "time": _getCurrentTime(),
         });
         _messageController.clear();
       });
+      if (widget.receiverId != null) {
+        try {
+          await ChatService.instance.sendMessage(widget.receiverId!, text);
+        } catch (e) {
+          // Message failed to send
+        }
+      }
     }
   }
 

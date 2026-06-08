@@ -259,101 +259,10 @@ class ServiceRequestPost {
 
 class RecruitmentSyncStore extends ChangeNotifier {
   RecruitmentSyncStore._() {
-    _addInitialMockJobs();
-    _addInitialMockApplications();
-    _seedTradesmanRatingsPreview();
   }
 
   void _addInitialMockApplications() {
-    final mocks = [
-      RecruitmentApplication(
-        id: 'test_accepted_service',
-        jobId: 'service_plumber_2',
-        jobTitle: 'سباك لإصلاح أعطال طارئة',
-        companyName: 'الشركة المصرية للصيانة',
-        userName: 'User',
-        status: 'Accepted',
-        updatedAt: DateTime.now(),
-      ),
-      RecruitmentApplication(
-        id: 'test_rejected_app',
-        jobId: 'tech_ui_ux_1',
-        jobTitle: 'UI/UX Designer',
-        companyName: 'وكالة بيكسل الرقمية',
-        userName: 'User',
-        status: 'Rejected',
-        updatedAt: DateTime.now(),
-      ),
-      RecruitmentApplication(
-        id: 'test_accepted_app',
-        jobId: 'tech_flutter_1',
-        jobTitle: 'Junior Flutter Developer',
-        companyName: 'إبداع للبرمجيات',
-        userName: 'User',
-        status: 'Hired',
-        updatedAt: DateTime.now(),
-      ),
-      RecruitmentApplication(
-        id: 'mock_app_1',
-        jobId: 'mock_company_job_1',
-        jobTitle: 'Senior Flutter Developer',
-        companyName: 'Jobito Labs',
-        userName: 'Karim',
-        status: 'Hired',
-        updatedAt: DateTime(2026, 5, 2),
-      ),
-      RecruitmentApplication(
-        id: 'mock_app_2',
-        jobId: 'mock_company_job_2',
-        jobTitle: 'Digital Marketing Manager',
-        companyName: 'Jobito Labs',
-        userName: 'Karim',
-        status: 'Applied',
-        updatedAt: DateTime(2026, 5, 2),
-      ),
-      RecruitmentApplication(
-        id: 'mock_app_3',
-        jobId: 'mock_company_job_3',
-        jobTitle: 'UI/UX Designer',
-        companyName: 'المارودي للمقاولات',
-        userName: 'Karim',
-        status: 'Waitlist',
-        updatedAt: DateTime(2026, 5, 1),
-      ),
-      RecruitmentApplication(
-        id: 'mock_app_4',
-        jobId: 'mock_company_job_4',
-        jobTitle: 'HR Generalist',
-        companyName: 'المارودي للمقاولات',
-        userName: 'Karim',
-        status: 'Rejected',
-        updatedAt: DateTime(2026, 4, 30),
-      ),
-      RecruitmentApplication(
-        id: 'mock_app_5',
-        jobId: 'tech_flutter_1',
-        jobTitle: 'Junior Flutter Developer',
-        companyName: 'إبداع للبرمجيات',
-        userName: 'Karim',
-        status: 'Applied',
-        updatedAt: DateTime(2026, 4, 28),
-      ),
-      RecruitmentApplication(
-        id: 'mock_app_6',
-        jobId: 'tech_ui_ux_1',
-        jobTitle: 'UI/UX Designer',
-        companyName: 'وكالة بيكسل الرقمية',
-        userName: 'Karim',
-        status: 'Applied',
-        updatedAt: DateTime(2026, 4, 28),
-      ),
-    ];
-
-    for (var mock in mocks) {
-      if (!_applications.any((a) => a.id == mock.id)) {
-        _applications.add(mock);
-      }
-    }
+    // Mock applications removed
   }
 
   void _seedTradesmanRatingsPreview() {
@@ -659,42 +568,46 @@ class RecruitmentSyncStore extends ChangeNotifier {
   }
 
   void replaceFromRemote({
-    required List<dynamic> jobs,
-    required List<dynamic> applications,
-    required List<dynamic> messages,
+    List<dynamic>? jobs,
+    List<dynamic>? applications,
+    List<dynamic>? messages,
   }) {
-    _jobs.clear();
-    for (final item in jobs) {
-      if (item is Map<String, dynamic>) {
-        final newJob = RecruitmentJob.fromMap(item);
-        _jobs.add(newJob);
+    if (jobs != null) {
+      _jobs.clear();
+      for (final item in jobs) {
+        if (item is Map<String, dynamic>) {
+          _jobs.add(RecruitmentJob.fromMap(item));
+        } else if (item is RecruitmentJob) {
+          _jobs.add(item);
+        }
       }
+      
+      final ids = <String>{};
+      _jobs.retainWhere((j) => ids.add(j.id));
     }
-    
-    // Always ensure mock jobs are present for the demo
-    _addInitialMockJobs();
-    
-    // Remove duplicates by ID (keeping the first one found, usually the remote one if it exists)
-    final ids = <String>{};
-    _jobs.retainWhere((j) => ids.add(j.id));
 
-    _applications.clear();
-    for (final item in applications) {
-      if (item is Map<String, dynamic>) {
-        _applications.add(RecruitmentApplication.fromMap(item));
+    if (applications != null) {
+      _applications.clear();
+      for (final item in applications) {
+        if (item is Map<String, dynamic>) {
+          _applications.add(RecruitmentApplication.fromMap(item));
+        } else if (item is RecruitmentApplication) {
+          _applications.add(item);
+        }
       }
+      
+      final appIds = <String>{};
+      _applications.retainWhere((a) => appIds.add(a.id));
     }
-    // Ensure mock applications are present for the demo
-    _addInitialMockApplications();
-    
-    // Remove duplicates by ID
-    final appIds = <String>{};
-    _applications.retainWhere((a) => appIds.add(a.id));
 
-    _messages.clear();
-    for (final item in messages) {
-      if (item is Map<String, dynamic>) {
-        _messages.add(RecruitmentMessage.fromMap(item));
+    if (messages != null) {
+      _messages.clear();
+      for (final item in messages) {
+        if (item is Map<String, dynamic>) {
+          _messages.add(RecruitmentMessage.fromMap(item));
+        } else if (item is RecruitmentMessage) {
+          _messages.add(item);
+        }
       }
     }
     notifyListeners();

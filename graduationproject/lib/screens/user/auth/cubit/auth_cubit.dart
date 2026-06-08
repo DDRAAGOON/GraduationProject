@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../shared/services/recruitment_sync_service.dart';
+
 part 'auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
@@ -10,11 +12,14 @@ class AuthCubit extends Cubit<AuthState> {
     emit(AuthLoading());
 
     try {
-      await Future.delayed(const Duration(seconds: 2)); // Simulate API call
+      await RecruitmentSyncService.instance.login(
+        email: email,
+        password: password,
+      );
 
       emit(AuthSuccess());
     } catch (e) {
-      emit(AuthError("Login failed"));
+      emit(AuthError("Login failed: $e"));
     }
   }
 }

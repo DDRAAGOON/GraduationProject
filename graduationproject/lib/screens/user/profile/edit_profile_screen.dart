@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:graduationproject/shared/l10n/app_localizations.dart';
 import 'package:graduationproject/shared/utils/image_helper.dart';
-import 'package:graduationproject/shared/services/recruitment_sync_service.dart';
+import 'package:graduationproject/shared/services/user_service.dart';
 import 'package:graduationproject/shared/state/recruitment_sync_store.dart';
 import 'package:graduationproject/shared/widgets/app_button.dart';
 import 'package:graduationproject/screens/user/profile/user_data.dart';
@@ -170,8 +170,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       gender: _selectedGender,
     );
 
-    RecruitmentSyncService.instance.updateProfile(
-      name: _fullNameController.text,
+    UserService.instance.updateProfile(
+      fullName: _fullNameController.text,
+      phone: _phoneController.text,
+      location: _locationController.text,
+      gender: _selectedGender,
+      bio: _aboutMeController.text,
     );
 
     ScaffoldMessenger.of(context).showSnackBar(

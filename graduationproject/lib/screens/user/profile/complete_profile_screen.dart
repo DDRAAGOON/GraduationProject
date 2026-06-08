@@ -7,7 +7,7 @@ import '../../../app/router/app_router.dart';
 import '../../../shared/state/recruitment_sync_store.dart';
 import '../../../shared/services/recruitment_sync_service.dart';
 import '../../../screens/user/profile/user_data.dart';
-
+import '../../../shared/services/user_service.dart';
 class CompleteProfileScreen extends StatefulWidget {
   const CompleteProfileScreen({super.key});
 
@@ -16,6 +16,7 @@ class CompleteProfileScreen extends StatefulWidget {
 }
 
 class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
+  bool _isSaving = false;
   String _selectedRole = "Job Seeker"; // "Job Seeker" or "Tradesman"
   
   final _fullName = TextEditingController();
@@ -730,7 +731,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         Expanded(
           flex: 2,
           child: ElevatedButton(
-            onPressed: () async {
+            onPressed: _isSaving ? null : () async {
               setState(() {
                 _fullNameError = _fullName.text.isEmpty ? t.required : null;
                 _phoneError = _phone.text.isEmpty ? t.required : null;
@@ -756,56 +757,92 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                 return;
               }
 
-              // Save data to Store
-              final store = RecruitmentSyncStore.instance;
-              
-              // Update Store
-              store.updateUserProfile(
-                fullName: _fullName.text,
-                title: _selectedRole == "Tradesman" ? (_selectedServices.isNotEmpty ? _selectedServices.join(", ") : "Tradesman") : "Job Seeker",
-                email: _email.text,
-                phone: _phone.text,
-                location: _selectedGovernorate ?? "",
-                about: _aboutMe.text,
-                skills: _skillsList,
-                education: _educationList,
-                experience: _experienceList,
-                socialLinks: _socialLinksList,
-                role: _selectedRole,
-                backgroundImage: _wallpaperImage?.path,
-                profileImage: _profileImage?.path,
-                portfolioImages: _workImages.map((e) => e.path).toList(),
-                birthDate: _dob.text,
-                gender: _selectedGender,
-                governorate: _selectedGovernorate ?? "",
-                tradesmanServices: _selectedServices,
-              );
+              setState(() => _isSaving = true);
 
-              // Sync with Service (optional depending on your backend state)
-              RecruitmentSyncService.instance.updateProfile(
-                name: _fullName.text,
-                photoUrl: _profileImage?.path,
-              );
+              try {
+                // Upload Images first if available
+                String? uploadedProfileUrl;
+                if (_profileImage != null) {
+                  uploadedProfileUrl = await UserService.instance.uploadImage(_profileImage!.path);
+                }
+                
+                String? uploadedBannerUrl;
+                if (_wallpaperImage != null) {
+                  // Not used in PUT /users/me according to the guide but maybe stored
+                }
 
-              // Save to static legacy data if needed
-              UserProfileData.dob = _dob.text;
-              UserProfileData.gender = _selectedGender;
+                String? uploadedCriminalUrl;
+                if (_criminalRecordFile != null) {
+                  uploadedCriminalUrl = await UserService.instance.uploadImage(_criminalRecordFile!.path);
+                }
 
-              if (_selectedRole == "Tradesman") {
-                Navigator.of(context).pushReplacementNamed(AppRoutes.tradesmanWorkspace);
-              } else {
-                Navigator.of(context).pushReplacementNamed(AppRoutes.userWorkspace);
+                // Call the API
+                await UserService.instance.updateProfile(
+                  fullName: _fullName.text.trim(),
+                  phone: _phone.text.trim(),
+                  bio: _aboutMe.text.trim(),
+                  classification: _selectedRole == "Tradesman" ? "tradesman" : "user",
+                  gender: _selectedGender.toLowerCase(),
+                  location: _selectedGovernorate,
+                  experience: _experienceList.length, // simple mapping for now
+                  services: _selectedRole == "Tradesman" ? _selectedServices : null,
+                  criminalRecordUrl: uploadedCriminalUrl,
+                  avatar: uploadedProfileUrl,
+                );
+
+                // Save data to Store
+                final store = RecruitmentSyncStore.instance;
+                store.updateUserProfile(
+                  fullName: _fullName.text,
+                  title: _selectedRole == "Tradesman" ? (_selectedServices.isNotEmpty ? _selectedServices.join(", ") : "Tradesman") : "Job Seeker",
+                  email: _email.text,
+                  phone: _phone.text,
+                  location: _selectedGovernorate ?? "",
+                  about: _aboutMe.text,
+                  skills: _skillsList,
+                  education: _educationList,
+                  experience: _experienceList,
+                  socialLinks: _socialLinksList,
+                  role: _selectedRole,
+                  backgroundImage: _wallpaperImage?.path,
+                  profileImage: _profileImage?.path,
+                  portfolioImages: _workImages.map((e) => e.path).toList(),
+                  birthDate: _dob.text,
+                  gender: _selectedGender,
+                  governorate: _selectedGovernorate ?? "",
+                  tradesmanServices: _selectedServices,
+                );
+
+                if (!mounted) return;
+                setState(() => _isSaving = false);
+
+                if (_selectedRole == "Tradesman") {
+                  Navigator.of(context).pushReplacementNamed(AppRoutes.tradesmanWorkspace);
+                } else {
+                  Navigator.of(context).pushReplacementNamed(AppRoutes.userWorkspace);
+                }
+              } catch (e) {
+                if (!mounted) return;
+                setState(() => _isSaving = false);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(e.toString().replaceAll('Exception: ', '')),
+                    backgroundColor: Colors.redAccent,
+                  ),
+                );
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF142C66),
+              backgroundColor: const Color(0xFF0051DD),
               padding: const EdgeInsets.symmetric(vertical: 14),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
             ),
-            child: Text(
-              t.tr(en: "Save Profile", ar: "حفظ الملف الشخصي"),
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-            ),
+            child: _isSaving 
+                ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                : Text(
+                    t.tr(en: "Save & Continue", ar: "حفظ ومتابعة"),
+                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
           ),
         ),
       ],

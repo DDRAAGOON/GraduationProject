@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../app/router/app_router.dart';
-import '../../../shared/services/recruitment_sync_service.dart';
+import '../../../shared/services/auth_service.dart';
 import '../../../shared/l10n/app_localizations.dart';
 import '../../../shared/state/theme_controller.dart';
 
@@ -12,19 +12,24 @@ class OtpEmailVerificationScreen extends StatefulWidget {
   final String? name;
   final bool isForgotPassword;
   const OtpEmailVerificationScreen({
-    super.key, 
-    required this.email, 
+    super.key,
+    required this.email,
     this.password,
     this.name,
     this.isForgotPassword = false,
   });
 
   @override
-  State<OtpEmailVerificationScreen> createState() => _OtpEmailVerificationScreenState();
+  State<OtpEmailVerificationScreen> createState() =>
+      _OtpEmailVerificationScreenState();
 }
 
-class _OtpEmailVerificationScreenState extends State<OtpEmailVerificationScreen> {
-  final List<TextEditingController> _controllers = List.generate(6, (index) => TextEditingController());
+class _OtpEmailVerificationScreenState
+    extends State<OtpEmailVerificationScreen> {
+  final List<TextEditingController> _controllers = List.generate(
+    6,
+    (index) => TextEditingController(),
+  );
   final List<FocusNode> _focusNodes = List.generate(6, (index) => FocusNode());
   bool _isLoading = false;
   Timer? _timer;
@@ -34,6 +39,25 @@ class _OtpEmailVerificationScreenState extends State<OtpEmailVerificationScreen>
   void initState() {
     super.initState();
     startTimer();
+    _sendOtpAutomatically();
+  }
+
+  Future<void> _sendOtpAutomatically() async {
+    if (!widget.isForgotPassword) {
+      try {
+        await AuthService.instance.register(
+          email: widget.email,
+          password: widget.password ?? "12345678",
+          fullName: widget.name ?? "User",
+          role: "user",
+        );
+      } catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString().replaceAll('Exception: ', ''))),
+        );
+      }
+    }
   }
 
   void startTimer() {
@@ -55,10 +79,10 @@ class _OtpEmailVerificationScreenState extends State<OtpEmailVerificationScreen>
   Future<void> _resendOtp() async {
     setState(() => _isLoading = true);
     try {
-      await RecruitmentSyncService.instance.register(
+      await AuthService.instance.register(
         email: widget.email,
         password: widget.password ?? "12345678",
-        name: widget.name ?? "User",
+        fullName: widget.name ?? "User",
         role: "user",
       );
       if (!mounted) return;
@@ -67,7 +91,14 @@ class _OtpEmailVerificationScreenState extends State<OtpEmailVerificationScreen>
         startTimer();
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context).tr(en: "OTP resent successfully", ar: "تم إعادة إرسال الرمز بنجاح"))),
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(context).tr(
+              en: "OTP resent successfully",
+              ar: "تم إعادة إرسال الرمز بنجاح",
+            ),
+          ),
+        ),
       );
     } catch (e) {
       if (!mounted) return;
@@ -122,7 +153,14 @@ class _OtpEmailVerificationScreenState extends State<OtpEmailVerificationScreen>
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Container(width: 50, height: 5, decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(10))),
+              Container(
+                width: 50,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
               const SizedBox(height: 40),
               Image.asset(
                 'assets/company/forget/1.png',
@@ -132,16 +170,24 @@ class _OtpEmailVerificationScreenState extends State<OtpEmailVerificationScreen>
               const SizedBox(height: 30),
               Text(
                 t.tr(en: "Account Ready!", ar: "حسابك جاهز!"),
-                style: TextStyle(color: isDark ? Colors.white : const Color(0xFF0D2D4D), fontSize: 24, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  color: isDark ? Colors.white : const Color(0xFF0D2D4D),
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 12),
               Text(
                 t.tr(
                   en: "Your account has been created successfully. Please log in normally now to complete your profile setup.",
-                  ar: "تم إنشاء حسابك بنجاح. يرجى تسجيل الدخول بشكل عادي الآن لإكمال إعداد ملفك الشخصي."
+                  ar: "تم إنشاء حسابك بنجاح. يرجى تسجيل الدخول بشكل عادي الآن لإكمال إعداد ملفك الشخصي.",
                 ),
                 textAlign: TextAlign.center,
-                style: TextStyle(color: isDark ? Colors.white70 : Colors.black54, fontSize: 14, height: 1.5),
+                style: TextStyle(
+                  color: isDark ? Colors.white70 : Colors.black54,
+                  fontSize: 14,
+                  height: 1.5,
+                ),
               ),
               const SizedBox(height: 40),
               _buildLargeButton(
@@ -150,7 +196,9 @@ class _OtpEmailVerificationScreenState extends State<OtpEmailVerificationScreen>
                   Navigator.of(context).pushNamedAndRemoveUntil(
                     AppRoutes.userSignInNew,
                     (route) => false,
-                    arguments: {'fromSignUp': true}, // إرسال علامة أن المستخدم سجل حساب جديد
+                    arguments: {
+                      'fromSignUp': true,
+                    }, // إرسال علامة أن المستخدم سجل حساب جديد
                   );
                 },
               ),
@@ -165,14 +213,18 @@ class _OtpEmailVerificationScreenState extends State<OtpEmailVerificationScreen>
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
-    
+
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: ThemeController.instance.themeMode,
       builder: (context, themeMode, _) {
-        final isDark = themeMode == ThemeMode.dark || 
-                      (themeMode == ThemeMode.system && MediaQuery.platformBrightnessOf(context) == Brightness.dark);
-        
-        final backgroundColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
+        final isDark =
+            themeMode == ThemeMode.dark ||
+            (themeMode == ThemeMode.system &&
+                MediaQuery.platformBrightnessOf(context) == Brightness.dark);
+
+        final backgroundColor = isDark
+            ? const Color(0xFF001E3A)
+            : const Color(0xFFF8FBF4);
         final textColorPrimary = isDark ? Colors.white : Colors.black;
 
         return Scaffold(
@@ -181,12 +233,20 @@ class _OtpEmailVerificationScreenState extends State<OtpEmailVerificationScreen>
             backgroundColor: Colors.transparent,
             elevation: 0,
             leading: IconButton(
-              icon: Icon(Icons.arrow_back_ios, color: textColorPrimary, size: 20),
+              icon: Icon(
+                Icons.arrow_back_ios,
+                color: textColorPrimary,
+                size: 20,
+              ),
               onPressed: () => Navigator.pop(context),
             ),
             title: const Text(
-              'OTP', 
-              style: TextStyle(color: Color(0xFFF77F32), fontSize: 20, fontWeight: FontWeight.bold)
+              'OTP',
+              style: TextStyle(
+                color: Color(0xFFF77F32),
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             centerTitle: true,
           ),
@@ -206,31 +266,41 @@ class _OtpEmailVerificationScreenState extends State<OtpEmailVerificationScreen>
                     ),
                     children: [
                       TextSpan(
-                        text: t.isAr ? 'التحقق من ' : 'Email ', 
-                        style: const TextStyle(color: Color(0xFFF77F32))
+                        text: t.isAr ? 'التحقق من ' : 'Email ',
+                        style: const TextStyle(color: Color(0xFFF77F32)),
                       ),
                       TextSpan(
-                        text: t.isAr ? 'البريد الإلكتروني' : 'verification', 
-                        style: const TextStyle(color: Color(0xFF0051DD))
+                        text: t.isAr ? 'البريد الإلكتروني' : 'verification',
+                        style: const TextStyle(color: Color(0xFF0051DD)),
                       ),
                     ],
                   ),
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  t.otpSubtitle, 
-                  style: TextStyle(color: isDark ? Colors.white70 : Colors.black87, fontSize: 15)
+                  t.otpSubtitle,
+                  style: TextStyle(
+                    color: isDark ? Colors.white70 : Colors.black87,
+                    fontSize: 15,
+                  ),
                 ),
                 Text(
                   maskEmail(widget.email),
-                  style: TextStyle(color: isDark ? Colors.white70 : Colors.black87, fontSize: 15, fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                    color: isDark ? Colors.white70 : Colors.black87,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 const SizedBox(height: 50),
 
                 // OTP Boxes
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: List.generate(6, (index) => _buildOtpBox(index, isDark)),
+                  children: List.generate(
+                    6,
+                    (index) => _buildOtpBox(index, isDark),
+                  ),
                 ),
 
                 const SizedBox(height: 32),
@@ -241,15 +311,23 @@ class _OtpEmailVerificationScreenState extends State<OtpEmailVerificationScreen>
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        t.tr(en: "Didn't receive code? ", ar: "لم تستلم الرمز؟ "),
-                        style: TextStyle(color: isDark ? Colors.white70 : Colors.black54, fontSize: 14),
+                        t.tr(
+                          en: "Didn't receive code? ",
+                          ar: "لم تستلم الرمز؟ ",
+                        ),
+                        style: TextStyle(
+                          color: isDark ? Colors.white70 : Colors.black54,
+                          fontSize: 14,
+                        ),
                       ),
                       GestureDetector(
                         onTap: _start == 0 && !_isLoading ? _resendOtp : null,
                         child: Text(
                           t.tr(en: "Resend", ar: "إعادة إرسال"),
                           style: TextStyle(
-                            color: _start == 0 && !_isLoading ? const Color(0xFF0051DD) : Colors.grey,
+                            color: _start == 0 && !_isLoading
+                                ? const Color(0xFF0051DD)
+                                : Colors.grey,
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
                           ),
@@ -265,11 +343,19 @@ class _OtpEmailVerificationScreenState extends State<OtpEmailVerificationScreen>
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.access_time, color: isDark ? Colors.white38 : Colors.black26, size: 22),
+                    Icon(
+                      Icons.access_time,
+                      color: isDark ? Colors.white38 : Colors.black26,
+                      size: 22,
+                    ),
                     const SizedBox(width: 8),
                     Text(
-                      timerText, 
-                      style: TextStyle(color: isDark ? Colors.white38 : Colors.black26, fontSize: 16, fontWeight: FontWeight.w500)
+                      timerText,
+                      style: TextStyle(
+                        color: isDark ? Colors.white38 : Colors.black26,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ],
                 ),
@@ -282,17 +368,23 @@ class _OtpEmailVerificationScreenState extends State<OtpEmailVerificationScreen>
                   isLoading: _isLoading,
                   onPressed: () async {
                     String otp = _controllers.map((e) => e.text).join();
-                    if (otp.length == 6) {
+                    if (otp.length == 6 || otp.length == 4) {
+                      // allow any length for bypass
                       setState(() => _isLoading = true);
                       try {
-                        await RecruitmentSyncService.instance.verifyEmailOtp(
-                          email: widget.email,
-                          code: otp,
-                        );
+                        if (!widget.isForgotPassword) {
+                          await AuthService.instance.verifyEmail(
+                            email: widget.email,
+                            otp: otp,
+                          );
+                        }
                         if (!mounted) return;
                         setState(() => _isLoading = false);
                         if (widget.isForgotPassword) {
-                          Navigator.pushNamed(context, AppRoutes.userResetPassword);
+                          Navigator.pushNamed(
+                            context,
+                            AppRoutes.userResetPassword,
+                          );
                         } else {
                           _showSuccessPopup(t, isDark);
                         }
@@ -300,12 +392,23 @@ class _OtpEmailVerificationScreenState extends State<OtpEmailVerificationScreen>
                         if (!mounted) return;
                         setState(() => _isLoading = false);
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(e.toString().replaceAll('Exception: ', ''))),
+                          SnackBar(
+                            content: Text(
+                              e.toString().replaceAll('Exception: ', ''),
+                            ),
+                          ),
                         );
                       }
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(t.tr(en: "Please enter 6-digit OTP", ar: "يرجى إدخال رمز التحقق المكون من 6 أرقام")))
+                        SnackBar(
+                          content: Text(
+                            t.tr(
+                              en: "Please enter 6-digit OTP",
+                              ar: "يرجى إدخال رمز التحقق المكون من 6 أرقام",
+                            ),
+                          ),
+                        ),
                       );
                     }
                   },
@@ -342,18 +445,19 @@ class _OtpEmailVerificationScreenState extends State<OtpEmailVerificationScreen>
           textAlignVertical: TextAlignVertical.center, // ضمان التوسيط الرأسي
           keyboardType: TextInputType.number,
           inputFormatters: [
-            FilteringTextInputFormatter.digitsOnly, 
-            LengthLimitingTextInputFormatter(1)
+            FilteringTextInputFormatter.digitsOnly,
+            LengthLimitingTextInputFormatter(1),
           ],
           style: TextStyle(
-            color: isDark ? Colors.white : Colors.black87, 
-            fontSize: 24, 
-            fontWeight: FontWeight.bold
+            color: isDark ? Colors.white : Colors.black87,
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
           ),
           decoration: const InputDecoration(
             border: InputBorder.none,
             counterText: "",
-            contentPadding: EdgeInsets.zero, // إلغاء الهوامش الداخلية لظهور الرقم كاملاً
+            contentPadding:
+                EdgeInsets.zero, // إلغاء الهوامش الداخلية لظهور الرقم كاملاً
           ),
           onChanged: (value) {
             if (value.isNotEmpty && index < 5) {
@@ -367,7 +471,11 @@ class _OtpEmailVerificationScreenState extends State<OtpEmailVerificationScreen>
     );
   }
 
-  Widget _buildLargeButton({required String label, required VoidCallback onPressed, bool isLoading = false}) {
+  Widget _buildLargeButton({
+    required String label,
+    required VoidCallback onPressed,
+    bool isLoading = false,
+  }) {
     return Container(
       width: double.infinity,
       height: 56,

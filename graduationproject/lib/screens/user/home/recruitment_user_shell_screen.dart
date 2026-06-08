@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../app/router/app_router.dart';
 import '../../../shared/services/recruitment_sync_service.dart';
+import '../../../shared/services/user_service.dart';
+import '../../../shared/services/auth_service.dart';
+import '../../../shared/services/job_service.dart';
+import '../../../shared/services/application_service.dart';
 import '../../../shared/state/recruitment_sync_store.dart';
 import '../messages/messages_list_screen.dart';
 import '../messages/chat_thread_screen.dart';
@@ -39,6 +43,9 @@ class _RecruitmentUserShellScreenState
   void initState() {
     super.initState();
     RecruitmentSyncService.instance.startPolling();
+    UserService.instance.getCurrentUser().catchError((_) {});
+    JobService.instance.getJobs().catchError((_) {});
+    ApplicationService.instance.getMyApplications().catchError((_) {});
   }
 
   void _onTabChange(int index) {
@@ -279,7 +286,7 @@ class _RecruitmentUserShellScreenState
           TextButton(
             onPressed: () async {
               Navigator.pop(context);
-              RecruitmentSyncService.instance.logout();
+              await AuthService.instance.logout();
               Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.userSignInNew, (route) => false);
             },
             child: Text(isAr ? 'تسجيل الخروج' : 'Logout', style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),

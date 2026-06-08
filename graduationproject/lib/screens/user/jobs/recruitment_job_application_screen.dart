@@ -5,6 +5,7 @@ import '../../../shared/services/recruitment_sync_service.dart';
 import '../../../shared/state/recruitment_sync_store.dart';
 import '../../../shared/utils/job_category_helper.dart';
 import '../../../shared/widgets/app_button.dart';
+import '../../../shared/services/application_service.dart';
 
 class RecruitmentJobApplicationScreen extends StatefulWidget {
   const RecruitmentJobApplicationScreen({super.key, required this.job});
@@ -84,9 +85,10 @@ class _RecruitmentJobApplicationScreenState
 
       setState(() => _loading = true);
       try {
-        await RecruitmentSyncService.instance.applyToJob(
+        await ApplicationService.instance.applyToJob(
           jobId: widget.job.id,
-          userName: store.currentUserName,
+          address: address,
+          coverLetter: _problemDescription.text.trim(),
         );
         store.applyToJob(
           widget.job,
@@ -103,7 +105,7 @@ class _RecruitmentJobApplicationScreenState
           ),
         );
         Navigator.of(context).pop();
-      } catch (_) {
+      } catch (e) {
         store.applyToJob(
           widget.job,
           about: _problemDescription.text.trim(),
@@ -114,7 +116,7 @@ class _RecruitmentJobApplicationScreenState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              isAr ? 'تم حفظ طلبك محلياً.' : 'Your request was saved locally.',
+              isAr ? 'خطأ من السيرفر: $e. تم الحفظ محلياً.' : 'Server Error: $e. Saved locally.',
             ),
           ),
         );
@@ -138,9 +140,11 @@ class _RecruitmentJobApplicationScreenState
 
     setState(() => _loading = true);
     try {
-      await RecruitmentSyncService.instance.applyToJob(
+      await ApplicationService.instance.applyToJob(
         jobId: widget.job.id,
-        userName: store.currentUserName,
+        coverLetter: _cover.text.trim(),
+        portfolioUrl: _portfolio.text.trim().isNotEmpty ? _portfolio.text.trim() : null,
+        resumeUrl: _selectedCVName != null ? 'https://example.com/cv/$_selectedCVName' : null,
       );
       store.applyToJob(widget.job, hasCv: true);
       if (!mounted) return;
@@ -153,14 +157,14 @@ class _RecruitmentJobApplicationScreenState
         ),
       );
       Navigator.of(context).pop();
-    } catch (_) {
+    } catch (e) {
       store.applyToJob(widget.job, hasCv: true);
       if (!mounted) return;
       setState(() => _loading = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            isAr ? 'تم حفظ طلبك محلياً.' : 'Your application was saved locally.',
+            isAr ? 'خطأ من السيرفر: $e. تم الحفظ محلياً.' : 'Server Error: $e. Saved locally.',
           ),
         ),
       );

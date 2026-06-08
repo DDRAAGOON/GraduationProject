@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../shared/state/recruitment_sync_store.dart';
+import '../../../shared/services/job_service.dart';
 
 class RecruitmentApplicationTimelineScreen extends StatefulWidget {
   const RecruitmentApplicationTimelineScreen({
@@ -528,7 +529,7 @@ class _RecruitmentApplicationTimelineScreenState
               child: Text(isAr ? 'إلغاء' : 'Cancel'),
             ),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 if (localRating == 0) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text(isAr ? 'يرجى اختيار التقييم أولاً' : 'Please select a rating')),
@@ -536,9 +537,21 @@ class _RecruitmentApplicationTimelineScreenState
                   return;
                 }
                 Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(isAr ? 'شكراً لتقييمك!' : 'Thank you for your feedback!'), backgroundColor: Colors.green),
-                );
+
+                try {
+                  await JobService.instance.submitRating(
+                    ratingValue: localRating,
+                    comment: controller.text.trim(),
+                    jobId: int.tryParse(app.jobId),
+                  );
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(isAr ? 'شكراً لتقييمك!' : 'Thank you for your feedback!'), backgroundColor: Colors.green),
+                  );
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('حدث خطأ أثناء التقييم: $e'), backgroundColor: Colors.red),
+                  );
+                }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF142C66),

@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 
 import '../../data/api/company_api_client.dart';
+import '../../data/api/api_client.dart';
 import '../state/company_store.dart';
 import '../state/recruitment_sync_store.dart';
 import 'session_manager.dart';
@@ -37,13 +38,33 @@ class RecruitmentSyncService {
       }
       
       _client.setToken(token);
+      await ApiClient.saveToken(token);
 
       if (user != null) {
-        final String name = user['name']?.toString() ?? 'User';
-        RecruitmentSyncStore.instance.updateCurrentUser(
-          name: name,
-          email: user['email']?.toString(),
-          photoUrl: user['photoUrl']?.toString(),
+        final String name = user['fullName']?.toString() ?? user['name']?.toString() ?? 'User';
+        final email = user['email']?.toString() ?? '';
+        final photoUrl = ApiClient.resolveImageUrl(user['avatar']?.toString() ?? user['photoUrl']?.toString());
+        final bioStr = user['bio']?.toString();
+        final locationStr = user['location']?.toString();
+        final phoneStr = user['phone']?.toString();
+        final roleStr = user['role']?.toString();
+        final titleStr = user['classification']?.toString() ?? user['title']?.toString() ?? '';
+        
+        List<String>? tradesmanServices;
+        if (user['services'] is List) {
+          tradesmanServices = (user['services'] as List).map((e) => e.toString()).toList();
+        }
+        
+        RecruitmentSyncStore.instance.updateUserProfile(
+          fullName: name,
+          title: titleStr,
+          email: email,
+          phone: phoneStr,
+          location: locationStr,
+          about: bioStr,
+          role: roleStr,
+          tradesmanServices: tradesmanServices,
+          profileImage: photoUrl,
         );
 
         if (role == 'company') {

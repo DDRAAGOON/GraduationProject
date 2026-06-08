@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../app/router/app_router.dart';
 import '../../../shared/utils/image_helper.dart';
 import '../../../shared/state/recruitment_sync_store.dart';
+import '../../../shared/services/job_service.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/l10n/app_localizations.dart';
 import '../home/tabs/recruitment_ui_utils.dart';
@@ -143,8 +144,9 @@ class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScree
     );
   }
 
-  void _addComment() {
+  Future<void> _addComment() async {
     if (_commentController.text.trim().isNotEmpty && _userRating > 0) {
+      // Optimistic UI update
       setState(() {
         _mockReviews.insert(0, {
           'userName': RecruitmentSyncStore.instance.currentUserName,
@@ -152,10 +154,24 @@ class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScree
           'comment': _commentController.text.trim(),
           'date': 'الآن',
         });
+      });
+
+      try {
+        await JobService.instance.submitRating(
+          ratingValue: _userRating,
+          comment: _commentController.text.trim(),
+          jobId: int.tryParse(widget.job.id), // Ensure it matches backend type
+        );
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم إضافة تقييمك بنجاح!'), backgroundColor: Colors.green));
+      } catch (e) {
+        // Handle failure silently or show error
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('حدث خطأ أثناء إرسال التقييم: $e'), backgroundColor: Colors.red));
+      }
+
+      setState(() {
         _commentController.clear();
         _userRating = 0;
       });
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم إضافة تقييمك بنجاح!'), backgroundColor: Colors.green));
     }
   }
 

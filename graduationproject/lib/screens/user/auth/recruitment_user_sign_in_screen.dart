@@ -5,7 +5,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../../app/router/app_router.dart';
 import '../../../shared/services/session_manager.dart';
-import '../../../shared/services/recruitment_sync_service.dart';
+import '../../../shared/services/auth_service.dart';
 import 'sign_up_screen/email_password_sign_up_screen.dart';
 import '../../../shared/l10n/app_localizations.dart';
 import '../../../shared/state/theme_controller.dart';
@@ -48,41 +48,29 @@ class _RecruitmentUserSignInScreenState
     if (_emailError != null || _passError != null) return;
     setState(() => _loading = true);
 
-    // Bypass login for UI testing
-    await Future.delayed(const Duration(seconds: 1));
-    if (!mounted) return;
-    setState(() => _loading = false);
-
-    // التحقق هل المستخدم قادم من عملية إنشاء حساب جديد أم لا
-    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-    final bool isNewUser = args?['fromSignUp'] ?? false;
-
-    if (isNewUser) {
-      Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.userCompleteProfile, (route) => false);
-    } else {
-      Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.userWorkspace, (route) => false);
-    }
-    return;
-
     try {
-      final user = await RecruitmentSyncService.instance.login(
+      final user = await AuthService.instance.login(
         email: _email.text.trim(),
         password: _password.text,
-        expectedRole: 'user',
       );
 
-      final name = user['name']?.toString() ?? 'User';
-
-      await SessionManager.saveUserSession(
-        email: _email.text.trim(),
-        name: name,
-      );
+      final role = user['role']?.toString().toLowerCase() ?? 'user';
 
       if (!mounted) return;
       setState(() => _loading = false);
-      Navigator.of(
-        context,
-      ).pushNamedAndRemoveUntil(AppRoutes.userCompleteProfile, (route) => false);
+
+      final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+      final bool isNewUser = args?['fromSignUp'] ?? false;
+
+      if (isNewUser) {
+        Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.userCompleteProfile, (route) => false);
+      } else {
+        if (role == 'tradesman') {
+          Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.tradesmanWorkspace, (route) => false);
+        } else {
+          Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.userWorkspace, (route) => false);
+        }
+      }
     } catch (e) {
       if (!mounted) return;
       setState(() => _loading = false);
@@ -91,27 +79,9 @@ class _RecruitmentUserSignInScreenState
           : 'Invalid email or password.';
 
       if (e is DioException) {
-        if (e.type == DioExceptionType.connectionTimeout ||
-            e.type == DioExceptionType.receiveTimeout) {
-          msg = t.isAr
-              ? 'فشل الاتصال بالخادم، تحقق من الإنترنت'
-              : 'Connection timeout. Check your internet.';
-        } else if (e.response?.statusCode == 401 ||
-            e.response?.statusCode == 403) {
-          msg = t.isAr
-              ? 'البريد الإلكتروني أو كلمة المرور غير صحيحة'
-              : 'Invalid email or password.';
-        } else {
-          msg = t.isAr
-              ? 'حدث خطأ في الاتصال بالخادم'
-              : 'Server connection error.';
-        }
+        msg = t.isAr ? 'فشل الاتصال بالخادم' : 'Server connection error.';
       } else {
-        msg =
-            e.toString().contains('حساب مخصص') ||
-                e.toString().contains('company accounts')
-            ? e.toString().replaceAll('Exception: ', '')
-            : msg;
+        msg = e.toString().replaceAll('Exception: ', '').replaceAll('ApiException', 'Error');
       }
 
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
@@ -121,33 +91,30 @@ class _RecruitmentUserSignInScreenState
   Future<void> _handleGoogleSignIn() async {
     setState(() => _loading = true);
     try {
-      final GoogleSignInAccount? googleUser = await _googleSignInInstance
-          .signIn();
+      final GoogleSignInAccount? googleUser = await _googleSignInInstance.signIn();
       if (googleUser == null) {
         setState(() => _loading = false);
         return;
       }
 
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
       final String? idToken = googleAuth.idToken;
 
       if (idToken == null) {
         throw Exception('Failed to get Google ID Token');
       }
 
-      await RecruitmentSyncService.instance.googleLogin(idToken);
-
-      final name = googleUser.displayName ?? googleUser.email.split('@').first;
-
-      await SessionManager.saveUserSession(email: googleUser.email, name: name);
+      final user = await AuthService.instance.googleLogin(idToken);
+      final role = user['role']?.toString().toLowerCase() ?? 'user';
 
       if (!mounted) return;
-
       setState(() => _loading = false);
-      Navigator.of(
-        context,
-      ).pushNamedAndRemoveUntil(AppRoutes.userCompleteProfile, (route) => false);
+
+      if (role == 'tradesman') {
+        Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.tradesmanWorkspace, (route) => false);
+      } else {
+        Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.userWorkspace, (route) => false);
+      }
     } catch (e) {
       if (!mounted) return;
       setState(() => _loading = false);
