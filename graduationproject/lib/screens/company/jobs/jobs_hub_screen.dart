@@ -85,20 +85,24 @@ class _CompanyJobsHubScreenState extends State<CompanyJobsHubScreen> {
 
           // ✅ فلترة صحيحة باستخدام companyId
           final companyJobs = allJobs.where((j) {
-            // ✅ التحقق من companyId أولاً
-            if (j.companyId.isNotEmpty && companyStore.companyId.isNotEmpty) {
-              return j.companyId == companyStore.companyId;
-            }
-
-            // ✅ ثم التحقق من اسم الشركة
-            if (j.companyName.isNotEmpty && companyStore.companyName.isNotEmpty) {
+            // ✅ الأولوية لـ companyName
+            if (companyStore.companyName.isNotEmpty && j.companyName.isNotEmpty) {
               return j.companyName.trim().toLowerCase() ==
                   companyStore.companyName.trim().toLowerCase();
+            }
+
+            // ✅ fallback لـ companyId لو موجود
+            if (companyStore.companyId.isNotEmpty && j.companyId.isNotEmpty) {
+              return j.companyId == companyStore.companyId;
             }
 
             return false;
           }).toList();
 
+          if (kDebugMode) {
+            debugPrint('✅ Filtered jobs: ${companyJobs.length} (from ${allJobs.length})');
+            debugPrint('🏢 Filtering by: ${companyStore.companyName}');
+          }
           // ✅ عرض وظائف الشركة فقط (بدون mock)
           final displayJobs = companyJobs;
 

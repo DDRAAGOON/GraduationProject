@@ -47,9 +47,19 @@ class ChatService {
   Future<List<dynamic>> getMyChats(String userId) async {
     try {
       final response = await _apiClient.get(ApiConstants.myChats(userId));
-      return response.data['data'] ?? response.data;
+      final data = response.data;
+
+      // ✅ التحقق من نوع البيانات قبل المعالجة
+      if (data is Map && data['data'] is List) {
+        return data['data'] as List;
+      } else if (data is List) {
+        return data;
+      }
+
+      return [];
     } catch (e) {
-      throw ErrorHandler.handle(e);
+      if (kDebugMode) debugPrint('⚠️ Error fetching chats: $e');
+      return [];
     }
   }
 

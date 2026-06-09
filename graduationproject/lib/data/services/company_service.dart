@@ -48,4 +48,17 @@ class CompanyService {
       throw ErrorHandler.handle(e);
     }
   }
+
+  /// Updates the authenticated company's own profile via PATCH /api/companies/my/profile
+  Future<Company> updateMyCompanyProfile(Map<String, dynamic> data) async {
+    try {
+      final response = await _apiClient.patch(
+        ApiConstants.myCompanyProfile,
+        data: data,
+      );
+      return Company.fromJson(response.data);
+    } catch (e) {
+      throw ErrorHandler.handle(e);
+    }
+  }
 }

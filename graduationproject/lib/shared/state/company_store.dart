@@ -1,7 +1,11 @@
 // [ChangeNotifier] holding company profile, jobs, and contacts.
 
-import 'package:flutter/foundation.dart';
+import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
+import 'package:graduationproject/shared/state/recruitment_sync_store.dart';
+
+import '../../core/network/secure_storage.dart';
 import '../models/contact_entry.dart';
 import '../models/job.dart';
 import '../services/session_manager.dart';
@@ -47,13 +51,13 @@ class CompanyStore extends ChangeNotifier {
   String get website => _website;
   String get employee => _employee;
   String get industry => _industry;
-  
+
   /// Returns an unmodifiable list of locations to prevent accidental mutations.
   List<String> get locations => List.unmodifiable(_locations);
-  
+
   /// Returns an unmodifiable list of the underlying technology stack.
   List<String> get techStack => List.unmodifiable(_techStack);
-  
+
   int get foundedDay => _foundedDay;
   int get foundedMonth => _foundedMonth;
   int get foundedYear => _foundedYear;
@@ -73,9 +77,6 @@ class CompanyStore extends ChangeNotifier {
   String get companyAboutAr => _aboutAr;
 
   /// Updates the localized company introduction and notifies UI listeners.
-  /// 
-  /// [english] The introduction text in English.
-  /// [arabic] The introduction text in Arabic.
   void setCompanyIntro({required String english, required String arabic}) {
     _aboutEn = english;
     _aboutAr = arabic;
@@ -90,20 +91,27 @@ class CompanyStore extends ChangeNotifier {
     String? nationalNumber,
     String? email,
   }) {
-    if (companyId != null) _companyId = companyId;
+    if (companyId != null && companyId.isNotEmpty) _companyId = companyId;
     if (companyName != null && companyName.isNotEmpty) _companyName = companyName;
     if (customProfileImage != null) _customProfileImage = customProfileImage;
     if (commercialRegister != null) _commercialRegister = commercialRegister;
     if (nationalNumber != null) _nationalNumber = nationalNumber;
-    
+
     if (email != null && email.isNotEmpty) {
       final existingEmailIndex = _contacts.indexWhere((c) => c.name.toLowerCase() == 'email' || c.name == 'البريد الإلكتروني');
       if (existingEmailIndex >= 0) {
-         _contacts[existingEmailIndex] = _contacts[existingEmailIndex].copyWith(value: email);
+        _contacts[existingEmailIndex] = _contacts[existingEmailIndex].copyWith(value: email);
       } else {
-         _contacts.add(ContactEntry(name: 'Email', value: email));
+        _contacts.add(ContactEntry(name: 'Email', value: email));
       }
     }
+
+    if (kDebugMode) {
+      debugPrint('✅ CompanyStore.setRegistrationData:');
+      debugPrint('   - companyId: $_companyId');
+      debugPrint('   - companyName: $_companyName');
+    }
+
     notifyListeners();
   }
 
@@ -145,14 +153,65 @@ class CompanyStore extends ChangeNotifier {
 
   Future<void> initFromSession() async {
     final data = await SessionManager.getCompanyData();
+
+    // ✅ محاولة جلب companyId من JWT token
+    if (data['companyId'] == null || data['companyId'].toString().isEmpty) {
+      try {
+        final token = await SecureStorage.getToken();
+        if (token != null && token.isNotEmpty) {
+          final parts = token.split('.');
+          if (parts.length == 3) {
+            final payload = parts[1];
+            final normalized = base64Url.normalize(payload);
+            final decoded = utf8.decode(base64Url.decode(normalized));
+            final json = jsonDecode(decoded) as Map<String, dynamic>;
+
+            // ✅ استخدام userId كـ companyId
+            _companyId = json['sub']?.toString() ?? '';
+
+            if (kDebugMode) {
+              debugPrint('✅ Extracted companyId from JWT: $_companyId');
+            }
+          }
+        }
+      } catch (e) {
+        if (kDebugMode) {
+          debugPrint('⚠️ Could not extract companyId from JWT: $e');
+        }
+      }
+    } else {
+      _companyId = data['companyId'].toString();
+    }
+
     if (data['name'] != null) _companyName = data['name']!;
     if (data['photo'] != null) _customProfileImage = data['photo']!;
-    
+
     final full = await SessionManager.getCompanyFullProfile();
     await loadFromSession(full);
+
+    if (kDebugMode) {
+      debugPrint('📦 CompanyStore.initFromSession:');
+      debugPrint('   - companyId: $_companyId');
+      debugPrint('   - companyName: $_companyName');
+    }
   }
 
   Future<void> loadFromSession(Map<String, dynamic> data) async {
+    // ✅ تحميل companyId من data
+    if (data['companyId'] != null) {
+      _companyId = data['companyId'].toString();
+      if (kDebugMode) debugPrint('✅ Loaded companyId from session: $_companyId');
+    }
+
+    // ✅ لو companyId فاضي، نجيبه من الـ jobs
+    if (_companyId.isEmpty) {
+      final jobs = RecruitmentSyncStore.instance.jobs;
+      if (jobs.isNotEmpty) {
+        _companyId = jobs.first.companyId;
+        if (kDebugMode) debugPrint('✅ Extracted companyId from jobs: $_companyId');
+      }
+    }
+
     _employee = data['employee'] as String? ?? '';
     _industry = data['industry'] as String? ?? '';
     _aboutEn = data['aboutEn'] as String? ?? '';
@@ -170,10 +229,10 @@ class CompanyStore extends ChangeNotifier {
   }
 
   // --- Associated Entities: Jobs & Contacts ---
-  
+
   /// Holds the list of dynamically managed jobs for the company.
   final List<Job> _jobs = [];
-  
+
   /// Holds contact details like social links and emails.
   final List<ContactEntry> _contacts = [];
 
@@ -192,15 +251,6 @@ class CompanyStore extends ChangeNotifier {
       _jobs[index] = job;
     } else {
       _jobs.insert(0, job);
-      // Generate mock applicants for the new job to demonstrate the pipeline
-      // Mock generation disabled to keep stats clean for backend
-      /*
-      RecruitmentSyncStore.instance.generateMockApplicants(
-        job.id,
-        job.title,
-        job.companyName,
-      );
-      */
     }
     notifyListeners();
   }
@@ -212,7 +262,6 @@ class CompanyStore extends ChangeNotifier {
   }
 
   /// Deletes a job from the current list using its unique ID.
-  /// Returns `true` if the deletion triggered an item removal and UI update.
   bool deleteJob(String id) {
     final before = _jobs.length;
     _jobs.removeWhere((job) => job.id == id);

@@ -2,6 +2,34 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+// ✅ Top-level helper functions
+String _formatSalary(Map<String, dynamic> map) {
+  final min = map['salaryMin'];
+  final max = map['salaryMax'];
+  final salary = map['salary'];
+
+  if (salary != null) return salary.toString();
+  if (min != null && max != null) return '$min - $max';
+  if (min != null) return 'من $min';
+  if (max != null) return 'حتى $max';
+  return 'غير محدد';
+}
+
+String _formatJobType(dynamic jobType) {
+  if (jobType is List && jobType.isNotEmpty) {
+    return jobType.join(', ');
+  }
+  return jobType?.toString() ?? 'Full-Time';
+}
+
+List<String> _extractList(dynamic data) {
+  if (data == null) return [];
+  if (data is List) {
+    return data.map((e) => e.toString()).toList();
+  }
+  return [data.toString()];
+}
+
 class RecruitmentJob {
   const RecruitmentJob({
     required this.id,
@@ -53,115 +81,45 @@ class RecruitmentJob {
   final String? specialTag;
   final String? userId;
 
-  static List<String> _parseList(dynamic data) {
-    if (data == null) return [];
-    if (data is List) {
-      return data.map((e) => e.toString()).toList();
-    }
-    return [data.toString()];
-  }
-
   factory RecruitmentJob.fromMap(Map<String, dynamic> map) {
-    // ✅ استخراج بيانات الشركة من company object
-    final companyData = map['company'] as Map<String, dynamic>? ?? {};
-
-    // ✅ معالجة الراتب
-    String parsedSalaryRange = 'غير محدد';
-    if (map['salaryMin'] != null || map['salaryMax'] != null) {
-      final min = map['salaryMin']?.toString() ?? '';
-      final max = map['salaryMax']?.toString() ?? '';
-      if (min.isNotEmpty && max.isNotEmpty) {
-        parsedSalaryRange = '$min - $max';
-      } else if (min.isNotEmpty) {
-        parsedSalaryRange = 'من $min';
-      } else if (max.isNotEmpty) {
-        parsedSalaryRange = 'حتى $max';
-      }
-    } else if (map['salary'] != null) {
-      parsedSalaryRange = map['salary'].toString();
-    } else if (map['salaryRange'] != null) {
-      if (map['salaryRange'] is List) {
-        parsedSalaryRange = (map['salaryRange'] as List).join(' - ');
-      } else {
-        parsedSalaryRange = map['salaryRange'].toString();
-      }
-    }
-
-    // ✅ معالجة نوع الوظيفة
-    String parsedType = 'Full-Time';
-    if (map['jobType'] != null) {
-      if (map['jobType'] is List && (map['jobType'] as List).isNotEmpty) {
-        parsedType = (map['jobType'] as List).join(' • ');
-      } else {
-        parsedType = map['jobType'].toString();
-      }
-    } else if (map['type'] != null) {
-      if (map['type'] is List) {
-        parsedType = (map['type'] as List).join(' • ');
-      } else {
-        parsedType = map['type'].toString();
-      }
-    }
-
-    // ✅ معالجة الحالة
-    String parsedStatus = 'Open';
-    if (map['isActive'] == true) {
-      parsedStatus = 'Open';
-    } else if (map['isActive'] == false) {
-      parsedStatus = 'Closed';
-    } else if (map['status'] != null) {
-      parsedStatus = map['status'].toString();
-    }
+    // ✅ التحقق من company أو user object
+    final companyData = map['company'] is Map ? map['company'] as Map : null;
+    final userData = map['user'] is Map ? map['user'] as Map : null;
 
     return RecruitmentJob(
-      // ✅ jobId أو id
       id: map['jobId']?.toString() ?? map['id']?.toString() ?? '',
+
+      // ✅ استخدام company أو user
+      companyId: companyData?['companyId']?.toString() ??
+          userData?['userId']?.toString() ?? '',
 
       title: map['title']?.toString() ?? '',
 
-      // ✅ companyId من company object
-      companyId: companyData['companyId']?.toString() ??
-          map['companyId']?.toString() ?? '',
+      companyName: companyData?['name']?.toString() ??
+          userData?['fullName']?.toString() ?? '',
 
-      // ✅ companyName من company object
-      companyName: companyData['name']?.toString() ??
-          map['companyName']?.toString() ?? '',
+      location: map['address']?.toString() ?? map['location']?.toString() ?? '',
 
-      // ✅ location من address
-      location: map['address']?.toString() ??
-          map['location']?.toString() ?? '',
+      salaryRange: _formatSalary(map),
+      type: _formatJobType(map['jobType']),
+      description: map['description']?.toString() ?? '',
 
-      salaryRange: parsedSalaryRange,
-      type: parsedType,
-      status: parsedStatus,
+      responsibilities: _extractList(map['responsibilities']),
+      qualifications: _extractList(map['qualifications']),
+      niceToHaves: _extractList(map['niceToHaves']),
+      benefits: _extractList(map['benefits']),
 
-      category: map['categoryId']?.toString() ??
-          map['category']?.toString() ??
-          map['classification']?.toString() ?? '',
+      category: map['category']?.toString() ?? map['classification']?.toString() ?? 'General',
+      tags: _extractList(map['skills'] ?? map['tags']),
 
-      tags: _parseList(map['skills'] ?? map['tags']),
+      capacity: map['slotsAvailable'] ?? 1,
+      acceptedCount: map['acceptedCount'] ?? 0,
+
+      status: (map['isActive'] == true || map['isActive'] == 'true') ? 'Open' : 'Closed',
 
       publishedAt: map['createdAt'] != null
-          ? DateTime.tryParse(map['createdAt'].toString()) ?? DateTime.now()
-          : (map['publishedAt'] != null
-          ? DateTime.tryParse(map['publishedAt'].toString()) ?? DateTime.now()
-          : DateTime.now()),
-
-      description: map['description']?.toString() ?? '',
-      responsibilities: _parseList(map['responsibilities']),
-      qualifications: _parseList(map['qualifications']),
-      niceToHaves: _parseList(map['niceToHaves']),
-      benefits: _parseList(map['benefits']),
-
-      acceptedCount: int.tryParse(map['acceptedCount']?.toString() ?? '0') ?? 0,
-      capacity: map['slotsAvailable'] ??
-          int.tryParse(map['requiredCount']?.toString() ?? '1') ?? 1,
-
-      companyLogoUrl: companyData['logoUrl']?.toString() ??
-          map['companyLogoUrl']?.toString(),
-
-      userId: map['user']?['userId']?.toString() ??
-          map['userId']?.toString(),
+          ? DateTime.tryParse(map['createdAt']) ?? DateTime.now()
+          : DateTime.now(),
     );
   }
 }
@@ -231,19 +189,56 @@ class RecruitmentApplication {
   }
 
   factory RecruitmentApplication.fromMap(Map<String, dynamic> map) {
+    // ✅ استخراج البيانات من user object
+    final userData = map['user'] is Map ? map['user'] as Map : {};
+
+    // ✅ استخراج البيانات من job object
+    final jobData = map['job'] is Map ? map['job'] as Map : {};
+    final jobCompanyData = jobData['company'] is Map ? jobData['company'] as Map : {};
+
     return RecruitmentApplication(
-      id: map['id']?.toString() ?? '',
-      jobId: map['jobId']?.toString() ?? '',
-      jobTitle: map['jobTitle']?.toString() ?? '',
-      companyName: map['companyName']?.toString() ?? '',
-      userName: map['userName']?.toString() ?? '',
+      // ✅ استخدام applicationId بدلاً من id
+      id: map['applicationId']?.toString() ?? map['id']?.toString() ?? '',
+
+      // ✅ استخدام jobId من الـ map أو من job object
+      jobId: map['jobId']?.toString() ?? jobData['jobId']?.toString() ?? jobData['id']?.toString() ?? '',
+
+      // ✅ استخراج jobTitle من job object
+      jobTitle: jobData['title']?.toString() ?? map['jobTitle']?.toString() ?? '',
+
+      // ✅ استخراج companyName من job.company object
+      companyName: jobCompanyData['name']?.toString() ??
+          jobCompanyData['companyName']?.toString() ??
+          map['companyName']?.toString() ?? '',
+
+      // ✅ استخراج userName من user object
+      userName: userData['fullName']?.toString() ??
+          '${userData['firstName'] ?? ''} ${userData['lastName'] ?? ''}'.trim() ??
+          map['userName']?.toString() ?? 'Unknown',
+
       status: map['status']?.toString() ?? 'Pending',
+
       updatedAt: map['updatedAt'] != null
           ? DateTime.tryParse(map['updatedAt'].toString()) ?? DateTime.now()
           : DateTime.now(),
-      email: map['email']?.toString(),
-      phone: map['phone']?.toString(),
-      location: map['location']?.toString(),
+
+      // ✅ استخراج البيانات من user object
+      email: userData['email']?.toString() ?? map['email']?.toString(),
+      phone: userData['phone']?.toString() ?? map['phone']?.toString(),
+      location: userData['location']?.toString() ??
+          userData['address']?.toString() ??
+          map['location']?.toString(),
+
+      gender: userData['gender']?.toString(),
+      birthDate: userData['birthDate']?.toString(),
+      languages: _extractList(userData['languages']),
+      about: userData['bio']?.toString() ?? userData['about']?.toString(),
+      experienceYears: userData['experienceYears'] is int
+          ? userData['experienceYears'] as int
+          : 0,
+      education: userData['education']?.toString(),
+      skills: _extractList(userData['skills']),
+      hasCv: map['resumeUrl'] != null && map['resumeUrl'].toString().isNotEmpty,
     );
   }
 }
@@ -849,7 +844,7 @@ class RecruitmentSyncStore extends ChangeNotifier {
       _jobs[index] = RecruitmentJob(
         id: old.id,
         title: old.title,
-        companyId: old.companyId,  // ✅ إصلاح: بدلاً من companyId: ''
+        companyId: old.companyId,
         companyName: old.companyName,
         location: old.location,
         salaryRange: old.salaryRange,

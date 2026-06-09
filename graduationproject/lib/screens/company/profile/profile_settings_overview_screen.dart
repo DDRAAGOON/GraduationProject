@@ -39,9 +39,7 @@ class _CompanyProfileSettingsOverviewScreenState
   late List<String> _locations;
   late List<String> _techStack;
 
-  late int _selectedDay;
-  late int _selectedMonth;
-  late int _selectedYear;
+  DateTime? _foundedDate;
   bool _loading = false;
   bool _saveSuccess = false;
   bool _saveError = false;
@@ -63,9 +61,10 @@ class _CompanyProfileSettingsOverviewScreenState
     }
     _locations = List.from(store.locations);
     _techStack = List.from(store.techStack);
-    _selectedDay = store.foundedDay;
-    _selectedMonth = store.foundedMonth;
-    _selectedYear = store.foundedYear;
+    // تحويل foundedDay/Month/Year المخزّنة إلى DateTime واحد
+    if (store.foundedYear > 0 && store.foundedMonth > 0 && store.foundedDay > 0) {
+      _foundedDate = DateTime(store.foundedYear, store.foundedMonth, store.foundedDay);
+    }
   }
 
   @override
@@ -80,7 +79,7 @@ class _CompanyProfileSettingsOverviewScreenState
   Future<void> _save() async {
     final t = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
-    
+
     // Validate
     if (_companyName.text.trim().isEmpty) {
       messenger.showSnackBar(
@@ -98,41 +97,20 @@ class _CompanyProfileSettingsOverviewScreenState
     try {
       final store = CompanyStore.instance;
       final isAr = LocaleController.instance.locale.value.languageCode == 'ar';
-      
-      // Sync with backend first to ensure persistence
-      await RecruitmentSyncService.instance.updateProfile(
-        name: _companyName.text.trim(),
-      );
 
-      // Local persistence
-      CompanyStore.instance.updateProfile(
+      // Sync with company-specific backend endpoint: PATCH /api/companies/my/profile
+      await RecruitmentSyncService.instance.updateCompanyProfile(
         name: _companyName.text.trim(),
+        employee: _employee.text.trim(),
+        industry: store.industry,
         website: store.website,
-        employee: _employee.text.trim(),
-        industry: store.industry,
         aboutEn: isAr ? store.companyAboutEn : _about.text.trim(),
         aboutAr: isAr ? _about.text.trim() : store.companyAboutAr,
         locations: _locations,
         techStack: _techStack,
-        foundedDay: _selectedDay,
-        foundedMonth: _selectedMonth,
-        foundedYear: _selectedYear,
-        benefits: _benefits,
-        category: _selectedCategory,
-        commercialRegister: store.commercialRegister,
-        nationalNumber: store.nationalNumber,
-      );
-
-      await SessionManager.saveCompanyFullProfile(
-        employee: _employee.text.trim(),
-        industry: store.industry,
-        aboutEn: isAr ? store.companyAboutEn : _about.text.trim(),
-        aboutAr: isAr ? _about.text.trim() : store.companyAboutAr,
-        locations: _locations,
-        techStack: _techStack,
-        foundedDay: _selectedDay,
-        foundedMonth: _selectedMonth,
-        foundedYear: _selectedYear,
+        foundedDay: _foundedDate?.day,
+        foundedMonth: _foundedDate?.month,
+        foundedYear: _foundedDate?.year,
         category: _selectedCategory,
         benefits: _benefits,
         commercialRegister: store.commercialRegister,
@@ -214,10 +192,6 @@ class _CompanyProfileSettingsOverviewScreenState
 
   Widget _buildProfileTab() {
     final t = AppLocalizations.of(context);
-    final months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-    ];
 
     return ListView(
       padding: const EdgeInsets.all(24),
@@ -256,30 +230,7 @@ class _CompanyProfileSettingsOverviewScreenState
 
         Text(t.dateFounded, style: Theme.of(context).textTheme.labelLarge),
         const SizedBox(height: 8),
-        Row(
-          children: [
-            Expanded(child: _buildDropdown<int>(
-              value: _selectedDay,
-              items: List.generate(32, (i) => i),
-              labelBuilder: (v) => v == 0 ? (t.isAr ? 'اليوم' : 'Day') : v.toString(),
-              onChanged: (v) => setState(() => _selectedDay = v!),
-            )),
-            const SizedBox(width: 12),
-            Expanded(child: _buildDropdown<int>(
-              value: _selectedMonth,
-              items: List.generate(13, (i) => i),
-              labelBuilder: (v) => v == 0 ? (t.isAr ? 'الشهر' : 'Month') : (t.isAr ? ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'][v-1] : months[v-1]),
-              onChanged: (v) => setState(() => _selectedMonth = v!),
-            )),
-            const SizedBox(width: 12),
-            Expanded(child: _buildDropdown<int>(
-              value: _selectedYear,
-              items: [0, ...List.generate(50, (i) => 2024 - i)],
-              labelBuilder: (v) => v == 0 ? (t.isAr ? 'السنة' : 'Year') : v.toString(),
-              onChanged: (v) => setState(() => _selectedYear = v!),
-            )),
-          ],
-        ),
+        _buildDatePickerField(),
         const SizedBox(height: 20),
         
         AppTextField(label: t.aboutCompany, controller: _about, maxLines: 4),
@@ -355,17 +306,20 @@ class _CompanyProfileSettingsOverviewScreenState
           _loading = true;
           _saveError = false;
         });
-        
+
         final bytes = await pickedFile.readAsBytes();
         final base64Image = 'data:image/jpeg;base64,${base64Encode(bytes)}';
-        
+
         // Update local store first for immediate feedback
         CompanyStore.instance.setRegistrationData(customProfileImage: base64Image);
         await SessionManager.saveCompanyPhoto(base64Image);
-        
-        // Sync with backend
-        await RecruitmentSyncService.instance.updateProfile(photoUrl: base64Image);
-        
+
+        // Sync photo with company profile endpoint: PATCH /api/companies/my/profile
+        await RecruitmentSyncService.instance.updateCompanyProfile(
+          name: CompanyStore.instance.companyName,
+          photoUrl: base64Image,
+        );
+
         if (mounted) {
           setState(() {
             _saveSuccess = true;
@@ -410,6 +364,48 @@ class _CompanyProfileSettingsOverviewScreenState
     if (newTag != null && newTag.trim().isNotEmpty) {
       setState(() => targetList.add(newTag.trim()));
     }
+  }
+
+  Widget _buildDatePickerField() {
+    final t = AppLocalizations.of(context);
+    final label = _foundedDate != null
+        ? '${_foundedDate!.month.toString().padLeft(2, '0')}/${_foundedDate!.day.toString().padLeft(2, '0')}/${_foundedDate!.year}'
+        : (t.isAr ? 'اختر تاريخ التأسيس' : 'Select founding date');
+
+    return GestureDetector(
+      onTap: () async {
+        final picked = await showDatePicker(
+          context: context,
+          initialDate: _foundedDate ?? DateTime(2010),
+          firstDate: DateTime(1900),
+          lastDate: DateTime.now(),
+        );
+        if (picked != null) {
+          setState(() => _foundedDate = picked);
+        }
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey.shade300),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 15,
+                  color: _foundedDate != null ? null : Colors.grey.shade500,
+                ),
+              ),
+            ),
+            const Icon(Icons.calendar_today_outlined, size: 20),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildChipField(String label, List<String> items, VoidCallback onAdd) {

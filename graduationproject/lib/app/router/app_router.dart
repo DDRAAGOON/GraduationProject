@@ -16,7 +16,6 @@ import '../../screens/company/candidates/recruitment_candidate_details_screen.da
 import '../../screens/company/help/help_center_screen.dart';
 import '../../screens/company/home/dashboard_screen.dart';
 import '../../screens/company/jobs/job_analytics_screen.dart';
-
 import '../../screens/company/jobs/job_applicants_table_view_screen.dart';
 import '../../screens/company/jobs/job_details_screen.dart';
 import '../../screens/company/jobs/jobs_hub_screen.dart';
@@ -165,18 +164,19 @@ final class AppRouter {
     final fallbackJob = RecruitmentSyncStore.instance.jobs.isNotEmpty
         ? RecruitmentSyncStore.instance.jobs.first
         : RecruitmentJob(
-            id: 'fallback',
-            title: 'No Job',
-            companyName: 'Company',
-            location: 'N/A',
-            salaryRange: 'N/A',
-            type: 'N/A',
-            status: 'Open',
-            tags: const <String>[],
-            publishedAt: DateTime.now(),
-            category: 'N/A',
-            benefits: const <String>[], companyId: '',
-          );
+      id: 'fallback',
+      title: 'No Job',
+      companyName: 'Company',
+      location: 'N/A',
+      salaryRange: 'N/A',
+      type: 'N/A',
+      status: 'Open',
+      tags: const <String>[],
+      publishedAt: DateTime.now(),
+      category: 'N/A',
+      benefits: const <String>[],
+      companyId: '',
+    );
 
     Widget page;
     switch (name) {
@@ -202,17 +202,17 @@ final class AppRouter {
         page = const RecruitmentJobFiltersScreen();
       case AppRoutes.userApplicationTimeline:
         final fallbackApplication =
-            RecruitmentSyncStore.instance.applications.isNotEmpty
+        RecruitmentSyncStore.instance.applications.isNotEmpty
             ? RecruitmentSyncStore.instance.applications.first
             : RecruitmentApplication(
-                id: 'fallback',
-                jobId: 'fallback',
-                jobTitle: 'Unknown',
-                companyName: 'Unknown',
-                userName: 'Unknown',
-                status: 'Applied',
-                updatedAt: DateTime.now(),
-              );
+          id: 'fallback',
+          jobId: 'fallback',
+          jobTitle: 'Unknown',
+          companyName: 'Unknown',
+          userName: 'Unknown',
+          status: 'Applied',
+          updatedAt: DateTime.now(),
+        );
         page = RecruitmentApplicationTimelineScreen(
           application: args is RecruitmentApplication
               ? args
@@ -268,8 +268,8 @@ final class AppRouter {
       case AppRoutes.companyDashboard:
         page = const CompanyDashboardScreen();
       case AppRoutes.companyWorkspace:
-        // Legacy recruitment shell kept for reference; company workspace should use
-        // the main company tabs (home/chat/job/profile/stats) via bottom nav.
+      // Legacy recruitment shell kept for reference; company workspace should use
+      // the main company tabs (home/chat/job/profile/stats) via bottom nav.
         page = const CompanyDashboardScreen();
       case AppRoutes.companyOnboardingNew:
         page = const RecruitmentCompanyOnboardingScreen();
@@ -279,31 +279,36 @@ final class AppRouter {
         page = const RecruitmentCompanyProfileScreen();
       case AppRoutes.companyCandidateDetails:
         final fallbackApplication =
-            RecruitmentSyncStore.instance.applications.isNotEmpty
+        RecruitmentSyncStore.instance.applications.isNotEmpty
             ? RecruitmentSyncStore.instance.applications.first
             : RecruitmentApplication(
-                id: 'fallback',
-                jobId: 'fallback',
-                jobTitle: 'Unknown',
-                companyName: 'Unknown',
-                userName: 'Unknown',
-                status: 'Applied',
-                updatedAt: DateTime.now(),
-              );
+          id: 'fallback',
+          jobId: 'fallback',
+          jobTitle: 'Unknown',
+          companyName: 'Unknown',
+          userName: 'Unknown',
+          status: 'Applied',
+          updatedAt: DateTime.now(),
+        );
         page = RecruitmentCandidateDetailsScreen(
           application: args is RecruitmentApplication
               ? args
               : fallbackApplication,
         );
       case AppRoutes.companyMessagesList:
+      // ✅ تم إصلاح التكرار - كان مكرر مرتين
         page = const CompanyMessagesListScreen();
       case AppRoutes.companyChatThread:
+        final thread1 = args is MessageThread ? args : MessageThread.mock();
         page = CompanyChatThreadScreen(
-          thread: args is MessageThread ? args : MessageThread.mock(),
+          name: thread1.title,
+          image:
+          'https://ui-avatars.com/api/?name=${Uri.encodeComponent(thread1.title)}&background=49769F&color=fff&size=128',
         );
       case AppRoutes.companyChatThreadCandidateV2:
+        final thread2 = args is MessageThread ? args : MessageThread.mock();
         page = CompanyChatThreadCandidateV2Screen(
-          thread: args is MessageThread ? args : MessageThread.mock(),
+          thread: thread2,  // ✅ مرر الـ thread كامل
         );
       case AppRoutes.companyNewChat:
         page = const CompanyNewChatScreen();

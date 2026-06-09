@@ -21,6 +21,7 @@ final class Applicant {
     this.skills = const [],
     this.hasCv = false,
     required this.jobId,
+    this.avatarUrl, // ✅ إضافة حقل الصورة الشخصية
   });
 
   final String id;
@@ -43,28 +44,30 @@ final class Applicant {
   final List<String> skills;
   final bool hasCv;
   final String jobId;
+  final String? avatarUrl; // ✅ الصورة الشخصية (اختيارية)
 
   /// Generates a static mock [Applicant] to populate the UI templates.
   static Applicant mock() => Applicant(
-        id: 'app_1',
-        fullName: 'Dragon',
-        role: 'متخصص',
-        rating: 4.5,
-        stage: 'In Review',
-        email: 'mahmoudessam936@gmail.com',
-        phone: '+20 123 456 789',
-        location: 'غير محدد',
-        appliedDateLabel: 'Today',
-        gender: 'لم يحدد',
-        birthDate: 'غير متوفر',
-        languages: ['العربية'],
-        about: 'لا يوجد نبذة تعريفية متاحة لهذا المتقدم.',
-        experienceYears: 0,
-        education: 'غير متوفر',
-        skills: [],
-        hasCv: false,
-        jobId: 'job_1',
-      );
+    id: 'app_1',
+    fullName: 'Dragon',
+    role: 'متخصص',
+    rating: 4.5,
+    stage: 'In Review',
+    email: 'mahmoudessam936@gmail.com',
+    phone: '+20 123 456 789',
+    location: 'غير محدد',
+    appliedDateLabel: 'Today',
+    gender: 'لم يحدد',
+    birthDate: 'غير متوفر',
+    languages: ['العربية'],
+    about: 'لا يوجد نبذة تعريفية متاحة لهذا المتقدم.',
+    experienceYears: 0,
+    education: 'غير متوفر',
+    skills: [],
+    hasCv: false,
+    jobId: 'job_1',
+    avatarUrl: null, // ✅ في الـ mock مفيش صورة
+  );
 
   static List<Applicant> mockList() => [];
 }

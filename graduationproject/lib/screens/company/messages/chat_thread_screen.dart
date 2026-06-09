@@ -1,91 +1,191 @@
-// Message thread between company and candidate.
-
 import 'package:flutter/material.dart';
-
 import '../../../shared/l10n/app_localizations.dart';
-import '../../../shared/models/message_thread.dart';
-import '../../../shared/widgets/app_scaffold.dart';
+import '../../../data/services/chat_service.dart';
+import '../../../core/network/api_client.dart';
 
 class CompanyChatThreadScreen extends StatefulWidget {
-  const CompanyChatThreadScreen({super.key, required this.thread});
+  final String name;
+  final String image;
 
-  final MessageThread thread;
+  const CompanyChatThreadScreen({
+    super.key,
+    required this.name,
+    required this.image,
+  });
 
   @override
-  State<CompanyChatThreadScreen> createState() =>
-      _CompanyChatThreadScreenState();
+  State<CompanyChatThreadScreen> createState() => _CompanyChatThreadScreen();
 }
 
-class _CompanyChatThreadScreenState extends State<CompanyChatThreadScreen> {
-  final _input = TextEditingController();
-  final List<_Bubble> _bubbles = [
-    _Bubble(
-      text:
-          'Hey Jake, I wanted to reach out because we saw your work contributions and were impressed by your work.',
-      fromMe: false,
-      time: DateTime.now().subtract(const Duration(minutes: 5)),
-    ),
-    _Bubble(
-      text: 'We want to invite you for a quick interview', 
-      fromMe: false,
-      time: DateTime.now().subtract(const Duration(minutes: 4)),
-    ),
-    _Bubble(
-      text:
-          'Hi, sure I would love to. Thanks for taking the time to see my work!',
-      fromMe: true,
-      time: DateTime.now().subtract(const Duration(minutes: 2)),
-    ),
-  ];
+class _CompanyChatThreadScreen extends State<CompanyChatThreadScreen> {
+  final TextEditingController _messageController = TextEditingController();
+  final List<Map<String, dynamic>> _messages = []; // تبدأ فارغة دائماً
+  bool _isTyping = false;
+  late final ChatService _chatService;
+
+  @override
+  void initState() {
+    super.initState();
+    _chatService = ChatService(ApiClient());
+  }
+
+  bool get _isChatbot => widget.name.contains('مساعد') || widget.name.contains('Assistant') || widget.name.contains('Jobito AI');
 
   @override
   void dispose() {
-    _input.dispose();
+    _messageController.dispose();
     super.dispose();
   }
 
-  void _send() {
-    final text = _input.text.trim();
-    if (text.isEmpty) return;
-    setState(() {
-      _bubbles.add(_Bubble(text: text, fromMe: true, time: DateTime.now()));
-      _input.clear();
-    });
+  void _sendMessage() async {
+    final text = _messageController.text.trim();
+    if (text.isNotEmpty) {
+      setState(() {
+        _messages.add({
+          "isMe": true,
+          "text": text,
+          "time": _getCurrentTime(),
+        });
+        _messageController.clear();
+      });
+
+      if (_isChatbot) {
+        setState(() => _isTyping = true);
+        try {
+          final response = await _chatService.askAiChatbot(text);
+          if (mounted) {
+            setState(() {
+              _isTyping = false;
+              _messages.add({
+                "isMe": false,
+                "text": response,
+                "time": _getCurrentTime(),
+              });
+            });
+          }
+        } catch (e) {
+          if (mounted) {
+            setState(() {
+              _isTyping = false;
+              _messages.add({
+                "isMe": false,
+                "text": "عذراً، حدث خطأ في الاتصال بالمساعد الذكي.",
+                "time": _getCurrentTime(),
+              });
+            });
+          }
+        }
+      }
+    }
+  }
+
+  String _getCurrentTime() {
+    final now = DateTime.now();
+    return "${now.hour}:${now.minute.toString().padLeft(2, '0')}";
   }
 
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
-    return AppScaffold(
-      title: widget.thread.title,
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
+    final onSurfaceColor = isDark ? Colors.white : Colors.black;
+
+    return Scaffold(
+      backgroundColor: backgroundColor,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        surfaceTintColor: Colors.transparent,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios, color: onSurfaceColor),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Row(
+          children: [
+            CircleAvatar(radius: 18, backgroundImage: widget.image.startsWith('http') ? NetworkImage(widget.image) : AssetImage(widget.image) as ImageProvider),
+            const SizedBox(width: 10),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(widget.name,
+                    style: TextStyle(
+                        color: onSurfaceColor,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold)),
+                Text(t.tr(en: "Online", ar: "متصل"),
+                    style: const TextStyle(color: Colors.green, fontSize: 12)),
+              ],
+            ),
+          ],
+        ),
+      ),
       body: Column(
         children: [
+          Divider(color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.12), height: 1),
           Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: _bubbles.length,
-              itemBuilder: (_, i) => _ChatBubble(bubble: _bubbles[i]),
+            child: _messages.isEmpty && !_isTyping
+                ? _buildEmptyChat(t, onSurfaceColor)
+                : ListView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+              itemCount: _messages.length + 1 + (_isTyping ? 1 : 0),
+              itemBuilder: (context, index) {
+                if (index == 0) return _buildHeader(onSurfaceColor);
+                if (_isTyping && index == _messages.length + 1) {
+                  return _buildTypingIndicator(onSurfaceColor);
+                }
+                final msg = _messages[index - 1];
+                return _buildMessageBubble(context, msg, onSurfaceColor);
+              },
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
+          _buildMessageInput(context, t, isDark, onSurfaceColor),
+          const SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyChat(AppLocalizations t, Color onSurfaceColor) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          _buildHeader(onSurfaceColor),
+          Text(
+            t.tr(en: "No messages yet. Say hi!", ar: "لا توجد رسائل بعد. قل مرحباً!"),
+            style: TextStyle(color: onSurfaceColor.withValues(alpha: 0.5)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTypingIndicator(Color onSurfaceColor) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 15),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          CircleAvatar(radius: 18, backgroundImage: widget.image.startsWith('http') ? NetworkImage(widget.image) : AssetImage(widget.image) as ImageProvider),
+          const SizedBox(width: 12),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: Theme.of(context).brightness == Brightness.dark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.05),
+              borderRadius: BorderRadius.circular(20),
+            ),
             child: Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Expanded(
-                  child: TextField(
-                    controller: _input,
-                    decoration: InputDecoration(
-                      hintText: t.replyMessage,
-                      prefixIcon: const Icon(Icons.attach_file),
-                    ),
-                    onSubmitted: (_) => _send(),
-                  ),
+                SizedBox(
+                  width: 12,
+                  height: 12,
+                  child: CircularProgressIndicator(strokeWidth: 2, color: onSurfaceColor.withValues(alpha: 0.5)),
                 ),
-                const SizedBox(width: 10),
-                IconButton.filled(
-                  onPressed: _send,
-                  icon: const Icon(Icons.send),
-                ),
+                const SizedBox(width: 8),
+                Text(AppLocalizations.of(context).tr(en: "Typing...", ar: "يكتب..."),
+                    style: TextStyle(color: onSurfaceColor, fontSize: 12)),
               ],
             ),
           ),
@@ -93,88 +193,101 @@ class _CompanyChatThreadScreenState extends State<CompanyChatThreadScreen> {
       ),
     );
   }
-}
 
-final class _Bubble {
-  const _Bubble({required this.text, required this.fromMe, required this.time});
+  Widget _buildMessageBubble(BuildContext context, Map<String, dynamic> msg, Color onSurfaceColor) {
+    bool isMe = msg["isMe"];
 
-  final String text;
-  final bool fromMe;
-  final DateTime time;
-}
-
-class _ChatBubble extends StatelessWidget {
-  const _ChatBubble({required this.bubble});
-
-  final _Bubble bubble;
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    
-    final bg = bubble.fromMe
-        ? cs.primary
-        : cs.surfaceContainerHigh;
-        
-    final textColor = bubble.fromMe
-        ? cs.onPrimary
-        : cs.onSurface;
-
-    final align = bubble.fromMe 
-        ? AlignmentDirectional.centerEnd 
-        : AlignmentDirectional.centerStart;
-        
-    final borderRadius = BorderRadius.only(
-      topLeft: const Radius.circular(20),
-      topRight: const Radius.circular(20),
-      bottomLeft: Radius.circular(bubble.fromMe ? 20 : 4),
-      bottomRight: Radius.circular(bubble.fromMe ? 4 : 20),
-    );
-
-    return Align(
-      alignment: align,
-      child: Container(
-        constraints: BoxConstraints(
-          maxWidth: MediaQuery.of(context).size.width * 0.75,
-        ),
-        margin: const EdgeInsets.symmetric(vertical: 4),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: bg,
-          borderRadius: borderRadius,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 5,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Wrap(
-          alignment: WrapAlignment.end,
-          crossAxisAlignment: WrapCrossAlignment.end,
-          runAlignment: WrapAlignment.end,
-          children: [
-            Text(
-              bubble.text,
-              style: TextStyle(
-                color: textColor,
-                fontSize: 14,
-                height: 1.4,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 8, top: 4),
-              child: Text(
-                TimeOfDay.fromDateTime(bubble.time).format(context),
-                style: TextStyle(
-                  color: textColor.withOpacity(0.7),
-                  fontSize: 10,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 15),
+      child: Row(
+        mainAxisAlignment:
+        isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+        children: [
+          if (!isMe)
+            CircleAvatar(radius: 18, backgroundImage: widget.image.startsWith('http') ? NetworkImage(widget.image) : AssetImage(widget.image) as ImageProvider),
+          const SizedBox(width: 12),
+          Flexible(
+            child: Column(
+              crossAxisAlignment:
+              isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: isMe
+                        ? Theme.of(context).colorScheme.primary
+                        : (Theme.of(context).brightness == Brightness.dark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.05)),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(msg["text"],
+                      style: TextStyle(
+                          color: isMe
+                              ? Colors.white
+                              : onSurfaceColor)),
                 ),
+                const SizedBox(height: 4),
+                Text(msg["time"],
+                    style:
+                    TextStyle(color: onSurfaceColor.withValues(alpha: 0.38), fontSize: 10)),
+              ],
+            ),
+          ),
+          if (isMe) const SizedBox(width: 12),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMessageInput(BuildContext context, AppLocalizations t, bool isDark, Color onSurfaceColor) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Container(
+        height: 60,
+        decoration: BoxDecoration(
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.05)
+                : Colors.black.withValues(alpha: 0.05),
+            borderRadius: BorderRadius.circular(30)),
+        child: Row(
+          children: [
+            const SizedBox(width: 20),
+            Expanded(
+              child: TextField(
+                controller: _messageController,
+                onChanged: (val) => setState(() {}),
+                style: TextStyle(color: onSurfaceColor),
+                decoration: InputDecoration(
+                    hintText: t.tr(en: "Type a message", ar: "اكتب رسالة"),
+                    hintStyle: TextStyle(color: onSurfaceColor.withValues(alpha: 0.38)),
+                    border: InputBorder.none),
               ),
             ),
+            IconButton(
+                icon: Icon(Icons.send,
+                    color: _messageController.text.isEmpty
+                        ? onSurfaceColor.withValues(alpha: 0.24)
+                        : Theme.of(context).colorScheme.primary),
+                onPressed: _messageController.text.isEmpty ? null : _sendMessage),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildHeader(Color onSurfaceColor) {
+    return Center(
+      child: Column(
+        children: [
+          CircleAvatar(radius: 40, backgroundImage: widget.image.startsWith('http') ? NetworkImage(widget.image) : AssetImage(widget.image) as ImageProvider),
+          const SizedBox(height: 10),
+          Text(widget.name,
+              style: TextStyle(
+                  color: onSurfaceColor,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold)),
+          const SizedBox(height: 30),
+        ],
       ),
     );
   }
