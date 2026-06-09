@@ -115,4 +115,13 @@ class ApiConstants {
   // Favorites
   static String toggleFavorite(String jobId) => '$apiPrefix/favorites/toggle/$jobId';
   static const String favorites = '$apiPrefix/favorites';
+
+  // Ratings
+  static const String ratings = '$apiPrefix/ratings';
+  static String companyRatings(String companyId) => '$apiPrefix/ratings/company/$companyId';
+  static String userRatings(String userId) => '$apiPrefix/ratings/user/$userId';
+  static String jobRatings(String jobId) => '$apiPrefix/ratings/job/$jobId';
+  static String companyGivenRatings(String companyId) => '$apiPrefix/ratings/company/$companyId/given';
+  static String userGivenRatings(String userId) => '$apiPrefix/ratings/user/$userId/given';
+  static String ratingById(String ratingId) => '$apiPrefix/ratings/$ratingId';
 }

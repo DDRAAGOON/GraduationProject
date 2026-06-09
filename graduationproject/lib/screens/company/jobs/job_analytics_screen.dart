@@ -259,12 +259,12 @@ class _AnalyticsBodyState extends State<_AnalyticsBody> {
         // ── Main chart card ────────────────────────────────────────
         Container(
           decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
+            color: cs.surfaceContainerLow,
             borderRadius: BorderRadius.circular(20),
             border: Border.all(color: cs.outlineVariant.withValues(alpha: 0.4)),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.04),
+                color: Colors.black.withValues(alpha: isDark ? 0.15 : 0.04),
                 blurRadius: 16,
                 offset: const Offset(0, 4),
               ),
@@ -407,7 +407,7 @@ class _AnalyticsBodyState extends State<_AnalyticsBody> {
                   child: _InlineStat(
                     label: isAr ? 'مشاهدات الوظيفة' : 'Job Views',
                     value: '$_totalViews',
-                    delta: '+12%', // يفضل جلبها من الـ API
+                    delta: _totalViews > 0 ? '+Live' : '–',
                     color: Colors.orange,
                     icon: Icons.visibility_outlined,
                   ),
@@ -420,7 +420,7 @@ class _AnalyticsBodyState extends State<_AnalyticsBody> {
                   child: _InlineStat(
                     label: isAr ? 'طلبات التقديم' : 'Applications',
                     value: '$_totalApplicants',
-                    delta: '+5%', // يفضل جلبها من الـ API
+                    delta: _totalApplicants > 0 ? '+Live' : '–',
                     color: const Color(0xFF4A80D8),
                     icon: Icons.assignment_outlined,
                   ),
@@ -825,12 +825,12 @@ class _ApplicantsBreakdownCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isDark ? cs.surfaceContainerLow : Colors.white,
+        color: cs.surfaceContainerLow,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: cs.outlineVariant.withValues(alpha: 0.4)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
+            color: Colors.black.withValues(alpha: isDark ? 0.15 : 0.04),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
