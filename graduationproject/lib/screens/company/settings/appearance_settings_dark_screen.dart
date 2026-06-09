@@ -12,4 +12,3 @@ class CompanyAppearanceSettingsDarkScreen extends StatelessWidget {
     return const CompanyAppearanceSettingsScreen(initialTheme: 'Dark');
   }
 }
-

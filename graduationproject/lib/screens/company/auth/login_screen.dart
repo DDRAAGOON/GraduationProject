@@ -35,9 +35,7 @@ class _CompanyLoginScreenState extends State<CompanyLoginScreen> {
   bool _obscurePassword = true;
   bool _isLoading = false;
 
-  final GoogleSignIn _googleSignIn = GoogleSignIn(
-    scopes: ['email', 'profile'],
-  );
+  final GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email', 'profile']);
 
   @override
   void dispose() {
@@ -63,7 +61,8 @@ class _CompanyLoginScreenState extends State<CompanyLoginScreen> {
       );
 
       final userName =
-          userData['name']?.toString() ?? _emailController.text.split('@').first;
+          userData['name']?.toString() ??
+          _emailController.text.split('@').first;
 
       // Persist the session locally.
       await SessionManager.saveCompanySession(
@@ -81,7 +80,8 @@ class _CompanyLoginScreenState extends State<CompanyLoginScreen> {
 
       // Also ensure the token returned by loginLegacy is in SecureStorage
       // (RecruitmentSyncService already does this, but being explicit here).
-      final token = userData['token']?.toString() ??
+      final token =
+          userData['token']?.toString() ??
           userData['accessToken']?.toString() ??
           userData['access_token']?.toString();
       if (token != null && token.isNotEmpty) {
@@ -120,14 +120,16 @@ class _CompanyLoginScreenState extends State<CompanyLoginScreen> {
 
       if (idToken == null) throw Exception('Failed to get Google ID Token');
 
-      final userData =
-          await RecruitmentSyncService.instance.googleLogin(idToken);
+      final userData = await RecruitmentSyncService.instance.googleLogin(
+        idToken,
+      );
 
       final companyName =
           userData['name']?.toString() ??
           googleUser.displayName ??
           googleUser.email.split('@').first;
-      final userEmail = userData['data']?['email']?.toString() ??
+      final userEmail =
+          userData['data']?['email']?.toString() ??
           userData['email']?.toString() ??
           googleUser.email;
 
@@ -158,10 +160,9 @@ class _CompanyLoginScreenState extends State<CompanyLoginScreen> {
   // ---------------------------------------------------------------------------
 
   void _navigateToDashboard() {
-    Navigator.of(context).pushNamedAndRemoveUntil(
-      AppRoutes.companyDashboard,
-      (route) => false,
-    );
+    Navigator.of(
+      context,
+    ).pushNamedAndRemoveUntil(AppRoutes.companyDashboard, (route) => false);
   }
 
   String _mapError(Object e) {
@@ -169,7 +170,7 @@ class _CompanyLoginScreenState extends State<CompanyLoginScreen> {
       final isAr = Localizations.localeOf(context).languageCode == 'ar';
       return e.localizedMessage(isAr);
     }
-    
+
     final t = AppLocalizations.of(context);
     final msg = e.toString().replaceAll('Exception: ', '');
     // Keep role-specific messages.
@@ -204,8 +205,9 @@ class _CompanyLoginScreenState extends State<CompanyLoginScreen> {
     final cs = theme.colorScheme;
 
     return Scaffold(
-      backgroundColor:
-          isDark ? const Color(0xFF001428) : const Color(0xFFF6F8FD),
+      backgroundColor: isDark
+          ? const Color(0xFF001428)
+          : const Color(0xFFF6F8FD),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -227,7 +229,8 @@ class _CompanyLoginScreenState extends State<CompanyLoginScreen> {
                     keyboardType: TextInputType.emailAddress,
                     textInputAction: TextInputAction.next,
                     style: TextStyle(
-                        color: isDark ? Colors.white : Colors.black87),
+                      color: isDark ? Colors.white : Colors.black87,
+                    ),
                     decoration: _inputDecoration(
                       hint: t.enterYourEmail,
                       icon: Icons.email_outlined,
@@ -253,7 +256,8 @@ class _CompanyLoginScreenState extends State<CompanyLoginScreen> {
                     textInputAction: TextInputAction.done,
                     onFieldSubmitted: (_) => _submit(),
                     style: TextStyle(
-                        color: isDark ? Colors.white : Colors.black87),
+                      color: isDark ? Colors.white : Colors.black87,
+                    ),
                     decoration: _inputDecoration(
                       hint: '••••••••',
                       icon: Icons.lock_outline,
@@ -267,7 +271,8 @@ class _CompanyLoginScreenState extends State<CompanyLoginScreen> {
                           color: cs.onSurface.withValues(alpha: 0.55),
                         ),
                         onPressed: () => setState(
-                            () => _obscurePassword = !_obscurePassword),
+                          () => _obscurePassword = !_obscurePassword,
+                        ),
                       ),
                     ),
                     validator: (v) {
@@ -283,8 +288,9 @@ class _CompanyLoginScreenState extends State<CompanyLoginScreen> {
                         ? Alignment.centerLeft
                         : Alignment.centerRight,
                     child: TextButton(
-                      onPressed: () => Navigator.of(context)
-                          .pushNamed(AppRoutes.companyForgotPassword),
+                      onPressed: () => Navigator.of(
+                        context,
+                      ).pushNamed(AppRoutes.companyForgotPassword),
                       child: Text(
                         t.forgotPassword,
                         style: TextStyle(
@@ -305,20 +311,23 @@ class _CompanyLoginScreenState extends State<CompanyLoginScreen> {
                     children: [
                       Expanded(
                         child: Divider(
-                            color: cs.onSurface.withValues(alpha: 0.15)),
+                          color: cs.onSurface.withValues(alpha: 0.15),
+                        ),
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 14),
                         child: Text(
                           t.orSignInWith,
                           style: TextStyle(
-                              color: cs.onSurface.withValues(alpha: 0.45),
-                              fontSize: 13),
+                            color: cs.onSurface.withValues(alpha: 0.45),
+                            fontSize: 13,
+                          ),
                         ),
                       ),
                       Expanded(
                         child: Divider(
-                            color: cs.onSurface.withValues(alpha: 0.15)),
+                          color: cs.onSurface.withValues(alpha: 0.15),
+                        ),
                       ),
                     ],
                   ),
@@ -330,9 +339,11 @@ class _CompanyLoginScreenState extends State<CompanyLoginScreen> {
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       side: BorderSide(
-                          color: cs.outline.withValues(alpha: 0.4)),
+                        color: cs.outline.withValues(alpha: 0.4),
+                      ),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14)),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
                     ),
                     icon: SvgPicture.asset(
                       'assets/company/icon/google_g.svg',
@@ -355,12 +366,14 @@ class _CompanyLoginScreenState extends State<CompanyLoginScreen> {
                       Text(
                         t.dontHaveAccount,
                         style: TextStyle(
-                            color: cs.onSurface.withValues(alpha: 0.6)),
+                          color: cs.onSurface.withValues(alpha: 0.6),
+                        ),
                       ),
                       const SizedBox(width: 4),
                       GestureDetector(
-                        onTap: () => Navigator.of(context)
-                            .pushNamed(AppRoutes.companySignUp),
+                        onTap: () => Navigator.of(
+                          context,
+                        ).pushNamed(AppRoutes.companySignUp),
                         child: Text(
                           t.signUpBtn,
                           style: TextStyle(
@@ -407,8 +420,7 @@ class _CompanyLoginScreenState extends State<CompanyLoginScreen> {
               ),
             ],
           ),
-          child:
-              const Icon(Icons.work_rounded, size: 40, color: Colors.white),
+          child: const Icon(Icons.work_rounded, size: 40, color: Colors.white),
         ),
         const SizedBox(height: 24),
         Text(
@@ -436,13 +448,13 @@ class _CompanyLoginScreenState extends State<CompanyLoginScreen> {
   }
 
   Widget _buildLabel(String text, bool isDark) => Text(
-        text,
-        style: TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-          color: isDark ? Colors.white70 : const Color(0xFF2C2C2C),
-        ),
-      );
+    text,
+    style: TextStyle(
+      fontSize: 14,
+      fontWeight: FontWeight.w600,
+      color: isDark ? Colors.white70 : const Color(0xFF2C2C2C),
+    ),
+  );
 
   InputDecoration _inputDecoration({
     required String hint,
@@ -454,13 +466,15 @@ class _CompanyLoginScreenState extends State<CompanyLoginScreen> {
     return InputDecoration(
       hintText: hint,
       hintStyle: TextStyle(color: cs.onSurface.withValues(alpha: 0.38)),
-      prefixIcon:
-          Icon(icon, color: cs.primary.withValues(alpha: 0.7), size: 20),
+      prefixIcon: Icon(
+        icon,
+        color: cs.primary.withValues(alpha: 0.7),
+        size: 20,
+      ),
       suffixIcon: suffixIcon,
       filled: true,
       fillColor: isDark ? Colors.white.withValues(alpha: 0.06) : Colors.white,
-      contentPadding:
-          const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+      contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
         borderSide: BorderSide(color: cs.outline.withValues(alpha: 0.3)),

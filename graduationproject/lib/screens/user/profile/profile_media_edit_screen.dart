@@ -38,7 +38,14 @@ class _ProfileMediaEditScreenState extends State<ProfileMediaEditScreen> {
                 // Here you would typically use an image picker
                 // For now, we'll just simulate selecting one
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(t.tr(en: "Image picker will open", ar: "سيفتح معرض الصور"))),
+                  SnackBar(
+                    content: Text(
+                      t.tr(
+                        en: "Image picker will open",
+                        ar: "سيفتح معرض الصور",
+                      ),
+                    ),
+                  ),
                 );
               },
               child: Container(
@@ -58,11 +65,20 @@ class _ProfileMediaEditScreenState extends State<ProfileMediaEditScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.camera_alt_outlined, size: 40, color: Theme.of(context).colorScheme.primary),
+                      Icon(
+                        Icons.camera_alt_outlined,
+                        size: 40,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
                       const SizedBox(height: 8),
                       Text(
-                        t.tr(en: "Tap to change cover photo", ar: "اضغط لتغيير صورة الغلاف"),
-                        style: TextStyle(color: Theme.of(context).colorScheme.primary),
+                        t.tr(
+                          en: "Tap to change cover photo",
+                          ar: "اضغط لتغيير صورة الغلاف",
+                        ),
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
                       ),
                     ],
                   ),
@@ -85,7 +101,8 @@ class _ProfileMediaEditScreenState extends State<ProfileMediaEditScreen> {
                     radius: 70,
                     backgroundImage: UserProfileData.profileImage != null
                         ? NetworkImage(UserProfileData.profileImage!)
-                        : const AssetImage(AppImages.companyProfile1) as ImageProvider,
+                        : const AssetImage(AppImages.companyProfile1)
+                              as ImageProvider,
                   ),
                   Positioned(
                     bottom: 0,
@@ -93,7 +110,14 @@ class _ProfileMediaEditScreenState extends State<ProfileMediaEditScreen> {
                     child: GestureDetector(
                       onTap: () {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(t.tr(en: "Image picker will open", ar: "سيفتح معرض الصور"))),
+                          SnackBar(
+                            content: Text(
+                              t.tr(
+                                en: "Image picker will open",
+                                ar: "سيفتح معرض الصور",
+                              ),
+                            ),
+                          ),
                         );
                       },
                       child: Container(
@@ -103,7 +127,11 @@ class _ProfileMediaEditScreenState extends State<ProfileMediaEditScreen> {
                           shape: BoxShape.circle,
                           border: Border.all(color: Colors.white, width: 2),
                         ),
-                        child: const Icon(Icons.edit, color: Colors.white, size: 20),
+                        child: const Icon(
+                          Icons.edit,
+                          color: Colors.white,
+                          size: 20,
+                        ),
                       ),
                     ),
                   ),
@@ -123,11 +151,17 @@ class _ProfileMediaEditScreenState extends State<ProfileMediaEditScreen> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Theme.of(context).colorScheme.primary,
                   padding: const EdgeInsets.symmetric(vertical: 15),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
                 child: Text(
                   t.tr(en: "Save Changes", ar: "حفظ التغييرات"),
-                  style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),

@@ -9,29 +9,29 @@ class ApiClient {
   final Dio _dio; // ✅ إزالة late
 
   ApiClient()
-      : _dio = Dio(
-    BaseOptions(
-      baseUrl: ApiConstants.baseUrl,
-      connectTimeout: const Duration(seconds: 60),
-      receiveTimeout: const Duration(seconds: 60),
-      sendTimeout: const Duration(seconds: 60),
-    ),
-  ) {
+    : _dio = Dio(
+        BaseOptions(
+          baseUrl: ApiConstants.baseUrl,
+          connectTimeout: const Duration(seconds: 60),
+          receiveTimeout: const Duration(seconds: 60),
+          sendTimeout: const Duration(seconds: 60),
+        ),
+      ) {
     // 👇 إعداد تجاوز الـ SSL للـ Railway
     (_dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient = () {
       final client = HttpClient();
       client.badCertificateCallback =
           (X509Certificate cert, String host, int port) {
-        if (host.contains('railway.app') ||
-            host == 'jobito-api-production.up.railway.app') {
-          return true;
-        }
-        return false;
-      };
+            if (host.contains('railway.app') ||
+                host == 'jobito-api-production.up.railway.app') {
+              return true;
+            }
+            return false;
+          };
       return client;
     };
     // 👆
-    
+
     _dio.interceptors.add(ApiInterceptors());
 
     if (kDebugMode) {
@@ -47,10 +47,10 @@ class ApiClient {
 
   // ✅ GET Request - بدون try-catch الفارغة
   Future<Response> get(
-      String path, {
-        Map<String, dynamic>? queryParameters,
-        Options? options,
-      }) async {
+    String path, {
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+  }) async {
     return await _dio.get(
       path,
       queryParameters: queryParameters,
@@ -60,11 +60,11 @@ class ApiClient {
 
   // ✅ POST Request
   Future<Response> post(
-      String path, {
-        dynamic data,
-        Map<String, dynamic>? queryParameters,
-        Options? options,
-      }) async {
+    String path, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+  }) async {
     return await _dio.post(
       path,
       data: data,
@@ -75,11 +75,11 @@ class ApiClient {
 
   // ✅ PATCH Request
   Future<Response> patch(
-      String path, {
-        dynamic data,
-        Map<String, dynamic>? queryParameters,
-        Options? options,
-      }) async {
+    String path, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+  }) async {
     return await _dio.patch(
       path,
       data: data,
@@ -90,11 +90,11 @@ class ApiClient {
 
   // ✅ PUT Request
   Future<Response> put(
-      String path, {
-        dynamic data,
-        Map<String, dynamic>? queryParameters,
-        Options? options,
-      }) async {
+    String path, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+  }) async {
     return await _dio.put(
       path,
       data: data,
@@ -105,11 +105,11 @@ class ApiClient {
 
   // ✅ DELETE Request
   Future<Response> delete(
-      String path, {
-        dynamic data,
-        Map<String, dynamic>? queryParameters,
-        Options? options,
-      }) async {
+    String path, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+  }) async {
     return await _dio.delete(
       path,
       data: data,

@@ -357,16 +357,19 @@ class _TradesmanBrowseCompaniesScreenState
     );
   }
 
-  Widget _buildTypeButton(String label, bool isSelected, Color activeColor, VoidCallback onTap) {
+  Widget _buildTypeButton(
+    String label,
+    bool isSelected,
+    Color activeColor,
+    VoidCallback onTap,
+  ) {
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(vertical: 14),
         decoration: BoxDecoration(
-          color: isSelected
-              ? activeColor
-              : const Color(0xFF142C66),
+          color: isSelected ? activeColor : const Color(0xFF142C66),
           borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(30),
             bottomRight: Radius.circular(30),

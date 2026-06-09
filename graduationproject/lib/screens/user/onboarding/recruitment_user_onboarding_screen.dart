@@ -20,21 +20,30 @@ class _RecruitmentUserOnboardingScreenState
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
-    
+
     final List<_OnboardingItem> items = [
       _OnboardingItem(
         title: t.tr(en: 'Find Jobs That Match You', ar: 'ابحث عن وظائف تناسبك'),
-        subtitle: t.tr(en: 'Search with filters by role, location, and salary.', ar: 'ابحث باستخدام الفلاتر حسب الدور والموقع والراتب.'),
+        subtitle: t.tr(
+          en: 'Search with filters by role, location, and salary.',
+          ar: 'ابحث باستخدام الفلاتر حسب الدور والموقع والراتب.',
+        ),
         icon: Icons.search_rounded,
       ),
       _OnboardingItem(
         title: t.tr(en: 'Apply With Full Profile', ar: 'قدّم بملف شخصي كامل'),
-        subtitle: t.tr(en: 'Send CV, portfolio, and cover letter in one flow.', ar: 'أرسل السيرة الذاتية ومعرض الأعمال وخطاب التقديم في مسار واحد.'),
+        subtitle: t.tr(
+          en: 'Send CV, portfolio, and cover letter in one flow.',
+          ar: 'أرسل السيرة الذاتية ومعرض الأعمال وخطاب التقديم في مسار واحد.',
+        ),
         icon: Icons.assignment_turned_in_rounded,
       ),
       _OnboardingItem(
         title: t.tr(en: 'Track Every Hiring Stage', ar: 'تتبع كل مرحلة توظيف'),
-        subtitle: t.tr(en: 'Get live updates from review to offer.', ar: 'احصل على تحديثات مباشرة من المراجعة إلى العرض.'),
+        subtitle: t.tr(
+          en: 'Get live updates from review to offer.',
+          ar: 'احصل على تحديثات مباشرة من المراجعة إلى العرض.',
+        ),
         icon: Icons.timeline_rounded,
       ),
     ];
@@ -57,17 +66,17 @@ class _RecruitmentUserOnboardingScreenState
                       children: [
                         CircleAvatar(
                           radius: 56,
-                          backgroundColor:
-                              Theme.of(context).colorScheme.primary.withValues(alpha: 0.15),
+                          backgroundColor: Theme.of(
+                            context,
+                          ).colorScheme.primary.withValues(alpha: 0.15),
                           child: Icon(item.icon, size: 58),
                         ),
                         const SizedBox(height: 20),
                         Text(
                           item.title,
                           textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                fontWeight: FontWeight.w800,
-                              ),
+                          style: Theme.of(context).textTheme.headlineSmall
+                              ?.copyWith(fontWeight: FontWeight.w800),
                         ),
                         const SizedBox(height: 10),
                         Text(
@@ -94,7 +103,9 @@ class _RecruitmentUserOnboardingScreenState
                       decoration: BoxDecoration(
                         color: i == _index
                             ? Theme.of(context).colorScheme.primary
-                            : Theme.of(context).colorScheme.primary.withValues(alpha: 0.25),
+                            : Theme.of(
+                                context,
+                              ).colorScheme.primary.withValues(alpha: 0.25),
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
@@ -106,8 +117,9 @@ class _RecruitmentUserOnboardingScreenState
                       label: _index == items.length - 1 ? t.getStarted : t.next,
                       onPressed: () {
                         if (_index == items.length - 1) {
-                          Navigator.of(context)
-                              .pushReplacementNamed(AppRoutes.userSignInNew);
+                          Navigator.of(
+                            context,
+                          ).pushReplacementNamed(AppRoutes.userSignInNew);
                           return;
                         }
                         _controller.nextPage(

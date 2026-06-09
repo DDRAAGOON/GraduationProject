@@ -19,7 +19,7 @@ class CompleteProfileScreen extends StatefulWidget {
 
 class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   String _selectedRole = "Job Seeker"; // "Job Seeker" or "Tradesman"
-  
+
   final _fullName = TextEditingController();
   final _phone = TextEditingController();
   final _email = TextEditingController();
@@ -50,10 +50,10 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   final _eduInstitution = TextEditingController();
   final _eduDuration = TextEditingController();
   final _eduDegree = TextEditingController();
-  
+
   final _expTitle = TextEditingController();
   final _expDuration = TextEditingController();
-  
+
   final _skillController = TextEditingController();
 
   File? _profileImage;
@@ -64,21 +64,62 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   final ImagePicker _picker = ImagePicker();
 
   final List<String> _egyptGovernorates = [
-    "Cairo", "Giza", "Alexandria", "Dakahlia", "Red Sea", "Beheira", "Fayoum", "Gharbia", "Ismailia", "Monufia", "Minya", "Qalyubia", "New Valley", "Suez", "Aswan", "Assiut", "Beni Suef", "Port Said", "Damietta", "South Sinai", "Kafr El Sheikh", "Matrouh", "Luxor", "Qena", "North Sinai", "Sohag"
+    "Cairo",
+    "Giza",
+    "Alexandria",
+    "Dakahlia",
+    "Red Sea",
+    "Beheira",
+    "Fayoum",
+    "Gharbia",
+    "Ismailia",
+    "Monufia",
+    "Minya",
+    "Qalyubia",
+    "New Valley",
+    "Suez",
+    "Aswan",
+    "Assiut",
+    "Beni Suef",
+    "Port Said",
+    "Damietta",
+    "South Sinai",
+    "Kafr El Sheikh",
+    "Matrouh",
+    "Luxor",
+    "Qena",
+    "North Sinai",
+    "Sohag",
   ];
 
   final List<String> _tradesmanServices = [
-    "Electrician", "Plumber", "Carpenter", "HVAC Technician", "Painter", "Mechanic", "Blacksmith"
+    "Electrician",
+    "Plumber",
+    "Carpenter",
+    "HVAC Technician",
+    "Painter",
+    "Mechanic",
+    "Blacksmith",
   ];
   final List<String> _selectedServices = [];
   final _otherServiceController = TextEditingController();
 
   @override
   void dispose() {
-    _fullName.dispose(); _phone.dispose(); _email.dispose(); _dob.dispose(); _aboutMe.dispose();
-    _facebook.dispose(); _instagram.dispose(); _whatsapp.dispose();
-    _eduInstitution.dispose(); _eduDuration.dispose(); _eduDegree.dispose();
-    _expTitle.dispose(); _expDuration.dispose(); _skillController.dispose();
+    _fullName.dispose();
+    _phone.dispose();
+    _email.dispose();
+    _dob.dispose();
+    _aboutMe.dispose();
+    _facebook.dispose();
+    _instagram.dispose();
+    _whatsapp.dispose();
+    _eduInstitution.dispose();
+    _eduDuration.dispose();
+    _eduDegree.dispose();
+    _expTitle.dispose();
+    _expDuration.dispose();
+    _skillController.dispose();
     _otherServiceController.dispose();
     super.dispose();
   }
@@ -118,7 +159,9 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
           'duration': _eduDuration.text,
           'degree': _eduDegree.text,
         });
-        _eduInstitution.clear(); _eduDuration.clear(); _eduDegree.clear();
+        _eduInstitution.clear();
+        _eduDuration.clear();
+        _eduDegree.clear();
       });
     }
   }
@@ -130,7 +173,8 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
           'title': _expTitle.text,
           'duration': _expDuration.text,
         });
-        _expTitle.clear(); _expDuration.clear();
+        _expTitle.clear();
+        _expDuration.clear();
       });
     }
   }
@@ -147,15 +191,19 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
-    
+
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: ThemeController.instance.themeMode,
       builder: (context, themeMode, _) {
         final size = MediaQuery.sizeOf(context);
-        final isDark = themeMode == ThemeMode.dark || 
-                      (themeMode == ThemeMode.system && MediaQuery.platformBrightnessOf(context) == Brightness.dark);
-        
-        final backgroundColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
+        final isDark =
+            themeMode == ThemeMode.dark ||
+            (themeMode == ThemeMode.system &&
+                MediaQuery.platformBrightnessOf(context) == Brightness.dark);
+
+        final backgroundColor = isDark
+            ? const Color(0xFF001E3A)
+            : const Color(0xFFF8FBF4);
         final textColor = isDark ? Colors.white : Colors.black;
 
         return Scaffold(
@@ -173,23 +221,54 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
 
                   // Photos
                   _buildSectionTitle(t.profilePhoto, isDark),
-                  _buildPhotoUploadArea(type: 'profile', file: _profileImage, isDark: isDark),
+                  _buildPhotoUploadArea(
+                    type: 'profile',
+                    file: _profileImage,
+                    isDark: isDark,
+                  ),
                   const SizedBox(height: 30),
-                  _buildSectionTitle(t.tr(en: "Wallpaper", ar: "صورة الغلاف"), isDark),
-                  _buildPhotoUploadArea(type: 'wallpaper', file: _wallpaperImage, isDark: isDark),
+                  _buildSectionTitle(
+                    t.tr(en: "Wallpaper", ar: "صورة الغلاف"),
+                    isDark,
+                  ),
+                  _buildPhotoUploadArea(
+                    type: 'wallpaper',
+                    file: _wallpaperImage,
+                    isDark: isDark,
+                  ),
                   const SizedBox(height: 30),
 
                   // Personal Info
                   _buildSectionTitle(t.personalInfo, isDark),
                   const SizedBox(height: 16),
                   _buildLabel(t.fullName, textColor),
-                  _buildTextField(_fullName, t.tr(en: 'e.g. Karim Mohamed', ar: 'مثال: كريم محمد'), isDark, errorText: _fullNameError, onChanged: (v) => setState(() => _fullNameError = null)),
+                  _buildTextField(
+                    _fullName,
+                    t.tr(en: 'e.g. Karim Mohamed', ar: 'مثال: كريم محمد'),
+                    isDark,
+                    errorText: _fullNameError,
+                    onChanged: (v) => setState(() => _fullNameError = null),
+                  ),
                   const SizedBox(height: 16),
                   _buildLabel(t.phoneNumber, textColor),
-                  _buildTextField(_phone, '01xxxxxxxxx', isDark, keyboardType: TextInputType.phone, errorText: _phoneError, onChanged: (v) => setState(() => _phoneError = null)),
+                  _buildTextField(
+                    _phone,
+                    '01xxxxxxxxx',
+                    isDark,
+                    keyboardType: TextInputType.phone,
+                    errorText: _phoneError,
+                    onChanged: (v) => setState(() => _phoneError = null),
+                  ),
                   const SizedBox(height: 16),
                   _buildLabel(t.email, textColor),
-                  _buildTextField(_email, 'example@gmail.com', isDark, keyboardType: TextInputType.emailAddress, errorText: _emailError, onChanged: (v) => setState(() => _emailError = null)),
+                  _buildTextField(
+                    _email,
+                    'example@gmail.com',
+                    isDark,
+                    keyboardType: TextInputType.emailAddress,
+                    errorText: _emailError,
+                    onChanged: (v) => setState(() => _emailError = null),
+                  ),
                   const SizedBox(height: 16),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -201,7 +280,15 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                             _buildLabel(t.dob, textColor),
                             GestureDetector(
                               onTap: () => _selectDate(context),
-                              child: AbsorbPointer(child: _buildTextField(_dob, 'DD/MM/YYYY', isDark, suffixIcon: Icons.calendar_today_outlined, errorText: _dobError)),
+                              child: AbsorbPointer(
+                                child: _buildTextField(
+                                  _dob,
+                                  'DD/MM/YYYY',
+                                  isDark,
+                                  suffixIcon: Icons.calendar_today_outlined,
+                                  errorText: _dobError,
+                                ),
+                              ),
                             ),
                           ],
                         ),
@@ -219,7 +306,10 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  _buildLabel(t.tr(en: "Governorate", ar: "المحافظة"), textColor),
+                  _buildLabel(
+                    t.tr(en: "Governorate", ar: "المحافظة"),
+                    textColor,
+                  ),
                   _buildGovernorateDropdown(isDark, t),
 
                   const SizedBox(height: 40),
@@ -233,27 +323,43 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                     Text(
                       t.tr(
                         en: "The criminal record is an official document that shows a person's criminal history (Fish and Tashbih).",
-                        ar: "صحيفة الحالة الجنائية هي وثيقة رسمية توضح التاريخ الجنائي للشخص (الفيش والتشبيه)"
+                        ar: "صحيفة الحالة الجنائية هي وثيقة رسمية توضح التاريخ الجنائي للشخص (الفيش والتشبيه)",
                       ),
-                      style: TextStyle(color: textColor.withOpacity(0.6), fontSize: 13),
+                      style: TextStyle(
+                        color: textColor.withOpacity(0.6),
+                        fontSize: 13,
+                      ),
                     ),
                     const SizedBox(height: 16),
-                    _buildPhotoUploadArea(type: 'criminal', file: _criminalRecordFile, isDark: isDark),
+                    _buildPhotoUploadArea(
+                      type: 'criminal',
+                      file: _criminalRecordFile,
+                      isDark: isDark,
+                    ),
                     const SizedBox(height: 40),
                     const Divider(color: Colors.black12),
                     const SizedBox(height: 20),
                   ],
 
                   // About Me
-                  _buildSectionTitle(t.tr(en: "Brief About Me", ar: "نبذة عني"), isDark),
+                  _buildSectionTitle(
+                    t.tr(en: "Brief About Me", ar: "نبذة عني"),
+                    isDark,
+                  ),
                   const SizedBox(height: 12),
                   _buildTextField(
-                    _aboutMe, 
-                    _selectedRole == "Tradesman" 
-                      ? t.tr(en: "Tell us about your craft and experience...", ar: "تحدث عن حرفتك وخبرتك...")
-                      : t.tr(en: "Write a short brief about your skills and goals...", ar: "اكتب نبذة قصيرة عن مهاراتك وأهدافك..."), 
-                    isDark, 
-                    maxLines: 4
+                    _aboutMe,
+                    _selectedRole == "Tradesman"
+                        ? t.tr(
+                            en: "Tell us about your craft and experience...",
+                            ar: "تحدث عن حرفتك وخبرتك...",
+                          )
+                        : t.tr(
+                            en: "Write a short brief about your skills and goals...",
+                            ar: "اكتب نبذة قصيرة عن مهاراتك وأهدافك...",
+                          ),
+                    isDark,
+                    maxLines: 4,
                   ),
 
                   const SizedBox(height: 40),
@@ -265,33 +371,82 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                     _buildSectionTitle(t.education, isDark),
                     const SizedBox(height: 16),
                     if (_educationList.isNotEmpty) ...[
-                      ..._educationList.map((edu) => _buildAddedItem(edu['institution']!, "${edu['degree']} (${edu['duration']})", isDark, () {
-                        setState(() => _educationList.remove(edu));
-                      })),
+                      ..._educationList.map(
+                        (edu) => _buildAddedItem(
+                          edu['institution']!,
+                          "${edu['degree']} (${edu['duration']})",
+                          isDark,
+                          () {
+                            setState(() => _educationList.remove(edu));
+                          },
+                        ),
+                      ),
                       const SizedBox(height: 16),
                     ],
                     Row(
                       children: [
-                        Expanded(child: _buildLabel(t.tr(en: "Education institution", ar: "المؤسسة التعليمية"), textColor)),
+                        Expanded(
+                          child: _buildLabel(
+                            t.tr(
+                              en: "Education institution",
+                              ar: "المؤسسة التعليمية",
+                            ),
+                            textColor,
+                          ),
+                        ),
                         const SizedBox(width: 16),
-                        _buildLabel(t.tr(en: "Duration", ar: "المدة"), textColor),
+                        _buildLabel(
+                          t.tr(en: "Duration", ar: "المدة"),
+                          textColor,
+                        ),
                         const SizedBox(width: 40),
                       ],
                     ),
                     Row(
                       children: [
-                        Expanded(child: _buildTextField(_eduInstitution, t.tr(en: "e.g. El Shorouk Academy", ar: "مثال: أكاديمية الشروق"), isDark)),
+                        Expanded(
+                          child: _buildTextField(
+                            _eduInstitution,
+                            t.tr(
+                              en: "e.g. El Shorouk Academy",
+                              ar: "مثال: أكاديمية الشروق",
+                            ),
+                            isDark,
+                          ),
+                        ),
                         const SizedBox(width: 16),
-                        Expanded(child: _buildTextField(_eduDuration, '2023 - 2026', isDark)),
+                        Expanded(
+                          child: _buildTextField(
+                            _eduDuration,
+                            '2023 - 2026',
+                            isDark,
+                          ),
+                        ),
                       ],
                     ),
                     const SizedBox(height: 12),
-                    _buildLabel(t.tr(en: "Academic degree", ar: "الدرجة العلمية"), textColor),
+                    _buildLabel(
+                      t.tr(en: "Academic degree", ar: "الدرجة العلمية"),
+                      textColor,
+                    ),
                     Row(
                       children: [
-                        Expanded(child: _buildTextField(_eduDegree, t.tr(en: "e.g. Bachelor's Degree", ar: "مثال: بكالوريوس نظم معلومات"), isDark)),
+                        Expanded(
+                          child: _buildTextField(
+                            _eduDegree,
+                            t.tr(
+                              en: "e.g. Bachelor's Degree",
+                              ar: "مثال: بكالوريوس نظم معلومات",
+                            ),
+                            isDark,
+                          ),
+                        ),
                         const SizedBox(width: 16),
-                        _buildActionButton(t.tr(en: "Add", ar: "إضافة"), isDark, _addEducation),
+                        _buildActionButton(
+                          t.tr(en: "Add", ar: "إضافة"),
+                          isDark,
+                          _addEducation,
+                        ),
                       ],
                     ),
 
@@ -300,7 +455,10 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                     const SizedBox(height: 20),
                   ] else ...[
                     // Services (For Tradesman)
-                    _buildSectionTitle(t.tr(en: "Choose Service", ar: "اختر الخدمة"), isDark),
+                    _buildSectionTitle(
+                      t.tr(en: "Choose Service", ar: "اختر الخدمة"),
+                      isDark,
+                    ),
                     const SizedBox(height: 16),
                     Wrap(
                       spacing: 10,
@@ -319,14 +477,23 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                               }
                             });
                           },
-                          selectedColor: const Color(0xFF0051DD).withOpacity(0.2),
+                          selectedColor: const Color(
+                            0xFF0051DD,
+                          ).withOpacity(0.2),
                           checkmarkColor: const Color(0xFF0051DD),
                         );
                       }).toList(),
                     ),
                     const SizedBox(height: 16),
-                    _buildLabel(t.tr(en: "Other profession", ar: "مهنة أخرى"), textColor),
-                    _buildTextField(_otherServiceController, t.tr(en: "e.g. Carpenter", ar: "مثال: نجار"), isDark),
+                    _buildLabel(
+                      t.tr(en: "Other profession", ar: "مهنة أخرى"),
+                      textColor,
+                    ),
+                    _buildTextField(
+                      _otherServiceController,
+                      t.tr(en: "e.g. Carpenter", ar: "مثال: نجار"),
+                      isDark,
+                    ),
                     const SizedBox(height: 40),
                     const Divider(color: Colors.black12),
                     const SizedBox(height: 20),
@@ -337,22 +504,42 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                     _buildSectionTitle(t.workExperience, isDark),
                     const SizedBox(height: 16),
                     if (_experienceList.isNotEmpty) ...[
-                      ..._experienceList.map((exp) => _buildAddedItem(exp['title']!, exp['duration']!, isDark, () {
-                        setState(() => _experienceList.remove(exp));
-                      })),
+                      ..._experienceList.map(
+                        (exp) => _buildAddedItem(
+                          exp['title']!,
+                          exp['duration']!,
+                          isDark,
+                          () {
+                            setState(() => _experienceList.remove(exp));
+                          },
+                        ),
+                      ),
                       const SizedBox(height: 16),
                     ],
                     Row(
                       children: [
                         Expanded(child: _buildLabel(t.jobTitle, textColor)),
                         const SizedBox(width: 16),
-                        _buildActionButton(t.tr(en: "Add", ar: "إضافة"), isDark, _addExperience),
+                        _buildActionButton(
+                          t.tr(en: "Add", ar: "إضافة"),
+                          isDark,
+                          _addExperience,
+                        ),
                       ],
                     ),
-                    _buildTextField(_expTitle, t.tr(en: "e.g. Accountant", ar: "مثال: محاسب"), isDark),
+                    _buildTextField(
+                      _expTitle,
+                      t.tr(en: "e.g. Accountant", ar: "مثال: محاسب"),
+                      isDark,
+                    ),
                     const SizedBox(height: 12),
                     _buildLabel(t.tr(en: "Duration", ar: "المدة"), textColor),
-                    _buildTextField(_expDuration, '2 Years', isDark, width: size.width * 0.4),
+                    _buildTextField(
+                      _expDuration,
+                      '2 Years',
+                      isDark,
+                      width: size.width * 0.4,
+                    ),
 
                     const SizedBox(height: 40),
                     const Divider(color: Colors.black12),
@@ -365,11 +552,23 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                   if (_skillsList.isNotEmpty) ...[
                     Wrap(
                       spacing: 8,
-                      children: _skillsList.map((skill) => Chip(
-                        label: Text(skill, style: TextStyle(color: isDark ? Colors.white : Colors.black)),
-                        onDeleted: () => setState(() => _skillsList.remove(skill)),
-                        backgroundColor: isDark ? Colors.white10 : Colors.black12,
-                      )).toList(),
+                      children: _skillsList
+                          .map(
+                            (skill) => Chip(
+                              label: Text(
+                                skill,
+                                style: TextStyle(
+                                  color: isDark ? Colors.white : Colors.black,
+                                ),
+                              ),
+                              onDeleted: () =>
+                                  setState(() => _skillsList.remove(skill)),
+                              backgroundColor: isDark
+                                  ? Colors.white10
+                                  : Colors.black12,
+                            ),
+                          )
+                          .toList(),
                     ),
                     const SizedBox(height: 12),
                   ],
@@ -377,15 +576,22 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                     children: [
                       Expanded(
                         child: _buildTextField(
-                          _skillController, 
-                          _selectedRole == "Tradesman" 
-                            ? t.tr(en: "e.g. welding", ar: "مثال: لحام المعادن") 
-                            : t.tr(en: "e.g. dart", ar: "مثال: dart"), 
-                          isDark
-                        )
+                          _skillController,
+                          _selectedRole == "Tradesman"
+                              ? t.tr(
+                                  en: "e.g. welding",
+                                  ar: "مثال: لحام المعادن",
+                                )
+                              : t.tr(en: "e.g. dart", ar: "مثال: dart"),
+                          isDark,
+                        ),
                       ),
                       const SizedBox(width: 16),
-                      _buildActionButton(t.tr(en: "Add", ar: "إضافة"), isDark, _addSkill),
+                      _buildActionButton(
+                        t.tr(en: "Add", ar: "إضافة"),
+                        isDark,
+                        _addSkill,
+                      ),
                     ],
                   ),
 
@@ -403,7 +609,12 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                   _buildTextField(_instagram, 'URL', isDark),
                   const SizedBox(height: 12),
                   _buildLabel("WhatsApp", textColor),
-                  _buildTextField(_whatsapp, 'Phone Number', isDark, keyboardType: TextInputType.phone),
+                  _buildTextField(
+                    _whatsapp,
+                    'Phone Number',
+                    isDark,
+                    keyboardType: TextInputType.phone,
+                  ),
 
                   if (_selectedRole == "Tradesman") ...[
                     const SizedBox(height: 40),
@@ -411,11 +622,18 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                     const SizedBox(height: 20),
                     _buildSectionTitle(t.yourWork, isDark),
                     const SizedBox(height: 16),
-                    _buildPhotoUploadArea(type: 'work', file: _workImages.isNotEmpty ? _workImages.first : null, isDark: isDark),
+                    _buildPhotoUploadArea(
+                      type: 'work',
+                      file: _workImages.isNotEmpty ? _workImages.first : null,
+                      isDark: isDark,
+                    ),
                   ],
 
                   const SizedBox(height: 50),
-                  Align(alignment: Alignment.centerRight, child: _buildSaveButton(t)),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: _buildSaveButton(t),
+                  ),
                   const SizedBox(height: 40),
                 ],
               ),
@@ -428,28 +646,60 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
 
   String _translateService(String service, AppLocalizations t) {
     switch (service) {
-      case "Electrician": return t.tr(en: "Electrician", ar: "كهربائي");
-      case "Plumber": return t.tr(en: "Plumber", ar: "فني سباكة");
-      case "Carpenter": return t.tr(en: "Carpenter", ar: "نجار");
-      case "HVAC Technician": return t.tr(en: "HVAC Technician", ar: "فني تكييف");
-      case "Painter": return t.tr(en: "Painter", ar: "نقاش");
-      case "Mechanic": return t.tr(en: "Mechanic", ar: "ميكانيكي");
-      case "Blacksmith": return t.tr(en: "Blacksmith", ar: "حداد");
-      default: return service;
+      case "Electrician":
+        return t.tr(en: "Electrician", ar: "كهربائي");
+      case "Plumber":
+        return t.tr(en: "Plumber", ar: "فني سباكة");
+      case "Carpenter":
+        return t.tr(en: "Carpenter", ar: "نجار");
+      case "HVAC Technician":
+        return t.tr(en: "HVAC Technician", ar: "فني تكييف");
+      case "Painter":
+        return t.tr(en: "Painter", ar: "نقاش");
+      case "Mechanic":
+        return t.tr(en: "Mechanic", ar: "ميكانيكي");
+      case "Blacksmith":
+        return t.tr(en: "Blacksmith", ar: "حداد");
+      default:
+        return service;
     }
   }
 
   Widget _buildHeader(AppLocalizations t, bool isDark) {
     return RichText(
       text: TextSpan(
-        style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black, height: 1.2),
+        style: TextStyle(
+          fontSize: 26,
+          fontWeight: FontWeight.bold,
+          color: isDark ? Colors.white : Colors.black,
+          height: 1.2,
+        ),
         children: [
-          TextSpan(text: t.tr(en: 'You Can Signin ', ar: 'يمكنك تسجيل الدخول كـ ')),
-          TextSpan(text: t.tr(en: 'tradesman', ar: 'حرفي'), style: const TextStyle(color: Color(0xFF0051DD))),
-          TextSpan(text: t.tr(en: ' or a ', ar: ' أو ')),
-          TextSpan(text: t.tr(en: 'job seeker', ar: 'باحث عن عمل'), style: const TextStyle(color: Color(0xFFF77F32))),
-          TextSpan(text: t.tr(en: ' with ', ar: ' مع ')),
-          const TextSpan(text: 'Jobito', style: TextStyle(color: Color(0xFFF77F32), decoration: TextDecoration.underline, decorationColor: Color(0xFFF77F32))),
+          TextSpan(
+            text: t.tr(en: 'You Can Signin ', ar: 'يمكنك تسجيل الدخول كـ '),
+          ),
+          TextSpan(
+            text: t.tr(en: 'tradesman', ar: 'حرفي'),
+            style: const TextStyle(color: Color(0xFF0051DD)),
+          ),
+          TextSpan(
+            text: t.tr(en: ' or a ', ar: ' أو '),
+          ),
+          TextSpan(
+            text: t.tr(en: 'job seeker', ar: 'باحث عن عمل'),
+            style: const TextStyle(color: Color(0xFFF77F32)),
+          ),
+          TextSpan(
+            text: t.tr(en: ' with ', ar: ' مع '),
+          ),
+          const TextSpan(
+            text: 'Jobito',
+            style: TextStyle(
+              color: Color(0xFFF77F32),
+              decoration: TextDecoration.underline,
+              decorationColor: Color(0xFFF77F32),
+            ),
+          ),
         ],
       ),
     );
@@ -460,20 +710,38 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        _buildRoleBtn(t.tr(en: "Job Seeker", ar: "باحث عن عمل"), const Color(0xFFF77F32)),
+        _buildRoleBtn(
+          t.tr(en: "Job Seeker", ar: "باحث عن عمل"),
+          const Color(0xFFF77F32),
+        ),
         Container(
           margin: const EdgeInsets.symmetric(horizontal: 16),
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          decoration: BoxDecoration(color: const Color(0xFF0D1B3E), borderRadius: BorderRadius.circular(4)),
-          child: Text(t.tr(en: "OR", ar: "أو"), style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 12)),
+          decoration: BoxDecoration(
+            color: const Color(0xFF0D1B3E),
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: Text(
+            t.tr(en: "OR", ar: "أو"),
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              fontSize: 12,
+            ),
+          ),
         ),
-        _buildRoleBtn(t.tr(en: "Tradesman", ar: "حرفي"), const Color(0xFF0051DD)),
+        _buildRoleBtn(
+          t.tr(en: "Tradesman", ar: "حرفي"),
+          const Color(0xFF0051DD),
+        ),
       ],
     );
   }
 
   Widget _buildRoleBtn(String role, Color color) {
-    String roleValue = (role == "Job Seeker" || role == "باحث عن عمل") ? "Job Seeker" : "Tradesman";
+    String roleValue = (role == "Job Seeker" || role == "باحث عن عمل")
+        ? "Job Seeker"
+        : "Tradesman";
     bool isSelected = _selectedRole == roleValue;
     return GestureDetector(
       onTap: () => setState(() => _selectedRole = roleValue),
@@ -484,20 +752,53 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: color),
         ),
-        child: Text(role, style: TextStyle(color: isSelected ? Colors.white : color, fontWeight: FontWeight.bold)),
+        child: Text(
+          role,
+          style: TextStyle(
+            color: isSelected ? Colors.white : color,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
     );
   }
 
   Widget _buildSectionTitle(String title, bool isDark) {
-    return Text(title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black));
+    return Text(
+      title,
+      style: TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.bold,
+        color: isDark ? Colors.white : Colors.black,
+      ),
+    );
   }
 
   Widget _buildLabel(String text, Color color) {
-    return Padding(padding: const EdgeInsets.only(bottom: 8), child: Text(text, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: color.withOpacity(0.8))));
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          color: color.withOpacity(0.8),
+        ),
+      ),
+    );
   }
 
-  Widget _buildTextField(TextEditingController controller, String hint, bool isDark, {int maxLines = 1, IconData? suffixIcon, double? width, TextInputType? keyboardType, String? errorText, Function(String)? onChanged}) {
+  Widget _buildTextField(
+    TextEditingController controller,
+    String hint,
+    bool isDark, {
+    int maxLines = 1,
+    IconData? suffixIcon,
+    double? width,
+    TextInputType? keyboardType,
+    String? errorText,
+    Function(String)? onChanged,
+  }) {
     return Container(
       width: width,
       margin: const EdgeInsets.only(bottom: 4),
@@ -509,16 +810,42 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         style: TextStyle(color: isDark ? Colors.white : Colors.black),
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: TextStyle(color: isDark ? Colors.white38 : Colors.black26, fontSize: 14),
-          suffixIcon: suffixIcon != null ? Icon(suffixIcon, size: 20, color: isDark ? Colors.white54 : Colors.black54) : null,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          hintStyle: TextStyle(
+            color: isDark ? Colors.white38 : Colors.black26,
+            fontSize: 14,
+          ),
+          suffixIcon: suffixIcon != null
+              ? Icon(
+                  suffixIcon,
+                  size: 20,
+                  color: isDark ? Colors.white54 : Colors.black54,
+                )
+              : null,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 14,
+          ),
           filled: true,
           fillColor: isDark ? Colors.white.withOpacity(0.05) : Colors.white,
           errorText: errorText,
-          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: isDark ? Colors.white24 : Colors.black12)),
-          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFF142C66), width: 1.5)),
-          errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Colors.redAccent)),
-          focusedErrorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Colors.redAccent, width: 1.5)),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide(
+              color: isDark ? Colors.white24 : Colors.black12,
+            ),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: const BorderSide(color: Color(0xFF142C66), width: 1.5),
+          ),
+          errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: const BorderSide(color: Colors.redAccent),
+          ),
+          focusedErrorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: const BorderSide(color: Colors.redAccent, width: 1.5),
+          ),
         ),
       ),
     );
@@ -528,15 +855,31 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     return Container(
       height: 48,
       padding: const EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(color: isDark ? Colors.white.withOpacity(0.05) : Colors.white, border: Border.all(color: isDark ? Colors.white24 : Colors.black12), borderRadius: BorderRadius.circular(8)),
+      decoration: BoxDecoration(
+        color: isDark ? Colors.white.withOpacity(0.05) : Colors.white,
+        border: Border.all(color: isDark ? Colors.white24 : Colors.black12),
+        borderRadius: BorderRadius.circular(8),
+      ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           value: _selectedGender,
           isExpanded: true,
           dropdownColor: isDark ? const Color(0xFF001E3A) : Colors.white,
           items: [
-            DropdownMenuItem(value: "Male", child: Text(t.tr(en: "Male", ar: "ذكر"), style: TextStyle(color: isDark ? Colors.white : Colors.black))),
-            DropdownMenuItem(value: "Female", child: Text(t.tr(en: "Female", ar: "أنثى"), style: TextStyle(color: isDark ? Colors.white : Colors.black))),
+            DropdownMenuItem(
+              value: "Male",
+              child: Text(
+                t.tr(en: "Male", ar: "ذكر"),
+                style: TextStyle(color: isDark ? Colors.white : Colors.black),
+              ),
+            ),
+            DropdownMenuItem(
+              value: "Female",
+              child: Text(
+                t.tr(en: "Female", ar: "أنثى"),
+                style: TextStyle(color: isDark ? Colors.white : Colors.black),
+              ),
+            ),
           ],
           onChanged: (v) => setState(() => _selectedGender = v!),
         ),
@@ -551,15 +894,36 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         Container(
           height: 48,
           padding: const EdgeInsets.symmetric(horizontal: 12),
-          decoration: BoxDecoration(color: isDark ? Colors.white.withOpacity(0.05) : Colors.white, border: Border.all(color: _governorateError != null ? Colors.redAccent : (isDark ? Colors.white24 : Colors.black12)), borderRadius: BorderRadius.circular(8)),
+          decoration: BoxDecoration(
+            color: isDark ? Colors.white.withOpacity(0.05) : Colors.white,
+            border: Border.all(
+              color: _governorateError != null
+                  ? Colors.redAccent
+                  : (isDark ? Colors.white24 : Colors.black12),
+            ),
+            borderRadius: BorderRadius.circular(8),
+          ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
               value: _selectedGovernorate,
-              hint: Text(t.tr(en: "Select Governorate", ar: "اختر المحافظة"), style: TextStyle(color: isDark ? Colors.white38 : Colors.black26)),
+              hint: Text(
+                t.tr(en: "Select Governorate", ar: "اختر المحافظة"),
+                style: TextStyle(
+                  color: isDark ? Colors.white38 : Colors.black26,
+                ),
+              ),
               isExpanded: true,
               dropdownColor: isDark ? const Color(0xFF001E3A) : Colors.white,
               items: _egyptGovernorates.map((gov) {
-                return DropdownMenuItem(value: gov, child: Text(t.translateLocation(gov), style: TextStyle(color: isDark ? Colors.white : Colors.black)));
+                return DropdownMenuItem(
+                  value: gov,
+                  child: Text(
+                    t.translateLocation(gov),
+                    style: TextStyle(
+                      color: isDark ? Colors.white : Colors.black,
+                    ),
+                  ),
+                );
               }).toList(),
               onChanged: (v) => setState(() {
                 _selectedGovernorate = v;
@@ -571,35 +935,87 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         if (_governorateError != null)
           Padding(
             padding: const EdgeInsets.only(top: 4, left: 12),
-            child: Text(_governorateError!, style: const TextStyle(color: Colors.redAccent, fontSize: 12)),
+            child: Text(
+              _governorateError!,
+              style: const TextStyle(color: Colors.redAccent, fontSize: 12),
+            ),
           ),
       ],
     );
   }
 
-  Widget _buildPhotoUploadArea({required String type, File? file, required bool isDark}) {
+  Widget _buildPhotoUploadArea({
+    required String type,
+    File? file,
+    required bool isDark,
+  }) {
     final t = AppLocalizations.of(context);
     return GestureDetector(
       onTap: () => _pickImage(type),
       child: Container(
         width: double.infinity,
         height: 100,
-        decoration: BoxDecoration(color: isDark ? Colors.white.withOpacity(0.05) : Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFF0051DD).withOpacity(0.3), width: 1)),
-        child: file != null 
-          ? ClipRRect(borderRadius: BorderRadius.circular(12), child: Image.file(file, fit: BoxFit.cover))
-          : Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.cloud_upload_outlined, color: Color(0xFF0051DD), size: 28),
-                const SizedBox(height: 8),
-                RichText(text: TextSpan(style: TextStyle(fontSize: 13, color: isDark ? Colors.white70 : Colors.black54), children: [
-                  TextSpan(text: t.tr(en: 'Click to ', ar: 'اضغط لـ '), style: const TextStyle(color: Color(0xFF0051DD), decoration: TextDecoration.underline)),
-                  TextSpan(text: t.tr(en: 'replace', ar: 'الاستبدال'), style: const TextStyle(color: Color(0xFF0051DD), decoration: TextDecoration.underline)),
-                  TextSpan(text: t.tr(en: ' or drag and drop', ar: ' أو السحب والإفلات')),
-                ])),
-                Text("(SVG, PNG, JPG or GIF (max. 400 x 400px))", style: TextStyle(color: isDark ? Colors.white38 : Colors.grey, fontSize: 10))
-              ],
-            ),
+        decoration: BoxDecoration(
+          color: isDark ? Colors.white.withOpacity(0.05) : Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: const Color(0xFF0051DD).withOpacity(0.3),
+            width: 1,
+          ),
+        ),
+        child: file != null
+            ? ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.file(file, fit: BoxFit.cover),
+              )
+            : Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.cloud_upload_outlined,
+                    color: Color(0xFF0051DD),
+                    size: 28,
+                  ),
+                  const SizedBox(height: 8),
+                  RichText(
+                    text: TextSpan(
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: isDark ? Colors.white70 : Colors.black54,
+                      ),
+                      children: [
+                        TextSpan(
+                          text: t.tr(en: 'Click to ', ar: 'اضغط لـ '),
+                          style: const TextStyle(
+                            color: Color(0xFF0051DD),
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                        TextSpan(
+                          text: t.tr(en: 'replace', ar: 'الاستبدال'),
+                          style: const TextStyle(
+                            color: Color(0xFF0051DD),
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                        TextSpan(
+                          text: t.tr(
+                            en: ' or drag and drop',
+                            ar: ' أو السحب والإفلات',
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Text(
+                    "(SVG, PNG, JPG or GIF (max. 400 x 400px))",
+                    style: TextStyle(
+                      color: isDark ? Colors.white38 : Colors.grey,
+                      fontSize: 10,
+                    ),
+                  ),
+                ],
+              ),
       ),
     );
   }
@@ -609,24 +1025,68 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), border: Border.all(color: const Color(0xFF0051DD).withOpacity(0.3))),
-        child: Text(text, style: const TextStyle(color: Color(0xFF0051DD), fontSize: 12, fontWeight: FontWeight.bold)),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: const Color(0xFF0051DD).withOpacity(0.3)),
+        ),
+        child: Text(
+          text,
+          style: const TextStyle(
+            color: Color(0xFF0051DD),
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
     );
   }
 
-  Widget _buildAddedItem(String title, String subtitle, bool isDark, VoidCallback onDelete) {
+  Widget _buildAddedItem(
+    String title,
+    String subtitle,
+    bool isDark,
+    VoidCallback onDelete,
+  ) {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(color: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.03), borderRadius: BorderRadius.circular(8)),
+      decoration: BoxDecoration(
+        color: isDark
+            ? Colors.white.withOpacity(0.05)
+            : Colors.black.withOpacity(0.03),
+        borderRadius: BorderRadius.circular(8),
+      ),
       child: Row(
         children: [
-          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(title, style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black)),
-            Text(subtitle, style: TextStyle(fontSize: 12, color: isDark ? Colors.white70 : Colors.black54)),
-          ])),
-          IconButton(icon: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 20), onPressed: onDelete),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : Colors.black,
+                  ),
+                ),
+                Text(
+                  subtitle,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: isDark ? Colors.white70 : Colors.black54,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          IconButton(
+            icon: const Icon(
+              Icons.delete_outline,
+              color: Colors.redAccent,
+              size: 20,
+            ),
+            onPressed: onDelete,
+          ),
         ],
       ),
     );
@@ -638,23 +1098,29 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   Future<void> _saveProfile(AppLocalizations t) async {
     // 1. Validate required fields
     setState(() {
-      _fullNameError    = _fullName.text.trim().isEmpty ? t.required : null;
-      _phoneError       = _phone.text.trim().isEmpty    ? t.required : null;
-      _emailError       = _email.text.trim().isEmpty    ? t.required : null;
-      _dobError         = _dob.text.isEmpty             ? t.required : null;
-      _governorateError = _selectedGovernorate == null  ? t.required : null;
+      _fullNameError = _fullName.text.trim().isEmpty ? t.required : null;
+      _phoneError = _phone.text.trim().isEmpty ? t.required : null;
+      _emailError = _email.text.trim().isEmpty ? t.required : null;
+      _dobError = _dob.text.isEmpty ? t.required : null;
+      _governorateError = _selectedGovernorate == null ? t.required : null;
     });
 
-    if (_fullNameError != null || _phoneError != null ||
-        _emailError != null || _dobError != null ||
+    if (_fullNameError != null ||
+        _phoneError != null ||
+        _emailError != null ||
+        _dobError != null ||
         _governorateError != null) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(t.tr(
-          en: 'Please fill all required fields',
-          ar: 'يرجى ملء جميع الحقول المطلوبة',
-        )),
-        backgroundColor: Colors.redAccent,
-      ));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            t.tr(
+              en: 'Please fill all required fields',
+              ar: 'يرجى ملء جميع الحقول المطلوبة',
+            ),
+          ),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
       return;
     }
 
@@ -666,23 +1132,31 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
           _otherServiceController.text.trim(),
       ];
       if (allServices.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(t.tr(
-            en: 'Please select at least one service',
-            ar: 'يرجى اختيار خدمة واحدة على الأقل',
-          )),
-          backgroundColor: Colors.redAccent,
-        ));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              t.tr(
+                en: 'Please select at least one service',
+                ar: 'يرجى اختيار خدمة واحدة على الأقل',
+              ),
+            ),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
         return;
       }
       if (_criminalRecordFile == null) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(t.tr(
-            en: 'Please upload your criminal record (Fish)',
-            ar: 'يرجى رفع الفيش الجنائي',
-          )),
-          backgroundColor: Colors.redAccent,
-        ));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              t.tr(
+                en: 'Please upload your criminal record (Fish)',
+                ar: 'يرجى رفع الفيش الجنائي',
+              ),
+            ),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
         return;
       }
     }
@@ -720,59 +1194,59 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
       ];
 
       final Map<String, dynamic> payload = {
-        'fullName'  : _fullName.text.trim(),
-        'phone'     : _phone.text.trim(),
-        'bio'       : _aboutMe.text.trim(),
-        'dob'       : _dob.text,           // Backend: dob
-        'gender'    : _selectedGender,
-        'location'  : _selectedGovernorate,
+        'fullName': _fullName.text.trim(),
+        'phone': _phone.text.trim(),
+        'bio': _aboutMe.text.trim(),
+        'dob': _dob.text, // Backend: dob
+        'gender': _selectedGender,
+        'location': _selectedGovernorate,
         'classification': isTradesman ? 'tradesman' : 'seeker',
 
-        if (_skillsList.isNotEmpty)
-          'skills' : _skillsList,          // Backend: skills
-
+        if (_skillsList.isNotEmpty) 'skills': _skillsList, // Backend: skills
         // Seeker-specific
         if (!isTradesman && _educationList.isNotEmpty)
-          'educations' : _educationList,   // Backend: educations
+          'educations': _educationList, // Backend: educations
 
         if (!isTradesman && _experienceList.isNotEmpty)
-          'experiences' : _experienceList, // Backend: experiences
-
+          'experiences': _experienceList, // Backend: experiences
         // Tradesman-specific
         if (isTradesman && allServices.isNotEmpty)
-          'services' : allServices,        // Backend: services
+          'services': allServices, // Backend: services
 
         if (isTradesman && criminalRecordUrl != null)
-          'criminalRecordUrl' : criminalRecordUrl, // Backend: criminalRecordUrl
+          'criminalRecordUrl': criminalRecordUrl, // Backend: criminalRecordUrl
 
         if (portfolioUrls.isNotEmpty)
-          'portfolios' : portfolioUrls,    // Backend: portfolios
+          'portfolios': portfolioUrls, // Backend: portfolios
 
-        if (avatarUrl != null)
-          'avatarUrl' : avatarUrl,         // Backend: avatarUrl
+        if (avatarUrl != null) 'avatarUrl': avatarUrl, // Backend: avatarUrl
       };
 
       // 7. Call PUT /api/users/me
-      final response = await RecruitmentSyncService.instance.completeUserProfile(payload);
+      final response = await RecruitmentSyncService.instance
+          .completeUserProfile(payload);
 
       if (!mounted) return;
 
       // 8. Handle requiresLogout (tradesman pending review)
       if (response['requiresLogout'] == true) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(t.tr(
-            en: 'Your account is under review. You will be notified once approved.',
-            ar: 'حسابك قيد المراجعة. سيتم إشعارك عند الموافقة.',
-          )),
-          backgroundColor: Colors.orange,
-          duration: const Duration(seconds: 4),
-        ));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              t.tr(
+                en: 'Your account is under review. You will be notified once approved.',
+                ar: 'حسابك قيد المراجعة. سيتم إشعارك عند الموافقة.',
+              ),
+            ),
+            backgroundColor: Colors.orange,
+            duration: const Duration(seconds: 4),
+          ),
+        );
         // Logout and go to sign-in
         await RecruitmentSyncService.instance.logout();
-        Navigator.of(context).pushNamedAndRemoveUntil(
-          AppRoutes.userSignInNew,
-          (route) => false,
-        );
+        Navigator.of(
+          context,
+        ).pushNamedAndRemoveUntil(AppRoutes.userSignInNew, (route) => false);
         return;
       }
 
@@ -785,58 +1259,74 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
       // 10. Update local store & legacy data
       final store = RecruitmentSyncStore.instance;
       final List<Map<String, String>> socialLinks = [];
-      if (_facebook.text.isNotEmpty)  socialLinks.add({'platform': 'Facebook',  'url': _facebook.text});
-      if (_instagram.text.isNotEmpty) socialLinks.add({'platform': 'Instagram', 'url': _instagram.text});
-      if (_whatsapp.text.isNotEmpty)  socialLinks.add({'platform': 'WhatsApp',  'url': _whatsapp.text});
+      if (_facebook.text.isNotEmpty)
+        socialLinks.add({'platform': 'Facebook', 'url': _facebook.text});
+      if (_instagram.text.isNotEmpty)
+        socialLinks.add({'platform': 'Instagram', 'url': _instagram.text});
+      if (_whatsapp.text.isNotEmpty)
+        socialLinks.add({'platform': 'WhatsApp', 'url': _whatsapp.text});
 
       store.updateUserProfile(
-        fullName   : _fullName.text.trim(),
-        title      : isTradesman
+        fullName: _fullName.text.trim(),
+        title: isTradesman
             ? (allServices.isNotEmpty ? allServices.join(', ') : 'Tradesman')
             : 'Job Seeker',
-        email      : _email.text.trim(),
-        phone      : _phone.text.trim(),
-        location   : _selectedGovernorate ?? '',
-        about      : _aboutMe.text.trim(),
-        skills     : _skillsList,
-        education  : _educationList,
-        experience : _experienceList,
+        email: _email.text.trim(),
+        phone: _phone.text.trim(),
+        location: _selectedGovernorate ?? '',
+        about: _aboutMe.text.trim(),
+        skills: _skillsList,
+        education: _educationList,
+        experience: _experienceList,
         socialLinks: socialLinks,
-        role               : _selectedRole,
-        backgroundImage    : _wallpaperImage?.path,
-        profileImage       : _profileImage?.path,
-        portfolioImages    : _workImages.map((e) => e.path).toList(),
-        birthDate          : _dob.text,
-        gender             : _selectedGender,
-        governorate        : _selectedGovernorate ?? '',
-        tradesmanServices  : _selectedServices,
+        role: _selectedRole,
+        backgroundImage: _wallpaperImage?.path,
+        profileImage: _profileImage?.path,
+        portfolioImages: _workImages.map((e) => e.path).toList(),
+        birthDate: _dob.text,
+        gender: _selectedGender,
+        governorate: _selectedGovernorate ?? '',
+        tradesmanServices: _selectedServices,
       );
 
-      UserProfileData.dob    = _dob.text;
+      UserProfileData.dob = _dob.text;
       UserProfileData.gender = _selectedGender;
 
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(t.tr(en: 'Profile saved successfully!', ar: 'تم حفظ الملف الشخصي بنجاح!')),
-        backgroundColor: Colors.green,
-      ));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            t.tr(
+              en: 'Profile saved successfully!',
+              ar: 'تم حفظ الملف الشخصي بنجاح!',
+            ),
+          ),
+          backgroundColor: Colors.green,
+        ),
+      );
 
       // 11. Navigate to workspace
       await Future.delayed(const Duration(milliseconds: 600));
       if (!mounted) return;
       if (isTradesman) {
-        Navigator.of(context).pushReplacementNamed(AppRoutes.tradesmanWorkspace);
+        Navigator.of(
+          context,
+        ).pushReplacementNamed(AppRoutes.tradesmanWorkspace);
       } else {
         Navigator.of(context).pushReplacementNamed(AppRoutes.userWorkspace);
       }
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(t.tr(
-          en: 'Save failed: ${e.toString()}',
-          ar: 'فشل الحفظ: ${e.toString()}',
-        )),
-        backgroundColor: Colors.redAccent,
-      ));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            t.tr(
+              en: 'Save failed: ${e.toString()}',
+              ar: 'فشل الحفظ: ${e.toString()}',
+            ),
+          ),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }

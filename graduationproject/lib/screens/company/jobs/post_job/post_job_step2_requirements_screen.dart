@@ -16,11 +16,15 @@ class CompanyPostJobStep2DescriptionScreen extends StatefulWidget {
 
 class _CompanyPostJobStep2DescriptionScreenState
     extends State<CompanyPostJobStep2DescriptionScreen> {
-  final List<TextEditingController> _descriptionPoints = [TextEditingController()];
-  final List<TextEditingController> _responsibilities = [TextEditingController()];
+  final List<TextEditingController> _descriptionPoints = [
+    TextEditingController(),
+  ];
+  final List<TextEditingController> _responsibilities = [
+    TextEditingController(),
+  ];
   final List<TextEditingController> _qualifications = [TextEditingController()];
   final List<TextEditingController> _niceToHaves = [TextEditingController()];
-  
+
   bool _loading = false;
 
   bool _initialized = false;
@@ -33,7 +37,7 @@ class _CompanyPostJobStep2DescriptionScreenState
       final args = ModalRoute.of(context)?.settings.arguments;
       if (args is Map<String, dynamic>) {
         _isEditing = args['jobId'] != null;
-        
+
         final resp = args['responsibilities'] as List<String>?;
         if (resp != null && resp.isNotEmpty) {
           _responsibilities.clear();
@@ -41,7 +45,7 @@ class _CompanyPostJobStep2DescriptionScreenState
             _responsibilities.add(TextEditingController(text: r));
           }
         }
-        
+
         final qual = args['qualifications'] as List<String>?;
         if (qual != null && qual.isNotEmpty) {
           _qualifications.clear();
@@ -49,7 +53,7 @@ class _CompanyPostJobStep2DescriptionScreenState
             _qualifications.add(TextEditingController(text: q));
           }
         }
-        
+
         final nice = args['niceToHaves'] as List<String>?;
         if (nice != null && nice.isNotEmpty) {
           _niceToHaves.clear();
@@ -94,16 +98,30 @@ class _CompanyPostJobStep2DescriptionScreenState
     setState(() => _loading = false);
 
     final args = ModalRoute.of(context)?.settings.arguments;
-    final data = args is Map<String, dynamic> ? args : const <String, dynamic>{};
-    
+    final data = args is Map<String, dynamic>
+        ? args
+        : const <String, dynamic>{};
+
     Navigator.of(context).pushNamed(
       AppRoutes.companyPostJobStep3,
       arguments: {
         ...data,
-        'responsibilities': _responsibilities.map((e) => e.text.trim()).where((e) => e.isNotEmpty).toList(),
-        'niceToHaves': _niceToHaves.map((e) => e.text.trim()).where((e) => e.isNotEmpty).toList(),
-        'qualifications': _qualifications.map((e) => e.text.trim()).where((e) => e.isNotEmpty).toList(),
-        'descriptionPoints': _descriptionPoints.map((e) => e.text.trim()).where((e) => e.isNotEmpty).toList(),
+        'responsibilities': _responsibilities
+            .map((e) => e.text.trim())
+            .where((e) => e.isNotEmpty)
+            .toList(),
+        'niceToHaves': _niceToHaves
+            .map((e) => e.text.trim())
+            .where((e) => e.isNotEmpty)
+            .toList(),
+        'qualifications': _qualifications
+            .map((e) => e.text.trim())
+            .where((e) => e.isNotEmpty)
+            .toList(),
+        'descriptionPoints': _descriptionPoints
+            .map((e) => e.text.trim())
+            .where((e) => e.isNotEmpty)
+            .toList(),
       },
     );
   }
@@ -118,11 +136,17 @@ class _CompanyPostJobStep2DescriptionScreenState
         children: [
           SectionTitle(t.step2Label),
           const SizedBox(height: 12),
-          
+
           _buildDynamicSection(
             title: t.tr(en: "Responsibilities", ar: "المسؤوليات"),
-            subtitle: t.tr(en: "Define core duties.", ar: "حدد المسؤوليات الأساسية لهذا المنصب"),
-            hint: t.tr(en: "e.g. Community participation...", ar: "...مثال: المشاركة المجتمعية لضمان"),
+            subtitle: t.tr(
+              en: "Define core duties.",
+              ar: "حدد المسؤوليات الأساسية لهذا المنصب",
+            ),
+            hint: t.tr(
+              en: "e.g. Community participation...",
+              ar: "...مثال: المشاركة المجتمعية لضمان",
+            ),
             points: _responsibilities,
           ),
 
@@ -130,17 +154,32 @@ class _CompanyPostJobStep2DescriptionScreenState
 
           _buildDynamicSection(
             title: t.tr(en: "Required Qualifications", ar: "المؤهلات المطلوبة"),
-            subtitle: t.tr(en: "Add qualifications you prefer.", ar: "أضف المؤهلات التي تفضلها في المرشحين"),
-            hint: t.tr(en: "e.g. You are a growth marketer...", ar: "...مثال: أنت مسوق نمو وتعرف كيف"),
+            subtitle: t.tr(
+              en: "Add qualifications you prefer.",
+              ar: "أضف المؤهلات التي تفضلها في المرشحين",
+            ),
+            hint: t.tr(
+              en: "e.g. You are a growth marketer...",
+              ar: "...مثال: أنت مسوق نمو وتعرف كيف",
+            ),
             points: _qualifications,
           ),
 
           const Divider(height: 48),
 
           _buildDynamicSection(
-            title: t.tr(en: "Nice-To-Haves", ar: "مزايا إضافية (Nice-To-Haves)"),
-            subtitle: t.tr(en: "Encourage diverse applicants.", ar: "شجع مجموعة متنوعة من المرشحين على التقديم"),
-            hint: t.tr(en: "e.g. English fluency...", ar: "...مثال: طلاقة في اللغة الإنجليزية، إدارة المشاريع"),
+            title: t.tr(
+              en: "Nice-To-Haves",
+              ar: "مزايا إضافية (Nice-To-Haves)",
+            ),
+            subtitle: t.tr(
+              en: "Encourage diverse applicants.",
+              ar: "شجع مجموعة متنوعة من المرشحين على التقديم",
+            ),
+            hint: t.tr(
+              en: "e.g. English fluency...",
+              ar: "...مثال: طلاقة في اللغة الإنجليزية، إدارة المشاريع",
+            ),
             points: _niceToHaves,
           ),
 
@@ -185,7 +224,10 @@ class _CompanyPostJobStep2DescriptionScreenState
                   hintText: subtitle,
                   hintStyle: const TextStyle(fontSize: 13),
                   border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
                 ),
                 style: const TextStyle(fontSize: 14),
               ),
@@ -209,7 +251,11 @@ class _CompanyPostJobStep2DescriptionScreenState
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.add, size: 18, color: Theme.of(context).colorScheme.primary),
+                Icon(
+                  Icons.add,
+                  size: 18,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
                 const SizedBox(width: 8),
                 Text(
                   t.tr(en: "Add another point", ar: "إضافة نقطة أخرى"),

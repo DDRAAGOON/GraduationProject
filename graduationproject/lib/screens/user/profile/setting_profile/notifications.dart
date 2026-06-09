@@ -20,7 +20,9 @@ class _NotificationsState extends State<Notifications> {
     final t = AppLocalizations.of(context);
     final isAr = t.isAr;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final backgroundColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
+    final backgroundColor = isDark
+        ? const Color(0xFF001E3A)
+        : const Color(0xFFF8FBF4);
     final onSurfaceColor = isDark ? Colors.white : Colors.black;
 
     return AnimatedBuilder(
@@ -34,7 +36,11 @@ class _NotificationsState extends State<Notifications> {
             surfaceTintColor: Colors.transparent,
             title: Text(
               t.tr(en: "Edit Profile", ar: "تعديل الملف الشخصي"),
-              style: TextStyle(color: onSurfaceColor, fontSize: 20, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                color: onSurfaceColor,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             centerTitle: false,
             leading: IconButton(
@@ -45,7 +51,8 @@ class _NotificationsState extends State<Notifications> {
           body: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start, // Let Directionality handle it
+              crossAxisAlignment:
+                  CrossAxisAlignment.start, // Let Directionality handle it
               children: [
                 const SizedBox(height: 20),
                 // Tabs
@@ -53,38 +60,99 @@ class _NotificationsState extends State<Notifications> {
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: [
-                      _buildTabItem(context, t.tr(en: "Profile Setting", ar: "إعدادات الملف"), false, () {
-                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const EditProfileScreen()));
-                      }, isDark, onSurfaceColor),
+                      _buildTabItem(
+                        context,
+                        t.tr(en: "Profile Setting", ar: "إعدادات الملف"),
+                        false,
+                        () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const EditProfileScreen(),
+                            ),
+                          );
+                        },
+                        isDark,
+                        onSurfaceColor,
+                      ),
                       const SizedBox(width: 20),
-                      _buildTabItem(context, t.tr(en: "Account Security", ar: "أمان الحساب"), false, () {
-                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const ProfileLoginDetailsScreen()));
-                      }, isDark, onSurfaceColor),
+                      _buildTabItem(
+                        context,
+                        t.tr(en: "Account Security", ar: "أمان الحساب"),
+                        false,
+                        () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const ProfileLoginDetailsScreen(),
+                            ),
+                          );
+                        },
+                        isDark,
+                        onSurfaceColor,
+                      ),
                       const SizedBox(width: 20),
-                      _buildTabItem(context, t.tr(en: "Notification", ar: "الإشعارات"), true, () {}, isDark, onSurfaceColor),
+                      _buildTabItem(
+                        context,
+                        t.tr(en: "Notification", ar: "الإشعارات"),
+                        true,
+                        () {},
+                        isDark,
+                        onSurfaceColor,
+                      ),
                       const SizedBox(width: 20),
-                      _buildTabItem(context, t.tr(en: "Preferences", ar: "التفضيلات"), false, () {
-                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Preferences()));
-                      }, isDark, onSurfaceColor),
+                      _buildTabItem(
+                        context,
+                        t.tr(en: "Preferences", ar: "التفضيلات"),
+                        false,
+                        () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const Preferences(),
+                            ),
+                          );
+                        },
+                        isDark,
+                        onSurfaceColor,
+                      ),
                     ],
                   ),
                 ),
                 const SizedBox(height: 10),
-                Divider(color: onSurfaceColor.withValues(alpha: 0.12), height: 1),
+                Divider(
+                  color: onSurfaceColor.withValues(alpha: 0.12),
+                  height: 1,
+                ),
                 const SizedBox(height: 30),
 
                 // Notification Settings Title
                 Column(
-                  crossAxisAlignment: CrossAxisAlignment.start, // Start = Right in RTL
+                  crossAxisAlignment:
+                      CrossAxisAlignment.start, // Start = Right in RTL
                   children: [
                     Text(
-                      t.tr(en: "Notification Settings", ar: "إعدادات الإشعارات"), 
-                      style: TextStyle(color: onSurfaceColor, fontSize: 18, fontWeight: FontWeight.bold),
+                      t.tr(
+                        en: "Notification Settings",
+                        ar: "إعدادات الإشعارات",
+                      ),
+                      style: TextStyle(
+                        color: onSurfaceColor,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      t.tr(en: "Choose how and when you want to receive notifications from us.", ar: "اختر كيف ومتى تود استلام الإشعارات منا."), 
-                      style: TextStyle(color: onSurfaceColor.withValues(alpha: 0.7), fontSize: 13),
+                      t.tr(
+                        en: "Choose how and when you want to receive notifications from us.",
+                        ar: "اختر كيف ومتى تود استلام الإشعارات منا.",
+                      ),
+                      style: TextStyle(
+                        color: onSurfaceColor.withValues(alpha: 0.7),
+                        fontSize: 13,
+                      ),
                     ),
                   ],
                 ),
@@ -92,8 +160,14 @@ class _NotificationsState extends State<Notifications> {
 
                 _buildNotificationOption(
                   context,
-                  t.tr(en: "Email Notifications", ar: "إشعارات البريد الإلكتروني"),
-                  t.tr(en: "Receive weekly summary for jobs and articles", ar: "استلم ملخصاً أسبوعياً للوظائف والمقالات"),
+                  t.tr(
+                    en: "Email Notifications",
+                    ar: "إشعارات البريد الإلكتروني",
+                  ),
+                  t.tr(
+                    en: "Receive weekly summary for jobs and articles",
+                    ar: "استلم ملخصاً أسبوعياً للوظائف والمقالات",
+                  ),
                   store.emailNotifications,
                   (val) {
                     store.updateNotificationSettings(email: val);
@@ -104,7 +178,10 @@ class _NotificationsState extends State<Notifications> {
                 _buildNotificationOption(
                   context,
                   t.tr(en: "Job Alerts", ar: "تنبيهات الوظائف"),
-                  t.tr(en: "When new jobs that match your skills are posted", ar: "عند نشر وظيفة جديدة تناسب مهاراتك"),
+                  t.tr(
+                    en: "When new jobs that match your skills are posted",
+                    ar: "عند نشر وظيفة جديدة تناسب مهاراتك",
+                  ),
                   store.jobAlerts,
                   (val) {
                     store.updateNotificationSettings(jobs: val);
@@ -115,7 +192,10 @@ class _NotificationsState extends State<Notifications> {
                 _buildNotificationOption(
                   context,
                   t.tr(en: "Application Updates", ar: "تحديثات الطلبات"),
-                  t.tr(en: "When your application status changes", ar: "عند تغير حالة طلبات التوظيف الخاصة بك"),
+                  t.tr(
+                    en: "When your application status changes",
+                    ar: "عند تغير حالة طلبات التوظيف الخاصة بك",
+                  ),
                   store.applicationUpdates,
                   (val) {
                     store.updateNotificationSettings(updates: val);
@@ -133,7 +213,14 @@ class _NotificationsState extends State<Notifications> {
     );
   }
 
-  Widget _buildTabItem(BuildContext context, String title, bool isActive, VoidCallback onTap, bool isDark, Color onSurfaceColor) {
+  Widget _buildTabItem(
+    BuildContext context,
+    String title,
+    bool isActive,
+    VoidCallback onTap,
+    bool isDark,
+    Color onSurfaceColor,
+  ) {
     return GestureDetector(
       onTap: onTap,
       child: Column(
@@ -141,8 +228,10 @@ class _NotificationsState extends State<Notifications> {
           Text(
             title,
             style: TextStyle(
-              color: isActive ? Theme.of(context).colorScheme.primary : onSurfaceColor.withValues(alpha: 0.5), 
-              fontWeight: isActive ? FontWeight.bold : FontWeight.normal, 
+              color: isActive
+                  ? Theme.of(context).colorScheme.primary
+                  : onSurfaceColor.withValues(alpha: 0.5),
+              fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
               fontSize: 14,
             ),
           ),
@@ -158,23 +247,39 @@ class _NotificationsState extends State<Notifications> {
     );
   }
 
-  Widget _buildNotificationOption(BuildContext context, String title, String subtitle, bool value, ValueChanged<bool> onChanged, Color onSurfaceColor, bool isAr) {
+  Widget _buildNotificationOption(
+    BuildContext context,
+    String title,
+    String subtitle,
+    bool value,
+    ValueChanged<bool> onChanged,
+    Color onSurfaceColor,
+    bool isAr,
+  ) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 30),
       child: Row(
         children: [
           Expanded(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start, // Respects RTL/LTR automatically
+              crossAxisAlignment:
+                  CrossAxisAlignment.start, // Respects RTL/LTR automatically
               children: [
                 Text(
-                  title, 
-                  style: TextStyle(color: onSurfaceColor, fontSize: 16, fontWeight: FontWeight.bold),
+                  title,
+                  style: TextStyle(
+                    color: onSurfaceColor,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  subtitle, 
-                  style: TextStyle(color: onSurfaceColor.withValues(alpha: 0.6), fontSize: 13),
+                  subtitle,
+                  style: TextStyle(
+                    color: onSurfaceColor.withValues(alpha: 0.6),
+                    fontSize: 13,
+                  ),
                 ),
               ],
             ),
@@ -193,4 +298,3 @@ class _NotificationsState extends State<Notifications> {
     );
   }
 }
-

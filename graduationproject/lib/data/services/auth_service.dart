@@ -53,10 +53,7 @@ class AuthService {
 
   Future<void> resendCode(String email) async {
     try {
-      await _apiClient.post(
-        ApiConstants.resendCode,
-        data: {'email': email},
-      );
+      await _apiClient.post(ApiConstants.resendCode, data: {'email': email});
     } catch (e) {
       throw ErrorHandler.handle(e);
     }
@@ -111,10 +108,7 @@ class AuthService {
 
   Future<User> updateMe(Map<String, dynamic> data) async {
     try {
-      final response = await _apiClient.put(
-        ApiConstants.userMe,
-        data: data,
-      );
+      final response = await _apiClient.put(ApiConstants.userMe, data: data);
       return User.fromJson(response.data);
     } catch (e) {
       throw ErrorHandler.handle(e);
@@ -123,10 +117,7 @@ class AuthService {
 
   Future<void> updateTheme(String theme) async {
     try {
-      await _apiClient.patch(
-        ApiConstants.userTheme,
-        data: {'theme': theme},
-      );
+      await _apiClient.patch(ApiConstants.userTheme, data: {'theme': theme});
     } catch (e) {
       throw ErrorHandler.handle(e);
     }
@@ -147,10 +138,7 @@ class AuthService {
     try {
       await _apiClient.put(
         ApiConstants.userPassword,
-        data: {
-          'oldPassword': oldPassword,
-          'newPassword': newPassword,
-        },
+        data: {'oldPassword': oldPassword, 'newPassword': newPassword},
       );
     } catch (e) {
       throw ErrorHandler.handle(e);

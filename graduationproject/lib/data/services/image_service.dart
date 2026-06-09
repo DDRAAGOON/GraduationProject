@@ -50,7 +50,9 @@ class ImageService {
 
   Future<List<String>> getEntityImages(String type, String id) async {
     try {
-      final response = await _apiClient.get(ApiConstants.entityImages(type, id));
+      final response = await _apiClient.get(
+        ApiConstants.entityImages(type, id),
+      );
       return List<String>.from(response.data);
     } catch (_) {
       return []; // silent
@@ -59,7 +61,9 @@ class ImageService {
 
   Future<String?> getUserProfileImage(String userId) async {
     try {
-      final response = await _apiClient.get(ApiConstants.userProfileImage(userId));
+      final response = await _apiClient.get(
+        ApiConstants.userProfileImage(userId),
+      );
       return response.data['url'];
     } catch (_) {
       return null; // silent

@@ -11,4 +11,3 @@ abstract class CompanyRepository {
 
   Future<List<MessageThread>> fetchMessageThreads();
 }
-

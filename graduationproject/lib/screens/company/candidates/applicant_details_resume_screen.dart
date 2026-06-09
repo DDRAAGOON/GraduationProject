@@ -8,7 +8,10 @@ import '../../../shared/widgets/app_scaffold.dart';
 import '../widgets/company_applicant_avatar.dart';
 
 class CompanyApplicantDetailsResumeScreen extends StatelessWidget {
-  const CompanyApplicantDetailsResumeScreen({super.key, required this.applicant});
+  const CompanyApplicantDetailsResumeScreen({
+    super.key,
+    required this.applicant,
+  });
 
   final Applicant applicant;
 
@@ -33,7 +36,8 @@ class CompanyApplicantDetailsResumeScreen extends StatelessWidget {
                       children: [
                         Text(
                           applicant.fullName,
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w900),
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.w900),
                         ),
                         const SizedBox(height: 4),
                         Text(applicant.role),
@@ -47,10 +51,16 @@ class CompanyApplicantDetailsResumeScreen extends StatelessWidget {
           const SizedBox(height: 16),
           Card(
             child: ListTile(
-              leading: Icon(Icons.description_outlined, color: Theme.of(context).colorScheme.primary),
+              leading: Icon(
+                Icons.description_outlined,
+                color: Theme.of(context).colorScheme.primary,
+              ),
               title: Text(t.isAr ? 'فيش وتشبيه.pdf' : 'Criminal_Record.pdf'),
               subtitle: Text('498 kB • ${t.lastUsed}'),
-              trailing: Icon(Icons.check_circle_outline, color: Colors.green.shade600),
+              trailing: Icon(
+                Icons.check_circle_outline,
+                color: Colors.green.shade600,
+              ),
               onTap: () {},
             ),
           ),

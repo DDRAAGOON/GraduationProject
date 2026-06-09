@@ -51,9 +51,7 @@ class _SplashScreenState extends State<SplashScreen> {
     if (_checking) {
       return const Scaffold(
         backgroundColor: Color(0xFFFDFCF9),
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
+        body: Center(child: CircularProgressIndicator()),
       );
     }
 
@@ -159,8 +157,9 @@ class _SplashScreenState extends State<SplashScreen> {
             child: AppButton(
               label: 'Get Started',
               onPressed: () {
-                Navigator.of(context)
-                    .pushReplacementNamed(AppRoutes.roleSelection);
+                Navigator.of(
+                  context,
+                ).pushReplacementNamed(AppRoutes.roleSelection);
               },
             ),
           ),

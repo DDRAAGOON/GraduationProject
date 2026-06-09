@@ -10,7 +10,10 @@ import '../../../shared/widgets/section_title.dart';
 import '../widgets/company_applicant_avatar.dart';
 
 class CompanyApplicantHiringProgressHiredDeclinedScreen extends StatefulWidget {
-  const CompanyApplicantHiringProgressHiredDeclinedScreen({super.key, required this.applicant});
+  const CompanyApplicantHiringProgressHiredDeclinedScreen({
+    super.key,
+    required this.applicant,
+  });
 
   final Applicant applicant;
 
@@ -42,7 +45,10 @@ class _CompanyApplicantHiringProgressHiredDeclinedScreenState
         children: [
           Card(
             child: ListTile(
-              leading: CompanyApplicantAvatar(seed: widget.applicant.id, radius: 24),
+              leading: CompanyApplicantAvatar(
+                seed: widget.applicant.id,
+                radius: 24,
+              ),
               title: Text(widget.applicant.fullName),
               subtitle: Text(widget.applicant.role),
             ),

@@ -44,23 +44,35 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final Color textColor = isDark ? const Color(0xFFD9D9D9) : Colors.black;
-    
-    final companyJobs = store.jobs.where((job) => 
-      job.companyName.trim().toLowerCase() == (widget.company['name'] ?? '').toString().trim().toLowerCase()
-    ).toList();
+
+    final companyJobs = store.jobs
+        .where(
+          (job) =>
+              job.companyName.trim().toLowerCase() ==
+              (widget.company['name'] ?? '').toString().trim().toLowerCase(),
+        )
+        .toList();
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4),
+      backgroundColor: isDark
+          ? const Color(0xFF001E3A)
+          : const Color(0xFFF8FBF4),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: isDark ? Colors.white : Colors.black),
+          icon: Icon(
+            Icons.arrow_back_ios,
+            color: isDark ? Colors.white : Colors.black,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           t.tr(en: 'Company Profile', ar: 'ملف الشركة'),
-          style: TextStyle(color: isDark ? Colors.white : Colors.black, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: isDark ? Colors.white : Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
       body: SingleChildScrollView(
@@ -69,33 +81,63 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
           children: [
             // Header Section
             _buildHeader(context, isDark, isAr, textColor),
-            
+
             Padding(
               padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // 1. Company Basic Info Rows
-                  _buildSectionTitle(t.tr(en: 'Company Information', ar: 'معلومات الشركة'), textColor),
+                  _buildSectionTitle(
+                    t.tr(en: 'Company Information', ar: 'معلومات الشركة'),
+                    textColor,
+                  ),
                   const SizedBox(height: 12),
                   _buildContentCard(
                     isDark,
                     Column(
                       children: [
-                        _buildDetailRow(Icons.category_outlined, t.tr(en: 'Industry', ar: 'مجال العمل'), widget.company['industry'] ?? '---', isDark, textColor),
+                        _buildDetailRow(
+                          Icons.category_outlined,
+                          t.tr(en: 'Industry', ar: 'مجال العمل'),
+                          widget.company['industry'] ?? '---',
+                          isDark,
+                          textColor,
+                        ),
                         const Divider(),
-                        _buildDetailRow(Icons.location_on_outlined, t.tr(en: 'Location', ar: 'الموقع'), 'القاهرة، مصر', isDark, textColor),
+                        _buildDetailRow(
+                          Icons.location_on_outlined,
+                          t.tr(en: 'Location', ar: 'الموقع'),
+                          'القاهرة، مصر',
+                          isDark,
+                          textColor,
+                        ),
                         const Divider(),
-                        _buildDetailRow(Icons.groups_outlined, t.tr(en: 'Employees', ar: 'عدد الموظفين'), '50 - 200', isDark, textColor),
+                        _buildDetailRow(
+                          Icons.groups_outlined,
+                          t.tr(en: 'Employees', ar: 'عدد الموظفين'),
+                          '50 - 200',
+                          isDark,
+                          textColor,
+                        ),
                         const Divider(),
-                        _buildDetailRow(Icons.event_available_outlined, t.tr(en: 'Founded', ar: 'تاريخ التأسيس'), '2015', isDark, textColor),
+                        _buildDetailRow(
+                          Icons.event_available_outlined,
+                          t.tr(en: 'Founded', ar: 'تاريخ التأسيس'),
+                          '2015',
+                          isDark,
+                          textColor,
+                        ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 24),
 
                   // 2. Reviews & Feedback (Input + List)
-                  _buildSectionTitle(t.tr(en: 'Reviews & Feedback', ar: 'التقييمات والآراء'), textColor),
+                  _buildSectionTitle(
+                    t.tr(en: 'Reviews & Feedback', ar: 'التقييمات والآراء'),
+                    textColor,
+                  ),
                   const SizedBox(height: 12),
                   _buildContentCard(
                     isDark,
@@ -105,41 +147,71 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                           controller: _commentController,
                           style: const TextStyle(color: Color(0xFF142C66)),
                           decoration: InputDecoration(
-                            hintText: isAr ? 'اكتب تعليقك هنا...' : 'Write your comment...',
-                            hintStyle: TextStyle(color: const Color(0xFF142C66).withOpacity(0.5)),
+                            hintText: isAr
+                                ? 'اكتب تعليقك هنا...'
+                                : 'Write your comment...',
+                            hintStyle: TextStyle(
+                              color: const Color(0xFF142C66).withOpacity(0.5),
+                            ),
                             suffixIcon: IconButton(
-                              icon: const Icon(Icons.send, color: Color(0xFFFF7A2A)),
+                              icon: const Icon(
+                                Icons.send,
+                                color: Color(0xFFFF7A2A),
+                              ),
                               onPressed: _addComment,
                             ),
                             border: InputBorder.none,
                           ),
                         ),
                         const Divider(color: Colors.white24),
-                        ..._comments.map((c) => ListTile(
-                          contentPadding: EdgeInsets.zero,
-                          leading: const CircleAvatar(child: Icon(Icons.person)),
-                          title: Text(c['name']!, style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF142C66))),
-                          subtitle: Text(c['text']!, style: const TextStyle(color: Color(0xFF142C66))),
-                        )),
+                        ..._comments.map(
+                          (c) => ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            leading: const CircleAvatar(
+                              child: Icon(Icons.person),
+                            ),
+                            title: Text(
+                              c['name']!,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF142C66),
+                              ),
+                            ),
+                            subtitle: Text(
+                              c['text']!,
+                              style: const TextStyle(color: Color(0xFF142C66)),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 24),
 
                   // 3. About Company (Description)
-                  _buildSectionTitle(t.tr(en: 'About Company', ar: 'عن الشركة'), textColor),
+                  _buildSectionTitle(
+                    t.tr(en: 'About Company', ar: 'عن الشركة'),
+                    textColor,
+                  ),
                   const SizedBox(height: 12),
                   _buildContentCard(
                     isDark,
                     Text(
                       widget.company['description'] ?? '---',
-                      style: const TextStyle(height: 1.6, color: Color(0xFF142C66), fontWeight: FontWeight.w500),
+                      style: const TextStyle(
+                        height: 1.6,
+                        color: Color(0xFF142C66),
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 24),
 
                   // 4. Social Media Links
-                  _buildSectionTitle(t.tr(en: 'Social Media', ar: 'روابط التواصل'), textColor),
+                  _buildSectionTitle(
+                    t.tr(en: 'Social Media', ar: 'روابط التواصل'),
+                    textColor,
+                  ),
                   const SizedBox(height: 12),
                   _buildContentCard(
                     isDark,
@@ -155,27 +227,49 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                   const SizedBox(height: 24),
 
                   // 5. Benefits/Perks
-                  _buildSectionTitle(t.tr(en: 'Benefits', ar: 'المميزات'), textColor),
+                  _buildSectionTitle(
+                    t.tr(en: 'Benefits', ar: 'المميزات'),
+                    textColor,
+                  ),
                   const SizedBox(height: 12),
                   Wrap(
                     spacing: 10,
                     runSpacing: 10,
                     children: [
-                      _buildBenefitChip(t.tr(en: 'Health Insurance', ar: 'تأمين صحي'), isDark),
-                      _buildBenefitChip(t.tr(en: 'Flexible Hours', ar: 'ساعات مرنة'), isDark),
-                      _buildBenefitChip(t.tr(en: 'Transportation', ar: 'بدل انتقال'), isDark),
+                      _buildBenefitChip(
+                        t.tr(en: 'Health Insurance', ar: 'تأمين صحي'),
+                        isDark,
+                      ),
+                      _buildBenefitChip(
+                        t.tr(en: 'Flexible Hours', ar: 'ساعات مرنة'),
+                        isDark,
+                      ),
+                      _buildBenefitChip(
+                        t.tr(en: 'Transportation', ar: 'بدل انتقال'),
+                        isDark,
+                      ),
                     ],
                   ),
                   const SizedBox(height: 32),
 
                   // 6. Open Vacancies
-                  _buildSectionTitle(t.tr(en: 'Open Vacancies', ar: 'الوظائف المتاحة'), textColor),
+                  _buildSectionTitle(
+                    t.tr(en: 'Open Vacancies', ar: 'الوظائف المتاحة'),
+                    textColor,
+                  ),
                   const SizedBox(height: 16),
                   if (companyJobs.isEmpty)
-                    Center(child: Text(t.tr(en: 'No vacancies', ar: 'لا توجد وظائف حالياً'), style: TextStyle(color: textColor)))
+                    Center(
+                      child: Text(
+                        t.tr(en: 'No vacancies', ar: 'لا توجد وظائف حالياً'),
+                        style: TextStyle(color: textColor),
+                      ),
+                    )
                   else
-                    ...companyJobs.map((job) => _buildJobItem(job, context, isDark)),
-                  
+                    ...companyJobs.map(
+                      (job) => _buildJobItem(job, context, isDark),
+                    ),
+
                   const SizedBox(height: 50),
                 ],
               ),
@@ -186,7 +280,12 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
     );
   }
 
-  Widget _buildHeader(BuildContext context, bool isDark, bool isAr, Color textColor) {
+  Widget _buildHeader(
+    BuildContext context,
+    bool isDark,
+    bool isAr,
+    Color textColor,
+  ) {
     const headerColor = Color(0xFF213E75);
     return Container(
       width: double.infinity,
@@ -206,12 +305,19 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
           const SizedBox(height: 16),
           Text(
             widget.company['name'] ?? '---',
-            style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.white),
+            style: const TextStyle(
+              fontSize: 26,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
           ),
           const SizedBox(height: 8),
           Text(
             widget.company['industry'] ?? '---',
-            style: const TextStyle(color: Colors.cyanAccent, fontWeight: FontWeight.bold),
+            style: const TextStyle(
+              color: Colors.cyanAccent,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ],
       ),
@@ -222,9 +328,9 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
     return Text(
       title,
       style: TextStyle(
-        fontSize: 18, 
-        fontWeight: FontWeight.bold, 
-        color: textColor
+        fontSize: 18,
+        fontWeight: FontWeight.bold,
+        color: textColor,
       ),
     );
   }
@@ -248,7 +354,13 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
     );
   }
 
-  Widget _buildDetailRow(IconData icon, String label, String value, bool isDark, Color textColor) {
+  Widget _buildDetailRow(
+    IconData icon,
+    String label,
+    String value,
+    bool isDark,
+    Color textColor,
+  ) {
     const rowTextColor = Color(0xFF142C66);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
@@ -257,7 +369,7 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
           Icon(icon, size: 20, color: const Color(0xFF142C66)),
           const SizedBox(width: 12),
           Text(
-            label, 
+            label,
             style: TextStyle(
               color: rowTextColor.withOpacity(0.7),
               fontWeight: FontWeight.w600,
@@ -265,9 +377,9 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
           ),
           const Spacer(),
           Text(
-            value, 
+            value,
             style: const TextStyle(
-              fontWeight: FontWeight.bold, 
+              fontWeight: FontWeight.bold,
               color: rowTextColor,
             ),
           ),
@@ -279,7 +391,10 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
   Widget _buildSocialIcon(IconData icon, Color color) {
     return Container(
       padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(color: color.withOpacity(0.1), shape: BoxShape.circle),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        shape: BoxShape.circle,
+      ),
       child: Icon(icon, color: color),
     );
   }
@@ -292,13 +407,22 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: const Color(0xFF4CAF50).withOpacity(0.2)),
       ),
-      child: Text(label, style: const TextStyle(color: Color(0xFF4CAF50), fontWeight: FontWeight.bold, fontSize: 13)),
+      child: Text(
+        label,
+        style: const TextStyle(
+          color: Color(0xFF4CAF50),
+          fontWeight: FontWeight.bold,
+          fontSize: 13,
+        ),
+      ),
     );
   }
 
   Widget _buildJobItem(RecruitmentJob job, BuildContext context, bool isDark) {
     return GestureDetector(
-      onTap: () => Navigator.of(context).pushNamed(AppRoutes.userJobDetails, arguments: job),
+      onTap: () => Navigator.of(
+        context,
+      ).pushNamed(AppRoutes.userJobDetails, arguments: job),
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
@@ -310,7 +434,15 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
           children: [
             const Icon(Icons.work_outline, color: Colors.white70),
             const SizedBox(width: 16),
-            Expanded(child: Text(job.title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
+            Expanded(
+              child: Text(
+                job.title,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
             const Icon(Icons.arrow_forward_ios, color: Colors.white, size: 14),
           ],
         ),
@@ -318,5 +450,3 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
     );
   }
 }
-
-

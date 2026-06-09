@@ -42,14 +42,24 @@ class CompanyPublicProfileScreen extends StatefulWidget {
   const CompanyPublicProfileScreen({super.key, required this.company});
 
   @override
-  State<CompanyPublicProfileScreen> createState() => _CompanyPublicProfileScreenState();
+  State<CompanyPublicProfileScreen> createState() =>
+      _CompanyPublicProfileScreenState();
 }
 
-class _CompanyPublicProfileScreenState extends State<CompanyPublicProfileScreen> {
+class _CompanyPublicProfileScreenState
+    extends State<CompanyPublicProfileScreen> {
   final TextEditingController _commentController = TextEditingController();
   final List<Map<String, dynamic>> _mockComments = [
-    {'name': 'أحمد علي', 'text': 'شركة محترمة جداً وبيئة عمل ممتازة.', 'date': '2024-05-10'},
-    {'name': 'سارة محمود', 'text': 'تجربة رائعة مع فريق التوظيف لديهم.', 'date': '2024-05-08'},
+    {
+      'name': 'أحمد علي',
+      'text': 'شركة محترمة جداً وبيئة عمل ممتازة.',
+      'date': '2024-05-10',
+    },
+    {
+      'name': 'سارة محمود',
+      'text': 'تجربة رائعة مع فريق التوظيف لديهم.',
+      'date': '2024-05-08',
+    },
   ];
 
   @override
@@ -86,12 +96,20 @@ class _CompanyPublicProfileScreenState extends State<CompanyPublicProfileScreen>
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: isDark ? Colors.white : Colors.black, size: 20),
+          icon: Icon(
+            Icons.arrow_back_ios,
+            color: isDark ? Colors.white : Colors.black,
+            size: 20,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           isAr ? 'ملف الشركة' : 'Company Profile',
-          style: TextStyle(color: isDark ? Colors.white : Colors.black, fontWeight: FontWeight.bold, fontSize: 18),
+          style: TextStyle(
+            color: isDark ? Colors.white : Colors.black,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
         ),
         centerTitle: true,
       ),
@@ -105,42 +123,80 @@ class _CompanyPublicProfileScreenState extends State<CompanyPublicProfileScreen>
             Padding(
               padding: const EdgeInsets.all(20),
               child: Column(
-                crossAxisAlignment: isAr ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                crossAxisAlignment: isAr
+                    ? CrossAxisAlignment.end
+                    : CrossAxisAlignment.start,
                 children: [
                   // 2. Basic Info (B5ADAD)
-                  _buildSectionTitle(isAr ? 'معلومات الشركة' : 'Company Information', isAr, isDark),
+                  _buildSectionTitle(
+                    isAr ? 'معلومات الشركة' : 'Company Information',
+                    isAr,
+                    isDark,
+                  ),
                   const SizedBox(height: 12),
                   _buildContentCard(
                     child: Column(
                       children: [
-                        _buildDetailRow(Icons.category_outlined, isAr ? 'مجال العمل' : 'Industry', company.industry),
+                        _buildDetailRow(
+                          Icons.category_outlined,
+                          isAr ? 'مجال العمل' : 'Industry',
+                          company.industry,
+                        ),
                         const Divider(color: Colors.white24),
-                        _buildDetailRow(Icons.location_on_outlined, isAr ? 'الموقع' : 'Location', company.locations.isNotEmpty ? company.locations.first : 'N/A'),
+                        _buildDetailRow(
+                          Icons.location_on_outlined,
+                          isAr ? 'الموقع' : 'Location',
+                          company.locations.isNotEmpty
+                              ? company.locations.first
+                              : 'N/A',
+                        ),
                         const Divider(color: Colors.white24),
-                        _buildDetailRow(Icons.groups_outlined, isAr ? 'عدد الموظفين' : 'Employees', company.employee),
+                        _buildDetailRow(
+                          Icons.groups_outlined,
+                          isAr ? 'عدد الموظفين' : 'Employees',
+                          company.employee,
+                        ),
                         const Divider(color: Colors.white24),
-                        _buildDetailRow(Icons.event_available_outlined, isAr ? 'تاريخ التأسيس' : 'Founded', company.foundedYear.toString()),
+                        _buildDetailRow(
+                          Icons.event_available_outlined,
+                          isAr ? 'تاريخ التأسيس' : 'Founded',
+                          company.foundedYear.toString(),
+                        ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 24),
 
                   // 3. Reviews (B5ADAD)
-                  _buildSectionTitle(isAr ? 'التقييمات والآراء' : 'Reviews & Feedback', isAr, isDark),
+                  _buildSectionTitle(
+                    isAr ? 'التقييمات والآراء' : 'Reviews & Feedback',
+                    isAr,
+                    isDark,
+                  ),
                   const SizedBox(height: 12),
                   _buildContentCard(
                     child: Column(
                       children: [
                         TextField(
                           controller: _commentController,
-                          style: const TextStyle(color: Color(0xFF142C66), fontSize: 14),
+                          style: const TextStyle(
+                            color: Color(0xFF142C66),
+                            fontSize: 14,
+                          ),
                           textAlign: isAr ? TextAlign.right : TextAlign.left,
                           decoration: InputDecoration(
-                            hintText: isAr ? 'اكتب تعليقك هنا...' : 'Write your comment...',
-                            hintStyle: TextStyle(color: const Color(0xFF142C66).withOpacity(0.5)),
+                            hintText: isAr
+                                ? 'اكتب تعليقك هنا...'
+                                : 'Write your comment...',
+                            hintStyle: TextStyle(
+                              color: const Color(0xFF142C66).withOpacity(0.5),
+                            ),
                             border: InputBorder.none,
                             suffixIcon: IconButton(
-                              icon: const Icon(Icons.send, color: Color(0xFFFF7A2A)),
+                              icon: const Icon(
+                                Icons.send,
+                                color: Color(0xFFFF7A2A),
+                              ),
                               onPressed: _addComment,
                             ),
                           ),
@@ -150,14 +206,30 @@ class _CompanyPublicProfileScreenState extends State<CompanyPublicProfileScreen>
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
                           itemCount: _mockComments.length,
-                          separatorBuilder: (_, __) => const Divider(color: Colors.white24),
+                          separatorBuilder: (_, __) =>
+                              const Divider(color: Colors.white24),
                           itemBuilder: (context, index) {
                             final c = _mockComments[index];
                             return ListTile(
                               contentPadding: EdgeInsets.zero,
-                              leading: const CircleAvatar(child: Icon(Icons.person)),
-                              title: Text(c['name'], style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF142C66), fontSize: 14)),
-                              subtitle: Text(c['text'], style: const TextStyle(color: Color(0xFF142C66), fontSize: 13)),
+                              leading: const CircleAvatar(
+                                child: Icon(Icons.person),
+                              ),
+                              title: Text(
+                                c['name'],
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF142C66),
+                                  fontSize: 14,
+                                ),
+                              ),
+                              subtitle: Text(
+                                c['text'],
+                                style: const TextStyle(
+                                  color: Color(0xFF142C66),
+                                  fontSize: 13,
+                                ),
+                              ),
                             );
                           },
                         ),
@@ -167,51 +239,96 @@ class _CompanyPublicProfileScreenState extends State<CompanyPublicProfileScreen>
                   const SizedBox(height: 24),
 
                   // 4. About Company (B5ADAD)
-                  _buildSectionTitle(isAr ? 'عن الشركة' : 'About Company', isAr, isDark),
+                  _buildSectionTitle(
+                    isAr ? 'عن الشركة' : 'About Company',
+                    isAr,
+                    isDark,
+                  ),
                   const SizedBox(height: 12),
                   _buildContentCard(
                     child: Text(
-                      isAr ? (company.aboutAr.isNotEmpty ? company.aboutAr : company.aboutEn) : company.aboutEn,
-                      style: const TextStyle(height: 1.6, color: Color(0xFF142C66), fontWeight: FontWeight.w500),
+                      isAr
+                          ? (company.aboutAr.isNotEmpty
+                                ? company.aboutAr
+                                : company.aboutEn)
+                          : company.aboutEn,
+                      style: const TextStyle(
+                        height: 1.6,
+                        color: Color(0xFF142C66),
+                        fontWeight: FontWeight.w500,
+                      ),
                       textAlign: isAr ? TextAlign.right : TextAlign.left,
                     ),
                   ),
                   const SizedBox(height: 24),
 
                   // 5. Contact (B5ADAD)
-                  _buildSectionTitle(isAr ? 'روابط التواصل' : 'Social Media', isAr, isDark),
+                  _buildSectionTitle(
+                    isAr ? 'روابط التواصل' : 'Social Media',
+                    isAr,
+                    isDark,
+                  ),
                   const SizedBox(height: 12),
                   _buildContentCard(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        _buildSocialIcon(Icons.language, Colors.blue, company.website),
-                        _buildSocialIcon(Icons.facebook, Colors.indigo, 'https://facebook.com/${company.name.replaceAll(' ', '')}'),
-                        _buildSocialIcon(Icons.link, Colors.blueAccent, company.website),
+                        _buildSocialIcon(
+                          Icons.language,
+                          Colors.blue,
+                          company.website,
+                        ),
+                        _buildSocialIcon(
+                          Icons.facebook,
+                          Colors.indigo,
+                          'https://facebook.com/${company.name.replaceAll(' ', '')}',
+                        ),
+                        _buildSocialIcon(
+                          Icons.link,
+                          Colors.blueAccent,
+                          company.website,
+                        ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 24),
 
                   // 6. Benefits (B5ADAD Chips)
-                  _buildSectionTitle(isAr ? 'المميزات' : 'Benefits', isAr, isDark),
+                  _buildSectionTitle(
+                    isAr ? 'المميزات' : 'Benefits',
+                    isAr,
+                    isDark,
+                  ),
                   const SizedBox(height: 12),
                   Wrap(
                     spacing: 10,
                     runSpacing: 10,
                     alignment: isAr ? WrapAlignment.end : WrapAlignment.start,
-                    children: company.benefits.map((b) => _buildBenefitChip(b)).toList(),
+                    children: company.benefits
+                        .map((b) => _buildBenefitChip(b))
+                        .toList(),
                   ),
                   const SizedBox(height: 32),
 
                   // 7. Open Vacancies (213E75 Cards)
-                  _buildSectionTitle(isAr ? 'الوظائف المتاحة' : 'Open Vacancies', isAr, isDark),
+                  _buildSectionTitle(
+                    isAr ? 'الوظائف المتاحة' : 'Open Vacancies',
+                    isAr,
+                    isDark,
+                  ),
                   const SizedBox(height: 16),
                   if (company.jobs.isEmpty)
-                    Center(child: Text(isAr ? 'لا توجد وظائف حالياً' : 'No vacancies', style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)))
+                    Center(
+                      child: Text(
+                        isAr ? 'لا توجد وظائف حالياً' : 'No vacancies',
+                        style: TextStyle(
+                          color: isDark ? Colors.white70 : Colors.black87,
+                        ),
+                      ),
+                    )
                   else
                     ...company.jobs.map((job) => _buildJobItem(job, context)),
-                  
+
                   const SizedBox(height: 50),
                 ],
               ),
@@ -239,19 +356,31 @@ class _CompanyPublicProfileScreenState extends State<CompanyPublicProfileScreen>
             child: widget.company.logoUrl != null
                 ? ClipRRect(
                     borderRadius: BorderRadius.circular(50),
-                    child: Image(image: getAppImageProvider(widget.company.logoUrl)!, fit: BoxFit.cover, width: 100, height: 100),
+                    child: Image(
+                      image: getAppImageProvider(widget.company.logoUrl)!,
+                      fit: BoxFit.cover,
+                      width: 100,
+                      height: 100,
+                    ),
                   )
                 : const Icon(Icons.business, size: 50, color: Colors.white),
           ),
           const SizedBox(height: 16),
           Text(
             widget.company.name,
-            style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.white),
+            style: const TextStyle(
+              fontSize: 26,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
           ),
           const SizedBox(height: 8),
           Text(
             widget.company.industry,
-            style: const TextStyle(color: Colors.cyanAccent, fontWeight: FontWeight.bold),
+            style: const TextStyle(
+              color: Colors.cyanAccent,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ],
       ),
@@ -264,9 +393,9 @@ class _CompanyPublicProfileScreenState extends State<CompanyPublicProfileScreen>
       child: Text(
         title,
         style: TextStyle(
-          fontSize: 18, 
-          fontWeight: FontWeight.bold, 
-          color: isDark ? Colors.white : const Color(0xFF142C66)
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          color: isDark ? Colors.white : const Color(0xFF142C66),
         ),
       ),
     );
@@ -279,7 +408,13 @@ class _CompanyPublicProfileScreenState extends State<CompanyPublicProfileScreen>
       decoration: BoxDecoration(
         color: const Color(0xFFB5ADAD),
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4))],
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: child,
     );
@@ -293,9 +428,21 @@ class _CompanyPublicProfileScreenState extends State<CompanyPublicProfileScreen>
         children: [
           Icon(icon, size: 20, color: rowTextColor),
           const SizedBox(width: 12),
-          Text(label, style: TextStyle(color: rowTextColor.withValues(alpha: 0.7), fontWeight: FontWeight.w600)),
+          Text(
+            label,
+            style: TextStyle(
+              color: rowTextColor.withValues(alpha: 0.7),
+              fontWeight: FontWeight.w600,
+            ),
+          ),
           const Spacer(),
-          Text(value, style: const TextStyle(fontWeight: FontWeight.bold, color: rowTextColor)),
+          Text(
+            value,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              color: rowTextColor,
+            ),
+          ),
         ],
       ),
     );
@@ -310,7 +457,10 @@ class _CompanyPublicProfileScreenState extends State<CompanyPublicProfileScreen>
       },
       child: Container(
         padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.3), shape: BoxShape.circle),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.3),
+          shape: BoxShape.circle,
+        ),
         child: Icon(icon, color: const Color(0xFF142C66)),
       ),
     );
@@ -322,15 +472,25 @@ class _CompanyPublicProfileScreenState extends State<CompanyPublicProfileScreen>
       decoration: BoxDecoration(
         color: const Color(0xFF142C66).withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFF142C66).withValues(alpha: 0.2)),
+        border: Border.all(
+          color: const Color(0xFF142C66).withValues(alpha: 0.2),
+        ),
       ),
-      child: Text(label, style: const TextStyle(color: Color(0xFF142C66), fontWeight: FontWeight.bold, fontSize: 13)),
+      child: Text(
+        label,
+        style: const TextStyle(
+          color: Color(0xFF142C66),
+          fontWeight: FontWeight.bold,
+          fontSize: 13,
+        ),
+      ),
     );
   }
 
   Widget _buildJobItem(RecruitmentJob job, BuildContext context) {
     return GestureDetector(
-      onTap: () => Navigator.of(context).pushNamed('/user/jobs/details', arguments: job),
+      onTap: () =>
+          Navigator.of(context).pushNamed('/user/jobs/details', arguments: job),
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
@@ -342,7 +502,15 @@ class _CompanyPublicProfileScreenState extends State<CompanyPublicProfileScreen>
           children: [
             const Icon(Icons.work_outline, color: Colors.white70),
             const SizedBox(width: 16),
-            Expanded(child: Text(job.title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
+            Expanded(
+              child: Text(
+                job.title,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
             const Icon(Icons.arrow_forward_ios, color: Colors.white, size: 14),
           ],
         ),

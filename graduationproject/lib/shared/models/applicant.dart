@@ -71,4 +71,3 @@ final class Applicant {
 
   static List<Applicant> mockList() => [];
 }
-

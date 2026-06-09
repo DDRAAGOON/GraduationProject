@@ -9,7 +9,9 @@ class UserHelpCenterScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final backgroundColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
+    final backgroundColor = isDark
+        ? const Color(0xFF001E3A)
+        : const Color(0xFFF8FBF4);
     final onSurfaceColor = isDark ? Colors.white : Colors.black;
     final store = RecruitmentSyncStore.instance;
     final isTradesman = store.userRole == 'Tradesman';
@@ -35,7 +37,11 @@ class UserHelpCenterScreen extends StatelessWidget {
           const SizedBox(height: 10),
           Text(
             t.tr(en: 'Popular articles', ar: 'المقالات الشائعة'),
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: onSurfaceColor),
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: onSurfaceColor,
+            ),
           ),
           const SizedBox(height: 16),
 
@@ -104,7 +110,7 @@ class UserHelpCenterScreen extends StatelessWidget {
             isDark: isDark,
             onSurfaceColor: onSurfaceColor,
           ),
-          
+
           const SizedBox(height: 50),
         ],
       ),
@@ -113,7 +119,12 @@ class UserHelpCenterScreen extends StatelessWidget {
 }
 
 class _FaqTile extends StatefulWidget {
-  const _FaqTile({required this.title, required this.body, required this.isDark, required this.onSurfaceColor});
+  const _FaqTile({
+    required this.title,
+    required this.body,
+    required this.isDark,
+    required this.onSurfaceColor,
+  });
   final String title;
   final String body;
   final bool isDark;
@@ -149,11 +160,17 @@ class _FaqTileState extends State<_FaqTile> {
                   Expanded(
                     child: Text(
                       widget.title,
-                      style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: widget.onSurfaceColor),
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 15,
+                        color: widget.onSurfaceColor,
+                      ),
                     ),
                   ),
                   Icon(
-                    _expanded ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded,
+                    _expanded
+                        ? Icons.keyboard_arrow_up_rounded
+                        : Icons.keyboard_arrow_down_rounded,
                     color: Theme.of(context).colorScheme.primary,
                   ),
                 ],

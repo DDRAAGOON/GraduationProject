@@ -27,40 +27,52 @@ class TradesmanMyAppsScreen extends StatelessWidget {
             .getTradesmanPostedWorksPreview(isAr: isAr)
             .where((work) => !store.isJobDeleted(work.id))
             .map((work) {
-          final status = store.tradesmanJobStatus(work.id, work.status);
-          return TradesmanPostedWorkRow(
-            id: work.id,
-            title: work.title,
-            rate: work.rate,
-            status: store.translateTradesmanWorkStatus(status, isAr),
-            applicantsCount: work.applicantsCount,
-            postedAt: work.postedAt,
-          );
-        }).toList();
+              final status = store.tradesmanJobStatus(work.id, work.status);
+              return TradesmanPostedWorkRow(
+                id: work.id,
+                title: work.title,
+                rate: work.rate,
+                status: store.translateTradesmanWorkStatus(status, isAr),
+                applicantsCount: work.applicantsCount,
+                postedAt: work.postedAt,
+              );
+            })
+            .toList();
 
         // Also add real jobs posted by this tradesman
         final realJobs = store.jobs
-            .where((j) =>
-                j.companyName == store.currentUserName && !store.isJobDeleted(j.id))
+            .where(
+              (j) =>
+                  j.companyName == store.currentUserName &&
+                  !store.isJobDeleted(j.id),
+            )
             .map((j) {
-          return TradesmanPostedWorkRow(
-            id: j.id,
-            title: j.title,
-            rate: "5.0",
-            status: isAr ? "نشط" : "Active",
-            applicantsCount: store.applications.where((a) => a.jobId == j.id).length,
-            postedAt: j.publishedAt,
-          );
-        }).toList();
+              return TradesmanPostedWorkRow(
+                id: j.id,
+                title: j.title,
+                rate: "5.0",
+                status: isAr ? "نشط" : "Active",
+                applicantsCount: store.applications
+                    .where((a) => a.jobId == j.id)
+                    .length,
+                postedAt: j.publishedAt,
+              );
+            })
+            .toList();
 
         final allWorks = [...realJobs, ...mockWorks];
 
-        final totalApplicants =
-            allWorks.fold<int>(0, (sum, row) => sum + row.applicantsCount);
-        final activeCount =
-            allWorks.where((w) => w.status.contains(isAr ? 'نشط' : 'Active')).length;
+        final totalApplicants = allWorks.fold<int>(
+          0,
+          (sum, row) => sum + row.applicantsCount,
+        );
+        final activeCount = allWorks
+            .where((w) => w.status.contains(isAr ? 'نشط' : 'Active'))
+            .length;
 
-        final bgColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
+        final bgColor = isDark
+            ? const Color(0xFF001E3A)
+            : const Color(0xFFF8FBF4);
 
         return Scaffold(
           backgroundColor: bgColor,
@@ -84,7 +96,9 @@ class TradesmanMyAppsScreen extends StatelessWidget {
                       ? 'معاينة لأعمالك المنشورة وبيانات المتقدمين'
                       : 'Preview of your posted works and applicants',
                   style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.54),
                     fontSize: 13,
                     height: 1.5,
                   ),
@@ -109,9 +123,14 @@ class TradesmanMyAppsScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 30),
                 Container(
-                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 12,
+                    horizontal: 8,
+                  ),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.03),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.03),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
@@ -129,12 +148,14 @@ class TradesmanMyAppsScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 12),
-                ...allWorks.map((work) => _buildWorkRow(context, work, isAr, isDark)),
+                ...allWorks.map(
+                  (work) => _buildWorkRow(context, work, isAr, isDark),
+                ),
               ],
             ),
           ),
         );
-      }
+      },
     );
   }
 
@@ -158,10 +179,8 @@ class TradesmanMyAppsScreen extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => JobApplicantsScreen(
-                  jobId: work.id,
-                  jobTitle: work.title,
-                ),
+                builder: (context) =>
+                    JobApplicantsScreen(jobId: work.id, jobTitle: work.title),
               ),
             );
           },
@@ -231,7 +250,11 @@ class TradesmanMyAppsScreen extends StatelessWidget {
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.delete_outline, color: Colors.red, size: 20),
+                  icon: const Icon(
+                    Icons.delete_outline,
+                    color: Colors.red,
+                    size: 20,
+                  ),
                   onPressed: () => _showDeleteDialog(context, work, isAr),
                 ),
               ],
@@ -242,23 +265,41 @@ class TradesmanMyAppsScreen extends StatelessWidget {
     );
   }
 
-  void _showDeleteDialog(BuildContext context, TradesmanPostedWorkRow work, bool isAr) {
+  void _showDeleteDialog(
+    BuildContext context,
+    TradesmanPostedWorkRow work,
+    bool isAr,
+  ) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(isAr ? 'حذف العمل' : 'Delete Work'),
-        content: Text(isAr ? 'هل أنت متأكد من حذف هذا العمل؟' : 'Are you sure you want to delete this work?'),
+        content: Text(
+          isAr
+              ? 'هل أنت متأكد من حذف هذا العمل؟'
+              : 'Are you sure you want to delete this work?',
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(isAr ? 'إلغاء' : 'Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(isAr ? 'إلغاء' : 'Cancel'),
+          ),
           TextButton(
             onPressed: () {
               RecruitmentSyncStore.instance.removeJob(work.id);
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(isAr ? 'تم الحذف بنجاح' : 'Deleted successfully')),
+                SnackBar(
+                  content: Text(
+                    isAr ? 'تم الحذف بنجاح' : 'Deleted successfully',
+                  ),
+                ),
               );
             },
-            child: Text(isAr ? 'حذف' : 'Delete', style: const TextStyle(color: Colors.red)),
+            child: Text(
+              isAr ? 'حذف' : 'Delete',
+              style: const TextStyle(color: Colors.red),
+            ),
           ),
         ],
       ),
@@ -295,7 +336,9 @@ class TradesmanMyAppsScreen extends StatelessWidget {
               label,
               style: TextStyle(
                 fontSize: 11,
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.6),
                 fontWeight: FontWeight.w600,
               ),
             ),

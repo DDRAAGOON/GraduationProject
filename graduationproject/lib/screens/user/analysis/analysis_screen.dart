@@ -22,7 +22,9 @@ class AnalysisScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   InkWell(
-                    onTap: () => Navigator.of(context).pushNamed(AppRoutes.userEditProfile),
+                    onTap: () => Navigator.of(
+                      context,
+                    ).pushNamed(AppRoutes.userEditProfile),
                     borderRadius: BorderRadius.circular(20),
                     child: const CircleAvatar(
                       radius: 20,
@@ -33,7 +35,11 @@ class AnalysisScreen extends StatelessWidget {
                     children: [
                       _buildTopIconButton(context, Icons.add),
                       const SizedBox(width: 12),
-                      _buildTopIconButton(context, Icons.notifications_none, hasBadge: false),
+                      _buildTopIconButton(
+                        context,
+                        Icons.notifications_none,
+                        hasBadge: false,
+                      ),
                       const SizedBox(width: 12),
                       _buildTopIconButton(context, Icons.settings_outlined),
                     ],
@@ -45,7 +51,10 @@ class AnalysisScreen extends StatelessWidget {
               // Total Jobs Applied Card
               _buildStatCard(
                 context,
-                title: t.tr(en: "Total Jobs Applied", ar: "إجمالي الوظائف المقدمة"),
+                title: t.tr(
+                  en: "Total Jobs Applied",
+                  ar: "إجمالي الوظائف المقدمة",
+                ),
                 value: "45",
                 icon: Icons.description_outlined,
               ),
@@ -60,7 +69,11 @@ class AnalysisScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTopIconButton(BuildContext context, IconData icon, {bool hasBadge = false}) {
+  Widget _buildTopIconButton(
+    BuildContext context,
+    IconData icon, {
+    bool hasBadge = false,
+  }) {
     return Stack(
       children: [
         Container(
@@ -71,9 +84,15 @@ class AnalysisScreen extends StatelessWidget {
                 ? const Color(0xFF0D2D4D)
                 : Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
             shape: BoxShape.circle,
-            border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.12)),
+            border: Border.all(
+              color: Theme.of(context).dividerColor.withValues(alpha: 0.12),
+            ),
           ),
-          child: Icon(icon, color: Theme.of(context).colorScheme.onSurface, size: 22),
+          child: Icon(
+            icon,
+            color: Theme.of(context).colorScheme.onSurface,
+            size: 22,
+          ),
         ),
         if (hasBadge)
           Positioned(
@@ -92,7 +111,12 @@ class AnalysisScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStatCard(BuildContext context, {required String title, required String value, required IconData icon}) {
+  Widget _buildStatCard(
+    BuildContext context, {
+    required String title,
+    required String value,
+    required IconData icon,
+  }) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
@@ -100,7 +124,9 @@ class AnalysisScreen extends StatelessWidget {
         color: Theme.of(context).brightness == Brightness.dark
             ? Colors.transparent
             : Theme.of(context).colorScheme.surface,
-        border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.12)),
+        border: Border.all(
+          color: Theme.of(context).dividerColor.withValues(alpha: 0.12),
+        ),
         borderRadius: BorderRadius.circular(2),
       ),
       child: Row(
@@ -111,18 +137,28 @@ class AnalysisScreen extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 18, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 12),
               Text(
                 value,
-                style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 64, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontSize: 64,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ],
           ),
           Icon(
             icon,
-            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12),
+            color: Theme.of(
+              context,
+            ).colorScheme.onSurface.withValues(alpha: 0.12),
             size: 80,
           ),
         ],
@@ -138,14 +174,20 @@ class AnalysisScreen extends StatelessWidget {
         color: Theme.of(context).brightness == Brightness.dark
             ? Colors.transparent
             : Theme.of(context).colorScheme.surface,
-        border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.12)),
+        border: Border.all(
+          color: Theme.of(context).dividerColor.withValues(alpha: 0.12),
+        ),
         borderRadius: BorderRadius.circular(2),
       ),
       child: Column(
         children: [
           Text(
             t.tr(en: "Jobs Applied Status", ar: "حالة الوظائف المقدمة"),
-            style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 18, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           const SizedBox(height: 30),
           Stack(
@@ -157,8 +199,12 @@ class AnalysisScreen extends StatelessWidget {
                 child: CircularProgressIndicator(
                   value: 0.6,
                   strokeWidth: 28,
-                  backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
-                  valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
+                  backgroundColor: Theme.of(
+                    context,
+                  ).colorScheme.primary.withValues(alpha: 0.2),
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    Theme.of(context).colorScheme.primary,
+                  ),
                 ),
               ),
               SizedBox(
@@ -168,19 +214,33 @@ class AnalysisScreen extends StatelessWidget {
                   value: 0.4,
                   strokeWidth: 28,
                   backgroundColor: Colors.transparent,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.blueGrey.withValues(alpha: 0.3)),
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    Colors.blueGrey.withValues(alpha: 0.3),
+                  ),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 40),
-          _buildLegendItem(context, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), text: "100%", subtext: t.tr(en: "Unsuitable", ar: "غير مناسب")),
+          _buildLegendItem(
+            context,
+            color: Theme.of(
+              context,
+            ).colorScheme.onSurface.withValues(alpha: 0.7),
+            text: "100%",
+            subtext: t.tr(en: "Unsuitable", ar: "غير مناسب"),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildLegendItem(BuildContext context, {required Color color, required String text, required String subtext}) {
+  Widget _buildLegendItem(
+    BuildContext context, {
+    required Color color,
+    required String text,
+    required String subtext,
+  }) {
     return Padding(
       padding: const EdgeInsets.only(left: 40),
       child: Row(
@@ -199,11 +259,20 @@ class AnalysisScreen extends StatelessWidget {
             children: [
               Text(
                 text,
-                style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               Text(
                 subtext,
-                style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 14),
+                style: TextStyle(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.54),
+                  fontSize: 14,
+                ),
               ),
             ],
           ),

@@ -5,7 +5,10 @@ import '../../../shared/state/recruitment_sync_store.dart';
 import '../../../shared/widgets/app_button.dart';
 
 class RecruitmentCandidateDetailsScreen extends StatelessWidget {
-  const RecruitmentCandidateDetailsScreen({super.key, required this.application});
+  const RecruitmentCandidateDetailsScreen({
+    super.key,
+    required this.application,
+  });
 
   final RecruitmentApplication application;
 

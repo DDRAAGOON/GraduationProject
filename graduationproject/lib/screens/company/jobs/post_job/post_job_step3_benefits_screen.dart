@@ -85,10 +85,12 @@ class _CompanyPostJobStep3BenefitsScreenState
             onPressed: () {
               if (titleController.text.isNotEmpty) {
                 setState(() {
-                  _benefits.add(JobBenefit(
-                    title: titleController.text.trim(),
-                    description: descController.text.trim(),
-                  ));
+                  _benefits.add(
+                    JobBenefit(
+                      title: titleController.text.trim(),
+                      description: descController.text.trim(),
+                    ),
+                  );
                 });
               }
               Navigator.of(ctx).pop();
@@ -104,13 +106,18 @@ class _CompanyPostJobStep3BenefitsScreenState
     setState(() => _loading = true);
 
     final args = ModalRoute.of(context)?.settings.arguments;
-    final data = args is Map<String, dynamic> ? args : const <String, dynamic>{};
+    final data = args is Map<String, dynamic>
+        ? args
+        : const <String, dynamic>{};
 
     final title = (data['title'] as String?)?.trim() ?? 'Untitled Job';
-    final employmentType = (data['employmentType'] as String?)?.trim() ?? 'Full-Time';
-    final salaryRange = (data['salaryRange'] as String?)?.trim() ?? 'Competitive';
+    final employmentType =
+        (data['employmentType'] as String?)?.trim() ?? 'Full-Time';
+    final salaryRange =
+        (data['salaryRange'] as String?)?.trim() ?? 'Competitive';
     final step1Description = (data['description'] as String?) ?? '';
-    final descriptionPoints = (data['descriptionPoints'] as List<String>?) ?? [];
+    final descriptionPoints =
+        (data['descriptionPoints'] as List<String>?) ?? [];
     final category = (data['category'] as String?) ?? 'General';
     final department = (data['department'] as String?) ?? '';
     final positions = (data['positions'] as int?) ?? 1;
@@ -121,11 +128,13 @@ class _CompanyPostJobStep3BenefitsScreenState
 
     final fullDescription = [
       if (step1Description.isNotEmpty) step1Description,
-      ...descriptionPoints
+      ...descriptionPoints,
     ].join('\n');
 
     final companyLocations = CompanyStore.instance.locations;
-    final fallbackLocation = companyLocations.isNotEmpty ? companyLocations.first : 'Remote';
+    final fallbackLocation = companyLocations.isNotEmpty
+        ? companyLocations.first
+        : 'Remote';
     final location = (data['location'] as String?) ?? fallbackLocation;
 
     try {
@@ -168,7 +177,9 @@ class _CompanyPostJobStep3BenefitsScreenState
 
       if (!mounted) return;
       setState(() => _loading = false);
-      Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.companyDashboard, (r) => false);
+      Navigator.of(
+        context,
+      ).pushNamedAndRemoveUntil(AppRoutes.companyDashboard, (r) => false);
     } catch (e) {
       if (!mounted) return;
       setState(() => _loading = false);
@@ -190,7 +201,10 @@ class _CompanyPostJobStep3BenefitsScreenState
           SectionTitle(t.step3Label),
           const SizedBox(height: 8),
           Text(
-            t.tr(en: "This job comes with many perks and benefits.", ar: "هذه الوظيفة تأتي مع العديد من المزايا والفوائد"),
+            t.tr(
+              en: "This job comes with many perks and benefits.",
+              ar: "هذه الوظيفة تأتي مع العديد من المزايا والفوائد",
+            ),
             style: TextStyle(
               color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
               fontSize: 14,
@@ -241,7 +255,9 @@ class _BenefitCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Theme.of(context).colorScheme.outline.withOpacity(0.05)),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withOpacity(0.05),
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.02),
@@ -259,14 +275,21 @@ class _BenefitCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   benefit.title,
-                  style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 14),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 14,
+                  ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
               InkWell(
                 onTap: onDelete,
-                child: Icon(Icons.close, size: 16, color: Theme.of(context).colorScheme.error.withOpacity(0.5)),
+                child: Icon(
+                  Icons.close,
+                  size: 16,
+                  color: Theme.of(context).colorScheme.error.withOpacity(0.5),
+                ),
               ),
             ],
           ),
@@ -312,7 +335,11 @@ class _AddBenefitCard extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.add, color: Theme.of(context).colorScheme.primary, size: 24),
+            Icon(
+              Icons.add,
+              color: Theme.of(context).colorScheme.primary,
+              size: 24,
+            ),
             const SizedBox(height: 8),
             Text(
               t.tr(en: "Add Benefit", ar: "إضافة ميزة"),

@@ -16,7 +16,8 @@ class CompanyResetPasswordScreen extends StatefulWidget {
       _CompanyResetPasswordScreenState();
 }
 
-class _CompanyResetPasswordScreenState extends State<CompanyResetPasswordScreen> {
+class _CompanyResetPasswordScreenState
+    extends State<CompanyResetPasswordScreen> {
   final _newPassword = TextEditingController();
   final _confirmPassword = TextEditingController();
   bool _obscure1 = true;
@@ -49,7 +50,9 @@ class _CompanyResetPasswordScreenState extends State<CompanyResetPasswordScreen>
     await Future<void>.delayed(const Duration(milliseconds: 700));
     if (!mounted) return;
     setState(() => _loading = false);
-    Navigator.of(context).pushReplacementNamed(AppRoutes.companyPasswordChanged);
+    Navigator.of(
+      context,
+    ).pushReplacementNamed(AppRoutes.companyPasswordChanged);
   }
 
   @override
@@ -62,16 +65,16 @@ class _CompanyResetPasswordScreenState extends State<CompanyResetPasswordScreen>
         children: [
           Text(
             t.resetPassword,
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.w800,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
           ),
           const SizedBox(height: 8),
           Text(
             t.resetPasswordSub,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-                ),
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+            ),
           ),
           const SizedBox(height: 24),
           AppTextField(

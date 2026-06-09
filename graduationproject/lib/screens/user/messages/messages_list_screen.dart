@@ -35,7 +35,9 @@ class _MessagesListScreenState extends State<MessagesListScreen> {
     final t = AppLocalizations.of(context);
     final store = RecruitmentSyncStore.instance;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final backgroundColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
+    final backgroundColor = isDark
+        ? const Color(0xFF001E3A)
+        : const Color(0xFFF8FBF4);
     final onSurfaceColor = isDark ? Colors.white : Colors.black;
 
     return Scaffold(
@@ -72,9 +74,11 @@ class _MessagesListScreenState extends State<MessagesListScreen> {
                   animation: store,
                   builder: (context, _) {
                     // Filter real messages from store
-                    final messages = store.messages.where((m) => 
-                      m.text.toLowerCase().contains(_searchQuery)
-                    ).toList();
+                    final messages = store.messages
+                        .where(
+                          (m) => m.text.toLowerCase().contains(_searchQuery),
+                        )
+                        .toList();
 
                     if (messages.isEmpty) {
                       return _buildEmptyState(t, onSurfaceColor);
@@ -84,7 +88,8 @@ class _MessagesListScreenState extends State<MessagesListScreen> {
                       physics: const BouncingScrollPhysics(),
                       itemCount: messages.length,
                       separatorBuilder: (context, index) => Divider(
-                        color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.12),
+                        color: (isDark ? Colors.white : Colors.black)
+                            .withValues(alpha: 0.12),
                         height: 1,
                       ),
                       itemBuilder: (context, index) {
@@ -93,7 +98,8 @@ class _MessagesListScreenState extends State<MessagesListScreen> {
                           context,
                           name: msg.fromCompany ? "Company Support" : "User",
                           message: msg.text,
-                          time: "${msg.createdAt.hour}:${msg.createdAt.minute.toString().padLeft(2, '0')}",
+                          time:
+                              "${msg.createdAt.hour}:${msg.createdAt.minute.toString().padLeft(2, '0')}",
                           image: AppImages.companyProfile2, // Fallback image
                           onSurfaceColor: onSurfaceColor,
                         );
@@ -114,7 +120,11 @@ class _MessagesListScreenState extends State<MessagesListScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.chat_bubble_outline, size: 64, color: onSurfaceColor.withValues(alpha: 0.2)),
+          Icon(
+            Icons.chat_bubble_outline,
+            size: 64,
+            color: onSurfaceColor.withValues(alpha: 0.2),
+          ),
           const SizedBox(height: 16),
           Text(
             t.tr(en: "No messages yet", ar: "لا توجد رسائل بعد"),
@@ -128,7 +138,12 @@ class _MessagesListScreenState extends State<MessagesListScreen> {
     );
   }
 
-  Widget _buildSearchBar(BuildContext context, AppLocalizations t, bool isDark, Color onSurfaceColor) {
+  Widget _buildSearchBar(
+    BuildContext context,
+    AppLocalizations t,
+    bool isDark,
+    Color onSurfaceColor,
+  ) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
@@ -136,13 +151,18 @@ class _MessagesListScreenState extends State<MessagesListScreen> {
             ? Colors.white.withValues(alpha: 0.05)
             : Colors.black.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(30),
-        border: Border.all(color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.12)),
+        border: Border.all(
+          color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.12),
+        ),
       ),
       child: TextField(
         controller: _searchController,
         style: TextStyle(color: onSurfaceColor),
         decoration: InputDecoration(
-          icon: Icon(Icons.search, color: onSurfaceColor.withValues(alpha: 0.54)),
+          icon: Icon(
+            Icons.search,
+            color: onSurfaceColor.withValues(alpha: 0.54),
+          ),
           hintText: t.tr(en: "Search messages", ar: "البحث في الرسائل"),
           hintStyle: TextStyle(color: onSurfaceColor.withValues(alpha: 0.38)),
           border: InputBorder.none,
@@ -179,15 +199,21 @@ class _MessagesListScreenState extends State<MessagesListScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(name, style: TextStyle(
-                        color: onSurfaceColor,
-                        fontSize: 16, 
-                        fontWeight: FontWeight.bold
-                      )),
-                      Text(time, style: TextStyle(
-                        color: onSurfaceColor.withValues(alpha: 0.38), 
-                        fontSize: 12
-                      )),
+                      Text(
+                        name,
+                        style: TextStyle(
+                          color: onSurfaceColor,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        time,
+                        style: TextStyle(
+                          color: onSurfaceColor.withValues(alpha: 0.38),
+                          fontSize: 12,
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 5),
@@ -197,7 +223,7 @@ class _MessagesListScreenState extends State<MessagesListScreen> {
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       color: onSurfaceColor.withValues(alpha: 0.54),
-                      fontSize: 14
+                      fontSize: 14,
                     ),
                   ),
                 ],

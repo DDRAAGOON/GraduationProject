@@ -31,50 +31,63 @@ class _CompaniesTabState extends State<CompaniesTab> {
       builder: (context, _) {
         final List<Map<String, dynamic>> companiesData = [
           {
-            'name': 'dragon', 
-            'jobs': 14, 
-            'logo': Icons.business, 
+            'name': 'dragon',
+            'jobs': 14,
+            'logo': Icons.business,
             'cat': 'Non-Tech',
             'industry': isAr ? 'خدمات عامة' : 'General Services',
-            'description': isAr ? 'شركة رائدة في تقديم الحلول المتكاملة.' : 'A leading company in providing integrated solutions.',
+            'description': isAr
+                ? 'شركة رائدة في تقديم الحلول المتكاملة.'
+                : 'A leading company in providing integrated solutions.',
           },
           {
-            'name': 'Nexora Solutions', 
-            'jobs': 8, 
-            'logo': Icons.account_tree_rounded, 
+            'name': 'Nexora Solutions',
+            'jobs': 8,
+            'logo': Icons.account_tree_rounded,
             'cat': 'Technical',
             'industry': isAr ? 'برمجيات' : 'Software',
-            'description': isAr ? 'متخصصون في بناء الأنظمة السحابية.' : 'Specialists in building cloud systems.',
+            'description': isAr
+                ? 'متخصصون في بناء الأنظمة السحابية.'
+                : 'Specialists in building cloud systems.',
           },
           {
-            'name': 'إبداع للبرمجيات', 
-            'jobs': 5, 
-            'logo': Icons.code, 
+            'name': 'إبداع للبرمجيات',
+            'jobs': 5,
+            'logo': Icons.code,
             'cat': 'Technical',
             'industry': isAr ? 'تكنولوجيا المعلومات' : 'IT',
-            'description': isAr ? 'نبتكر حلولاً تقنية ذكية.' : 'We innovate smart technical solutions.',
+            'description': isAr
+                ? 'نبتكر حلولاً تقنية ذكية.'
+                : 'We innovate smart technical solutions.',
           },
           {
-            'name': 'المارودي للمقاولات', 
-            'jobs': 12, 
-            'logo': Icons.handyman, 
+            'name': 'المارودي للمقاولات',
+            'jobs': 12,
+            'logo': Icons.handyman,
             'cat': 'Non-Tech',
             'industry': isAr ? 'مقاولات' : 'Construction',
-            'description': isAr ? 'خبرة طويلة في مجال البناء والتشييد.' : 'Long experience in construction.',
+            'description': isAr
+                ? 'خبرة طويلة في مجال البناء والتشييد.'
+                : 'Long experience in construction.',
           },
           {
-            'name': 'Jobito Labs', 
-            'jobs': 20, 
-            'logo': Icons.rocket_launch, 
+            'name': 'Jobito Labs',
+            'jobs': 20,
+            'logo': Icons.rocket_launch,
             'cat': 'Technical',
             'industry': isAr ? 'مختبرات تقنية' : 'Tech Labs',
-            'description': isAr ? 'نصنع مستقبل التكنولوجيا في مصر.' : 'Creating the future of tech in Egypt.',
+            'description': isAr
+                ? 'نصنع مستقبل التكنولوجيا في مصر.'
+                : 'Creating the future of tech in Egypt.',
           },
         ];
 
         final filtered = companiesData.where((c) {
-          final matchesSearch = c['name'].toString().toLowerCase().contains(_searchQuery.toLowerCase());
-          final matchesCat = _selectedCategory == 'الكل' || c['cat'] == _selectedCategory;
+          final matchesSearch = c['name'].toString().toLowerCase().contains(
+            _searchQuery.toLowerCase(),
+          );
+          final matchesCat =
+              _selectedCategory == 'الكل' || c['cat'] == _selectedCategory;
           return matchesSearch && matchesCat;
         }).toList();
 
@@ -102,17 +115,29 @@ class _CompaniesTabState extends State<CompaniesTab> {
                     children: [
                       Text(
                         isAr ? 'تصفح الشركات' : 'Browse Companies',
-                        style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        isAr ? 'اكتشف أفضل الشركات وابحث عن فرصتك المثالية.' : 'Discover best companies and find your ideal opportunity.',
+                        isAr
+                            ? 'اكتشف أفضل الشركات وابحث عن فرصتك المثالية.'
+                            : 'Discover best companies and find your ideal opportunity.',
                         textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 13),
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.8),
+                          fontSize: 13,
+                        ),
                       ),
                       const SizedBox(height: 24),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: const Color(0xFFECEAF2),
                           borderRadius: BorderRadius.circular(100),
@@ -122,21 +147,35 @@ class _CompaniesTabState extends State<CompaniesTab> {
                             Expanded(
                               child: Row(
                                 children: [
-                                  const Icon(Icons.search, color: Colors.grey, size: 18),
+                                  const Icon(
+                                    Icons.search,
+                                    color: Colors.grey,
+                                    size: 18,
+                                  ),
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: TextField(
                                       controller: _searchController,
-                                      textAlign: isAr ? TextAlign.right : TextAlign.left,
-                                      onChanged: (v) => setState(() => _searchQuery = v),
-                                      style: const TextStyle(color: Colors.black87),
+                                      textAlign: isAr
+                                          ? TextAlign.right
+                                          : TextAlign.left,
+                                      onChanged: (v) =>
+                                          setState(() => _searchQuery = v),
+                                      style: const TextStyle(
+                                        color: Colors.black87,
+                                      ),
                                       decoration: InputDecoration(
-                                        hintText: isAr ? 'ابحث عن شركة...' : 'Search for company...',
+                                        hintText: isAr
+                                            ? 'ابحث عن شركة...'
+                                            : 'Search for company...',
                                         border: InputBorder.none,
                                         enabledBorder: InputBorder.none,
                                         focusedBorder: InputBorder.none,
                                         filled: false,
-                                        hintStyle: const TextStyle(color: Colors.grey, fontSize: 13),
+                                        hintStyle: const TextStyle(
+                                          color: Colors.grey,
+                                          fontSize: 13,
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -150,12 +189,26 @@ class _CompaniesTabState extends State<CompaniesTab> {
                                 DropdownButtonHideUnderline(
                                   child: DropdownButton<String>(
                                     value: 'All',
-                                    icon: const Icon(Icons.keyboard_arrow_down, color: Colors.grey, size: 20),
-                                    style: const TextStyle(color: Colors.black87, fontSize: 13, fontWeight: FontWeight.w500),
-                                    items: ['All', 'Cairo', 'Giza'].map((gov) => DropdownMenuItem(
-                                      value: gov,
-                                      child: Text(translateValue(gov, isAr)),
-                                    )).toList(),
+                                    icon: const Icon(
+                                      Icons.keyboard_arrow_down,
+                                      color: Colors.grey,
+                                      size: 20,
+                                    ),
+                                    style: const TextStyle(
+                                      color: Colors.black87,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                    items: ['All', 'Cairo', 'Giza']
+                                        .map(
+                                          (gov) => DropdownMenuItem(
+                                            value: gov,
+                                            child: Text(
+                                              translateValue(gov, isAr),
+                                            ),
+                                          ),
+                                        )
+                                        .toList(),
                                     onChanged: (v) {},
                                   ),
                                 ),
@@ -166,7 +219,11 @@ class _CompaniesTabState extends State<CompaniesTab> {
                                     color: Color(0xFFFF7A2A),
                                     shape: BoxShape.circle,
                                   ),
-                                  child: const Icon(Icons.location_on, color: Colors.white, size: 18),
+                                  child: const Icon(
+                                    Icons.location_on,
+                                    color: Colors.white,
+                                    size: 18,
+                                  ),
                                 ),
                               ],
                             ),
@@ -183,13 +240,20 @@ class _CompaniesTabState extends State<CompaniesTab> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Column(
-                  crossAxisAlignment: isAr ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                  crossAxisAlignment: isAr
+                      ? CrossAxisAlignment.end
+                      : CrossAxisAlignment.start,
                   children: [
                     Align(
-                      alignment: isAr ? Alignment.centerRight : Alignment.centerLeft,
+                      alignment: isAr
+                          ? Alignment.centerRight
+                          : Alignment.centerLeft,
                       child: Text(
-                        isAr ? 'التصنيف' : 'Category', 
-                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        isAr ? 'التصنيف' : 'Category',
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -197,15 +261,31 @@ class _CompaniesTabState extends State<CompaniesTab> {
                       children: [
                         Expanded(
                           child: GestureDetector(
-                            onTap: () => setState(() => _selectedCategory = _selectedCategory == 'Non-Tech' ? 'الكل' : 'Non-Tech'),
-                            child: _buildCategoryBtn(isAr ? 'غير تقني' : 'Non-Tech', _selectedCategory == 'Non-Tech'),
+                            onTap: () => setState(
+                              () => _selectedCategory =
+                                  _selectedCategory == 'Non-Tech'
+                                  ? 'الكل'
+                                  : 'Non-Tech',
+                            ),
+                            child: _buildCategoryBtn(
+                              isAr ? 'غير تقني' : 'Non-Tech',
+                              _selectedCategory == 'Non-Tech',
+                            ),
                           ),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: GestureDetector(
-                            onTap: () => setState(() => _selectedCategory = _selectedCategory == 'Technical' ? 'الكل' : 'Technical'),
-                            child: _buildCategoryBtn(isAr ? 'تقني' : 'Technical', _selectedCategory == 'Technical'),
+                            onTap: () => setState(
+                              () => _selectedCategory =
+                                  _selectedCategory == 'Technical'
+                                  ? 'الكل'
+                                  : 'Technical',
+                            ),
+                            child: _buildCategoryBtn(
+                              isAr ? 'تقني' : 'Technical',
+                              _selectedCategory == 'Technical',
+                            ),
                           ),
                         ),
                       ],
@@ -219,15 +299,31 @@ class _CompaniesTabState extends State<CompaniesTab> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Column(
-                  crossAxisAlignment: isAr ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                  crossAxisAlignment: isAr
+                      ? CrossAxisAlignment.end
+                      : CrossAxisAlignment.start,
                   children: [
-                    Text(isAr ? 'جميع الشركات' : 'All Companies', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                     Text(
-                      isAr ? 'إجمالي الشركات المدرجة: ${filtered.length}' : 'Total listed companies: ${filtered.length}',
-                      style: TextStyle(color: Colors.grey.shade500, fontSize: 12),
+                      isAr ? 'جميع الشركات' : 'All Companies',
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      isAr
+                          ? 'إجمالي الشركات المدرجة: ${filtered.length}'
+                          : 'Total listed companies: ${filtered.length}',
+                      style: TextStyle(
+                        color: Colors.grey.shade500,
+                        fontSize: 12,
+                      ),
                     ),
                     const SizedBox(height: 20),
-                    ...filtered.map((company) => _buildCompanyCard(context, company, isAr, isDark)),
+                    ...filtered.map(
+                      (company) =>
+                          _buildCompanyCard(context, company, isAr, isDark),
+                    ),
                   ],
                 ),
               ),
@@ -235,7 +331,7 @@ class _CompaniesTabState extends State<CompaniesTab> {
             ],
           ),
         );
-      }
+      },
     );
   }
 
@@ -253,14 +349,23 @@ class _CompaniesTabState extends State<CompaniesTab> {
       ),
       child: Center(
         child: Text(
-          label, 
-          style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 15),
+          label,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+            fontSize: 15,
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildCompanyCard(BuildContext context, Map<String, dynamic> company, bool isAr, bool isDark) {
+  Widget _buildCompanyCard(
+    BuildContext context,
+    Map<String, dynamic> company,
+    bool isAr,
+    bool isDark,
+  ) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(20),
@@ -272,23 +377,32 @@ class _CompaniesTabState extends State<CompaniesTab> {
             color: Colors.black.withOpacity(0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
-          )
+          ),
         ],
       ),
       child: Column(
-        crossAxisAlignment: isAr ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        crossAxisAlignment: isAr
+            ? CrossAxisAlignment.end
+            : CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: isAr ? MainAxisAlignment.start : MainAxisAlignment.end,
+            mainAxisAlignment: isAr
+                ? MainAxisAlignment.start
+                : MainAxisAlignment.end,
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
-                  isAr ? 'وظائف شاغرة ${company['jobs']}' : '${company['jobs']} Vacant Jobs',
+                  isAr
+                      ? 'وظائف شاغرة ${company['jobs']}'
+                      : '${company['jobs']} Vacant Jobs',
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 11,
@@ -311,9 +425,9 @@ class _CompaniesTabState extends State<CompaniesTab> {
           ),
           const SizedBox(height: 8),
           Text(
-            isAr 
-              ? 'شركة رائدة في مجال الحلول المتكاملة والابتكار، توفر بيئة عمل محفزة.' 
-              : 'A leading company in integrated solutions and innovation, providing a motivating work environment.',
+            isAr
+                ? 'شركة رائدة في مجال الحلول المتكاملة والابتكار، توفر بيئة عمل محفزة.'
+                : 'A leading company in integrated solutions and innovation, providing a motivating work environment.',
             style: TextStyle(
               color: Colors.white.withOpacity(0.7),
               fontSize: 13,
@@ -344,19 +458,27 @@ class _CompaniesTabState extends State<CompaniesTab> {
             alignment: isAr ? Alignment.centerLeft : Alignment.centerRight,
             child: TextButton(
               onPressed: () => Navigator.of(context).pushNamed(
-                AppRoutes.userCompanyDetails, 
-                arguments: {'name': company['name']}
+                AppRoutes.userCompanyDetails,
+                arguments: {'name': company['name']},
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  if (!isAr) const Text('View Profile', style: TextStyle(color: Colors.white)),
+                  if (!isAr)
+                    const Text(
+                      'View Profile',
+                      style: TextStyle(color: Colors.white),
+                    ),
                   Icon(
-                    isAr ? Icons.arrow_back_ios : Icons.arrow_forward_ios, 
-                    size: 14, 
-                    color: const Color(0xFFFF7A2A)
+                    isAr ? Icons.arrow_back_ios : Icons.arrow_forward_ios,
+                    size: 14,
+                    color: const Color(0xFFFF7A2A),
                   ),
-                  if (isAr) const Text('عرض الملف الشخصي', style: TextStyle(color: Colors.white)),
+                  if (isAr)
+                    const Text(
+                      'عرض الملف الشخصي',
+                      style: TextStyle(color: Colors.white),
+                    ),
                 ],
               ),
             ),
@@ -369,7 +491,10 @@ class _CompaniesTabState extends State<CompaniesTab> {
   Widget _buildCompanyIcon(IconData icon) {
     return Container(
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(color: const Color(0xFFEDF2FF), borderRadius: BorderRadius.circular(15)),
+      decoration: BoxDecoration(
+        color: const Color(0xFFEDF2FF),
+        borderRadius: BorderRadius.circular(15),
+      ),
       child: Icon(icon, color: const Color(0xFF49769F), size: 30),
     );
   }

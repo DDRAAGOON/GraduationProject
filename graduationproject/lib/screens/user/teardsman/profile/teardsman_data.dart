@@ -8,7 +8,7 @@ class TradesmanProfileData {
   static String address = "";
   static String service = "";
   static String? profileImage;
-  
+
   static List<String> skills = [];
   static List<Map<String, String>> education = [];
   static List<String> workImages = [];

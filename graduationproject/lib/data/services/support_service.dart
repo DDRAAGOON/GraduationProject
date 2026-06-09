@@ -32,7 +32,9 @@ class SupportService {
 
   Future<HelpArticle> getHelpArticleDetails(String id) async {
     try {
-      final response = await _apiClient.get(ApiConstants.supportHelpArticleById(id));
+      final response = await _apiClient.get(
+        ApiConstants.supportHelpArticleById(id),
+      );
       return HelpArticle.fromJson(response.data);
     } catch (e) {
       throw ErrorHandler.handle(e);

@@ -37,8 +37,8 @@ class _MainScreenState extends State<MainScreen> {
           Icon(Icons.analytics_rounded, size: 30, color: Colors.white),
         ],
         color: Theme.of(context).colorScheme.primary,
-        buttonBackgroundColor: Theme.of(context).brightness == Brightness.dark 
-            ? const Color(0xFF001E3A) 
+        buttonBackgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? const Color(0xFF001E3A)
             : Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         animationCurve: Curves.easeInOut,
@@ -52,4 +52,3 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 }
-

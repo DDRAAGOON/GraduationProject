@@ -42,7 +42,7 @@ class _CompanyCompanyProfileScreenState
       final syncService = RecruitmentSyncService.instance;
       // 1. Fetch Profile
       final profile = await syncService.getCompanyProfile();
-      
+
       // 2. Fetch Stats
       CompanyStatistics? stats;
       if (profile.companyId.isNotEmpty) {
@@ -82,11 +82,24 @@ class _CompanyCompanyProfileScreenState
       while (_store.contacts.isNotEmpty) {
         _store.removeContact(0);
       }
-      if (profile.contactEmail?.isNotEmpty == true) _store.addContact(ContactEntry(name: 'Email', value: profile.contactEmail!));
-      if (profile.phone?.isNotEmpty == true) _store.addContact(ContactEntry(name: 'Phone', value: profile.phone!));
-      if (profile.socialLinks.linkedin?.isNotEmpty == true) _store.addContact(ContactEntry(name: 'LinkedIn', value: profile.socialLinks.linkedin!));
-      if (profile.socialLinks.facebook?.isNotEmpty == true) _store.addContact(ContactEntry(name: 'Facebook', value: profile.socialLinks.facebook!));
-      if (profile.socialLinks.twitter?.isNotEmpty == true) _store.addContact(ContactEntry(name: 'Twitter', value: profile.socialLinks.twitter!));
+      if (profile.contactEmail?.isNotEmpty == true)
+        _store.addContact(
+          ContactEntry(name: 'Email', value: profile.contactEmail!),
+        );
+      if (profile.phone?.isNotEmpty == true)
+        _store.addContact(ContactEntry(name: 'Phone', value: profile.phone!));
+      if (profile.socialLinks.linkedin?.isNotEmpty == true)
+        _store.addContact(
+          ContactEntry(name: 'LinkedIn', value: profile.socialLinks.linkedin!),
+        );
+      if (profile.socialLinks.facebook?.isNotEmpty == true)
+        _store.addContact(
+          ContactEntry(name: 'Facebook', value: profile.socialLinks.facebook!),
+        );
+      if (profile.socialLinks.twitter?.isNotEmpty == true)
+        _store.addContact(
+          ContactEntry(name: 'Twitter', value: profile.socialLinks.twitter!),
+        );
 
       if (mounted) {
         setState(() {
@@ -155,12 +168,20 @@ class _CompanyCompanyProfileScreenState
                       Text(
                         t.isAr
                             ? (_store.companyAboutAr.trim().isNotEmpty
-                                ? _store.companyAboutAr
-                                : (_store.companyAboutEn.trim().isNotEmpty ? _store.companyAboutEn : t.notYet))
-                            : (_store.companyAboutEn.trim().isNotEmpty ? _store.companyAboutEn : t.notYet),
+                                  ? _store.companyAboutAr
+                                  : (_store.companyAboutEn.trim().isNotEmpty
+                                        ? _store.companyAboutEn
+                                        : t.notYet))
+                            : (_store.companyAboutEn.trim().isNotEmpty
+                                  ? _store.companyAboutEn
+                                  : t.notYet),
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: (_store.companyAboutAr.isEmpty && _store.companyAboutEn.isEmpty)
-                              ? Theme.of(context).colorScheme.onSurface.withOpacity(0.4)
+                          color:
+                              (_store.companyAboutAr.isEmpty &&
+                                  _store.companyAboutEn.isEmpty)
+                              ? Theme.of(
+                                  context,
+                                ).colorScheme.onSurface.withOpacity(0.4)
                               : null,
                         ),
                       ),
@@ -168,30 +189,56 @@ class _CompanyCompanyProfileScreenState
                       SectionTitle(t.benefits),
                       const SizedBox(height: 10),
                       _store.benefits.isEmpty
-                          ? Text(t.notYet, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)))
+                          ? Text(
+                              t.notYet,
+                              style: TextStyle(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurface.withOpacity(0.4),
+                              ),
+                            )
                           : Wrap(
                               spacing: 8,
                               runSpacing: 8,
-                              children: _store.benefits.map((item) => Chip(
-                                label: Text(item, style: const TextStyle(fontSize: 12)),
-                                visualDensity: VisualDensity.compact,
-                                backgroundColor: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.3),
-                              )).toList(),
+                              children: _store.benefits
+                                  .map(
+                                    (item) => Chip(
+                                      label: Text(
+                                        item,
+                                        style: const TextStyle(fontSize: 12),
+                                      ),
+                                      visualDensity: VisualDensity.compact,
+                                      backgroundColor: Theme.of(context)
+                                          .colorScheme
+                                          .secondaryContainer
+                                          .withOpacity(0.3),
+                                    ),
+                                  )
+                                  .toList(),
                             ),
                       const SizedBox(height: 16),
-                      if (_store.commercialRegister.isNotEmpty || _store.nationalNumber.isNotEmpty) ...[
-                        SectionTitle(t.tr(en: 'Registration Info', ar: 'بيانات التسجيل')),
+                      if (_store.commercialRegister.isNotEmpty ||
+                          _store.nationalNumber.isNotEmpty) ...[
+                        SectionTitle(
+                          t.tr(en: 'Registration Info', ar: 'بيانات التسجيل'),
+                        ),
                         const SizedBox(height: 10),
                         if (_store.commercialRegister.isNotEmpty)
                           _RegistrationInfoTile(
                             icon: Icons.assignment_outlined,
-                            title: t.tr(en: 'Commercial Register', ar: 'السجل التجاري'),
+                            title: t.tr(
+                              en: 'Commercial Register',
+                              ar: 'السجل التجاري',
+                            ),
                             value: _store.commercialRegister,
                           ),
                         if (_store.nationalNumber.isNotEmpty)
                           _RegistrationInfoTile(
                             icon: Icons.badge_outlined,
-                            title: t.tr(en: 'National Number', ar: 'الرقم القومي'),
+                            title: t.tr(
+                              en: 'National Number',
+                              ar: 'الرقم القومي',
+                            ),
                             value: _store.nationalNumber,
                           ),
                         const SizedBox(height: 16),
@@ -201,8 +248,9 @@ class _CompanyCompanyProfileScreenState
                         const SizedBox(height: 10),
                         ..._store.contacts.asMap().entries.map(
                           (entry) => _EditableLinkTile(
-                            icon: entry.value.name.toLowerCase().contains('email') 
-                                ? Icons.email_outlined 
+                            icon:
+                                entry.value.name.toLowerCase().contains('email')
+                                ? Icons.email_outlined
                                 : Icons.link_outlined,
                             title: entry.value.name,
                             value: entry.value.value,
@@ -215,9 +263,7 @@ class _CompanyCompanyProfileScreenState
               ),
             ),
 
-      bottomNavigationBar: const CompanyBottomNav(
-        current: CompanyTab.profile,
-      ),
+      bottomNavigationBar: const CompanyBottomNav(current: CompanyTab.profile),
     );
   }
 
@@ -274,7 +320,7 @@ class _CompanyCompanyProfileScreenState
         Text(
           value,
           style: TextStyle(
-            fontWeight: FontWeight.bold, 
+            fontWeight: FontWeight.bold,
             fontSize: 15,
             color: Theme.of(context).colorScheme.primary,
           ),
@@ -446,18 +492,31 @@ class _CompanyStatsBar extends StatelessWidget {
                 item(
                   icon: Icons.local_fire_department_outlined,
                   label: t.tr(en: 'Founded', ar: 'تاريخ التأسيس'),
-                  value: (foundedDay == 0 || foundedMonth == 0 || foundedYear == 0)
+                  value:
+                      (foundedDay == 0 || foundedMonth == 0 || foundedYear == 0)
                       ? t.notYet
                       : t.tr(
-                          en: '$foundedMonth/$foundedDay/$foundedYear', 
-                          ar: '$foundedYear/$foundedMonth/$foundedDay'.replaceAll('0', '٠').replaceAll('1', '١').replaceAll('2', '٢').replaceAll('3', '٣').replaceAll('4', '٤').replaceAll('5', '٥').replaceAll('6', '٦').replaceAll('7', '٧').replaceAll('8', '٨').replaceAll('9', '٩')
+                          en: '$foundedMonth/$foundedDay/$foundedYear',
+                          ar: '$foundedYear/$foundedMonth/$foundedDay'
+                              .replaceAll('0', '٠')
+                              .replaceAll('1', '١')
+                              .replaceAll('2', '٢')
+                              .replaceAll('3', '٣')
+                              .replaceAll('4', '٤')
+                              .replaceAll('5', '٥')
+                              .replaceAll('6', '٦')
+                              .replaceAll('7', '٧')
+                              .replaceAll('8', '٨')
+                              .replaceAll('9', '٩'),
                         ),
                 ),
                 const SizedBox(width: 14),
                 item(
                   icon: Icons.location_on_outlined,
                   label: t.locationInfo,
-                  value: countriesCount == 0 ? t.notYet : countriesCount.toString(),
+                  value: countriesCount == 0
+                      ? t.notYet
+                      : countriesCount.toString(),
                 ),
               ],
             ),
@@ -473,7 +532,11 @@ class _CompanyStatsBar extends StatelessWidget {
                 item(
                   icon: Icons.category_outlined,
                   label: t.categoryLabel,
-                  value: category.isEmpty ? t.notYet : (category == 'Technical' ? t.technical : t.nonTechnical),
+                  value: category.isEmpty
+                      ? t.notYet
+                      : (category == 'Technical'
+                            ? t.technical
+                            : t.nonTechnical),
                 ),
               ],
             ),

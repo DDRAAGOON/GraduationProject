@@ -12,4 +12,3 @@ class CompanyAppearanceSettingsLightScreen extends StatelessWidget {
     return const CompanyAppearanceSettingsScreen(initialTheme: 'Light');
   }
 }
-

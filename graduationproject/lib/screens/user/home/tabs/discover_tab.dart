@@ -85,7 +85,10 @@ class _DiscoverTabState extends State<DiscoverTab> {
                           ),
                           const SizedBox(height: 24),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 4,
+                            ),
                             decoration: BoxDecoration(
                               color: const Color(0xFFECEAF2),
                               borderRadius: BorderRadius.circular(100),
@@ -95,20 +98,34 @@ class _DiscoverTabState extends State<DiscoverTab> {
                                 Expanded(
                                   child: Row(
                                     children: [
-                                      const Icon(Icons.search, color: Colors.grey, size: 20),
+                                      const Icon(
+                                        Icons.search,
+                                        color: Colors.grey,
+                                        size: 20,
+                                      ),
                                       const SizedBox(width: 8),
                                       Expanded(
                                         child: TextField(
                                           controller: _searchController,
-                                          style: const TextStyle(color: Colors.black87),
-                                          onChanged: (value) => store.updateFilters(searchQuery: value.trim()),
+                                          style: const TextStyle(
+                                            color: Colors.black87,
+                                          ),
+                                          onChanged: (value) =>
+                                              store.updateFilters(
+                                                searchQuery: value.trim(),
+                                              ),
                                           decoration: InputDecoration(
-                                            hintText: isAr ? 'ابحث...' : 'Search...',
+                                            hintText: isAr
+                                                ? 'ابحث...'
+                                                : 'Search...',
                                             border: InputBorder.none,
                                             enabledBorder: InputBorder.none,
                                             focusedBorder: InputBorder.none,
                                             filled: false,
-                                            hintStyle: const TextStyle(color: Colors.grey, fontSize: 13),
+                                            hintStyle: const TextStyle(
+                                              color: Colors.grey,
+                                              fontSize: 13,
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -122,13 +139,33 @@ class _DiscoverTabState extends State<DiscoverTab> {
                                     DropdownButtonHideUnderline(
                                       child: DropdownButton<String>(
                                         value: store.filterLocation,
-                                        icon: const Icon(Icons.keyboard_arrow_down, color: Colors.grey, size: 18),
-                                        style: const TextStyle(color: Colors.black87, fontSize: 12, fontWeight: FontWeight.w500),
-                                        items: RecruitmentSyncStore.egyptGovernorates.map((gov) => DropdownMenuItem(
-                                          value: gov,
-                                          child: Text(translateValue(gov, isAr)),
-                                        )).toList(),
-                                        onChanged: (value) { if (value != null) store.updateFilters(location: value); },
+                                        icon: const Icon(
+                                          Icons.keyboard_arrow_down,
+                                          color: Colors.grey,
+                                          size: 18,
+                                        ),
+                                        style: const TextStyle(
+                                          color: Colors.black87,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                        items: RecruitmentSyncStore
+                                            .egyptGovernorates
+                                            .map(
+                                              (gov) => DropdownMenuItem(
+                                                value: gov,
+                                                child: Text(
+                                                  translateValue(gov, isAr),
+                                                ),
+                                              ),
+                                            )
+                                            .toList(),
+                                        onChanged: (value) {
+                                          if (value != null)
+                                            store.updateFilters(
+                                              location: value,
+                                            );
+                                        },
                                       ),
                                     ),
                                     const SizedBox(width: 4),
@@ -138,7 +175,11 @@ class _DiscoverTabState extends State<DiscoverTab> {
                                         color: Color(0xFFFF7A2A),
                                         shape: BoxShape.circle,
                                       ),
-                                      child: const Icon(Icons.location_on, color: Colors.white, size: 18),
+                                      child: const Icon(
+                                        Icons.location_on,
+                                        color: Colors.white,
+                                        size: 18,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -154,18 +195,38 @@ class _DiscoverTabState extends State<DiscoverTab> {
                       children: [
                         RichText(
                           text: TextSpan(
-                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
                             children: [
                               TextSpan(text: isAr ? "جميع " : "All "),
-                              TextSpan(text: isAr ? "الوظائف" : "Jobs", style: TextStyle(color: Theme.of(context).colorScheme.primary)),
+                              TextSpan(
+                                text: isAr ? "الوظائف" : "Jobs",
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                              ),
                             ],
                           ),
                         ),
                         Container(
-                          decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)),
+                          decoration: BoxDecoration(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.primary.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
                           child: IconButton(
-                            onPressed: () => Navigator.of(context).pushNamed(AppRoutes.userAdvancedFilters),
-                            icon: Icon(Icons.tune, color: Theme.of(context).colorScheme.primary, size: 20),
+                            onPressed: () => Navigator.of(
+                              context,
+                            ).pushNamed(AppRoutes.userAdvancedFilters),
+                            icon: Icon(
+                              Icons.tune,
+                              color: Theme.of(context).colorScheme.primary,
+                              size: 20,
+                            ),
                             constraints: const BoxConstraints(),
                             padding: const EdgeInsets.all(10),
                           ),
@@ -185,9 +246,15 @@ class _DiscoverTabState extends State<DiscoverTab> {
     );
   }
 
-  Widget _buildFeaturedJobCardFull(BuildContext context, RecruitmentJob job, bool isAr) {
+  Widget _buildFeaturedJobCardFull(
+    BuildContext context,
+    RecruitmentJob job,
+    bool isAr,
+  ) {
     return GestureDetector(
-      onTap: () => Navigator.of(context).pushNamed(AppRoutes.userJobDetails, arguments: job),
+      onTap: () => Navigator.of(
+        context,
+      ).pushNamed(AppRoutes.userJobDetails, arguments: job),
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.all(16),
@@ -219,13 +286,30 @@ class _DiscoverTabState extends State<DiscoverTab> {
             ),
             const SizedBox(height: 16),
             if (job.description.isNotEmpty)
-              _buildPreviewText(isAr ? "الوصف" : "Description", job.description, isAr),
+              _buildPreviewText(
+                isAr ? "الوصف" : "Description",
+                job.description,
+                isAr,
+              ),
             if (job.qualifications.isNotEmpty)
-              _buildPreviewText(isAr ? "المؤهلات" : "Qualifications", job.qualifications.join(', '), isAr),
+              _buildPreviewText(
+                isAr ? "المؤهلات" : "Qualifications",
+                job.qualifications.join(', '),
+                isAr,
+              ),
             if (job.responsibilities.isNotEmpty)
-              _buildPreviewText(isAr ? "المسؤوليات" : "Responsibilities", job.responsibilities.join(', '), isAr),
+              _buildPreviewText(
+                isAr ? "المسؤوليات" : "Responsibilities",
+                job.responsibilities.join(', '),
+                isAr,
+              ),
             if (job.benefits.isNotEmpty)
-              _buildPreviewText(isAr ? "مزايا إضافية" : "Extra Benefits", job.benefits.join(' • '), isAr, isBenefit: true),
+              _buildPreviewText(
+                isAr ? "مزايا إضافية" : "Extra Benefits",
+                job.benefits.join(' • '),
+                isAr,
+                isBenefit: true,
+              ),
             const SizedBox(height: 12),
             buildWhiteTag(translateValue(job.type, isAr)),
             const SizedBox(height: 24),
@@ -254,7 +338,12 @@ class _DiscoverTabState extends State<DiscoverTab> {
     );
   }
 
-  Widget _buildPreviewText(String label, String text, bool isAr, {bool isBenefit = false}) {
+  Widget _buildPreviewText(
+    String label,
+    String text,
+    bool isAr, {
+    bool isBenefit = false,
+  }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 4),
       child: Text(
@@ -270,9 +359,15 @@ class _DiscoverTabState extends State<DiscoverTab> {
     );
   }
 
-  Widget _buildApplyActionBtn(BuildContext context, RecruitmentJob job, bool isAr) {
+  Widget _buildApplyActionBtn(
+    BuildContext context,
+    RecruitmentJob job,
+    bool isAr,
+  ) {
     return ElevatedButton(
-      onPressed: () => Navigator.of(context).pushNamed(AppRoutes.userJobApplication, arguments: job),
+      onPressed: () => Navigator.of(
+        context,
+      ).pushNamed(AppRoutes.userJobApplication, arguments: job),
       style: ElevatedButton.styleFrom(
         backgroundColor: const Color(0xFF142C66),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -280,7 +375,10 @@ class _DiscoverTabState extends State<DiscoverTab> {
       ),
       child: Text(
         isAr ? "تقديم" : "Apply",
-        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        style: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+        ),
       ),
     );
   }

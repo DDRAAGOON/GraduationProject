@@ -32,7 +32,9 @@ class ApplicationService {
 
   Future<List<JobApplication>> getJobApplications(String jobId) async {
     try {
-      final response = await _apiClient.get(ApiConstants.jobApplications(jobId));
+      final response = await _apiClient.get(
+        ApiConstants.jobApplications(jobId),
+      );
       final List<dynamic> data = response.data;
       return data.map((json) => JobApplication.fromJson(json)).toList();
     } catch (e) {
@@ -49,7 +51,10 @@ class ApplicationService {
     }
   }
 
-  Future<JobApplication> updateApplicationStatus(String id, String status) async {
+  Future<JobApplication> updateApplicationStatus(
+    String id,
+    String status,
+  ) async {
     try {
       final response = await _apiClient.patch(
         ApiConstants.applicationStatus(id),

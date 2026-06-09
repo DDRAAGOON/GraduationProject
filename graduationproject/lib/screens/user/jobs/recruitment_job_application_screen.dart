@@ -98,7 +98,9 @@ class _RecruitmentJobApplicationScreenState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              isAr ? 'تم إرسال طلب الخدمة بنجاح.' : 'Service request sent successfully.',
+              isAr
+                  ? 'تم إرسال طلب الخدمة بنجاح.'
+                  : 'Service request sent successfully.',
             ),
           ),
         );
@@ -148,7 +150,9 @@ class _RecruitmentJobApplicationScreenState
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            isAr ? 'تم تقديم الطلب بنجاح.' : 'Application submitted successfully.',
+            isAr
+                ? 'تم تقديم الطلب بنجاح.'
+                : 'Application submitted successfully.',
           ),
         ),
       );
@@ -160,7 +164,9 @@ class _RecruitmentJobApplicationScreenState
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            isAr ? 'تم حفظ طلبك محلياً.' : 'Your application was saved locally.',
+            isAr
+                ? 'تم حفظ طلبك محلياً.'
+                : 'Your application was saved locally.',
           ),
         ),
       );
@@ -211,7 +217,9 @@ class _RecruitmentJobApplicationScreenState
             _buildInputField(
               isAr ? 'تفاصيل العنوان' : 'Address details',
               _addressDetail,
-              hint: isAr ? 'المحافظة، المنطقة، الشارع...' : 'Governorate, area, street...',
+              hint: isAr
+                  ? 'المحافظة، المنطقة، الشارع...'
+                  : 'Governorate, area, street...',
             ),
             const SizedBox(height: 12),
             _buildInputField(
@@ -259,7 +267,9 @@ class _RecruitmentJobApplicationScreenState
                                 : 'Upload your CV (PDF, DOC)'),
                         style: TextStyle(
                           color: _selectedCVName == null
-                              ? theme.colorScheme.onSurface.withValues(alpha: 0.5)
+                              ? theme.colorScheme.onSurface.withValues(
+                                  alpha: 0.5,
+                                )
                               : theme.colorScheme.onSurface,
                         ),
                       ),
@@ -300,9 +310,7 @@ class _RecruitmentJobApplicationScreenState
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: theme.dividerColor.withValues(alpha: 0.1),
-        ),
+        border: Border.all(color: theme.dividerColor.withValues(alpha: 0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -347,7 +355,6 @@ class _RecruitmentJobApplicationScreenState
       ),
     );
   }
-
 
   Widget _buildInputField(
     String label,

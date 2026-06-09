@@ -147,15 +147,26 @@ final class Job {
       responsibilities: List<String>.from(map['responsibilities'] ?? []),
       qualifications: List<String>.from(map['qualifications'] ?? []),
       niceToHaves: List<String>.from(map['niceToHaves'] ?? []),
-      benefits: (map['benefits'] as List<dynamic>?)
-          ?.map((e) => JobBenefit.fromMap({'title': e.toString(), 'description': ''}))
-          .toList() ?? [],
+      benefits:
+          (map['benefits'] as List<dynamic>?)
+              ?.map(
+                (e) => JobBenefit.fromMap({
+                  'title': e.toString(),
+                  'description': '',
+                }),
+              )
+              .toList() ??
+          [],
       tags: List<String>.from(map['tags'] ?? []),
       status: map['status']?.toString() ?? 'Open',
       requiredCount: int.tryParse(map['requiredCount']?.toString() ?? '1') ?? 1,
       acceptedCount: int.tryParse(map['acceptedCount']?.toString() ?? '0') ?? 0,
-      deadline: map['deadline'] != null ? DateTime.tryParse(map['deadline'].toString()) : null,
-      createdAt: map['createdAt'] != null ? DateTime.parse(map['createdAt'].toString()) : null,
+      deadline: map['deadline'] != null
+          ? DateTime.tryParse(map['deadline'].toString())
+          : null,
+      createdAt: map['createdAt'] != null
+          ? DateTime.parse(map['createdAt'].toString())
+          : null,
     );
   }
 }

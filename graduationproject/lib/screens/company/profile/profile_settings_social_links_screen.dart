@@ -154,7 +154,9 @@ class _CompanyProfileSettingsSocialLinksScreenState
                   ),
                 ),
                 Align(
-                  alignment: t.isAr ? Alignment.centerRight : Alignment.centerLeft,
+                  alignment: t.isAr
+                      ? Alignment.centerRight
+                      : Alignment.centerLeft,
                   child: OutlinedButton.icon(
                     onPressed: _addMore,
                     icon: const Icon(Icons.add),

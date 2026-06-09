@@ -62,10 +62,14 @@ class _RecruitmentUserShellScreenState
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: ThemeController.instance.themeMode,
       builder: (context, themeMode, _) {
-        final isDark = themeMode == ThemeMode.dark || 
-                      (themeMode == ThemeMode.system && MediaQuery.platformBrightnessOf(context) == Brightness.dark);
+        final isDark =
+            themeMode == ThemeMode.dark ||
+            (themeMode == ThemeMode.system &&
+                MediaQuery.platformBrightnessOf(context) == Brightness.dark);
 
-        final backgroundColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
+        final backgroundColor = isDark
+            ? const Color(0xFF001E3A)
+            : const Color(0xFFF8FBF4);
 
         return Scaffold(
           key: _scaffoldKey,
@@ -104,7 +108,9 @@ class _RecruitmentUserShellScreenState
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Image.asset(
-                  isDark ? 'assets/company/logo/لوجو جديد.png' : 'assets/company/logo/لوجو جديد لايت.png',
+                  isDark
+                      ? 'assets/company/logo/لوجو جديد.png'
+                      : 'assets/company/logo/لوجو جديد لايت.png',
                   height: 45,
                 ),
               ),
@@ -139,11 +145,13 @@ class _RecruitmentUserShellScreenState
     return NavigationBarTheme(
       data: NavigationBarThemeData(
         indicatorColor: const Color(0xFFF77F32).withValues(alpha: 0.1),
-        labelTextStyle: WidgetStateProperty.all(TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.bold,
-          color: const Color(0xFF0051DD),
-        )),
+        labelTextStyle: WidgetStateProperty.all(
+          TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+            color: const Color(0xFF0051DD),
+          ),
+        ),
       ),
       child: NavigationBar(
         labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
@@ -152,32 +160,56 @@ class _RecruitmentUserShellScreenState
         onDestinationSelected: (int value) => setState(() => _tab = value),
         destinations: <NavigationDestination>[
           NavigationDestination(
-            icon: Icon(Icons.home_outlined, color: isDark ? Colors.white70 : Colors.black54),
+            icon: Icon(
+              Icons.home_outlined,
+              color: isDark ? Colors.white70 : Colors.black54,
+            ),
             selectedIcon: const Icon(Icons.home, color: Color(0xFF0051DD)),
             label: _isAr ? 'الرئيسية' : 'Home',
           ),
           NavigationDestination(
-            icon: Icon(Icons.search_outlined, color: isDark ? Colors.white70 : Colors.black54),
+            icon: Icon(
+              Icons.search_outlined,
+              color: isDark ? Colors.white70 : Colors.black54,
+            ),
             selectedIcon: const Icon(Icons.search, color: Color(0xFF0051DD)),
             label: _isAr ? 'اكتشف' : 'Discover',
           ),
           NavigationDestination(
-            icon: Icon(Icons.fact_check_outlined, color: isDark ? Colors.white70 : Colors.black54),
-            selectedIcon: const Icon(Icons.fact_check, color: Color(0xFF0051DD)),
+            icon: Icon(
+              Icons.fact_check_outlined,
+              color: isDark ? Colors.white70 : Colors.black54,
+            ),
+            selectedIcon: const Icon(
+              Icons.fact_check,
+              color: Color(0xFF0051DD),
+            ),
             label: _isAr ? 'تقديماتي' : 'My Apps',
           ),
           NavigationDestination(
-            icon: Icon(Icons.business_outlined, color: isDark ? Colors.white70 : Colors.black54),
+            icon: Icon(
+              Icons.business_outlined,
+              color: isDark ? Colors.white70 : Colors.black54,
+            ),
             selectedIcon: const Icon(Icons.business, color: Color(0xFF0051DD)),
             label: _isAr ? 'الشركات' : 'Companies',
           ),
           NavigationDestination(
-            icon: Icon(Icons.chat_bubble_outline, color: isDark ? Colors.white70 : Colors.black54),
-            selectedIcon: const Icon(Icons.chat_bubble, color: Color(0xFF0051DD)),
+            icon: Icon(
+              Icons.chat_bubble_outline,
+              color: isDark ? Colors.white70 : Colors.black54,
+            ),
+            selectedIcon: const Icon(
+              Icons.chat_bubble,
+              color: Color(0xFF0051DD),
+            ),
             label: _isAr ? 'الرسائل' : 'Messages',
           ),
           NavigationDestination(
-            icon: Icon(Icons.person_outline, color: isDark ? Colors.white70 : Colors.black54),
+            icon: Icon(
+              Icons.person_outline,
+              color: isDark ? Colors.white70 : Colors.black54,
+            ),
             selectedIcon: const Icon(Icons.person, color: Color(0xFF0051DD)),
             label: _isAr ? 'الملف الشخصي' : 'Profile',
           ),
@@ -205,22 +237,30 @@ class _RecruitmentUserShellScreenState
                   : null,
             ),
             accountName: Text(
-              store.currentUserName.isNotEmpty ? store.currentUserName : (isAr ? 'مستخدم' : 'User'),
+              store.currentUserName.isNotEmpty
+                  ? store.currentUserName
+                  : (isAr ? 'مستخدم' : 'User'),
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
             ),
-            accountEmail: Text(store.currentUserEmail, style: const TextStyle(color: Colors.white70)),
+            accountEmail: Text(
+              store.currentUserEmail,
+              style: const TextStyle(color: Colors.white70),
+            ),
           ),
           const SizedBox(height: 10),
           ListTile(
             leading: const Icon(Icons.swap_horiz, color: Color(0xFFFF7A2A)),
-            title: Text(isAr ? 'التبديل لوضع الحرفي' : 'Switch to Tradesman Mode'),
+            title: Text(
+              isAr ? 'التبديل لوضع الحرفي' : 'Switch to Tradesman Mode',
+            ),
             onTap: () async {
               Navigator.pop(context); // Close Drawer
               final store = RecruitmentSyncStore.instance;
               final prefs = await SharedPreferences.getInstance();
-              
+
               // Use email-specific key so new accounts on the same device need to verify
-              final String key = 'is_tradesman_verified_${store.currentUserEmail}';
+              final String key =
+                  'is_tradesman_verified_${store.currentUserEmail}';
               final bool isComplete = prefs.getBool(key) ?? false;
 
               if (isComplete) {
@@ -245,18 +285,29 @@ class _RecruitmentUserShellScreenState
             },
           ),
           ListTile(
-            leading: const Icon(Icons.settings_outlined, color: Color(0xFF213E75)),
+            leading: const Icon(
+              Icons.settings_outlined,
+              color: Color(0xFF213E75),
+            ),
             title: Text(isAr ? 'الإعدادات' : 'Settings'),
             onTap: () {
               Navigator.pop(context);
-              Navigator.of(context).push(MaterialPageRoute(builder: (context) => const Settings()));
+              Navigator.of(
+                context,
+              ).push(MaterialPageRoute(builder: (context) => const Settings()));
             },
           ),
           const Spacer(),
           const Divider(),
           ListTile(
             leading: const Icon(Icons.logout, color: Colors.red),
-            title: Text(isAr ? 'تسجيل الخروج' : 'Logout', style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+            title: Text(
+              isAr ? 'تسجيل الخروج' : 'Logout',
+              style: const TextStyle(
+                color: Colors.red,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             onTap: () {
               Navigator.pop(context);
               _showLogoutDialog(context, isAr);
@@ -273,16 +324,32 @@ class _RecruitmentUserShellScreenState
       context: context,
       builder: (context) => AlertDialog(
         title: Text(isAr ? 'تسجيل الخروج' : 'Logout'),
-        content: Text(isAr ? 'هل أنت متأكد من أنك تريد تسجيل الخروج؟' : 'Are you sure you want to log out?'),
+        content: Text(
+          isAr
+              ? 'هل أنت متأكد من أنك تريد تسجيل الخروج؟'
+              : 'Are you sure you want to log out?',
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: Text(isAr ? 'إلغاء' : 'Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(isAr ? 'إلغاء' : 'Cancel'),
+          ),
           TextButton(
             onPressed: () async {
               Navigator.pop(context);
               RecruitmentSyncService.instance.logout();
-              Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.userSignInNew, (route) => false);
+              Navigator.of(context).pushNamedAndRemoveUntil(
+                AppRoutes.userSignInNew,
+                (route) => false,
+              );
             },
-            child: Text(isAr ? 'تسجيل الخروج' : 'Logout', style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+            child: Text(
+              isAr ? 'تسجيل الخروج' : 'Logout',
+              style: const TextStyle(
+                color: Colors.red,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ],
       ),
@@ -297,7 +364,11 @@ class _RecruitmentUserShellScreenState
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         title: Column(
           children: [
-            const Icon(Icons.warning_amber_rounded, color: Color(0xFFFFB300), size: 50),
+            const Icon(
+              Icons.warning_amber_rounded,
+              color: Color(0xFFFFB300),
+              size: 50,
+            ),
             const SizedBox(height: 15),
             Text(
               isAr ? 'خطوة أخيرة للتبديل' : 'Final Step to Switch',
@@ -310,15 +381,25 @@ class _RecruitmentUserShellScreenState
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              isAr 
-                ? 'للدخول لوضع الحرفي واستقبال الطلبات، يجب رفع الفيش الجنائي وتحديد حرفتك أولاً.'
-                : 'To enter Tradesman Mode and receive requests, you must upload your fish and select your craft first.',
+              isAr
+                  ? 'للدخول لوضع الحرفي واستقبال الطلبات، يجب رفع الفيش الجنائي وتحديد حرفتك أولاً.'
+                  : 'To enter Tradesman Mode and receive requests, you must upload your fish and select your craft first.',
               textAlign: TextAlign.center,
               style: const TextStyle(fontSize: 15, height: 1.5),
             ),
             const SizedBox(height: 20),
-            _buildRequirementItem(isAr ? 'صحيفة الحالة الجنائية (الفيش)' : 'Criminal Record Document', isAr),
-            _buildRequirementItem(isAr ? 'اختيار الخدمة (كهربائي، سباك...)' : 'Select Service (Electrician...)', isAr),
+            _buildRequirementItem(
+              isAr
+                  ? 'صحيفة الحالة الجنائية (الفيش)'
+                  : 'Criminal Record Document',
+              isAr,
+            ),
+            _buildRequirementItem(
+              isAr
+                  ? 'اختيار الخدمة (كهربائي، سباك...)'
+                  : 'Select Service (Electrician...)',
+              isAr,
+            ),
           ],
         ),
         actions: [
@@ -327,7 +408,13 @@ class _RecruitmentUserShellScreenState
               Expanded(
                 child: TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: Text(isAr ? 'إلغاء' : 'Cancel', style: const TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
+                  child: Text(
+                    isAr ? 'إلغاء' : 'Cancel',
+                    style: const TextStyle(
+                      color: Colors.grey,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ),
               Expanded(
@@ -336,16 +423,24 @@ class _RecruitmentUserShellScreenState
                     Navigator.pop(context);
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const TradesmanVerificationScreen()),
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            const TradesmanVerificationScreen(),
+                      ),
                     );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF0051DD),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                   child: Text(
                     isAr ? 'إكمال الآن' : 'Complete Now',
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
@@ -360,9 +455,16 @@ class _RecruitmentUserShellScreenState
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
-        mainAxisAlignment: isAr ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment: isAr
+            ? MainAxisAlignment.end
+            : MainAxisAlignment.start,
         children: [
-          if (!isAr) const Icon(Icons.check_circle_outline, color: Colors.green, size: 18),
+          if (!isAr)
+            const Icon(
+              Icons.check_circle_outline,
+              color: Colors.green,
+              size: 18,
+            ),
           if (!isAr) const SizedBox(width: 8),
           Expanded(
             child: Text(
@@ -372,7 +474,12 @@ class _RecruitmentUserShellScreenState
             ),
           ),
           if (isAr) const SizedBox(width: 8),
-          if (isAr) const Icon(Icons.check_circle_outline, color: Colors.green, size: 18),
+          if (isAr)
+            const Icon(
+              Icons.check_circle_outline,
+              color: Colors.green,
+              size: 18,
+            ),
         ],
       ),
     );

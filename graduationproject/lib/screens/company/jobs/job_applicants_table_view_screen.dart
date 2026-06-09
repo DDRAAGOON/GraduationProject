@@ -126,9 +126,7 @@ class _CompanyJobApplicantsTableViewScreenState
           final t = AppLocalizations.of(context);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(
-                _getStatusMessage(newStatus, t.isAr),
-              ),
+              content: Text(_getStatusMessage(newStatus, t.isAr)),
               backgroundColor: _getStatusColor(newStatus),
               behavior: SnackBarBehavior.floating,
               duration: const Duration(seconds: 2),
@@ -154,7 +152,9 @@ class _CompanyJobApplicantsTableViewScreenState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              t.isAr ? 'فشل في تحديث الحالة: $e' : 'Failed to update status: $e',
+              t.isAr
+                  ? 'فشل في تحديث الحالة: $e'
+                  : 'Failed to update status: $e',
             ),
             backgroundColor: Colors.red,
             behavior: SnackBarBehavior.floating,
@@ -169,7 +169,9 @@ class _CompanyJobApplicantsTableViewScreenState
     switch (status.toLowerCase()) {
       case 'hired':
       case 'accepted':
-        return isAr ? 'تم قبول المتقدم بنجاح' : 'Applicant accepted successfully';
+        return isAr
+            ? 'تم قبول المتقدم بنجاح'
+            : 'Applicant accepted successfully';
       case 'declined':
       case 'rejected':
         return isAr ? 'تم رفض المتقدم' : 'Applicant declined';
@@ -316,47 +318,51 @@ class _CompanyJobApplicantsTableViewScreenState
 
       final applicants = applicantsList
           .map((app) {
-        if (app is! Map) return null;
+            if (app is! Map) return null;
 
-        final user = app['user'] is Map ? app['user'] as Map : {};
+            final user = app['user'] is Map ? app['user'] as Map : {};
 
-        // ✅ استخراج avatarUrl ومعالجته
-        String? avatarUrl = user['avatarUrl']?.toString();
-        if (avatarUrl != null && avatarUrl.isNotEmpty) {
-          if (!avatarUrl.startsWith('http')) {
-            avatarUrl = '${ApiConstants.baseUrl}$avatarUrl';
-          }
-        }
+            // ✅ استخراج avatarUrl ومعالجته
+            String? avatarUrl = user['avatarUrl']?.toString();
+            if (avatarUrl != null && avatarUrl.isNotEmpty) {
+              if (!avatarUrl.startsWith('http')) {
+                avatarUrl = '${ApiConstants.baseUrl}$avatarUrl';
+              }
+            }
 
-        return Applicant(
-          id: app['applicationId']?.toString() ?? app['id']?.toString() ?? '',
-          fullName: user['fullName']?.toString() ?? 'Unknown',
-          role: app['job']?['title']?.toString() ?? widget.job.title,
-          rating: 4.5,
-          stage: _normalizeStatus(app['status']?.toString()),
-          email: user['email']?.toString() ?? '',
-          phone: user['phone']?.toString() ?? '',
-          location: user['location']?.toString() ?? 'Egypt',
-          appliedDateLabel: _formatDate(app['appliedAt']?.toString()),
-          gender: user['gender']?.toString(),
-          birthDate: user['birthDate']?.toString(),
-          languages: user['languages'] is List
-              ? List<String>.from(user['languages'])
-              : [],
-          about: user['bio']?.toString() ?? user['about']?.toString(),
-          experienceYears: user['experienceYears'] is int
-              ? user['experienceYears'] as int
-              : 0,
-          education: user['education']?.toString(),
-          skills: user['skills'] is List
-              ? List<String>.from(user['skills'])
-              : [],
-          hasCv: app['resumeUrl'] != null &&
-              app['resumeUrl'].toString().isNotEmpty,
-          jobId: widget.job.id,
-          avatarUrl: avatarUrl,
-        );
-      })
+            return Applicant(
+              id:
+                  app['applicationId']?.toString() ??
+                  app['id']?.toString() ??
+                  '',
+              fullName: user['fullName']?.toString() ?? 'Unknown',
+              role: app['job']?['title']?.toString() ?? widget.job.title,
+              rating: 4.5,
+              stage: _normalizeStatus(app['status']?.toString()),
+              email: user['email']?.toString() ?? '',
+              phone: user['phone']?.toString() ?? '',
+              location: user['location']?.toString() ?? 'Egypt',
+              appliedDateLabel: _formatDate(app['appliedAt']?.toString()),
+              gender: user['gender']?.toString(),
+              birthDate: user['birthDate']?.toString(),
+              languages: user['languages'] is List
+                  ? List<String>.from(user['languages'])
+                  : [],
+              about: user['bio']?.toString() ?? user['about']?.toString(),
+              experienceYears: user['experienceYears'] is int
+                  ? user['experienceYears'] as int
+                  : 0,
+              education: user['education']?.toString(),
+              skills: user['skills'] is List
+                  ? List<String>.from(user['skills'])
+                  : [],
+              hasCv:
+                  app['resumeUrl'] != null &&
+                  app['resumeUrl'].toString().isNotEmpty,
+              jobId: widget.job.id,
+              avatarUrl: avatarUrl,
+            );
+          })
           .where((a) => a != null)
           .cast<Applicant>()
           .toList();
@@ -464,7 +470,10 @@ class _CompanyJobApplicantsTableViewScreenState
                     ),
                     const SizedBox(height: 14),
                     ...stages.map((s) {
-                      final internalStatus = _mapLocalizedStatusToInternal(s, t);
+                      final internalStatus = _mapLocalizedStatusToInternal(
+                        s,
+                        t,
+                      );
                       return CheckboxListTile(
                         dense: true,
                         value: temp.contains(internalStatus),
@@ -488,9 +497,15 @@ class _CompanyJobApplicantsTableViewScreenState
                         Expanded(
                           child: OutlinedButton(
                             onPressed: () => Navigator.of(ctx).pop({
-                              'Applied', 'In Review', 'Shortlisted',
-                              'Waitlist', 'Hired', 'Declined',
-                              'Pending', 'Accepted', 'Rejected',
+                              'Applied',
+                              'In Review',
+                              'Shortlisted',
+                              'Waitlist',
+                              'Hired',
+                              'Declined',
+                              'Pending',
+                              'Accepted',
+                              'Rejected',
                             }),
                             child: Text(t.isAr ? 'إعادة تعيين' : 'Reset'),
                           ),
@@ -519,9 +534,11 @@ class _CompanyJobApplicantsTableViewScreenState
 
   String _mapLocalizedStatusToInternal(String localized, AppLocalizations t) {
     if (localized == (t.isAr ? 'تم التقديم' : 'Applied')) return 'Applied';
-    if (localized == (t.isAr ? 'قيد المراجعة' : 'In Review')) return 'In Review';
+    if (localized == (t.isAr ? 'قيد المراجعة' : 'In Review'))
+      return 'In Review';
     if (localized == (t.isAr ? 'مختصر' : 'Shortlisted')) return 'Shortlisted';
-    if (localized == (t.isAr ? 'قائمة الانتظار' : 'Waitlist')) return 'Waitlist';
+    if (localized == (t.isAr ? 'قائمة الانتظار' : 'Waitlist'))
+      return 'Waitlist';
     if (localized == (t.isAr ? 'تم التوظيف' : 'Hired')) return 'Hired';
     if (localized == (t.isAr ? 'مرفوض' : 'Declined')) return 'Declined';
     return localized;
@@ -561,16 +578,18 @@ class _CompanyJobApplicantsTableViewScreenState
                         controller: _searchController,
                         onChanged: (_) => setState(() {}),
                         decoration: InputDecoration(
-                          hintText: t.isAr ? 'البحث في المتقدمين' : 'Search applicants',
+                          hintText: t.isAr
+                              ? 'البحث في المتقدمين'
+                              : 'Search applicants',
                           prefixIcon: const Icon(Icons.search),
                           suffixIcon: _searchController.text.isNotEmpty
                               ? IconButton(
-                            icon: const Icon(Icons.clear),
-                            onPressed: () {
-                              _searchController.clear();
-                              setState(() {});
-                            },
-                          )
+                                  icon: const Icon(Icons.clear),
+                                  onPressed: () {
+                                    _searchController.clear();
+                                    setState(() {});
+                                  },
+                                )
                               : null,
                         ),
                       ),
@@ -593,16 +612,18 @@ class _CompanyJobApplicantsTableViewScreenState
                         controller: _searchController,
                         onChanged: (_) => setState(() {}),
                         decoration: InputDecoration(
-                          hintText: t.isAr ? 'البحث في المتقدمين' : 'Search applicants',
+                          hintText: t.isAr
+                              ? 'البحث في المتقدمين'
+                              : 'Search applicants',
                           prefixIcon: const Icon(Icons.search),
                           suffixIcon: _searchController.text.isNotEmpty
                               ? IconButton(
-                            icon: const Icon(Icons.clear),
-                            onPressed: () {
-                              _searchController.clear();
-                              setState(() {});
-                            },
-                          )
+                                  icon: const Icon(Icons.clear),
+                                  onPressed: () {
+                                    _searchController.clear();
+                                    setState(() {});
+                                  },
+                                )
                               : null,
                         ),
                       ),
@@ -623,66 +644,67 @@ class _CompanyJobApplicantsTableViewScreenState
                 ? const Center(child: CircularProgressIndicator())
                 : filtered.isEmpty
                 ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.people_outline,
-                    size: 64,
-                    color: Colors.grey.withOpacity(0.5),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    _errorMessage != null
-                        ? _errorMessage!
-                        : (t.isAr ? 'لا يوجد متقدمين' : 'No applicants'),
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.people_outline,
+                          size: 64,
+                          color: Colors.grey.withOpacity(0.5),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          _errorMessage != null
+                              ? _errorMessage!
+                              : (t.isAr ? 'لا يوجد متقدمين' : 'No applicants'),
+                          style: Theme.of(context).textTheme.bodyLarge
+                              ?.copyWith(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurface.withValues(alpha: 0.7),
+                              ),
+                        ),
+                        if (_errorMessage != null) ...[
+                          const SizedBox(height: 16),
+                          ElevatedButton.icon(
+                            onPressed: _fetchApplicants,
+                            icon: const Icon(Icons.refresh),
+                            label: Text(t.isAr ? 'إعادة المحاولة' : 'Retry'),
+                          ),
+                        ],
+                      ],
                     ),
-                  ),
-                  if (_errorMessage != null) ...[
-                    const SizedBox(height: 16),
-                    ElevatedButton.icon(
-                      onPressed: _fetchApplicants,
-                      icon: const Icon(Icons.refresh),
-                      label: Text(t.isAr ? 'إعادة المحاولة' : 'Retry'),
-                    ),
-                  ],
-                ],
-              ),
-            )
+                  )
                 : ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: filtered.length,
-              itemBuilder: (_, i) {
-                final a = filtered[i];
-                final isUpdating = _updatingApplicants.contains(a.id);
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: filtered.length,
+                    itemBuilder: (_, i) {
+                      final a = filtered[i];
+                      final isUpdating = _updatingApplicants.contains(a.id);
 
-                return _ApplicantRow(
-                  applicant: a,
-                  isUpdating: isUpdating,
-                  onTap: () {
-                    Navigator.of(context).pushNamed(
-                      AppRoutes.companyApplicantDetailsProfile,
-                      arguments: a,
-                    );
-                  },
-                  onAccept: () => _showStatusDialog(
-                    applicant: a,
-                    newStatus: 'Hired',
+                      return _ApplicantRow(
+                        applicant: a,
+                        isUpdating: isUpdating,
+                        onTap: () {
+                          Navigator.of(context).pushNamed(
+                            AppRoutes.companyApplicantDetailsProfile,
+                            arguments: a,
+                          );
+                        },
+                        onAccept: () =>
+                            _showStatusDialog(applicant: a, newStatus: 'Hired'),
+                        onReject: () => _showStatusDialog(
+                          applicant: a,
+                          newStatus: 'Declined',
+                        ),
+                        onWait: () => _showStatusDialog(
+                          applicant: a,
+                          newStatus: 'Waitlist',
+                        ),
+                        avatarIndex: i,
+                      );
+                    },
                   ),
-                  onReject: () => _showStatusDialog(
-                    applicant: a,
-                    newStatus: 'Declined',
-                  ),
-                  onWait: () => _showStatusDialog(
-                    applicant: a,
-                    newStatus: 'Waitlist',
-                  ),
-                  avatarIndex: i,
-                );
-              },
-            ),
           ),
         ],
       ),
@@ -734,11 +756,12 @@ class _ApplicantRow extends StatelessWidget {
     final isAr = t.isAr;
     final chipColor = _stageColor(context);
 
-    final bool hasProfileImage = applicant.avatarUrl != null &&
-        applicant.avatarUrl!.isNotEmpty;
+    final bool hasProfileImage =
+        applicant.avatarUrl != null && applicant.avatarUrl!.isNotEmpty;
 
     // ✅ هل الحالة نهائية (مقبول/مرفوض/انتظار)؟
-    final isFinal = applicant.stage.toLowerCase().contains('hire') ||
+    final isFinal =
+        applicant.stage.toLowerCase().contains('hire') ||
         applicant.stage.toLowerCase().contains('accept') ||
         applicant.stage.toLowerCase().contains('declin') ||
         applicant.stage.toLowerCase().contains('reject') ||
@@ -767,13 +790,13 @@ class _ApplicantRow extends StatelessWidget {
                     child: hasProfileImage
                         ? null
                         : Text(
-                      _getInitial(applicant.fullName),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                      ),
-                    ),
+                            _getInitial(applicant.fullName),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            ),
+                          ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -781,7 +804,9 @@ class _ApplicantRow extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          applicant.fullName.isNotEmpty ? applicant.fullName : 'Unknown',
+                          applicant.fullName.isNotEmpty
+                              ? applicant.fullName
+                              : 'Unknown',
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
@@ -808,7 +833,10 @@ class _ApplicantRow extends StatelessWidget {
                   ),
                   // ✅ شارة الحالة
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       color: chipColor.withOpacity(0.15),
                       borderRadius: BorderRadius.circular(14),
@@ -816,21 +844,21 @@ class _ApplicantRow extends StatelessWidget {
                     ),
                     child: isUpdating
                         ? const SizedBox(
-                      width: 16,
-                      height: 16,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white,
-                      ),
-                    )
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
                         : Text(
-                      _translateStatus(applicant.stage, isAr),
-                      style: TextStyle(
-                        color: chipColor,
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                            _translateStatus(applicant.stage, isAr),
+                            style: TextStyle(
+                              color: chipColor,
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                   ),
                 ],
               ),

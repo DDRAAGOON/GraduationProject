@@ -61,7 +61,8 @@ class _CompanyRatingsScreenState extends State<CompanyRatingsScreen>
           customProfileImage: res.data['logoUrl']?.toString(),
         );
       } catch (e) {
-        if (kDebugMode) debugPrint('❌ Could not fetch profile for companyId: $e');
+        if (kDebugMode)
+          debugPrint('❌ Could not fetch profile for companyId: $e');
       }
     }
     await _loadRatings();
@@ -82,7 +83,8 @@ class _CompanyRatingsScreenState extends State<CompanyRatingsScreen>
         _ratingService.getCompanyGivenRatings(_companyId),
       ]);
 
-      final received = results[0] as ({List<Rating> ratings, double average, int total});
+      final received =
+          results[0] as ({List<Rating> ratings, double average, int total});
       final given = results[1] as List<Rating>;
 
       if (mounted) {
@@ -162,8 +164,15 @@ class _CompanyRatingsScreenState extends State<CompanyRatingsScreen>
                   unselectedLabelColor: cs.onSurface.withOpacity(0.5),
                   indicatorColor: cs.primary,
                   tabs: [
-                    Tab(text: t.tr(en: 'Reviews Received', ar: 'التقييمات الواردة')),
-                    Tab(text: t.tr(en: 'Given Ratings', ar: 'التقييمات الصادرة')),
+                    Tab(
+                      text: t.tr(
+                        en: 'Reviews Received',
+                        ar: 'التقييمات الواردة',
+                      ),
+                    ),
+                    Tab(
+                      text: t.tr(en: 'Given Ratings', ar: 'التقييمات الصادرة'),
+                    ),
                   ],
                 ),
                 Expanded(
@@ -178,10 +187,13 @@ class _CompanyRatingsScreenState extends State<CompanyRatingsScreen>
                           children: [
                             _buildAddRatingForm(isAr, cs),
                             const SizedBox(height: 20),
-                            _buildRatingsList(_receivedRatings, isAr,
-                                emptyMsg: isAr
-                                    ? 'لا توجد تقييمات واردة بعد'
-                                    : 'No ratings received yet'),
+                            _buildRatingsList(
+                              _receivedRatings,
+                              isAr,
+                              emptyMsg: isAr
+                                  ? 'لا توجد تقييمات واردة بعد'
+                                  : 'No ratings received yet',
+                            ),
                           ],
                         ),
                       ),
@@ -191,10 +203,13 @@ class _CompanyRatingsScreenState extends State<CompanyRatingsScreen>
                         child: ListView(
                           padding: const EdgeInsets.all(16),
                           children: [
-                            _buildRatingsList(_givenRatings, isAr,
-                                emptyMsg: isAr
-                                    ? 'لم تعطِ أي تقييم بعد'
-                                    : 'No ratings given yet'),
+                            _buildRatingsList(
+                              _givenRatings,
+                              isAr,
+                              emptyMsg: isAr
+                                  ? 'لم تعطِ أي تقييم بعد'
+                                  : 'No ratings given yet',
+                            ),
                           ],
                         ),
                       ),
@@ -221,9 +236,7 @@ class _CompanyRatingsScreenState extends State<CompanyRatingsScreen>
         children: [
           // Big rating number
           Text(
-            _averageRating == 0
-                ? '–'
-                : _averageRating.toStringAsFixed(1),
+            _averageRating == 0 ? '–' : _averageRating.toStringAsFixed(1),
             style: TextStyle(
               fontSize: 52,
               fontWeight: FontWeight.w900,
@@ -275,7 +288,11 @@ class _CompanyRatingsScreenState extends State<CompanyRatingsScreen>
         } else if (i < rating) {
           return Icon(Icons.star_half_rounded, color: Colors.amber, size: size);
         }
-        return Icon(Icons.star_border_rounded, color: Colors.amber.shade300, size: size);
+        return Icon(
+          Icons.star_border_rounded,
+          color: Colors.amber.shade300,
+          size: size,
+        );
       }),
     );
   }
@@ -295,7 +312,10 @@ class _CompanyRatingsScreenState extends State<CompanyRatingsScreen>
                 const SizedBox(width: 8),
                 Text(
                   isAr ? 'أضف تقييمك' : 'Add Your Review',
-                  style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ],
             ),
@@ -360,7 +380,9 @@ class _CompanyRatingsScreenState extends State<CompanyRatingsScreen>
                         width: 18,
                         height: 18,
                         child: CircularProgressIndicator(
-                            strokeWidth: 2, color: Colors.white),
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
                       )
                     : const Icon(Icons.send_rounded),
                 label: Text(isAr ? 'إرسال التقييم' : 'Submit Review'),
@@ -388,25 +410,31 @@ class _CompanyRatingsScreenState extends State<CompanyRatingsScreen>
     return isAr ? 'ضعيف' : 'Poor';
   }
 
-  Widget _buildRatingsList(List<Rating> ratings, bool isAr,
-      {required String emptyMsg}) {
+  Widget _buildRatingsList(
+    List<Rating> ratings,
+    bool isAr, {
+    required String emptyMsg,
+  }) {
     if (ratings.isEmpty) {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 48),
         child: Center(
           child: Column(
             children: [
-              Icon(Icons.rate_review_outlined,
-                  size: 64,
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.25)),
+              Icon(
+                Icons.rate_review_outlined,
+                size: 64,
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withOpacity(0.25),
+              ),
               const SizedBox(height: 16),
               Text(
                 emptyMsg,
                 style: TextStyle(
-                  color: Theme.of(context)
-                      .colorScheme
-                      .onSurface
-                      .withOpacity(0.5),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.5),
                   fontSize: 15,
                 ),
               ),
@@ -522,7 +550,9 @@ class _CompanyRatingsScreenState extends State<CompanyRatingsScreen>
     final diff = now.difference(date);
     if (diff.inDays == 0) return isAr ? 'اليوم' : 'Today';
     if (diff.inDays < 7) {
-      return isAr ? 'منذ ${diff.inDays} ${diff.inDays == 1 ? 'يوم' : 'أيام'}' : '${diff.inDays}d ago';
+      return isAr
+          ? 'منذ ${diff.inDays} ${diff.inDays == 1 ? 'يوم' : 'أيام'}'
+          : '${diff.inDays}d ago';
     }
     if (diff.inDays < 30) {
       final w = (diff.inDays / 7).floor();

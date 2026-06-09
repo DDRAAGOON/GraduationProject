@@ -156,7 +156,13 @@ class RecruitmentSyncService {
   }) async {
     try {
       final authResponse = await _authService.register(
-        RegisterRequest(email: email, password: password, fullName: name, role: role, phone: phone),
+        RegisterRequest(
+          email: email,
+          password: password,
+          fullName: name,
+          role: role,
+          phone: phone,
+        ),
       );
       _currentUserRole = role;
       return authResponse.user;
@@ -165,15 +171,12 @@ class RecruitmentSyncService {
     }
   }
 
-  Future<User> updateProfile({
-    String? name,
-    String? photoUrl,
-  }) async {
+  Future<User> updateProfile({String? name, String? photoUrl}) async {
     try {
-      final user = await _authService.updateMe({
-        'fullName': name,
-        'photoUrl': photoUrl,
-      }..removeWhere((_, v) => v == null));
+      final user = await _authService.updateMe(
+        {'fullName': name, 'photoUrl': photoUrl}
+          ..removeWhere((_, v) => v == null),
+      );
 
       RecruitmentSyncStore.instance.updateCurrentUser(
         name: user.fullName ?? '',
@@ -189,12 +192,10 @@ class RecruitmentSyncService {
   /// Sends a full profile payload to PUT /api/users/me and returns the raw
   /// response map so the caller can inspect [requiresLogout] and [access_token].
   Future<Map<String, dynamic>> completeUserProfile(
-      Map<String, dynamic> payload) async {
+    Map<String, dynamic> payload,
+  ) async {
     try {
-      final response = await _apiClient.put(
-        ApiConstants.userMe,
-        data: payload,
-      );
+      final response = await _apiClient.put(ApiConstants.userMe, data: payload);
       // response.data may contain requiresLogout and access_token
       final data = response.data;
       if (data is Map<String, dynamic>) return data;
@@ -233,6 +234,7 @@ class RecruitmentSyncService {
     String? commercialRegister,
     String? nationalNumber,
     String? photoUrl,
+    Map<String, String>? socialLinks,
   }) async {
     try {
       final store = CompanyStore.instance;
@@ -246,17 +248,25 @@ class RecruitmentSyncService {
         if (aboutEn != null && aboutEn.isNotEmpty) 'description': aboutEn,
 
         // تعديلات لتطابق الباك-إند تماماً:
-        if (photoUrl != null && photoUrl.isNotEmpty) 'logo': photoUrl, // Backend reads body.logo
+        if (photoUrl != null && photoUrl.isNotEmpty)
+          'logo': photoUrl, // Backend reads body.logo
         if (benefits != null && benefits.isNotEmpty) 'benefits': benefits,
         if (techStack != null && techStack.isNotEmpty) 'techStack': techStack,
-        if (locations != null && locations.isNotEmpty) 'locationTags': locations, // Backend reads body.locationTags
-        if (category != null && category.isNotEmpty) 'classification': category, // Backend reads body.classification
+        if (locations != null && locations.isNotEmpty)
+          'locationTags': locations, // Backend reads body.locationTags
+        if (category != null && category.isNotEmpty)
+          'classification': category, // Backend reads body.classification
+        if (socialLinks != null && socialLinks.isNotEmpty)
+          'socialLinks': socialLinks,
       };
 
       // الباك-إند يحتاج التاريخ في حقل واحد 'foundedDate' كـ String
-      if (foundedYear != null && foundedYear > 0 &&
-          foundedMonth != null && foundedMonth > 0 &&
-          foundedDay != null && foundedDay > 0) {
+      if (foundedYear != null &&
+          foundedYear > 0 &&
+          foundedMonth != null &&
+          foundedMonth > 0 &&
+          foundedDay != null &&
+          foundedDay > 0) {
         final m = foundedMonth.toString().padLeft(2, '0');
         final d = foundedDay.toString().padLeft(2, '0');
         payload['foundedDate'] = '$foundedYear-$m-$d';
@@ -474,7 +484,8 @@ class RecruitmentSyncService {
 
     // ✅ تسجيل وقت الـ pull
     _lastPullTime = DateTime.now();
-    if (kDebugMode) debugPrint('🔄 Pulling server state (role: $_currentUserRole)...');
+    if (kDebugMode)
+      debugPrint('🔄 Pulling server state (role: $_currentUserRole)...');
 
     List<Map<String, dynamic>> jobs = [];
     List<Map<String, dynamic>> applications = [];
@@ -504,7 +515,9 @@ class RecruitmentSyncService {
               : userData is Map
               ? userData['fullName']?.toString() ?? 'N/A'
               : 'N/A';
-          debugPrint('   [$i] Job ${job['jobId']}: ${job['title']} by $companyName');
+          debugPrint(
+            '   [$i] Job ${job['jobId']}: ${job['title']} by $companyName',
+          );
         }
       }
     } catch (e) {
@@ -513,7 +526,8 @@ class RecruitmentSyncService {
 
     // ✅ 2. جلب التطبيقات - حسب الدور
     if (_currentUserRole == 'company') {
-      if (kDebugMode) debugPrint('ℹ️ Skipping /applications/my for company role');
+      if (kDebugMode)
+        debugPrint('ℹ️ Skipping /applications/my for company role');
 
       final companyName = CompanyStore.instance.companyName;
       _companyJobsCount = 0;
@@ -524,7 +538,8 @@ class RecruitmentSyncService {
           final companyData = job['company'];
           if (companyData is Map) {
             final name = companyData['name']?.toString() ?? '';
-            final match = name.trim().toLowerCase() == companyName.trim().toLowerCase();
+            final match =
+                name.trim().toLowerCase() == companyName.trim().toLowerCase();
             if (match) _companyJobsCount++;
             return match;
           }
@@ -532,7 +547,9 @@ class RecruitmentSyncService {
         }).toList();
 
         if (kDebugMode) {
-          debugPrint('🏢 Found $_companyJobsCount jobs for company: $companyName');
+          debugPrint(
+            '🏢 Found $_companyJobsCount jobs for company: $companyName',
+          );
         }
 
         // ✅ جلب المتقدمين لكل وظيفة بتاعة الشركة
@@ -571,12 +588,14 @@ class RecruitmentSyncService {
               debugPrint('✅ Job $jobId: $addedCount applicants');
             }
           } catch (e) {
-            if (kDebugMode) debugPrint('⚠️ Could not fetch apps for job $jobId: $e');
+            if (kDebugMode)
+              debugPrint('⚠️ Could not fetch apps for job $jobId: $e');
           }
         }
       }
 
-      if (kDebugMode) debugPrint('✅ Total applications: ${applications.length}');
+      if (kDebugMode)
+        debugPrint('✅ Total applications: ${applications.length}');
     } else {
       try {
         final appsResponse = await _apiClient.get(ApiConstants.myApplications);
@@ -585,10 +604,12 @@ class RecruitmentSyncService {
         if (appsData is List) {
           applications = appsData.cast<Map<String, dynamic>>();
         } else if (appsData is Map && appsData['data'] is List) {
-          applications = (appsData['data'] as List).cast<Map<String, dynamic>>();
+          applications = (appsData['data'] as List)
+              .cast<Map<String, dynamic>>();
         }
 
-        if (kDebugMode) debugPrint('✅ Fetched ${applications.length} applications');
+        if (kDebugMode)
+          debugPrint('✅ Fetched ${applications.length} applications');
       } catch (e) {
         if (kDebugMode) debugPrint('⚠️ Skipping applications: $e');
       }
@@ -621,7 +642,9 @@ class RecruitmentSyncService {
       );
 
       if (kDebugMode) {
-        debugPrint('✅ Store updated: ${jobs.length} jobs, ${applications.length} apps, ${messages.length} messages');
+        debugPrint(
+          '✅ Store updated: ${jobs.length} jobs, ${applications.length} apps, ${messages.length} messages',
+        );
         debugPrint('🏢 Company: ${CompanyStore.instance.companyName}');
         debugPrint('📊 Company jobs count: $_companyJobsCount');
       }
@@ -649,6 +672,9 @@ class RecruitmentSyncService {
   }
 
   // Legacy support
-  Future<void> verifyEmailOtp({required String email, required String code}) async {}
+  Future<void> verifyEmailOtp({
+    required String email,
+    required String code,
+  }) async {}
   Future<void> resendOtp(String email) async {}
 }

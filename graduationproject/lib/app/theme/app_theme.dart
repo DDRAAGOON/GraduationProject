@@ -9,11 +9,15 @@ final class AppTheme {
     final base = ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: AppColors.lightPrimary,
-        brightness: Brightness.light,
-        surface: AppColors.lightSurface,
-      ).copyWith(primary: AppColors.lightPrimary, secondary: AppColors.lightAccent),
+      colorScheme:
+          ColorScheme.fromSeed(
+            seedColor: AppColors.lightPrimary,
+            brightness: Brightness.light,
+            surface: AppColors.lightSurface,
+          ).copyWith(
+            primary: AppColors.lightPrimary,
+            secondary: AppColors.lightAccent,
+          ),
     );
 
     return base.copyWith(
@@ -40,7 +44,10 @@ final class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: AppColors.lightPrimary, width: 1.3),
+          borderSide: const BorderSide(
+            color: AppColors.lightPrimary,
+            width: 1.3,
+          ),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
@@ -65,7 +72,9 @@ final class AppTheme {
         style: OutlinedButton.styleFrom(
           side: const BorderSide(color: Color(0xFFD7DDED)),
           foregroundColor: AppColors.lightText,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         ),
       ),
@@ -91,11 +100,15 @@ final class AppTheme {
     final base = ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: AppColors.darkPrimary,
-        brightness: Brightness.dark,
-        surface: AppColors.darkSurface,
-      ).copyWith(primary: AppColors.darkPrimary, secondary: AppColors.darkAccent),
+      colorScheme:
+          ColorScheme.fromSeed(
+            seedColor: AppColors.darkPrimary,
+            brightness: Brightness.dark,
+            surface: AppColors.darkSurface,
+          ).copyWith(
+            primary: AppColors.darkPrimary,
+            secondary: AppColors.darkAccent,
+          ),
     );
 
     return base.copyWith(
@@ -122,7 +135,10 @@ final class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppColors.darkPrimary, width: 1.3),
+          borderSide: const BorderSide(
+            color: AppColors.darkPrimary,
+            width: 1.3,
+          ),
         ),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 14,

@@ -34,14 +34,14 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
     final companyStore = CompanyStore.instance;
 
     // ✅ التحقق من وجود صورة شخصية
-    final bool hasProfileImage = applicant.avatarUrl != null &&
-        applicant.avatarUrl!.isNotEmpty;
+    final bool hasProfileImage =
+        applicant.avatarUrl != null && applicant.avatarUrl!.isNotEmpty;
 
     return ListenableBuilder(
       listenable: syncStore,
       builder: (context, _) {
         final application = syncStore.applications.firstWhere(
-              (a) => a.id == applicant.id,
+          (a) => a.id == applicant.id,
           orElse: () => RecruitmentApplication(
             id: applicant.id,
             jobId: applicant.jobId,
@@ -54,15 +54,15 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
         );
 
         final job = companyStore.jobs.firstWhere(
-              (j) => j.id == applicant.jobId,
+          (j) => j.id == applicant.jobId,
           orElse: () => Job.mock(),
         );
 
         final acceptedCount = syncStore.applications
             .where(
               (a) =>
-          a.jobId == job.id && a.status.toLowerCase().contains('hire'),
-        )
+                  a.jobId == job.id && a.status.toLowerCase().contains('hire'),
+            )
             .length;
 
         return AppScaffold(
@@ -125,10 +125,10 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
   }
 
   Widget _buildMainContent(
-      BuildContext context,
-      AppLocalizations t,
-      bool isAr,
-      ) {
+    BuildContext context,
+    AppLocalizations t,
+    bool isAr,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -233,14 +233,14 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
   }
 
   Widget _buildSidebar(
-      BuildContext context,
-      AppLocalizations t,
-      bool isAr,
-      RecruitmentApplication application,
-      Job job,
-      int acceptedCount,
-      bool hasProfileImage, // ✅ إضافة parameter
-      ) {
+    BuildContext context,
+    AppLocalizations t,
+    bool isAr,
+    RecruitmentApplication application,
+    Job job,
+    int acceptedCount,
+    bool hasProfileImage, // ✅ إضافة parameter
+  ) {
     final requiredCount = job.requiredCount > 0 ? job.requiredCount : 1;
 
     const boxColor = Color(0xFF213E75);
@@ -272,20 +272,18 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
                   child: hasProfileImage
                       ? null
                       : Text(
-                    _getInitial(applicant.fullName),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 32,
-                    ),
-                  ),
+                          _getInitial(applicant.fullName),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 32,
+                          ),
+                        ),
                 ),
                 const SizedBox(height: 16),
                 Text(
                   applicant.fullName,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleLarge?.copyWith(
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: textColor,
                   ),
@@ -302,9 +300,7 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: Colors.white.withOpacity(0.2),
-                    ),
+                    border: Border.all(color: Colors.white.withOpacity(0.2)),
                   ),
                   child: Column(
                     children: [
@@ -355,11 +351,17 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
                   children: [
                     Text(
                       t.isAr ? 'اليوم' : 'Today',
-                      style: TextStyle(color: textColor.withOpacity(0.6), fontSize: 12),
+                      style: TextStyle(
+                        color: textColor.withOpacity(0.6),
+                        fontSize: 12,
+                      ),
                     ),
                     Text(
                       t.isAr ? 'الحالة الحالية' : 'Current Status',
-                      style: TextStyle(color: textColor.withOpacity(0.6), fontSize: 12),
+                      style: TextStyle(
+                        color: textColor.withOpacity(0.6),
+                        fontSize: 12,
+                      ),
                     ),
                   ],
                 ),
@@ -369,7 +371,10 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
                   children: [
                     Text(
                       application.userName,
-                      style: const TextStyle(fontWeight: FontWeight.bold, color: textColor),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: textColor,
+                      ),
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(
@@ -444,7 +449,10 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
               children: [
                 Text(
                   isAr ? 'بيانات التواصل' : 'Contact Info',
-                  style: const TextStyle(fontWeight: FontWeight.bold, color: textColor),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: textColor,
+                  ),
                 ),
                 const SizedBox(height: 16),
                 SizedBox(
@@ -492,9 +500,7 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
                       isAr ? 'عرض الفيش والتشبيه' : 'View Criminal Record',
                     ),
                     style: OutlinedButton.styleFrom(
-                      side: BorderSide(
-                        color: Colors.white.withOpacity(0.5),
-                      ),
+                      side: BorderSide(color: Colors.white.withOpacity(0.5)),
                       foregroundColor: textColor,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
@@ -552,10 +558,10 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
   }
 
   Future<void> _handleStatusChange(
-      BuildContext context,
-      String newStatus,
-      bool isAr,
-      ) async {
+    BuildContext context,
+    String newStatus,
+    bool isAr,
+  ) async {
     final t = AppLocalizations.of(context);
     await RecruitmentSyncService.instance.updateStatus(
       applicationId: applicant.id,
@@ -653,26 +659,26 @@ class CompanyApplicantDetailsProfileScreen extends StatelessWidget {
       children: details
           .map(
             (d) => SizedBox(
-          width: 120,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                d.label,
-                style: const TextStyle(color: Colors.grey, fontSize: 12),
+              width: 120,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    d.label,
+                    style: const TextStyle(color: Colors.grey, fontSize: 12),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    d.value,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 4),
-              Text(
-                d.value,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                ),
-              ),
-            ],
-          ),
-        ),
-      )
+            ),
+          )
           .toList(),
     );
   }

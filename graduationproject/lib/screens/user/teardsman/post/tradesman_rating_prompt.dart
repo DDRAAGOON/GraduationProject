@@ -21,7 +21,11 @@ class TradesmanRatingPrompt {
     await showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        icon: const Icon(Icons.check_circle, color: Color(0xFF4285F4), size: 48),
+        icon: const Icon(
+          Icons.check_circle,
+          color: Color(0xFF4285F4),
+          size: 48,
+        ),
         title: Text(t.tr(en: 'Request accepted', ar: 'تم قبول الطلب')),
         content: Text(
           isAr
@@ -43,7 +47,11 @@ class TradesmanRatingPrompt {
     await showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        icon: const Icon(Icons.star_outline, color: Color(0xFFFFB300), size: 48),
+        icon: const Icon(
+          Icons.star_outline,
+          color: Color(0xFFFFB300),
+          size: 48,
+        ),
         title: Text(t.tr(en: 'Rating reminder', ar: 'تذكير بالتقييم')),
         content: Text(
           isAr

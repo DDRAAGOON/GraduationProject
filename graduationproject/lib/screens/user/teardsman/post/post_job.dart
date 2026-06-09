@@ -20,7 +20,9 @@ class _PostJobState extends State<PostJob> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _skillController = TextEditingController();
-  final TextEditingController _capacityController = TextEditingController(text: "1");
+  final TextEditingController _capacityController = TextEditingController(
+    text: "1",
+  );
 
   final List<String> _days = [
     "Saturday",

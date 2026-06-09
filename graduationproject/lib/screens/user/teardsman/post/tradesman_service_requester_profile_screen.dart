@@ -79,9 +79,7 @@ class _TradesmanServiceRequesterProfileScreenState
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            isAr ? 'فشل تحديث الحالة' : 'Failed to update status',
-          ),
+          content: Text(isAr ? 'فشل تحديث الحالة' : 'Failed to update status'),
           backgroundColor: Colors.redAccent,
         ),
       );
@@ -118,7 +116,11 @@ class _TradesmanServiceRequesterProfileScreenState
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: colorScheme.onSurface, size: 20),
+          icon: Icon(
+            Icons.arrow_back_ios,
+            color: colorScheme.onSurface,
+            size: 20,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -227,7 +229,8 @@ class _TradesmanServiceRequesterProfileScreenState
                           children: [
                             Expanded(
                               child: FilledButton(
-                                onPressed: () => _updateStatus(context, 'Accepted'),
+                                onPressed: () =>
+                                    _updateStatus(context, 'Accepted'),
                                 style: FilledButton.styleFrom(
                                   backgroundColor: Colors.green,
                                 ),
@@ -237,7 +240,8 @@ class _TradesmanServiceRequesterProfileScreenState
                             const SizedBox(width: 10),
                             Expanded(
                               child: FilledButton(
-                                onPressed: () => _updateStatus(context, 'Rejected'),
+                                onPressed: () =>
+                                    _updateStatus(context, 'Rejected'),
                                 style: FilledButton.styleFrom(
                                   backgroundColor: const Color(0xFFEA4335),
                                 ),
@@ -251,7 +255,11 @@ class _TradesmanServiceRequesterProfileScreenState
                           width: double.infinity,
                           child: OutlinedButton.icon(
                             onPressed: () => _openChat(context),
-                            icon: const Icon(Icons.chat_bubble_outline, size: 18, color: Colors.white),
+                            icon: const Icon(
+                              Icons.chat_bubble_outline,
+                              size: 18,
+                              color: Colors.white,
+                            ),
                             label: Text(
                               t.tr(en: 'Message', ar: 'مراسلة'),
                               style: const TextStyle(color: Colors.white),

@@ -56,20 +56,23 @@ class _CompanyDashboardScreenState extends State<CompanyDashboardScreen> {
         return;
       }
 
-      _dio = Dio(BaseOptions(
-        baseUrl: 'https://jobito-api-production.up.railway.app/api',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $_token',
-        },
-      ));
+      _dio = Dio(
+        BaseOptions(
+          baseUrl: 'https://jobito-api-production.up.railway.app/api',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $_token',
+          },
+        ),
+      );
 
       // 2. Fetch company profile to get companyId
       final profileResponse = await _dio!.get('/companies/my/profile');
       final profileData = profileResponse.data;
 
       final profile = profileData['data'] ?? profileData;
-      final companyId = profile['id'] ?? profile['companyId'] ?? profile['company_id'];
+      final companyId =
+          profile['id'] ?? profile['companyId'] ?? profile['company_id'];
 
       if (companyId == null) {
         throw Exception('Could not find company ID in profile response');
@@ -81,10 +84,10 @@ class _CompanyDashboardScreenState extends State<CompanyDashboardScreen> {
       final stats = statsData['data'] ?? statsData;
 
       // 4. Fetch latest jobs
-      final jobsResponse = await _dio!.get('/jobs', queryParameters: {
-        'companyId': companyId,
-        'limit': 4,
-      });
+      final jobsResponse = await _dio!.get(
+        '/jobs',
+        queryParameters: {'companyId': companyId, 'limit': 4},
+      );
       final jobsData = jobsResponse.data;
       final jobs = jobsData['data'] ?? jobsData['jobs'] ?? [];
 
@@ -101,7 +104,8 @@ class _CompanyDashboardScreenState extends State<CompanyDashboardScreen> {
         setState(() {
           // التعامل المخصص مع خطأ 401 Unauthorized
           if (e.response?.statusCode == 401) {
-            _error = 'انتهت صلاحية الجلسة أو ليس لديك صلاحية. برجاء تسجيل الدخول مجدداً.';
+            _error =
+                'انتهت صلاحية الجلسة أو ليس لديك صلاحية. برجاء تسجيل الدخول مجدداً.';
             // توجيه المستخدم لتسجيل الدخول إذا انتهت الجلسة
             SecureStorage.deleteToken();
             Navigator.of(context).pushReplacementNamed(AppRoutes.companyLogin);
@@ -141,10 +145,17 @@ class _CompanyDashboardScreenState extends State<CompanyDashboardScreen> {
         elevation: 0,
         title: _companyProfile != null
             ? Text(
-          '${tLocal.tr(en: 'Hello', ar: 'مرحباً')}, ${_companyProfile!['name'] ?? _companyProfile!['companyName'] ?? _companyProfile!['company_name'] ?? 'Company'}',
-          style: TextStyle(color: Colors.white, fontSize: 20.sp, fontWeight: FontWeight.bold),
-        )
-            : Text(tLocal.tr(en: 'Dashboard', ar: 'لوحة التحكم'), style: const TextStyle(color: Colors.white)),
+                '${tLocal.tr(en: 'Hello', ar: 'مرحباً')}, ${_companyProfile!['name'] ?? _companyProfile!['companyName'] ?? _companyProfile!['company_name'] ?? 'Company'}',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20.sp,
+                  fontWeight: FontWeight.bold,
+                ),
+              )
+            : Text(
+                tLocal.tr(en: 'Dashboard', ar: 'لوحة التحكم'),
+                style: const TextStyle(color: Colors.white),
+              ),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: RefreshIndicator(
@@ -161,7 +172,9 @@ class _CompanyDashboardScreenState extends State<CompanyDashboardScreen> {
             context,
             MaterialPageRoute(
               builder: (context) => ChatThreadScreen(
-                name: tLocal.isAr ? 'مساعد جوبيتو الذكي' : 'Jobito AI Assistant',
+                name: tLocal.isAr
+                    ? 'مساعد جوبيتو الذكي'
+                    : 'Jobito AI Assistant',
                 image: AppImages.jobito,
               ),
             ),
@@ -184,8 +197,16 @@ class _CompanyDashboardScreenState extends State<CompanyDashboardScreen> {
       return _buildErrorState();
     }
 
-    final newCandidates = _getStat(_dashboardStats, 'newCandidates', 'new_candidates');
-    final acceptedCandidates = _getStat(_dashboardStats, 'acceptedCandidates', 'accepted_candidates');
+    final newCandidates = _getStat(
+      _dashboardStats,
+      'newCandidates',
+      'new_candidates',
+    );
+    final acceptedCandidates = _getStat(
+      _dashboardStats,
+      'acceptedCandidates',
+      'accepted_candidates',
+    );
 
     return SafeArea(
       child: SingleChildScrollView(
@@ -203,7 +224,10 @@ class _CompanyDashboardScreenState extends State<CompanyDashboardScreen> {
                   borderRadius: BorderRadius.circular(8.r),
                   border: Border.all(color: Colors.redAccent.withOpacity(0.5)),
                 ),
-                child: Text(_error!, style: const TextStyle(color: Colors.redAccent)),
+                child: Text(
+                  _error!,
+                  style: const TextStyle(color: Colors.redAccent),
+                ),
               ),
               SizedBox(height: 16.h),
             ],
@@ -246,24 +270,31 @@ class _CompanyDashboardScreenState extends State<CompanyDashboardScreen> {
 
             _latestJobs.isEmpty
                 ? Center(
-              child: Padding(
-                padding: EdgeInsets.all(32.w),
-                child: Text(
-                  tLocal.tr(en: 'No jobs posted yet.', ar: 'لا توجد وظائف تم نشرها بعد.'),
-                  style: TextStyle(color: Colors.white54, fontSize: 16.sp),
-                ),
-              ),
-            )
+                    child: Padding(
+                      padding: EdgeInsets.all(32.w),
+                      child: Text(
+                        tLocal.tr(
+                          en: 'No jobs posted yet.',
+                          ar: 'لا توجد وظائف تم نشرها بعد.',
+                        ),
+                        style: TextStyle(
+                          color: Colors.white54,
+                          fontSize: 16.sp,
+                        ),
+                      ),
+                    ),
+                  )
                 : ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: _latestJobs.length,
-              separatorBuilder: (context, index) => SizedBox(height: 12.h),
-              itemBuilder: (context, index) {
-                final job = _latestJobs[index];
-                return _buildJobCard(job);
-              },
-            ),
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: _latestJobs.length,
+                    separatorBuilder: (context, index) =>
+                        SizedBox(height: 12.h),
+                    itemBuilder: (context, index) {
+                      final job = _latestJobs[index];
+                      return _buildJobCard(job);
+                    },
+                  ),
           ],
         ),
       ),
@@ -283,10 +314,18 @@ class _CompanyDashboardScreenState extends State<CompanyDashboardScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.error_outline, color: Colors.redAccent, size: 56.w),
+                  Icon(
+                    Icons.error_outline,
+                    color: Colors.redAccent,
+                    size: 56.w,
+                  ),
                   SizedBox(height: 16.h),
                   Text(
-                    _error ?? tLocal.tr(en: 'An unexpected error occurred.', ar: 'حدث خطأ غير متوقع.'),
+                    _error ??
+                        tLocal.tr(
+                          en: 'An unexpected error occurred.',
+                          ar: 'حدث خطأ غير متوقع.',
+                        ),
                     textAlign: TextAlign.center,
                     style: TextStyle(color: Colors.white, fontSize: 16.sp),
                   ),
@@ -298,7 +337,10 @@ class _CompanyDashboardScreenState extends State<CompanyDashboardScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blueAccent,
                       foregroundColor: Colors.white,
-                      padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 24.w,
+                        vertical: 12.h,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8.r),
                       ),
@@ -369,7 +411,8 @@ class _CompanyDashboardScreenState extends State<CompanyDashboardScreen> {
 
   Widget _buildJobCard(dynamic job) {
     final title = job['title']?.toString() ?? 'Unknown Job';
-    final address = job['address']?.toString() ?? job['location']?.toString() ?? 'Remote';
+    final address =
+        job['address']?.toString() ?? job['location']?.toString() ?? 'Remote';
 
     // Safely parse jobType since it could be an array in the backend
     String jobType = 'Full-time';
@@ -380,14 +423,14 @@ class _CompanyDashboardScreenState extends State<CompanyDashboardScreen> {
       jobType = rawJobType.toString();
     }
 
-    final availableSlots = job['availableSlots'] ?? job['available_slots'] ?? job['capacity'] ?? 0;
+    final availableSlots =
+        job['availableSlots'] ?? job['available_slots'] ?? job['capacity'] ?? 0;
 
     return InkWell(
       onTap: () {
-        Navigator.of(context).pushNamed(
-          AppRoutes.companyJobDetails,
-          arguments: Job.fromMap(job),
-        );
+        Navigator.of(
+          context,
+        ).pushNamed(AppRoutes.companyJobDetails, arguments: Job.fromMap(job));
       },
       borderRadius: BorderRadius.circular(12.r),
       child: Container(
@@ -417,11 +460,16 @@ class _CompanyDashboardScreenState extends State<CompanyDashboardScreen> {
                 ),
                 SizedBox(width: 12.w),
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 10.w,
+                    vertical: 4.h,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.blueAccent.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(8.r),
-                    border: Border.all(color: Colors.blueAccent.withOpacity(0.3)),
+                    border: Border.all(
+                      color: Colors.blueAccent.withOpacity(0.3),
+                    ),
                   ),
                   child: Text(
                     jobType,
@@ -437,7 +485,11 @@ class _CompanyDashboardScreenState extends State<CompanyDashboardScreen> {
             SizedBox(height: 12.h),
             Row(
               children: [
-                Icon(Icons.location_on_outlined, color: Colors.white54, size: 16.w),
+                Icon(
+                  Icons.location_on_outlined,
+                  color: Colors.white54,
+                  size: 16.w,
+                ),
                 SizedBox(width: 4.w),
                 Expanded(
                   child: Text(

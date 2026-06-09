@@ -81,9 +81,8 @@ class CompanyAppBarActions extends StatelessWidget {
         ),
         IconButton(
           tooltip: t.settings,
-          onPressed: () => Navigator.of(
-            context,
-          ).pushNamed(AppRoutes.companySettings),
+          onPressed: () =>
+              Navigator.of(context).pushNamed(AppRoutes.companySettings),
           icon: const Icon(Icons.settings_outlined),
         ),
       ],

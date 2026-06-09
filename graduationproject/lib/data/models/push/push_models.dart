@@ -3,7 +3,11 @@ class PushRegistration {
   final String deviceToken;
   final String deviceName;
 
-  PushRegistration({this.userId, required this.deviceToken, required this.deviceName});
+  PushRegistration({
+    this.userId,
+    required this.deviceToken,
+    required this.deviceName,
+  });
 
   Map<String, dynamic> toJson() => {
     if (userId != null) 'userId': userId,

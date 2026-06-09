@@ -28,10 +28,10 @@ class ChatService {
   }
 
   Future<List<ChatMessage>> getP2PHistory(
-      String userId,
-      String otherId, {
-        int page = 1,
-      }) async {
+    String userId,
+    String otherId, {
+    int page = 1,
+  }) async {
     try {
       final response = await _apiClient.get(
         ApiConstants.chatHistory,
@@ -131,9 +131,7 @@ class ChatService {
           debugPrint('📦 Received ${rawData.length} users (List format)');
         }
       } else if (response.data is Map) {
-        rawData = response.data['data'] ??
-            response.data['users'] ??
-            [];
+        rawData = response.data['data'] ?? response.data['users'] ?? [];
         if (kDebugMode) {
           debugPrint('📦 Received ${rawData.length} users (Map format)');
         }
@@ -143,8 +141,12 @@ class ChatService {
       if (kDebugMode && rawData.isNotEmpty) {
         debugPrint('📋 First user raw data:');
         debugPrint('   - Keys: ${rawData.first.keys.toList()}');
-        debugPrint('   - ID: ${rawData.first['userId'] ?? rawData.first['id']}');
-        debugPrint('   - Name: ${rawData.first['fullName'] ?? rawData.first['name']}');
+        debugPrint(
+          '   - ID: ${rawData.first['userId'] ?? rawData.first['id']}',
+        );
+        debugPrint(
+          '   - Name: ${rawData.first['fullName'] ?? rawData.first['name']}',
+        );
         debugPrint('   - Email: ${rawData.first['email']}');
       }
 
@@ -152,11 +154,15 @@ class ChatService {
       final queryLower = query.toLowerCase();
       final filtered = rawData.where((json) {
         if (json is! Map) {
-          if (kDebugMode) debugPrint('⚠️ Skipping non-Map item: ${json.runtimeType}');
+          if (kDebugMode)
+            debugPrint('⚠️ Skipping non-Map item: ${json.runtimeType}');
           return false;
         }
 
-        final name = (json['fullName'] ?? json['name'] ?? json['username'] ?? '').toString().toLowerCase();
+        final name =
+            (json['fullName'] ?? json['name'] ?? json['username'] ?? '')
+                .toString()
+                .toLowerCase();
         final email = (json['email'] ?? '').toString().toLowerCase();
 
         final matches = name.contains(queryLower) || email.contains(queryLower);
@@ -173,59 +179,15 @@ class ChatService {
         debugPrint('🔍 ===== SEARCH END =====');
       }
 
-      return filtered.map((json) => UserInfo.fromJson(json as Map<String, dynamic>)).toList();
-
+      return filtered
+          .map((json) => UserInfo.fromJson(json as Map<String, dynamic>))
+          .toList();
     } catch (e, stackTrace) {
       if (kDebugMode) {
         debugPrint('❌ Search error: $e');
         debugPrint('❌ Stack trace: $stackTrace');
         debugPrint('🔍 ===== SEARCH END =====');
       }
-      return [];
-    }
-  }
-
-  // ═══════════════════════════════════════════════════════════════
-  // AI Chatbot
-  // ═══════════════════════════════════════════════════════════════
-
-  Future<String> askAiChatbot(
-      String message, {
-        String? userId,
-        File? image,
-      }) async {
-    try {
-      dynamic requestData;
-      if (image != null) {
-        requestData = FormData.fromMap({
-          'message': message,
-          if (userId != null) 'userId': userId,
-          'image': await MultipartFile.fromFile(image.path),
-        });
-      } else {
-        requestData = {
-          'message': message,
-          if (userId != null) 'userId': userId,
-        };
-      }
-
-      final response = await _apiClient.post(
-        ApiConstants.aiChatbot,
-        data: requestData,
-      );
-      return response.data['response']?.toString() ?? response.data['reply']?.toString() ?? '';
-    } catch (e) {
-      if (kDebugMode) debugPrint('❌ AI Chatbot error: $e');
-      throw ErrorHandler.handle(e);
-    }
-  }
-
-  Future<List<dynamic>> getAiChatbotHistory(String userId) async {
-    try {
-      final response = await _apiClient.get(ApiConstants.aiChatbotHistory(userId));
-      return response.data['data'] ?? response.data ?? [];
-    } catch (e) {
-      if (kDebugMode) debugPrint('❌ Error fetching AI history: $e');
       return [];
     }
   }

@@ -30,7 +30,9 @@ class CompanyPasswordChangedDialogScreen extends StatelessWidget {
                     height: 78,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Theme.of(context).colorScheme.primary.withOpacity(0.15),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.primary.withOpacity(0.15),
                     ),
                     child: Icon(
                       Icons.check_circle_outline,
@@ -42,24 +44,27 @@ class CompanyPasswordChangedDialogScreen extends StatelessWidget {
                   Text(
                     t.passwordChanged,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.w800,
-                        ),
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
                   const SizedBox(height: 10),
                   Text(
                     t.passwordChangedMsg,
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-                        ),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withOpacity(0.7),
+                    ),
                   ),
                   const SizedBox(height: 18),
                   AppButton(
                     label: t.backToSignIn,
-                    onPressed: () => Navigator.of(context).pushNamedAndRemoveUntil(
-                      AppRoutes.companySignIn,
-                      (r) => false,
-                    ),
+                    onPressed: () =>
+                        Navigator.of(context).pushNamedAndRemoveUntil(
+                          AppRoutes.companySignIn,
+                          (r) => false,
+                        ),
                   ),
                 ],
               ),

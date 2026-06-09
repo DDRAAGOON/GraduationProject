@@ -35,4 +35,3 @@ class CompanyApplicantAvatar extends StatelessWidget {
     );
   }
 }
-

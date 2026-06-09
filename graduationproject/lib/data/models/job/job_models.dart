@@ -68,7 +68,10 @@ class Job {
       companyId: json['companyId']?.toString() ?? '',
       companyName: json['companyName']?.toString() ?? 'Unknown Company',
       companyLogoUrl: json['companyLogoUrl']?.toString(),
-      location: json['address']?.toString() ?? json['location']?.toString() ?? 'Remote',
+      location:
+          json['address']?.toString() ??
+          json['location']?.toString() ??
+          'Remote',
       salaryRange: salaryRange,
       type: type,
       description: json['description']?.toString() ?? '',
@@ -76,15 +79,26 @@ class Job {
       qualifications: List<String>.from(json['qualifications'] ?? []),
       niceToHaves: List<String>.from(json['niceToHaves'] ?? []),
       benefits: List<String>.from(json['benefits'] ?? []),
-      category: json['categoryId']?.toString() ?? json['category']?.toString() ?? 'General',
+      category:
+          json['categoryId']?.toString() ??
+          json['category']?.toString() ??
+          'General',
       tags: List<String>.from(json['skills'] ?? json['tags'] ?? []),
-      createdAt: json['createdAt'] != null ? DateTime.tryParse(json['createdAt'].toString()) ?? DateTime.now() : DateTime.now(),
+      createdAt: json['createdAt'] != null
+          ? DateTime.tryParse(json['createdAt'].toString()) ?? DateTime.now()
+          : DateTime.now(),
       requiredCount: json['slotsAvailable'] ?? json['requiredCount'] ?? 1,
       acceptedCount: json['acceptedCount'] ?? 0,
       deadline: json['expiresAt'] != null
           ? DateTime.tryParse(json['expiresAt'].toString())
-          : (json['deadline'] != null ? DateTime.tryParse(json['deadline'].toString()) : null),
-      status: json['isActive'] == true ? 'Active' : (json['isActive'] == false ? 'Closed' : (json['status']?.toString() ?? 'Active')),
+          : (json['deadline'] != null
+                ? DateTime.tryParse(json['deadline'].toString())
+                : null),
+      status: json['isActive'] == true
+          ? 'Active'
+          : (json['isActive'] == false
+                ? 'Closed'
+                : (json['status']?.toString() ?? 'Active')),
     );
   }
 }
@@ -130,8 +144,10 @@ class CreateJobRequest {
     if (salaryRange != null && salaryRange!.isNotEmpty) {
       // e.g. "10k - 20k" -> min: 10000, max: 20000
       final parts = salaryRange!.replaceAll(RegExp(r'[kK]'), '000').split('-');
-      if (parts.isNotEmpty) salaryMin = int.tryParse(parts[0].replaceAll(RegExp(r'[^0-9]'), ''));
-      if (parts.length > 1) salaryMax = int.tryParse(parts[1].replaceAll(RegExp(r'[^0-9]'), ''));
+      if (parts.isNotEmpty)
+        salaryMin = int.tryParse(parts[0].replaceAll(RegExp(r'[^0-9]'), ''));
+      if (parts.length > 1)
+        salaryMax = int.tryParse(parts[1].replaceAll(RegExp(r'[^0-9]'), ''));
     }
 
     String finalDesc = description ?? '';
@@ -158,7 +174,9 @@ class CreateJobRequest {
       if (benefits != null) 'benefits': benefits,
       if (requiredCount != null) 'slotsAvailable': requiredCount,
       if (deadline != null) 'expiresAt': deadline?.toIso8601String(),
-      if (status != null) 'isActive': status?.toLowerCase() == 'active' || status?.toLowerCase() == 'نشط',
+      if (status != null)
+        'isActive':
+            status?.toLowerCase() == 'active' || status?.toLowerCase() == 'نشط',
       if (combinedSkills.isNotEmpty) 'skills': combinedSkills,
     };
   }

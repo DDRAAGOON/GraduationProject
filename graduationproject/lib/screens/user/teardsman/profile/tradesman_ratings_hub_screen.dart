@@ -26,21 +26,16 @@ class TradesmanRatingsHubScreen extends StatelessWidget {
           ),
           bottom: TabBar(
             labelColor: Theme.of(context).colorScheme.primary,
-            unselectedLabelColor:
-                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+            unselectedLabelColor: Theme.of(
+              context,
+            ).colorScheme.onSurface.withValues(alpha: 0.5),
             indicatorColor: Theme.of(context).colorScheme.primary,
             tabs: [
               Tab(
-                text: t.tr(
-                  en: 'Client ratings',
-                  ar: 'تقييمات العملاء',
-                ),
+                text: t.tr(en: 'Client ratings', ar: 'تقييمات العملاء'),
               ),
               Tab(
-                text: t.tr(
-                  en: 'My ratings',
-                  ar: 'تقييماتي للآخرين',
-                ),
+                text: t.tr(en: 'My ratings', ar: 'تقييماتي للآخرين'),
               ),
             ],
           ),
@@ -141,7 +136,11 @@ class _RatingsList extends StatelessWidget {
                   ),
                   Row(
                     children: [
-                      const Icon(Icons.star, color: Color(0xFFFFB300), size: 18),
+                      const Icon(
+                        Icons.star,
+                        color: Color(0xFFFFB300),
+                        size: 18,
+                      ),
                       const SizedBox(width: 4),
                       Text(
                         entry.rating.toStringAsFixed(1),

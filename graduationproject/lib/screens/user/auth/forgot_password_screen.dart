@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:country_picker/country_picker.dart';
 import '../../../shared/l10n/app_localizations.dart';
 import '../../../shared/state/theme_controller.dart';
@@ -50,14 +50,18 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
-    
+
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: ThemeController.instance.themeMode,
       builder: (context, themeMode, _) {
-        final isDark = themeMode == ThemeMode.dark || 
-                      (themeMode == ThemeMode.system && MediaQuery.platformBrightnessOf(context) == Brightness.dark);
-        
-        final backgroundColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
+        final isDark =
+            themeMode == ThemeMode.dark ||
+            (themeMode == ThemeMode.system &&
+                MediaQuery.platformBrightnessOf(context) == Brightness.dark);
+
+        final backgroundColor = isDark
+            ? const Color(0xFF001E3A)
+            : const Color(0xFFF8FBF4);
         final textColorPrimary = isDark ? Colors.white : Colors.black;
 
         return Scaffold(
@@ -66,22 +70,29 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             backgroundColor: Colors.transparent,
             elevation: 0,
             leading: IconButton(
-              icon: Icon(Icons.arrow_back_ios, color: isDark ? Colors.white70 : Colors.black54, size: 20),
+              icon: Icon(
+                Icons.arrow_back_ios,
+                color: isDark ? Colors.white70 : Colors.black54,
+                size: 20,
+              ),
               onPressed: () => Navigator.pop(context),
             ),
             title: Text(
               t.isAr ? 'نسيت كلمة المرور' : "Forgot Password",
               style: const TextStyle(
-                color: Color(0xFFF77F32), 
-                fontSize: 20, 
-                fontWeight: FontWeight.bold
+                color: Color(0xFFF77F32),
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
               ),
             ),
             centerTitle: true,
           ),
           body: SafeArea(
             child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 24.0,
+                vertical: 20,
+              ),
               children: [
                 const SizedBox(height: 20),
                 // Main Heading
@@ -94,12 +105,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     ),
                     children: [
                       TextSpan(
-                        text: t.isAr ? 'نسيت ' : 'Forgot ', 
-                        style: const TextStyle(color: Color(0xFFF77F32))
+                        text: t.isAr ? 'نسيت ' : 'Forgot ',
+                        style: const TextStyle(color: Color(0xFFF77F32)),
                       ),
                       TextSpan(
-                        text: t.isAr ? 'كلمة المرور؟' : 'Password?', 
-                        style: const TextStyle(color: Color(0xFF0051DD))
+                        text: t.isAr ? 'كلمة المرور؟' : 'Password?',
+                        style: const TextStyle(color: Color(0xFF0051DD)),
                       ),
                     ],
                   ),
@@ -108,7 +119,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 Text(
                   t.tr(
                     en: "Enter your email address to receive a confirmation code resetting your password.",
-                    ar: "أدخل بريدك الإلكتروني لتلقي رمز تأكيد لإعادة تعيين كلمة المرور الخاصة بك."
+                    ar: "أدخل بريدك الإلكتروني لتلقي رمز تأكيد لإعادة تعيين كلمة المرور الخاصة بك.",
                   ),
                   style: TextStyle(
                     color: isDark ? Colors.white70 : Colors.black54,
@@ -116,7 +127,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     height: 1.4,
                   ),
                 ),
-                
+
                 const SizedBox(height: 48),
 
                 // Email Field
@@ -124,7 +135,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 const SizedBox(height: 8),
                 _buildTextField(
                   controller: _emailController,
-                  hint: t.tr(en: "Enter your email", ar: "أدخل بريدك الإلكتروني"),
+                  hint: t.tr(
+                    en: "Enter your email",
+                    ar: "أدخل بريدك الإلكتروني",
+                  ),
                   isDark: isDark,
                   errorText: _emailError,
                 ),
@@ -159,17 +173,27 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         height: 56,
                         padding: const EdgeInsets.symmetric(horizontal: 12),
                         decoration: BoxDecoration(
-                          color: isDark ? Colors.white.withOpacity(0.05) : Colors.white,
+                          color: isDark
+                              ? Colors.white.withOpacity(0.05)
+                              : Colors.white,
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: isDark ? Colors.white24 : Colors.black12),
+                          border: Border.all(
+                            color: isDark ? Colors.white24 : Colors.black12,
+                          ),
                         ),
                         child: Row(
                           children: [
-                            Text(_selectedCountry.flagEmoji, style: const TextStyle(fontSize: 20)),
+                            Text(
+                              _selectedCountry.flagEmoji,
+                              style: const TextStyle(fontSize: 20),
+                            ),
                             const SizedBox(width: 8),
                             Text(
                               "+${_selectedCountry.phoneCode}",
-                              style: TextStyle(color: textColorPrimary, fontWeight: FontWeight.w600),
+                              style: TextStyle(
+                                color: textColorPrimary,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ],
                         ),
@@ -179,7 +203,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     Expanded(
                       child: _buildTextField(
                         controller: _phoneController,
-                        hint: t.tr(en: "Enter Mobile Number", ar: "أدخل رقم الهاتف"),
+                        hint: t.tr(
+                          en: "Enter Mobile Number",
+                          ar: "أدخل رقم الهاتف",
+                        ),
                         isDark: isDark,
                         keyboardType: TextInputType.phone,
                         errorText: _phoneError,
@@ -208,7 +235,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       _emailError = t.enterYourEmail;
                       hasError = true;
                     } else if (!_isValidEmail(email)) {
-                      _emailError = t.isAr ? "يجب أن ينتهي البريد بـ @gmail.com" : "Email must end with @gmail.com";
+                      _emailError = t.isAr
+                          ? "يجب أن ينتهي البريد بـ @gmail.com"
+                          : "Email must end with @gmail.com";
                       hasError = true;
                     }
 
@@ -216,7 +245,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       _phoneError = t.enterMobileNumber;
                       hasError = true;
                     } else if (!_isValidPhone(phone)) {
-                      _phoneError = t.isAr ? "رقم الهاتف غير صحيح" : "Invalid phone number";
+                      _phoneError = t.isAr
+                          ? "رقم الهاتف غير صحيح"
+                          : "Invalid phone number";
                       hasError = true;
                     }
 
@@ -270,21 +301,30 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         hintStyle: const TextStyle(color: Colors.black26, fontSize: 14),
         filled: true,
         fillColor: isDark ? Colors.white.withOpacity(0.05) : Colors.white,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 16,
+        ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
           borderSide: BorderSide(color: borderColor),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: isDark ? Colors.white : const Color(0xFF142C66), width: 1.5),
+          borderSide: BorderSide(
+            color: isDark ? Colors.white : const Color(0xFF142C66),
+            width: 1.5,
+          ),
         ),
         errorText: errorText,
       ),
     );
   }
 
-  Widget _buildLargeButton({required String label, required VoidCallback onPressed}) {
+  Widget _buildLargeButton({
+    required String label,
+    required VoidCallback onPressed,
+  }) {
     return Container(
       width: double.infinity,
       height: 56,

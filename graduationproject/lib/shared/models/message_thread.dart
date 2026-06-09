@@ -17,12 +17,12 @@ final class MessageThread {
   final String lastTimeLabelAr;
 
   static MessageThread mock() => const MessageThread(
-        id: 'thread_1',
-        title: 'Jan Mayer',
-        subtitle: 'We want to invite you for a quick interview...',
-        lastTimeLabelEn: '12 mins ago',
-        lastTimeLabelAr: 'منذ ١٢ دقيقة',
-      );
+    id: 'thread_1',
+    title: 'Jan Mayer',
+    subtitle: 'We want to invite you for a quick interview...',
+    lastTimeLabelEn: '12 mins ago',
+    lastTimeLabelAr: 'منذ ١٢ دقيقة',
+  );
 
   static List<MessageThread> mockList() => [];
 }

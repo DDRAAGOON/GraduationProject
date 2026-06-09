@@ -5,10 +5,12 @@ class RecruitmentAllApplicationsScreen extends StatefulWidget {
   const RecruitmentAllApplicationsScreen({super.key});
 
   @override
-  State<RecruitmentAllApplicationsScreen> createState() => _RecruitmentAllApplicationsScreenState();
+  State<RecruitmentAllApplicationsScreen> createState() =>
+      _RecruitmentAllApplicationsScreenState();
 }
 
-class _RecruitmentAllApplicationsScreenState extends State<RecruitmentAllApplicationsScreen> {
+class _RecruitmentAllApplicationsScreenState
+    extends State<RecruitmentAllApplicationsScreen> {
   String _activeTab = 'الكل';
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
@@ -21,17 +23,22 @@ class _RecruitmentAllApplicationsScreenState extends State<RecruitmentAllApplica
 
   String _translateStatus(String status, bool isAr) {
     final low = status.toLowerCase();
-    if (low.contains('hire') || low.contains('accept')) return isAr ? 'تم التوظيف' : 'Hired';
-    if (low.contains('reject') || low.contains('decline')) return isAr ? 'تم الرفض' : 'Rejected';
+    if (low.contains('hire') || low.contains('accept'))
+      return isAr ? 'تم التوظيف' : 'Hired';
+    if (low.contains('reject') || low.contains('decline'))
+      return isAr ? 'تم الرفض' : 'Rejected';
     if (low.contains('wait')) return isAr ? 'Waitlist' : 'Waitlist';
-    if (low.contains('review') || low.contains('interview')) return isAr ? 'قيد المراجعة' : 'Under Review';
+    if (low.contains('review') || low.contains('interview'))
+      return isAr ? 'قيد المراجعة' : 'Under Review';
     return isAr ? 'تم التقديم' : 'Applied';
   }
 
   Color _getStatusColor(String status) {
     final low = status.toLowerCase();
-    if (low.contains('hire') || low.contains('accept')) return const Color(0xFF4CAF50);
-    if (low.contains('reject') || low.contains('decline')) return const Color(0xFFF44336);
+    if (low.contains('hire') || low.contains('accept'))
+      return const Color(0xFF4CAF50);
+    if (low.contains('reject') || low.contains('decline'))
+      return const Color(0xFFF44336);
     if (low.contains('wait')) return const Color(0xFF2196F3);
     return const Color(0xFFFF9800);
   }
@@ -41,19 +48,22 @@ class _RecruitmentAllApplicationsScreenState extends State<RecruitmentAllApplica
     final store = RecruitmentSyncStore.instance;
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     final filteredApps = store.applications.where((app) {
-      final matchesSearch = app.jobTitle.toLowerCase().contains(_searchQuery.toLowerCase()) || 
-                           app.companyName.toLowerCase().contains(_searchQuery.toLowerCase());
-      
+      final matchesSearch =
+          app.jobTitle.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+          app.companyName.toLowerCase().contains(_searchQuery.toLowerCase());
+
       if (_activeTab == 'الكل' || _activeTab == 'All') return matchesSearch;
-      
+
       final status = _translateStatus(app.status, isAr);
       return matchesSearch && status == _activeTab;
     }).toList();
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4),
+      backgroundColor: isDark
+          ? const Color(0xFF001E3A)
+          : const Color(0xFFF8FBF4),
       body: SafeArea(
         child: Column(
           children: [
@@ -65,11 +75,18 @@ class _RecruitmentAllApplicationsScreenState extends State<RecruitmentAllApplica
                 children: [
                   Text(
                     isAr ? 'سجل التقديمات' : 'Applications Record',
-                    style: const TextStyle(color: Color(0xFFFF7A2A), fontWeight: FontWeight.bold, fontSize: 16),
+                    style: const TextStyle(
+                      color: Color(0xFFFF7A2A),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
                   ),
                   const Spacer(),
                   IconButton(
-                    icon: Icon(isAr ? Icons.arrow_forward_ios : Icons.arrow_back_ios, color: isDark ? Colors.white : Colors.black),
+                    icon: Icon(
+                      isAr ? Icons.arrow_forward_ios : Icons.arrow_back_ios,
+                      color: isDark ? Colors.white : Colors.black,
+                    ),
                     onPressed: () => Navigator.pop(context),
                   ),
                 ],
@@ -83,10 +100,16 @@ class _RecruitmentAllApplicationsScreenState extends State<RecruitmentAllApplica
                 width: double.infinity,
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF0D2D4D) : const Color(0xFFE0E0E0),
+                  color: isDark
+                      ? const Color(0xFF0D2D4D)
+                      : const Color(0xFFE0E0E0),
                   borderRadius: BorderRadius.circular(24),
                   boxShadow: [
-                    BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 4))
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
                   ],
                 ),
                 child: Column(
@@ -94,17 +117,37 @@ class _RecruitmentAllApplicationsScreenState extends State<RecruitmentAllApplica
                     RichText(
                       textAlign: TextAlign.center,
                       text: TextSpan(
-                        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                        ),
                         children: [
-                          TextSpan(text: '${store.currentUserName} ', style: const TextStyle(color: Color(0xFFFF7A2A))),
-                          TextSpan(text: isAr ? 'استمر في العمل الجيد' : 'keep up the good work', style: TextStyle(color: isDark ? Colors.white : const Color(0xFF213E75))),
+                          TextSpan(
+                            text: '${store.currentUserName} ',
+                            style: const TextStyle(color: Color(0xFFFF7A2A)),
+                          ),
+                          TextSpan(
+                            text: isAr
+                                ? 'استمر في العمل الجيد'
+                                : 'keep up the good work',
+                            style: TextStyle(
+                              color: isDark
+                                  ? Colors.white
+                                  : const Color(0xFF213E75),
+                            ),
+                          ),
                         ],
                       ),
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      isAr ? 'إليك ما يحدث مع طلباتك اعتباراً من اليوم' : 'Here is what is happening with your applications as of today',
-                      style: TextStyle(fontSize: 12, color: isDark ? Colors.white70 : Colors.black54),
+                      isAr
+                          ? 'إليك ما يحدث مع طلباتك اعتباراً من اليوم'
+                          : 'Here is what is happening with your applications as of today',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: isDark ? Colors.white70 : Colors.black54,
+                      ),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 24),
@@ -137,7 +180,10 @@ class _RecruitmentAllApplicationsScreenState extends State<RecruitmentAllApplica
                 alignment: isAr ? Alignment.centerRight : Alignment.centerLeft,
                 child: Text(
                   isAr ? 'سجل الطلبات' : 'Applications Record',
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
@@ -148,7 +194,10 @@ class _RecruitmentAllApplicationsScreenState extends State<RecruitmentAllApplica
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: const Color(0xFF142C66),
                   borderRadius: BorderRadius.circular(15),
@@ -165,7 +214,9 @@ class _RecruitmentAllApplicationsScreenState extends State<RecruitmentAllApplica
                     onChanged: (v) => setState(() => _searchQuery = v),
                     style: const TextStyle(color: Colors.black87),
                     decoration: InputDecoration(
-                      hintText: isAr ? 'ابحث عن الوظيفة أو الشركة...' : 'Search by job or company...',
+                      hintText: isAr
+                          ? 'ابحث عن الوظيفة أو الشركة...'
+                          : 'Search by job or company...',
                       prefixIcon: const Icon(Icons.search, color: Colors.grey),
                       border: InputBorder.none,
                       enabledBorder: InputBorder.none,
@@ -189,13 +240,16 @@ class _RecruitmentAllApplicationsScreenState extends State<RecruitmentAllApplica
                   final app = filteredApps[index];
                   final status = _translateStatus(app.status, isAr);
                   final color = _getStatusColor(app.status);
-                  final isAccepted = app.status.toLowerCase().contains('hire') || 
-                                   app.status.toLowerCase().contains('accept') ||
-                                   status == 'تم التوظيف' ||
-                                   status == 'Hired';
+                  final isAccepted =
+                      app.status.toLowerCase().contains('hire') ||
+                      app.status.toLowerCase().contains('accept') ||
+                      status == 'تم التوظيف' ||
+                      status == 'Hired';
 
                   return InkWell(
-                    onTap: isAccepted ? () => _showRatingDialog(context, app, isAr) : null,
+                    onTap: isAccepted
+                        ? () => _showRatingDialog(context, app, isAr)
+                        : null,
                     borderRadius: BorderRadius.circular(20),
                     child: Container(
                       margin: const EdgeInsets.only(bottom: 12),
@@ -203,7 +257,12 @@ class _RecruitmentAllApplicationsScreenState extends State<RecruitmentAllApplica
                       decoration: BoxDecoration(
                         color: isDark ? const Color(0xFF0D2D4D) : Colors.white,
                         borderRadius: BorderRadius.circular(20),
-                        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 5)],
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.02),
+                            blurRadius: 5,
+                          ),
+                        ],
                       ),
                       child: Row(
                         children: [
@@ -214,23 +273,35 @@ class _RecruitmentAllApplicationsScreenState extends State<RecruitmentAllApplica
                               color: Colors.grey.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            child: const Icon(Icons.business, size: 20, color: Color(0xFF49769F)),
+                            child: const Icon(
+                              Icons.business,
+                              size: 20,
+                              color: Color(0xFF49769F),
+                            ),
                           ),
                           const SizedBox(width: 12),
                           // Middle: Job Info
                           Expanded(
                             child: Column(
-                              crossAxisAlignment: isAr ? CrossAxisAlignment.start : CrossAxisAlignment.end,
+                              crossAxisAlignment: isAr
+                                  ? CrossAxisAlignment.start
+                                  : CrossAxisAlignment.end,
                               children: [
                                 Text(
                                   app.jobTitle,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                  ),
                                 ),
                                 Text(
                                   isAr ? 'دوام كامل •' : 'Full Time •',
-                                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey,
+                                  ),
                                 ),
                               ],
                             ),
@@ -238,38 +309,64 @@ class _RecruitmentAllApplicationsScreenState extends State<RecruitmentAllApplica
                           const Spacer(),
                           // Left: Date (Top) and Status (Bottom)
                           Column(
-                            crossAxisAlignment: isAr ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                            crossAxisAlignment: isAr
+                                ? CrossAxisAlignment.end
+                                : CrossAxisAlignment.start,
                             children: [
                               Text(
                                 '${app.updatedAt.day}/${app.updatedAt.month}/${app.updatedAt.year}',
-                                style: const TextStyle(fontSize: 11, color: Colors.grey),
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  color: Colors.grey,
+                                ),
                               ),
                               const SizedBox(height: 8),
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 4,
+                                ),
                                 decoration: BoxDecoration(
                                   color: color.withOpacity(0.1),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: Text(
                                   status,
-                                  style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.bold),
+                                  style: TextStyle(
+                                    color: color,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
                               if (isAccepted)
                                 Padding(
                                   padding: const EdgeInsets.only(top: 6),
                                   child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 4,
+                                    ),
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFFFF7A2A).withValues(alpha: 0.1),
+                                      color: const Color(
+                                        0xFFFF7A2A,
+                                      ).withValues(alpha: 0.1),
                                       borderRadius: BorderRadius.circular(20),
-                                      border: Border.all(color: const Color(0xFFFF7A2A).withValues(alpha: 0.5), width: 0.5),
+                                      border: Border.all(
+                                        color: const Color(
+                                          0xFFFF7A2A,
+                                        ).withValues(alpha: 0.5),
+                                        width: 0.5,
+                                      ),
                                     ),
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        const Icon(Icons.star, size: 10, color: Color(0xFFFF7A2A)),
+                                        const Icon(
+                                          Icons.star,
+                                          size: 10,
+                                          color: Color(0xFFFF7A2A),
+                                        ),
                                         const SizedBox(width: 4),
                                         Text(
                                           isAr ? 'تقييم التجربة' : 'Rate Exp',
@@ -298,7 +395,11 @@ class _RecruitmentAllApplicationsScreenState extends State<RecruitmentAllApplica
     );
   }
 
-  void _showRatingDialog(BuildContext context, RecruitmentApplication app, bool isAr) {
+  void _showRatingDialog(
+    BuildContext context,
+    RecruitmentApplication app,
+    bool isAr,
+  ) {
     int localRating = 0;
     final controller = TextEditingController();
 
@@ -306,7 +407,9 @@ class _RecruitmentAllApplicationsScreenState extends State<RecruitmentAllApplica
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
           title: Text(
             isAr ? 'تقييم تجربة التوظيف' : 'Rate Your Experience',
             textAlign: TextAlign.center,
@@ -317,27 +420,31 @@ class _RecruitmentAllApplicationsScreenState extends State<RecruitmentAllApplica
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  isAr 
-                    ? 'تهانينا على قبولك في "${app.jobTitle}" مع "${app.companyName}"!\nيرجى تقييم تجربتك:'
-                    : 'Congratulations on being accepted for "${app.jobTitle}" at "${app.companyName}"!\nPlease rate your experience:',
+                  isAr
+                      ? 'تهانينا على قبولك في "${app.jobTitle}" مع "${app.companyName}"!\nيرجى تقييم تجربتك:'
+                      : 'Congratulations on being accepted for "${app.jobTitle}" at "${app.companyName}"!\nPlease rate your experience:',
                   textAlign: TextAlign.center,
                   style: const TextStyle(fontSize: 14),
                 ),
                 const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(5, (index) => SizedBox(
-                    width: 40,
-                    child: IconButton(
-                      icon: Icon(
-                        localRating > index ? Icons.star : Icons.star_border,
-                        color: Colors.orange,
-                        size: 28,
+                  children: List.generate(
+                    5,
+                    (index) => SizedBox(
+                      width: 40,
+                      child: IconButton(
+                        icon: Icon(
+                          localRating > index ? Icons.star : Icons.star_border,
+                          color: Colors.orange,
+                          size: 28,
+                        ),
+                        onPressed: () =>
+                            setDialogState(() => localRating = index + 1),
+                        padding: EdgeInsets.zero,
                       ),
-                      onPressed: () => setDialogState(() => localRating = index + 1),
-                      padding: EdgeInsets.zero,
                     ),
-                  )),
+                  ),
                 ),
                 const SizedBox(height: 15),
                 TextField(
@@ -345,8 +452,12 @@ class _RecruitmentAllApplicationsScreenState extends State<RecruitmentAllApplica
                   maxLines: 3,
                   style: const TextStyle(fontSize: 14),
                   decoration: InputDecoration(
-                    hintText: isAr ? 'اكتب تعليقك هنا...' : 'Write your feedback here...',
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    hintText: isAr
+                        ? 'اكتب تعليقك هنا...'
+                        : 'Write your feedback here...',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     filled: true,
                     fillColor: Colors.grey.withOpacity(0.05),
                     contentPadding: const EdgeInsets.all(12),
@@ -364,20 +475,36 @@ class _RecruitmentAllApplicationsScreenState extends State<RecruitmentAllApplica
               onPressed: () {
                 if (localRating == 0) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(isAr ? 'يرجى اختيار التقييم أولاً' : 'Please select a rating')),
+                    SnackBar(
+                      content: Text(
+                        isAr
+                            ? 'يرجى اختيار التقييم أولاً'
+                            : 'Please select a rating',
+                      ),
+                    ),
                   );
                   return;
                 }
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(isAr ? 'شكراً لتقييمك!' : 'Thank you for your feedback!'), backgroundColor: Colors.green),
+                  SnackBar(
+                    content: Text(
+                      isAr ? 'شكراً لتقييمك!' : 'Thank you for your feedback!',
+                    ),
+                    backgroundColor: Colors.green,
+                  ),
                 );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF142C66),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
               ),
-              child: Text(isAr ? 'إرسال' : 'Submit', style: const TextStyle(color: Colors.white)),
+              child: Text(
+                isAr ? 'إرسال' : 'Submit',
+                style: const TextStyle(color: Colors.white),
+              ),
             ),
           ],
         ),
@@ -393,7 +520,11 @@ class _RecruitmentAllApplicationsScreenState extends State<RecruitmentAllApplica
         margin: const EdgeInsets.symmetric(horizontal: 4),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          border: isSelected ? const Border(bottom: BorderSide(color: Color(0xFFFF7A2A), width: 3)) : null,
+          border: isSelected
+              ? const Border(
+                  bottom: BorderSide(color: Color(0xFFFF7A2A), width: 3),
+                )
+              : null,
         ),
         child: Text(
           label,

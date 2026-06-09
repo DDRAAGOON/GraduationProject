@@ -672,7 +672,8 @@ class _TechnicalScreenState extends State<TechnicalScreen> {
           (job) =>
               job.acceptedCount < job.capacity &&
               (job.category.toLowerCase() == _selectedCategory.toLowerCase() ||
-               (_selectedCategory.toLowerCase() == 'service' && job.category.toLowerCase() == 'tradesman')) &&
+                  (_selectedCategory.toLowerCase() == 'service' &&
+                      job.category.toLowerCase() == 'tradesman')) &&
               job.title.toLowerCase().contains(query),
         )
         .toList();

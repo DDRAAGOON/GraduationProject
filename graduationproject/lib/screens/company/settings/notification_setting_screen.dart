@@ -20,8 +20,9 @@ class CompanyNotificationSettingScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             OutlinedButton(
-              onPressed: () =>
-                  Navigator.of(context).pushNamed(AppRoutes.companyAppearanceDark),
+              onPressed: () => Navigator.of(
+                context,
+              ).pushNamed(AppRoutes.companyAppearanceDark),
               child: Text(t.tr(en: 'Appearance', ar: 'المظهر')),
             ),
             const SizedBox(height: 14),
@@ -31,10 +32,7 @@ class CompanyNotificationSettingScreen extends StatelessWidget {
                 ar: 'هذه الشاشة بسيطة عمدًا في التصميم.\nاستخدمها كنقطة دخول لتفضيلات الإشعارات.',
               ),
               style: TextStyle(
-                color: Theme.of(context)
-                    .colorScheme
-                    .onSurface
-                    .withOpacity(0.7),
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
               ),
             ),
           ],
@@ -43,4 +41,3 @@ class CompanyNotificationSettingScreen extends StatelessWidget {
     );
   }
 }
-

@@ -62,10 +62,13 @@ class _CompanySignUpScreenState extends State<CompanySignUpScreen> {
     final pass = _password.text;
     final confirm = _confirmPassword.text;
     setState(() {
-      _companyNameError = _companyName.text.trim().isNotEmpty ? null : t.required;
+      _companyNameError = _companyName.text.trim().isNotEmpty
+          ? null
+          : t.required;
       _emailError = email.contains('@') ? null : t.enterValidEmail;
-      _companyNumberError =
-          _companyNumber.text.trim().length >= 6 ? null : t.enterCompanyNumber;
+      _companyNumberError = _companyNumber.text.trim().length >= 6
+          ? null
+          : t.enterCompanyNumber;
       _passwordError = pass.length >= 8 ? null : t.min8Chars;
       _confirmPasswordError = confirm == pass ? null : t.passwordsNoMatch;
     });
@@ -80,7 +83,7 @@ class _CompanySignUpScreenState extends State<CompanySignUpScreen> {
   Future<void> _submit() async {
     if (!_validate()) return;
     setState(() => _loading = true);
-    
+
     try {
       await RecruitmentSyncService.instance.register(
         email: _email.text.trim(),
@@ -106,7 +109,9 @@ class _CompanySignUpScreenState extends State<CompanySignUpScreen> {
       if (!mounted) return;
 
       setState(() => _loading = false);
-      Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.companyWorkspace, (route) => false);
+      Navigator.of(
+        context,
+      ).pushNamedAndRemoveUntil(AppRoutes.companyWorkspace, (route) => false);
     } catch (e) {
       if (!mounted) return;
       setState(() => _loading = false);
@@ -124,9 +129,7 @@ class _CompanySignUpScreenState extends State<CompanySignUpScreen> {
       } else {
         msg = t.registrationFailed;
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(msg)),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
     }
   }
 
@@ -208,9 +211,9 @@ class _CompanySignUpScreenState extends State<CompanySignUpScreen> {
               Text(
                 t.companyNumber,
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
+                  fontWeight: FontWeight.w600,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
               ),
               const SizedBox(height: 8),
               IntlPhoneField(
@@ -245,7 +248,9 @@ class _CompanySignUpScreenState extends State<CompanySignUpScreen> {
                 dropdownDecoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                    color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.outline.withOpacity(0.3),
                   ),
                 ),
                 onChanged: (phone) {
@@ -312,7 +317,9 @@ class _CompanySignUpScreenState extends State<CompanySignUpScreen> {
             children: [
               Checkbox(
                 value: _agree,
-                onChanged: _loading ? null : (v) => setState(() => _agree = v ?? false),
+                onChanged: _loading
+                    ? null
+                    : (v) => setState(() => _agree = v ?? false),
               ),
               Expanded(
                 child: Text(
@@ -346,7 +353,9 @@ class _CompanySignUpScreenState extends State<CompanySignUpScreen> {
               Text(
                 t.alreadyRegistered,
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.7),
                 ),
               ),
               TextButton(

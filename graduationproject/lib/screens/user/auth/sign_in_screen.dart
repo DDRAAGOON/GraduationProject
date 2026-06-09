@@ -116,7 +116,9 @@ class _SignInScreenState extends State<SignInScreen> {
                       Text(
                         t.emailAddress,
                         style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withOpacity(0.7),
                           fontSize: 14,
                         ),
                       ),
@@ -133,28 +135,34 @@ class _SignInScreenState extends State<SignInScreen> {
                   const SizedBox(height: 8),
                   TextField(
                     controller: _emailController,
-                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
                     decoration: InputDecoration(
                       hintText: t.enterYourEmail,
-                      hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.38)),
+                      hintStyle: TextStyle(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withOpacity(0.38),
+                      ),
                       filled: true,
-                      fillColor: Theme.of(context).brightness == Brightness.dark 
-                        ? Colors.white.withOpacity(0.05) 
-                        : Colors.black.withOpacity(0.05),
+                      fillColor: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white.withOpacity(0.05)
+                          : Colors.black.withOpacity(0.05),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                         borderSide: BorderSide(
                           color: _emailError != null
-                               ? Colors.red
-                               : Theme.of(context).dividerColor.withOpacity(0.2),
+                              ? Colors.red
+                              : Theme.of(context).dividerColor.withOpacity(0.2),
                         ),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                         borderSide: BorderSide(
                           color: _emailError != null
-                               ? Colors.red
-                               : Theme.of(context).dividerColor.withOpacity(0.2),
+                              ? Colors.red
+                              : Theme.of(context).dividerColor.withOpacity(0.2),
                         ),
                       ),
                     ),
@@ -166,7 +174,9 @@ class _SignInScreenState extends State<SignInScreen> {
                       Text(
                         t.password,
                         style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withOpacity(0.7),
                           fontSize: 14,
                         ),
                       ),
@@ -184,20 +194,28 @@ class _SignInScreenState extends State<SignInScreen> {
                   TextField(
                     controller: _passwordController,
                     obscureText: _obscurePassword,
-                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
                     decoration: InputDecoration(
                       hintText: "•••••••••••",
-                      hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.38)),
+                      hintStyle: TextStyle(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withOpacity(0.38),
+                      ),
                       filled: true,
-                      fillColor: Theme.of(context).brightness == Brightness.dark 
-                        ? Colors.white.withOpacity(0.05) 
-                        : Colors.black.withOpacity(0.05),
+                      fillColor: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white.withOpacity(0.05)
+                          : Colors.black.withOpacity(0.05),
                       suffixIcon: IconButton(
                         icon: Icon(
                           _obscurePassword
-                               ? Icons.visibility_off_outlined
-                               : Icons.visibility_outlined,
-                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                              ? Icons.visibility_off_outlined
+                              : Icons.visibility_outlined,
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withOpacity(0.7),
                         ),
                         onPressed: () {
                           setState(() {
@@ -209,16 +227,16 @@ class _SignInScreenState extends State<SignInScreen> {
                         borderRadius: BorderRadius.circular(8),
                         borderSide: BorderSide(
                           color: _passwordError != null
-                               ? Colors.red
-                               : Theme.of(context).dividerColor.withOpacity(0.2),
+                              ? Colors.red
+                              : Theme.of(context).dividerColor.withOpacity(0.2),
                         ),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                         borderSide: BorderSide(
                           color: _passwordError != null
-                               ? Colors.red
-                               : Theme.of(context).dividerColor.withOpacity(0.2),
+                              ? Colors.red
+                              : Theme.of(context).dividerColor.withOpacity(0.2),
                         ),
                       ),
                     ),
@@ -237,7 +255,11 @@ class _SignInScreenState extends State<SignInScreen> {
                       },
                       child: Text(
                         t.forgotPassword,
-                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7)),
+                        style: TextStyle(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withOpacity(0.7),
+                        ),
                       ),
                     ),
                   ),
@@ -248,9 +270,15 @@ class _SignInScreenState extends State<SignInScreen> {
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
-                          Theme.of(context).colorScheme.primary.withOpacity(0.9),
-                          Theme.of(context).colorScheme.primary.withOpacity(0.7),
-                          Theme.of(context).colorScheme.primary.withOpacity(0.5),
+                          Theme.of(
+                            context,
+                          ).colorScheme.primary.withOpacity(0.9),
+                          Theme.of(
+                            context,
+                          ).colorScheme.primary.withOpacity(0.7),
+                          Theme.of(
+                            context,
+                          ).colorScheme.primary.withOpacity(0.5),
                         ],
                         begin: Alignment.centerLeft,
                         end: Alignment.centerRight,
@@ -335,7 +363,11 @@ class _SignInScreenState extends State<SignInScreen> {
                     children: [
                       Text(
                         isAr ? 'انشاء حساب الان' : t.dontHaveAccount,
-                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7)),
+                        style: TextStyle(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withOpacity(0.7),
+                        ),
                       ),
                       const SizedBox(width: 4),
                       GestureDetector(
@@ -361,18 +393,32 @@ class _SignInScreenState extends State<SignInScreen> {
                   const SizedBox(height: 40),
                   Row(
                     children: [
-                      Expanded(child: Divider(color: Theme.of(context).dividerColor.withOpacity(0.2))),
+                      Expanded(
+                        child: Divider(
+                          color: Theme.of(
+                            context,
+                          ).dividerColor.withOpacity(0.2),
+                        ),
+                      ),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 18.0),
                         child: Text(
                           t.orSignInWith,
                           style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.38),
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withOpacity(0.38),
                             fontSize: 16,
                           ),
                         ),
                       ),
-                      Expanded(child: Divider(color: Theme.of(context).dividerColor.withOpacity(0.2))),
+                      Expanded(
+                        child: Divider(
+                          color: Theme.of(
+                            context,
+                          ).dividerColor.withOpacity(0.2),
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 30),
@@ -380,7 +426,9 @@ class _SignInScreenState extends State<SignInScreen> {
                     child: Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black.withOpacity(0.05),
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white
+                            : Colors.black.withOpacity(0.05),
                         shape: BoxShape.circle,
                       ),
                       child: Image.asset(

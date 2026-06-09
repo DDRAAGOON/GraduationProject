@@ -47,7 +47,8 @@ class AppScaffold extends StatelessWidget {
     final hasTitle = title != null || titleWidget != null;
     final effectiveCenterTitle =
         centerTitle ?? (title != null || titleWidget != null);
-    final effectiveTitleWidget = titleWidget ??
+    final effectiveTitleWidget =
+        titleWidget ??
         (title == null
             ? null
             : Align(
@@ -117,8 +118,9 @@ class AppScaffold extends StatelessWidget {
         onPopInvokedWithResult: (didPop, _) {
           if (didPop) return;
           if (!isHomeTab) {
-            Navigator.of(context)
-                .pushReplacementNamed(AppRoutes.companyDashboard);
+            Navigator.of(
+              context,
+            ).pushReplacementNamed(AppRoutes.companyDashboard);
           }
         },
         child: scaffold,

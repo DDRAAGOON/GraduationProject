@@ -19,7 +19,7 @@ class AppException implements Exception {
   String toString() {
     return 'AppException: $messageEn ($messageAr) ${techDetails != null ? "[$techDetails]" : ""}';
   }
-  
+
   String localizedMessage(bool isAr) => isAr ? messageAr : messageEn;
 }
 
@@ -29,8 +29,10 @@ class ErrorHandler {
       return _handleDioException(error);
     } else if (error is SocketException) {
       return AppException(
-        messageEn: 'No Internet connection. Please check your network and try again.',
-        messageAr: 'لا يوجد اتصال بالإنترنت. يرجى التحقق من الشبكة والمحاولة مرة أخرى.',
+        messageEn:
+            'No Internet connection. Please check your network and try again.',
+        messageAr:
+            'لا يوجد اتصال بالإنترنت. يرجى التحقق من الشبكة والمحاولة مرة أخرى.',
       );
     } else if (error is AppException) {
       return error; // Already parsed
@@ -50,33 +52,47 @@ class ErrorHandler {
       case DioExceptionType.sendTimeout:
       case DioExceptionType.receiveTimeout:
         return AppException(
-          messageEn: 'Connection timed out. Please check your network and try again.',
-          messageAr: 'انتهت مهلة الاتصال. يرجى التحقق من الشبكة والمحاولة مرة أخرى.',
+          messageEn:
+              'Connection timed out. Please check your network and try again.',
+          messageAr:
+              'انتهت مهلة الاتصال. يرجى التحقق من الشبكة والمحاولة مرة أخرى.',
         );
       case DioExceptionType.badResponse:
         final statusCode = error.response?.statusCode;
         final responseData = error.response?.data;
-        
+
         // Extract server message if available
         String? serverMsgEn;
         String? serverMsgAr;
         if (responseData is Map<String, dynamic>) {
-          serverMsgEn = responseData['message']?.toString() ?? responseData['error']?.toString();
+          serverMsgEn =
+              responseData['message']?.toString() ??
+              responseData['error']?.toString();
           // Assuming the server might return 'messageAr' if implemented, otherwise fallback to messageEn
-          serverMsgAr = responseData['messageAr']?.toString() ?? responseData['message']?.toString() ?? responseData['error']?.toString();
+          serverMsgAr =
+              responseData['messageAr']?.toString() ??
+              responseData['message']?.toString() ??
+              responseData['error']?.toString();
         }
 
         switch (statusCode) {
           case 400:
             return AppException(
-              messageEn: serverMsgEn ?? 'Bad request. Please check the entered data.',
-              messageAr: serverMsgAr ?? 'طلب غير صالح. يرجى التحقق من البيانات المدخلة.',
+              messageEn:
+                  serverMsgEn ?? 'Bad request. Please check the entered data.',
+              messageAr:
+                  serverMsgAr ??
+                  'طلب غير صالح. يرجى التحقق من البيانات المدخلة.',
             );
           case 401:
           case 403:
             return AppException(
-              messageEn: serverMsgEn ?? 'Session expired or invalid credentials. Please log in again.',
-              messageAr: serverMsgAr ?? 'انتهت الجلسة أو بيانات الدخول غير صالحة. يرجى تسجيل الدخول مرة أخرى.',
+              messageEn:
+                  serverMsgEn ??
+                  'Session expired or invalid credentials. Please log in again.',
+              messageAr:
+                  serverMsgAr ??
+                  'انتهت الجلسة أو بيانات الدخول غير صالحة. يرجى تسجيل الدخول مرة أخرى.',
             );
           case 404:
             return AppException(
@@ -95,7 +111,8 @@ class ErrorHandler {
             );
           default:
             return AppException(
-              messageEn: serverMsgEn ?? 'Something went wrong. Please try again.',
+              messageEn:
+                  serverMsgEn ?? 'Something went wrong. Please try again.',
               messageAr: serverMsgAr ?? 'حدث خطأ ما. يرجى المحاولة مرة أخرى.',
               techDetails: 'Status code: $statusCode',
             );
@@ -107,15 +124,19 @@ class ErrorHandler {
         );
       case DioExceptionType.connectionError:
         return AppException(
-          messageEn: 'Failed to connect to the server. Please check your internet connection.',
-          messageAr: 'فشل الاتصال بالخادم. يرجى التحقق من اتصال الإنترنت الخاص بك.',
+          messageEn:
+              'Failed to connect to the server. Please check your internet connection.',
+          messageAr:
+              'فشل الاتصال بالخادم. يرجى التحقق من اتصال الإنترنت الخاص بك.',
         );
       case DioExceptionType.unknown:
       default:
         if (error.error is SocketException) {
           return AppException(
-            messageEn: 'No Internet connection. Please check your network and try again.',
-            messageAr: 'لا يوجد اتصال بالإنترنت. يرجى التحقق من الشبكة والمحاولة مرة أخرى.',
+            messageEn:
+                'No Internet connection. Please check your network and try again.',
+            messageAr:
+                'لا يوجد اتصال بالإنترنت. يرجى التحقق من الشبكة والمحاولة مرة أخرى.',
           );
         }
         return AppException(
@@ -126,14 +147,16 @@ class ErrorHandler {
         );
     }
   }
-  
+
   static void logError(String context, dynamic error) {
     if (kReleaseMode) {
       // In production, only log critical errors cleanly
       if (error is AppException && error.isCritical) {
-         debugPrint('[JOBITO-ERROR] $context: ${error.messageEn} | Tech Details: ${error.techDetails}');
+        debugPrint(
+          '[JOBITO-ERROR] $context: ${error.messageEn} | Tech Details: ${error.techDetails}',
+        );
       } else if (error is! AppException) {
-         debugPrint('[JOBITO-ERROR] $context: Unhandled Exception -> $error');
+        debugPrint('[JOBITO-ERROR] $context: Unhandled Exception -> $error');
       }
     } else {
       // In debug mode, log everything

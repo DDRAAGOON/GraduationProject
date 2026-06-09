@@ -14,9 +14,9 @@ class ApiInterceptors extends Interceptor {
 
   @override
   void onRequest(
-      RequestOptions options,
-      RequestInterceptorHandler handler,
-      ) async {
+    RequestOptions options,
+    RequestInterceptorHandler handler,
+  ) async {
     final token = await SecureStorage.getToken();
     final lang = await SecureStorage.getLang();
 
@@ -39,7 +39,9 @@ class ApiInterceptors extends Interceptor {
   void onResponse(Response response, ResponseInterceptorHandler handler) {
     // ✅ Logging الاستجابات الناجحة
     if (kDebugMode) {
-      debugPrint('✅ API Response: ${response.statusCode} ${response.requestOptions.uri}');
+      debugPrint(
+        '✅ API Response: ${response.statusCode} ${response.requestOptions.uri}',
+      );
     }
     super.onResponse(response, handler);
   }
@@ -48,7 +50,9 @@ class ApiInterceptors extends Interceptor {
   void onError(DioException err, ErrorInterceptorHandler handler) {
     // ✅ Logging الأخطاء
     if (kDebugMode) {
-      debugPrint('❌ API Error: ${err.response?.statusCode} ${err.requestOptions.uri}');
+      debugPrint(
+        '❌ API Error: ${err.response?.statusCode} ${err.requestOptions.uri}',
+      );
       debugPrint('📝 Error Message: ${err.message}');
     }
 
@@ -56,14 +60,12 @@ class ApiInterceptors extends Interceptor {
     if (err.response?.statusCode == 401) {
       _handleUnauthorized();
     }
-
     // ✅ التعامل مع خطأ 403 (غير مصرح)
     else if (err.response?.statusCode == 403) {
       if (kDebugMode) {
         debugPrint('⚠️ Access Denied: ${err.requestOptions.uri}');
       }
     }
-
     // ✅ التعامل مع أخطاء السيرفر (500, 502, 503)
     else if (err.response?.statusCode != null &&
         err.response!.statusCode! >= 500) {
@@ -88,11 +90,12 @@ class ApiInterceptors extends Interceptor {
     final nav = navigatorKey?.currentState;
     if (nav != null) {
       // ✅ التحقق من أن المستخدم ليس بالفعل في شاشة الدخول
-      final currentRoute = nav.context.findAncestorStateOfType<NavigatorState>();
+      final currentRoute = nav.context
+          .findAncestorStateOfType<NavigatorState>();
 
       nav.pushNamedAndRemoveUntil(
         AppRoutes.companyLogin,
-            (route) => false, // إزالة جميع الشاشات من الـ stack
+        (route) => false, // إزالة جميع الشاشات من الـ stack
       );
     } else {
       if (kDebugMode) {

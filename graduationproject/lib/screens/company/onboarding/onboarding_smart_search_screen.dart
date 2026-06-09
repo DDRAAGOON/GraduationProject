@@ -14,11 +14,15 @@ class CompanyOnboardingSmartSearchScreen extends StatelessWidget {
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: ThemeController.instance.themeMode,
       builder: (context, themeMode, _) {
-        final isDark = themeMode == ThemeMode.dark || 
-                      (themeMode == ThemeMode.system && MediaQuery.platformBrightnessOf(context) == Brightness.dark);
-        
+        final isDark =
+            themeMode == ThemeMode.dark ||
+            (themeMode == ThemeMode.system &&
+                MediaQuery.platformBrightnessOf(context) == Brightness.dark);
+
         return Scaffold(
-          backgroundColor: isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4),
+          backgroundColor: isDark
+              ? const Color(0xFF001E3A)
+              : const Color(0xFFF8FBF4),
           body: Stack(
             children: [
               Positioned(
@@ -35,7 +39,7 @@ class CompanyOnboardingSmartSearchScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              
+
               SafeArea(
                 child: Column(
                   children: [
@@ -45,11 +49,12 @@ class CompanyOnboardingSmartSearchScreen extends StatelessWidget {
                         'assets/company/Onboarding/Onboarding-1.png',
                         height: size.height * 0.3,
                         fit: BoxFit.contain,
-                        errorBuilder: (context, error, stackTrace) => const Icon(
-                          Icons.post_add_rounded,
-                          size: 100,
-                          color: Colors.white,
-                        ),
+                        errorBuilder: (context, error, stackTrace) =>
+                            const Icon(
+                              Icons.post_add_rounded,
+                              size: 100,
+                              color: Colors.white,
+                            ),
                       ),
                     ),
                     const Spacer(flex: 2),
@@ -87,7 +92,10 @@ class CompanyOnboardingSmartSearchScreen extends StatelessWidget {
                     ),
                     const Spacer(flex: 3),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 32,
+                      ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -98,7 +106,9 @@ class CompanyOnboardingSmartSearchScreen extends StatelessWidget {
                             ),
                           ),
                           _buildNextButton(() {
-                            Navigator.of(context).pushNamed(AppRoutes.companyOnboardingNextJobCloser);
+                            Navigator.of(context).pushNamed(
+                              AppRoutes.companyOnboardingNextJobCloser,
+                            );
                           }, t),
                         ],
                       ),
@@ -120,9 +130,7 @@ class CompanyOnboardingSmartSearchScreen extends StatelessWidget {
         backgroundColor: const Color(0xFF142C66),
         foregroundColor: Colors.white,
         padding: const EdgeInsets.symmetric(horizontal: 45, vertical: 16),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(25),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
         elevation: 5,
       ),
       child: Text(

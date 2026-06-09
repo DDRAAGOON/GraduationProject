@@ -25,19 +25,25 @@ class CompanySettingsScreen extends StatelessWidget {
                 _SettingTile(
                   title: t.profileSettings,
                   icon: Icons.person_outline,
-                  onTap: () => Navigator.of(context).pushNamed(AppRoutes.companyProfileOverview),
+                  onTap: () => Navigator.of(
+                    context,
+                  ).pushNamed(AppRoutes.companyProfileOverview),
                 ),
                 const SizedBox(height: 8),
                 _SettingTile(
                   title: t.accountSecurity,
                   icon: Icons.security_outlined,
-                  onTap: () => Navigator.of(context).pushNamed(AppRoutes.companyAccountSecurity),
+                  onTap: () => Navigator.of(
+                    context,
+                  ).pushNamed(AppRoutes.companyAccountSecurity),
                 ),
                 const SizedBox(height: 8),
                 _SettingTile(
                   title: t.tr(en: 'Appearance', ar: 'المظهر'),
                   icon: Icons.palette_outlined,
-                  onTap: () => Navigator.of(context).pushNamed(AppRoutes.companyAppearanceLight),
+                  onTap: () => Navigator.of(
+                    context,
+                  ).pushNamed(AppRoutes.companyAppearanceLight),
                 ),
               ],
             ),
@@ -48,11 +54,16 @@ class CompanySettingsScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 TextButton.icon(
-                  onPressed: () => Navigator.of(context).pushNamed(AppRoutes.companyHelpCenter),
+                  onPressed: () => Navigator.of(
+                    context,
+                  ).pushNamed(AppRoutes.companyHelpCenter),
                   icon: const Icon(Icons.info_outline),
                   label: Text(
                     t.helpCenter,
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   style: TextButton.styleFrom(
                     foregroundColor: const Color(0xFFFF6C52),
@@ -65,13 +76,18 @@ class CompanySettingsScreen extends StatelessWidget {
                     await RecruitmentSyncService.instance.logout();
                     if (context.mounted) {
                       Navigator.of(context).pushNamedAndRemoveUntil(
-                          AppRoutes.roleSelection, (route) => false);
+                        AppRoutes.roleSelection,
+                        (route) => false,
+                      );
                     }
                   },
                   icon: const Icon(Icons.logout),
                   label: Text(
                     t.tr(en: 'Logout', ar: 'تسجيل خروج'),
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   style: TextButton.styleFrom(
                     foregroundColor: const Color(0xFFFF6C52),
@@ -102,7 +118,9 @@ class _SettingTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 0,
-      color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3),
+      color: Theme.of(
+        context,
+      ).colorScheme.surfaceContainerHighest.withOpacity(0.3),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: ListTile(
         leading: Icon(icon, color: Theme.of(context).colorScheme.primary),

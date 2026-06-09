@@ -100,10 +100,16 @@ class CompanyHelpCenterScreen extends StatelessWidget {
           const SizedBox(height: 18),
           Card(
             elevation: 0,
-            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
+            color: Theme.of(
+              context,
+            ).colorScheme.primary.withValues(alpha: 0.05),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
-              side: BorderSide(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1)),
+              side: BorderSide(
+                color: Theme.of(
+                  context,
+                ).colorScheme.primary.withValues(alpha: 0.1),
+              ),
             ),
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -114,16 +120,23 @@ class CompanyHelpCenterScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          t.tr(en: "Didn't find what you were looking for?", ar: 'لم تجد ما كنت تبحث عنه؟'),
-                          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                                fontWeight: FontWeight.w800,
-                              ),
+                          t.tr(
+                            en: "Didn't find what you were looking for?",
+                            ar: 'لم تجد ما كنت تبحث عنه؟',
+                          ),
+                          style: Theme.of(context).textTheme.titleSmall
+                              ?.copyWith(fontWeight: FontWeight.w800),
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          t.tr(en: 'Contact our customer service', ar: 'اتصل بخدمة العملاء'),
+                          t.tr(
+                            en: 'Contact our customer service',
+                            ar: 'اتصل بخدمة العملاء',
+                          ),
                           style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withValues(alpha: 0.7),
                             fontSize: 13,
                           ),
                         ),
@@ -165,7 +178,9 @@ class _FaqTileState extends State<_FaqTile> {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(18),
-        side: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
+        side: BorderSide(
+          color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
+        ),
       ),
       child: InkWell(
         onTap: () => setState(() => _expanded = !_expanded),
@@ -180,11 +195,16 @@ class _FaqTileState extends State<_FaqTile> {
                   Expanded(
                     child: Text(
                       widget.title,
-                      style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 15,
+                      ),
                     ),
                   ),
                   Icon(
-                    _expanded ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded,
+                    _expanded
+                        ? Icons.keyboard_arrow_up_rounded
+                        : Icons.keyboard_arrow_down_rounded,
                     color: Theme.of(context).colorScheme.primary,
                   ),
                 ],
@@ -194,7 +214,9 @@ class _FaqTileState extends State<_FaqTile> {
                 Text(
                   widget.body,
                   style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.7),
                     height: 1.5,
                   ),
                 ),
@@ -202,12 +224,29 @@ class _FaqTileState extends State<_FaqTile> {
                 Row(
                   children: [
                     Text(
-                        t.tr(en: 'Was this article helpful?', ar: 'هل كان هذا المقال مفيداً؟'),
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 11),
+                      t.tr(
+                        en: 'Was this article helpful?',
+                        ar: 'هل كان هذا المقال مفيداً؟',
+                      ),
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodySmall?.copyWith(fontSize: 11),
                     ),
                     const Spacer(),
-                    TextButton(onPressed: () {}, child: Text(t.tr(en: 'Yes', ar: 'نعم'), style: const TextStyle(fontSize: 12))),
-                    TextButton(onPressed: () {}, child: Text(t.tr(en: 'No', ar: 'لا'), style: const TextStyle(fontSize: 12, color: Colors.red))),
+                    TextButton(
+                      onPressed: () {},
+                      child: Text(
+                        t.tr(en: 'Yes', ar: 'نعم'),
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () {},
+                      child: Text(
+                        t.tr(en: 'No', ar: 'لا'),
+                        style: const TextStyle(fontSize: 12, color: Colors.red),
+                      ),
+                    ),
                   ],
                 ),
               ],

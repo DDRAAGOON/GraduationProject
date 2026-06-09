@@ -4,15 +4,9 @@ class LoginRequest {
   final String email;
   final String password;
 
-  LoginRequest({
-    required this.email,
-    required this.password,
-  });
+  LoginRequest({required this.email, required this.password});
 
-  Map<String, dynamic> toJson() => {
-    'email': email,
-    'password': password,
-  };
+  Map<String, dynamic> toJson() => {'email': email, 'password': password};
 }
 
 class RegisterRequest {
@@ -46,7 +40,12 @@ class AuthResponse {
   AuthResponse({required this.token, required this.user});
 
   factory AuthResponse.fromJson(Map<String, dynamic> json) {
-    String token = json['token'] ?? json['jwtToken'] ?? json['access_token'] ?? json['accessToken'] ?? '';
+    String token =
+        json['token'] ??
+        json['jwtToken'] ??
+        json['access_token'] ??
+        json['accessToken'] ??
+        '';
 
     Map<String, dynamic> userJson = json['user'] ?? json;
 
@@ -70,10 +69,7 @@ class AuthResponse {
       }
     }
 
-    return AuthResponse(
-      token: token,
-      user: User.fromJson(userJson),
-    );
+    return AuthResponse(token: token, user: User.fromJson(userJson));
   }
 }
 
@@ -103,7 +99,9 @@ class User {
       fullName: json['fullName'] ?? json['name'],
       email: json['email'] ?? '',
       photoUrl: json['photoUrl'] ?? json['picture'],
-      mSkills: json['skills'] != null ? List<String>.from(json['skills']) : null,
+      mSkills: json['skills'] != null
+          ? List<String>.from(json['skills'])
+          : null,
       mBio: json['bio'],
     );
   }

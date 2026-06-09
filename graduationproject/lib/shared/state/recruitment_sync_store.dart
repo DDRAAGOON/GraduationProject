@@ -90,13 +90,17 @@ class RecruitmentJob {
       id: map['jobId']?.toString() ?? map['id']?.toString() ?? '',
 
       // ✅ استخدام company أو user
-      companyId: companyData?['companyId']?.toString() ??
-          userData?['userId']?.toString() ?? '',
+      companyId:
+          companyData?['companyId']?.toString() ??
+          userData?['userId']?.toString() ??
+          '',
 
       title: map['title']?.toString() ?? '',
 
-      companyName: companyData?['name']?.toString() ??
-          userData?['fullName']?.toString() ?? '',
+      companyName:
+          companyData?['name']?.toString() ??
+          userData?['fullName']?.toString() ??
+          '',
 
       location: map['address']?.toString() ?? map['location']?.toString() ?? '',
 
@@ -109,13 +113,18 @@ class RecruitmentJob {
       niceToHaves: _extractList(map['niceToHaves']),
       benefits: _extractList(map['benefits']),
 
-      category: map['category']?.toString() ?? map['classification']?.toString() ?? 'General',
+      category:
+          map['category']?.toString() ??
+          map['classification']?.toString() ??
+          'General',
       tags: _extractList(map['skills'] ?? map['tags']),
 
       capacity: map['slotsAvailable'] ?? 1,
       acceptedCount: map['acceptedCount'] ?? 0,
 
-      status: (map['isActive'] == true || map['isActive'] == 'true') ? 'Open' : 'Closed',
+      status: (map['isActive'] == true || map['isActive'] == 'true')
+          ? 'Open'
+          : 'Closed',
 
       publishedAt: map['createdAt'] != null
           ? DateTime.tryParse(map['createdAt']) ?? DateTime.now()
@@ -194,27 +203,39 @@ class RecruitmentApplication {
 
     // ✅ استخراج البيانات من job object
     final jobData = map['job'] is Map ? map['job'] as Map : {};
-    final jobCompanyData = jobData['company'] is Map ? jobData['company'] as Map : {};
+    final jobCompanyData = jobData['company'] is Map
+        ? jobData['company'] as Map
+        : {};
 
     return RecruitmentApplication(
       // ✅ استخدام applicationId بدلاً من id
       id: map['applicationId']?.toString() ?? map['id']?.toString() ?? '',
 
       // ✅ استخدام jobId من الـ map أو من job object
-      jobId: map['jobId']?.toString() ?? jobData['jobId']?.toString() ?? jobData['id']?.toString() ?? '',
+      jobId:
+          map['jobId']?.toString() ??
+          jobData['jobId']?.toString() ??
+          jobData['id']?.toString() ??
+          '',
 
       // ✅ استخراج jobTitle من job object
-      jobTitle: jobData['title']?.toString() ?? map['jobTitle']?.toString() ?? '',
+      jobTitle:
+          jobData['title']?.toString() ?? map['jobTitle']?.toString() ?? '',
 
       // ✅ استخراج companyName من job.company object
-      companyName: jobCompanyData['name']?.toString() ??
+      companyName:
+          jobCompanyData['name']?.toString() ??
           jobCompanyData['companyName']?.toString() ??
-          map['companyName']?.toString() ?? '',
+          map['companyName']?.toString() ??
+          '',
 
       // ✅ استخراج userName من user object
-      userName: userData['fullName']?.toString() ??
-          '${userData['firstName'] ?? ''} ${userData['lastName'] ?? ''}'.trim() ??
-          map['userName']?.toString() ?? 'Unknown',
+      userName:
+          userData['fullName']?.toString() ??
+          '${userData['firstName'] ?? ''} ${userData['lastName'] ?? ''}'
+              .trim() ??
+          map['userName']?.toString() ??
+          'Unknown',
 
       status: map['status']?.toString() ?? 'Pending',
 
@@ -225,7 +246,8 @@ class RecruitmentApplication {
       // ✅ استخراج البيانات من user object
       email: userData['email']?.toString() ?? map['email']?.toString(),
       phone: userData['phone']?.toString() ?? map['phone']?.toString(),
-      location: userData['location']?.toString() ??
+      location:
+          userData['location']?.toString() ??
           userData['address']?.toString() ??
           map['location']?.toString(),
 
@@ -399,7 +421,7 @@ class RecruitmentSyncStore extends ChangeNotifier {
   final List<RecruitmentMessage> _messages = <RecruitmentMessage>[];
   final List<ChatThread> _tradesmanChatThreads = <ChatThread>[];
   final List<PendingTradesmanRating> _pendingTradesmanRatings =
-  <PendingTradesmanRating>[];
+      <PendingTradesmanRating>[];
   final Map<String, String> _tradesmanJobStatusOverrides = <String, String>{};
 
   String? _backgroundImage;
@@ -410,9 +432,9 @@ class RecruitmentSyncStore extends ChangeNotifier {
   List<String> _languages = <String>[];
   List<String> _tradesmanServices = <String>[];
   final List<TradesmanRatingEntry> _ratingsFromClients =
-  <TradesmanRatingEntry>[];
+      <TradesmanRatingEntry>[];
   final List<TradesmanRatingEntry> _ratingsGivenByTradesman =
-  <TradesmanRatingEntry>[];
+      <TradesmanRatingEntry>[];
   final Set<String> _savedJobIds = <String>{};
   final Set<String> _deletedJobIds = <String>{};
   final List<ServiceRequestPost> _serviceRequests = <ServiceRequestPost>[];
@@ -515,24 +537,24 @@ class RecruitmentSyncStore extends ChangeNotifier {
 
       final matchesQuery =
           query.isEmpty ||
-              job.title.toLowerCase().contains(query) ||
-              job.companyName.toLowerCase().contains(query);
+          job.title.toLowerCase().contains(query) ||
+          job.companyName.toLowerCase().contains(query);
       final matchesLocation =
           _filterLocation == 'All' ||
-              job.location.toLowerCase() == _filterLocation.toLowerCase();
+          job.location.toLowerCase() == _filterLocation.toLowerCase();
       final jobCat = job.category.toLowerCase();
       final filterCat = _filterCategory.toLowerCase();
       final matchesCategory =
           _filterCategory == 'All' ||
-              jobCat == filterCat ||
-              (filterCat == 'service' &&
-                  (jobCat == 'service' || jobCat == 'tradesman'));
+          jobCat == filterCat ||
+          (filterCat == 'service' &&
+              (jobCat == 'service' || jobCat == 'tradesman'));
       final matchesType =
           _filterType == 'All' ||
-              job.type.toLowerCase() == _filterType.toLowerCase();
+          job.type.toLowerCase() == _filterType.toLowerCase();
       final matchesSalary =
           _filterSalaryRange == 'All' ||
-              job.salaryRange.toLowerCase() == _filterSalaryRange.toLowerCase();
+          job.salaryRange.toLowerCase() == _filterSalaryRange.toLowerCase();
       return matchesQuery &&
           matchesLocation &&
           matchesCategory &&
@@ -557,13 +579,13 @@ class RecruitmentSyncStore extends ChangeNotifier {
   }
 
   void applyToJob(
-      RecruitmentJob job, {
-        String? about,
-        String? location,
-        String? email,
-        String? phone,
-        bool hasCv = false,
-      }) {
+    RecruitmentJob job, {
+    String? about,
+    String? location,
+    String? email,
+    String? phone,
+    bool hasCv = false,
+  }) {
     final alreadyApplied = _applications.any((a) => a.jobId == job.id);
     if (!alreadyApplied) {
       final newApp = RecruitmentApplication(
@@ -601,11 +623,7 @@ class RecruitmentSyncStore extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updateNotificationSettings({
-    bool? email,
-    bool? jobs,
-    bool? updates,
-  }) {
+  void updateNotificationSettings({bool? email, bool? jobs, bool? updates}) {
     if (email != null) _emailNotifications = email;
     if (jobs != null) _jobAlerts = jobs;
     if (updates != null) _applicationUpdates = updates;
@@ -730,7 +748,7 @@ class RecruitmentSyncStore extends ChangeNotifier {
     required String applicationId,
   }) {
     _pendingTradesmanRatings.removeWhere(
-          (r) => r.applicationId == applicationId,
+      (r) => r.applicationId == applicationId,
     );
     final random = Random();
     final maxSeconds = 24 * 60 * 60;
@@ -749,7 +767,7 @@ class RecruitmentSyncStore extends ChangeNotifier {
   PendingTradesmanRating? consumeDueTradesmanRating() {
     final now = DateTime.now();
     final index = _pendingTradesmanRatings.indexWhere(
-          (r) => !r.showAt.isAfter(now),
+      (r) => !r.showAt.isAfter(now),
     );
     if (index == -1) return null;
     final rating = _pendingTradesmanRatings.removeAt(index);

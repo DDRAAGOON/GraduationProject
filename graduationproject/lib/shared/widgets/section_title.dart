@@ -15,9 +15,9 @@ class SectionTitle extends StatelessWidget {
         Expanded(
           child: Text(
             text,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
           ),
         ),
         trailing ?? const SizedBox.shrink(),
@@ -25,4 +25,3 @@ class SectionTitle extends StatelessWidget {
     );
   }
 }
-

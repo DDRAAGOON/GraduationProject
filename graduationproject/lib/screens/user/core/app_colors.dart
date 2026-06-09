@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 class AppColors {
@@ -16,7 +15,6 @@ class AppColors {
   static const gradientPrimary = [
     Color(0xFF001E3A),
     Color(0xFF094174),
-    Color.fromARGB(255, 118, 159, 178)
+    Color.fromARGB(255, 118, 159, 178),
   ];
-
 }

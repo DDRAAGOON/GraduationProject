@@ -109,29 +109,34 @@ class _CompanyNewChatScreenState extends State<CompanyNewChatScreen> {
                 prefixIcon: const Icon(Icons.search),
                 suffixIcon: _isSearching
                     ? const Padding(
-                  padding: EdgeInsets.all(12.0),
-                  child: SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  ),
-                )
+                        padding: EdgeInsets.all(12.0),
+                        child: SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      )
                     : _searchController.text.isNotEmpty
                     ? IconButton(
-                  icon: const Icon(Icons.clear),
-                  onPressed: () {
-                    _searchController.clear();
-                    _searchUsers('');
-                  },
-                )
+                        icon: const Icon(Icons.clear),
+                        onPressed: () {
+                          _searchController.clear();
+                          _searchUsers('');
+                        },
+                      )
                     : null,
                 filled: true,
-                fillColor: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                fillColor: Theme.of(
+                  context,
+                ).colorScheme.surfaceContainerHighest.withOpacity(0.3),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
                 ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
               ),
             ),
           ),
@@ -142,101 +147,110 @@ class _CompanyNewChatScreenState extends State<CompanyNewChatScreen> {
                 ? const Center(child: CircularProgressIndicator())
                 : _searchResults.isEmpty
                 ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.search_off,
-                    size: 64,
-                    color: Colors.grey.withOpacity(0.5),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    _searchController.text.isEmpty
-                        ? 'ابحث عن مستخدمين بالاسم أو الإيميل'
-                        : 'لا توجد نتائج',
-                    style: TextStyle(
-                      color: Colors.grey.withOpacity(0.7),
-                      fontSize: 16,
-                    ),
-                  ),
-                ],
-              ),
-            )
-                : ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: _searchResults.length,
-              itemBuilder: (context, index) {
-                final user = _searchResults[index];
-
-                // ✅ التحقق من صحة الـ photoUrl
-                final bool hasValidPhoto = user.photoUrl != null &&
-                    user.photoUrl!.isNotEmpty &&
-                    (user.photoUrl!.startsWith('http://') ||
-                        user.photoUrl!.startsWith('https://'));
-
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 8),
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    side: BorderSide(color: Colors.grey.withOpacity(0.1)),
-                  ),
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      radius: 20,
-                      backgroundImage: hasValidPhoto
-                          ? NetworkImage(user.photoUrl!)
-                          : null,
-                      backgroundColor: Colors.blue.withOpacity(0.1),
-                      child: !hasValidPhoto
-                          ? Text(
-                        user.name.isNotEmpty ? user.name[0].toUpperCase() : '?',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.blue,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.search_off,
+                          size: 64,
+                          color: Colors.grey.withOpacity(0.5),
                         ),
-                      )
-                          : null,
+                        const SizedBox(height: 16),
+                        Text(
+                          _searchController.text.isEmpty
+                              ? 'ابحث عن مستخدمين بالاسم أو الإيميل'
+                              : 'لا توجد نتائج',
+                          style: TextStyle(
+                            color: Colors.grey.withOpacity(0.7),
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
                     ),
-                    title: Text(
-                      user.name,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    subtitle: Text(
-                      user.email,
-                      style: const TextStyle(fontSize: 12),
-                    ),
-                    trailing: user.role != null
-                        ? Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Colors.blue.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        user.role!,
-                        style: const TextStyle(fontSize: 10, color: Colors.blue),
-                      ),
-                    )
-                        : null,
-                    onTap: () {
-                      final thread = MessageThread(
-                        id: 'thread_${user.id}',
-                        title: user.name,
-                        subtitle: t.startNewConversation,
-                        lastTimeLabelEn: 'Now',
-                        lastTimeLabelAr: 'الآن',
-                      );
-                      Navigator.of(context).pushReplacementNamed(
-                        AppRoutes.companyChatThread,
-                        arguments: thread,
+                  )
+                : ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: _searchResults.length,
+                    itemBuilder: (context, index) {
+                      final user = _searchResults[index];
+
+                      // ✅ التحقق من صحة الـ photoUrl
+                      final bool hasValidPhoto =
+                          user.photoUrl != null &&
+                          user.photoUrl!.isNotEmpty &&
+                          (user.photoUrl!.startsWith('http://') ||
+                              user.photoUrl!.startsWith('https://'));
+
+                      return Card(
+                        margin: const EdgeInsets.only(bottom: 8),
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: BorderSide(color: Colors.grey.withOpacity(0.1)),
+                        ),
+                        child: ListTile(
+                          leading: CircleAvatar(
+                            radius: 20,
+                            backgroundImage: hasValidPhoto
+                                ? NetworkImage(user.photoUrl!)
+                                : null,
+                            backgroundColor: Colors.blue.withOpacity(0.1),
+                            child: !hasValidPhoto
+                                ? Text(
+                                    user.name.isNotEmpty
+                                        ? user.name[0].toUpperCase()
+                                        : '?',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.blue,
+                                    ),
+                                  )
+                                : null,
+                          ),
+                          title: Text(
+                            user.name,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          subtitle: Text(
+                            user.email,
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                          trailing: user.role != null
+                              ? Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.blue.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    user.role!,
+                                    style: const TextStyle(
+                                      fontSize: 10,
+                                      color: Colors.blue,
+                                    ),
+                                  ),
+                                )
+                              : null,
+                          onTap: () {
+                            final thread = MessageThread(
+                              id: 'thread_${user.id}',
+                              title: user.name,
+                              subtitle: t.startNewConversation,
+                              lastTimeLabelEn: 'Now',
+                              lastTimeLabelAr: 'الآن',
+                            );
+                            Navigator.of(context).pushReplacementNamed(
+                              AppRoutes.companyChatThread,
+                              arguments: thread,
+                            );
+                          },
+                        ),
                       );
                     },
                   ),
-                );
-              },
-            ),
           ),
         ],
       ),

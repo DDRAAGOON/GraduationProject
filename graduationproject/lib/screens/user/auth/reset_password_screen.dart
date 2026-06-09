@@ -34,14 +34,18 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
-    
+
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: ThemeController.instance.themeMode,
       builder: (context, themeMode, _) {
-        final isDark = themeMode == ThemeMode.dark || 
-                      (themeMode == ThemeMode.system && MediaQuery.platformBrightnessOf(context) == Brightness.dark);
-        
-        final backgroundColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
+        final isDark =
+            themeMode == ThemeMode.dark ||
+            (themeMode == ThemeMode.system &&
+                MediaQuery.platformBrightnessOf(context) == Brightness.dark);
+
+        final backgroundColor = isDark
+            ? const Color(0xFF001E3A)
+            : const Color(0xFFF8FBF4);
         final textColorPrimary = isDark ? Colors.white : Colors.black;
 
         return Scaffold(
@@ -50,22 +54,29 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
             backgroundColor: Colors.transparent,
             elevation: 0,
             leading: IconButton(
-              icon: Icon(Icons.arrow_back_ios, color: isDark ? Colors.white70 : Colors.black54, size: 20),
+              icon: Icon(
+                Icons.arrow_back_ios,
+                color: isDark ? Colors.white70 : Colors.black54,
+                size: 20,
+              ),
               onPressed: () => Navigator.pop(context),
             ),
             title: Text(
               t.resetPassword,
               style: const TextStyle(
-                color: Color(0xFFF77F32), 
-                fontSize: 20, 
-                fontWeight: FontWeight.bold
+                color: Color(0xFFF77F32),
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
               ),
             ),
             centerTitle: true,
           ),
           body: SafeArea(
             child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 24.0,
+                vertical: 20,
+              ),
               children: [
                 const SizedBox(height: 20),
                 // Main Heading
@@ -79,12 +90,12 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                     ),
                     children: [
                       TextSpan(
-                        text: t.isAr ? 'إعادة تعيين ' : 'Reset ', 
-                        style: const TextStyle(color: Color(0xFFF77F32))
+                        text: t.isAr ? 'إعادة تعيين ' : 'Reset ',
+                        style: const TextStyle(color: Color(0xFFF77F32)),
                       ),
                       TextSpan(
-                        text: t.isAr ? 'كلمة المرور' : 'Password', 
-                        style: const TextStyle(color: Color(0xFF0051DD))
+                        text: t.isAr ? 'كلمة المرور' : 'Password',
+                        style: const TextStyle(color: Color(0xFF0051DD)),
                       ),
                     ],
                   ),
@@ -98,7 +109,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                     height: 1.4,
                   ),
                 ),
-                
+
                 const SizedBox(height: 48),
 
                 // New Password Field
@@ -113,7 +124,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                   suffixIcon: IconButton(
                     onPressed: () => setState(() => _obscureNew = !_obscureNew),
                     icon: Icon(
-                      _obscureNew ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                      _obscureNew
+                          ? Icons.visibility_off_outlined
+                          : Icons.visibility_outlined,
                       color: Colors.grey,
                       size: 20,
                     ),
@@ -121,8 +134,14 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  t.tr(en: "Must be at least 8 characters", ar: "يجب أن تكون 8 أحرف على الأقل"),
-                  style: TextStyle(color: isDark ? Colors.white54 : Colors.black54, fontSize: 13),
+                  t.tr(
+                    en: "Must be at least 8 characters",
+                    ar: "يجب أن تكون 8 أحرف على الأقل",
+                  ),
+                  style: TextStyle(
+                    color: isDark ? Colors.white54 : Colors.black54,
+                    fontSize: 13,
+                  ),
                 ),
 
                 const SizedBox(height: 24),
@@ -137,9 +156,12 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                   obscureText: _obscureConfirm,
                   errorText: _confirmPassError,
                   suffixIcon: IconButton(
-                    onPressed: () => setState(() => _obscureConfirm = !_obscureConfirm),
+                    onPressed: () =>
+                        setState(() => _obscureConfirm = !_obscureConfirm),
                     icon: Icon(
-                      _obscureConfirm ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                      _obscureConfirm
+                          ? Icons.visibility_off_outlined
+                          : Icons.visibility_outlined,
                       color: Colors.grey,
                       size: 20,
                     ),
@@ -148,7 +170,10 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 const SizedBox(height: 8),
                 Text(
                   t.mustMatch,
-                  style: TextStyle(color: isDark ? Colors.white54 : Colors.black54, fontSize: 13),
+                  style: TextStyle(
+                    color: isDark ? Colors.white54 : Colors.black54,
+                    fontSize: 13,
+                  ),
                 ),
 
                 const SizedBox(height: 60),
@@ -168,7 +193,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                     bool hasError = false;
 
                     if (!_isPasswordValid(newPass)) {
-                      _newPassError = t.isAr ? "كلمة المرور قصيرة جداً" : "Password too short";
+                      _newPassError = t.isAr
+                          ? "كلمة المرور قصيرة جداً"
+                          : "Password too short";
                       hasError = true;
                     }
 
@@ -190,7 +217,11 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     );
   }
 
-  void _showSuccessBottomSheet(BuildContext context, AppLocalizations t, bool isDark) {
+  void _showSuccessBottomSheet(
+    BuildContext context,
+    AppLocalizations t,
+    bool isDark,
+  ) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -223,19 +254,26 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                     height: 120,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      border: Border.all(color: const Color(0xFF0D2D4D).withOpacity(0.1), width: 10),
+                      border: Border.all(
+                        color: const Color(0xFF0D2D4D).withOpacity(0.1),
+                        width: 10,
+                      ),
                     ),
                   ),
-                  const Icon(Icons.verified_user_rounded, color: Color(0xFF0D2D4D), size: 80),
+                  const Icon(
+                    Icons.verified_user_rounded,
+                    color: Color(0xFF0D2D4D),
+                    size: 80,
+                  ),
                 ],
               ),
               const SizedBox(height: 30),
               Text(
                 t.passwordChanged,
                 style: TextStyle(
-                  color: isDark ? Colors.white : const Color(0xFF0D2D4D), 
-                  fontSize: 24, 
-                  fontWeight: FontWeight.bold
+                  color: isDark ? Colors.white : const Color(0xFF0D2D4D),
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 12),
@@ -243,9 +281,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 t.passwordChangedMsg,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: isDark ? Colors.white70 : Colors.black54, 
-                  fontSize: 14, 
-                  height: 1.5
+                  color: isDark ? Colors.white70 : Colors.black54,
+                  fontSize: 14,
+                  height: 1.5,
                 ),
               ),
               const SizedBox(height: 40),
@@ -298,20 +336,29 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
         fillColor: isDark ? Colors.white.withOpacity(0.05) : Colors.white,
         suffixIcon: suffixIcon,
         errorText: errorText,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 16,
+        ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
           borderSide: BorderSide(color: borderColor),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: isDark ? Colors.white : const Color(0xFF142C66), width: 1.5),
+          borderSide: BorderSide(
+            color: isDark ? Colors.white : const Color(0xFF142C66),
+            width: 1.5,
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildLargeButton({required String label, required VoidCallback onPressed}) {
+  Widget _buildLargeButton({
+    required String label,
+    required VoidCallback onPressed,
+  }) {
     return Container(
       width: double.infinity,
       height: 56,

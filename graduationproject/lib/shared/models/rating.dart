@@ -58,18 +58,13 @@ class RaterInfo {
   final String fullName;
   final String? avatarUrl;
 
-  RaterInfo({
-    required this.userId,
-    required this.fullName,
-    this.avatarUrl,
-  });
+  RaterInfo({required this.userId, required this.fullName, this.avatarUrl});
 
   factory RaterInfo.fromMap(Map<String, dynamic> map) {
     return RaterInfo(
       userId: map['userId']?.toString() ?? '',
-      fullName: map['fullName']?.toString() ??
-          map['name']?.toString() ??
-          'Unknown',
+      fullName:
+          map['fullName']?.toString() ?? map['name']?.toString() ?? 'Unknown',
       avatarUrl: map['avatarUrl']?.toString(),
     );
   }

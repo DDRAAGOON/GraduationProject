@@ -17,7 +17,7 @@ class _EmailPasswordSignUpScreenState extends State<EmailPasswordSignUpScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
-  
+
   bool _obscurePassword = true;
   bool _obscureConfirm = true;
   bool _agreeToTerms = false;
@@ -53,15 +53,21 @@ class _EmailPasswordSignUpScreenState extends State<EmailPasswordSignUpScreen> {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
-    
+
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: ThemeController.instance.themeMode,
       builder: (context, themeMode, _) {
-        final isDark = themeMode == ThemeMode.dark || 
-                      (themeMode == ThemeMode.system && MediaQuery.platformBrightnessOf(context) == Brightness.dark);
-        
-        final backgroundColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
-        final textColorPrimary = isDark ? Colors.white : const Color(0xFF000000);
+        final isDark =
+            themeMode == ThemeMode.dark ||
+            (themeMode == ThemeMode.system &&
+                MediaQuery.platformBrightnessOf(context) == Brightness.dark);
+
+        final backgroundColor = isDark
+            ? const Color(0xFF001E3A)
+            : const Color(0xFFF8FBF4);
+        final textColorPrimary = isDark
+            ? Colors.white
+            : const Color(0xFF000000);
 
         return Scaffold(
           backgroundColor: backgroundColor,
@@ -74,7 +80,10 @@ class _EmailPasswordSignUpScreenState extends State<EmailPasswordSignUpScreen> {
             child: Form(
               key: _formKey,
               child: ListView(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 8,
+                ),
                 children: [
                   // Title
                   Transform.translate(
@@ -117,7 +126,7 @@ class _EmailPasswordSignUpScreenState extends State<EmailPasswordSignUpScreen> {
                       ],
                     ),
                   ),
-                  
+
                   const SizedBox(height: 48),
 
                   // Email Address
@@ -125,7 +134,10 @@ class _EmailPasswordSignUpScreenState extends State<EmailPasswordSignUpScreen> {
                   const SizedBox(height: 8),
                   _buildTextField(
                     controller: _emailController,
-                    hint: t.tr(en: 'Enter your email', ar: 'اكتب بريدك الإلكتروني'),
+                    hint: t.tr(
+                      en: 'Enter your email',
+                      ar: 'اكتب بريدك الإلكتروني',
+                    ),
                     isDark: isDark,
                     keyboardType: TextInputType.emailAddress,
                     validator: (v) {
@@ -146,9 +158,12 @@ class _EmailPasswordSignUpScreenState extends State<EmailPasswordSignUpScreen> {
                     isDark: isDark,
                     obscureText: _obscurePassword,
                     suffixIcon: IconButton(
-                      onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                      onPressed: () =>
+                          setState(() => _obscurePassword = !_obscurePassword),
                       icon: Icon(
-                        _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                        _obscurePassword
+                            ? Icons.visibility_off_outlined
+                            : Icons.visibility_outlined,
                         color: Colors.grey,
                         size: 20,
                       ),
@@ -163,7 +178,10 @@ class _EmailPasswordSignUpScreenState extends State<EmailPasswordSignUpScreen> {
                   const SizedBox(height: 20),
 
                   // Confirm Password
-                  _buildLabel(t.tr(en: 'Confirm password', ar: 'تأكيد كلمة المرور'), textColorPrimary),
+                  _buildLabel(
+                    t.tr(en: 'Confirm password', ar: 'تأكيد كلمة المرور'),
+                    textColorPrimary,
+                  ),
                   const SizedBox(height: 8),
                   _buildTextField(
                     controller: _confirmPasswordController,
@@ -171,16 +189,20 @@ class _EmailPasswordSignUpScreenState extends State<EmailPasswordSignUpScreen> {
                     isDark: isDark,
                     obscureText: _obscureConfirm,
                     suffixIcon: IconButton(
-                      onPressed: () => setState(() => _obscureConfirm = !_obscureConfirm),
+                      onPressed: () =>
+                          setState(() => _obscureConfirm = !_obscureConfirm),
                       icon: Icon(
-                        _obscureConfirm ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                        _obscureConfirm
+                            ? Icons.visibility_off_outlined
+                            : Icons.visibility_outlined,
                         color: Colors.grey,
                         size: 20,
                       ),
                     ),
                     validator: (v) {
                       if (v == null || v.isEmpty) return t.required;
-                      if (v != _passwordController.text) return t.passwordsNoMatch;
+                      if (v != _passwordController.text)
+                        return t.passwordsNoMatch;
                       return null;
                     },
                   ),
@@ -194,7 +216,7 @@ class _EmailPasswordSignUpScreenState extends State<EmailPasswordSignUpScreen> {
 
                   // Continue Button
                   _buildContinueButton(t),
-                  
+
                   const SizedBox(height: 24),
                 ],
               ),
@@ -204,7 +226,6 @@ class _EmailPasswordSignUpScreenState extends State<EmailPasswordSignUpScreen> {
       },
     );
   }
-
 
   Widget _buildLabel(String text, Color color) {
     return Text(
@@ -240,14 +261,20 @@ class _EmailPasswordSignUpScreenState extends State<EmailPasswordSignUpScreen> {
         suffixIcon: suffixIcon,
         filled: true,
         fillColor: Colors.transparent,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 16,
+        ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
           borderSide: BorderSide(color: borderColor),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: isDark ? Colors.white : const Color(0xFF142C66), width: 1.5),
+          borderSide: BorderSide(
+            color: isDark ? Colors.white : const Color(0xFF142C66),
+            width: 1.5,
+          ),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
@@ -272,7 +299,9 @@ class _EmailPasswordSignUpScreenState extends State<EmailPasswordSignUpScreen> {
             onChanged: (v) => setState(() => _agreeToTerms = v ?? false),
             activeColor: const Color(0xFF142C66),
             side: BorderSide(color: isDark ? Colors.white54 : Colors.black26),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(4),
+            ),
           ),
         ),
         const SizedBox(width: 12),

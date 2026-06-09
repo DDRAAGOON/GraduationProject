@@ -52,13 +52,19 @@ class _RecruitmentUserSignInScreenState
     setState(() => _loading = false);
 
     // التحقق هل المستخدم قادم من عملية إنشاء حساب جديد أم لا
-    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final args =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
     final bool isNewUser = args?['fromSignUp'] ?? false;
 
     if (isNewUser) {
-      Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.userCompleteProfile, (route) => false);
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        AppRoutes.userCompleteProfile,
+        (route) => false,
+      );
     } else {
-      Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.userWorkspace, (route) => false);
+      Navigator.of(
+        context,
+      ).pushNamedAndRemoveUntil(AppRoutes.userWorkspace, (route) => false);
     }
     return;
 
@@ -78,9 +84,10 @@ class _RecruitmentUserSignInScreenState
 
       if (!mounted) return;
       setState(() => _loading = false);
-      Navigator.of(
-        context,
-      ).pushNamedAndRemoveUntil(AppRoutes.userCompleteProfile, (route) => false);
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        AppRoutes.userCompleteProfile,
+        (route) => false,
+      );
     } catch (e) {
       if (!mounted) return;
       setState(() => _loading = false);
@@ -143,9 +150,10 @@ class _RecruitmentUserSignInScreenState
       if (!mounted) return;
 
       setState(() => _loading = false);
-      Navigator.of(
-        context,
-      ).pushNamedAndRemoveUntil(AppRoutes.userCompleteProfile, (route) => false);
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        AppRoutes.userCompleteProfile,
+        (route) => false,
+      );
     } catch (e) {
       if (!mounted) return;
       setState(() => _loading = false);
@@ -158,15 +166,21 @@ class _RecruitmentUserSignInScreenState
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
-    
+
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: ThemeController.instance.themeMode,
       builder: (context, themeMode, _) {
-        final isDark = themeMode == ThemeMode.dark || 
-                      (themeMode == ThemeMode.system && MediaQuery.platformBrightnessOf(context) == Brightness.dark);
-        
-        final backgroundColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
-        final textColorPrimary = isDark ? Colors.white : const Color(0xFF000000);
+        final isDark =
+            themeMode == ThemeMode.dark ||
+            (themeMode == ThemeMode.system &&
+                MediaQuery.platformBrightnessOf(context) == Brightness.dark);
+
+        final backgroundColor = isDark
+            ? const Color(0xFF001E3A)
+            : const Color(0xFFF8FBF4);
+        final textColorPrimary = isDark
+            ? Colors.white
+            : const Color(0xFF000000);
 
         return Scaffold(
           backgroundColor: backgroundColor,
@@ -177,7 +191,7 @@ class _RecruitmentUserSignInScreenState
                 const SizedBox(height: 5),
                 // Title
                 Transform.translate(
-                  offset: const Offset( -70, -10),
+                  offset: const Offset(-70, -10),
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
@@ -187,36 +201,36 @@ class _RecruitmentUserSignInScreenState
                         height: 300,
                         fit: BoxFit.contain,
                       ),
-                    Transform.translate(
-                      offset: const Offset(-15, -20),
-                      child: Text.rich(
-                        TextSpan(
-                          children: [
-                            TextSpan(
-                              text: t.isAr ? 'تسجيل ' : 'Sign ',
-                              style: const TextStyle(color: Colors.orange),
-                            ),
-                            TextSpan(
-                              text: t.isAr ? 'الدخول إلى\n' : 'in to\n',
-                              style: const TextStyle(color: Colors.black),
-                            ),
-                            TextSpan(
-                              text: t.isAr ? 'حسابك' : 'your Account',
-                              style: const TextStyle(color: Colors.white),
-                            ),
-                          ],
-                        ),
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                      Transform.translate(
+                        offset: const Offset(-15, -20),
+                        child: Text.rich(
+                          TextSpan(
+                            children: [
+                              TextSpan(
+                                text: t.isAr ? 'تسجيل ' : 'Sign ',
+                                style: const TextStyle(color: Colors.orange),
+                              ),
+                              TextSpan(
+                                text: t.isAr ? 'الدخول إلى\n' : 'in to\n',
+                                style: const TextStyle(color: Colors.black),
+                              ),
+                              TextSpan(
+                                text: t.isAr ? 'حسابك' : 'your Account',
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                            ],
+                          ),
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
-                    ),
                     ],
                   ),
                 ),
-                
+
                 const SizedBox(height: 60),
 
                 // Email Field
@@ -224,7 +238,10 @@ class _RecruitmentUserSignInScreenState
                 const SizedBox(height: 8),
                 _buildTextField(
                   controller: _email,
-                  hint: t.tr(en: 'Enter your email', ar: 'اكتب بريدك الإلكتروني'),
+                  hint: t.tr(
+                    en: 'Enter your email',
+                    ar: 'اكتب بريدك الإلكتروني',
+                  ),
                   prefixIcon: Icons.mail_outline,
                   isDark: isDark,
                   errorText: _emailError,
@@ -245,7 +262,9 @@ class _RecruitmentUserSignInScreenState
                   suffixIcon: IconButton(
                     onPressed: () => setState(() => _obscure = !_obscure),
                     icon: Icon(
-                      _obscure ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                      _obscure
+                          ? Icons.visibility_off_outlined
+                          : Icons.visibility_outlined,
                       color: Colors.grey,
                       size: 20,
                     ),
@@ -256,7 +275,9 @@ class _RecruitmentUserSignInScreenState
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
-                    onPressed: () => Navigator.of(context).pushNamed(AppRoutes.userForgotPassword),
+                    onPressed: () => Navigator.of(
+                      context,
+                    ).pushNamed(AppRoutes.userForgotPassword),
                     child: Text(
                       t.forgotPassword,
                       style: TextStyle(
@@ -295,7 +316,6 @@ class _RecruitmentUserSignInScreenState
     );
   }
 
-
   Widget _buildLabel(String text, Color color) {
     return Text(
       text,
@@ -330,14 +350,20 @@ class _RecruitmentUserSignInScreenState
         suffixIcon: suffixIcon,
         filled: true,
         fillColor: Colors.transparent,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 16,
+        ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
           borderSide: BorderSide(color: borderColor),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: isDark ? Colors.white : const Color(0xFF142C66), width: 1.5),
+          borderSide: BorderSide(
+            color: isDark ? Colors.white : const Color(0xFF142C66),
+            width: 1.5,
+          ),
         ),
         errorText: errorText,
       ),
@@ -430,21 +456,36 @@ class _RecruitmentUserSignInScreenState
               ),
               RichText(
                 text: const TextSpan(
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                   children: [
-                    TextSpan(text: 'G', style: TextStyle(color: Color(0xFF4285F4))),
-                    TextSpan(text: 'o', style: TextStyle(color: Color(0xFFEA4335))),
-                    TextSpan(text: 'o', style: TextStyle(color: Color(0xFFFBBC05))),
-                    TextSpan(text: 'g', style: TextStyle(color: Color(0xFF4285F4))),
-                    TextSpan(text: 'l', style: TextStyle(color: Color(0xFF34A853))),
-                    TextSpan(text: 'e', style: TextStyle(color: Color(0xFFEA4335))),
+                    TextSpan(
+                      text: 'G',
+                      style: TextStyle(color: Color(0xFF4285F4)),
+                    ),
+                    TextSpan(
+                      text: 'o',
+                      style: TextStyle(color: Color(0xFFEA4335)),
+                    ),
+                    TextSpan(
+                      text: 'o',
+                      style: TextStyle(color: Color(0xFFFBBC05)),
+                    ),
+                    TextSpan(
+                      text: 'g',
+                      style: TextStyle(color: Color(0xFF4285F4)),
+                    ),
+                    TextSpan(
+                      text: 'l',
+                      style: TextStyle(color: Color(0xFF34A853)),
+                    ),
+                    TextSpan(
+                      text: 'e',
+                      style: TextStyle(color: Color(0xFFEA4335)),
+                    ),
                   ],
                 ),
               ),
-            ]
+            ],
           ],
         ),
       ),

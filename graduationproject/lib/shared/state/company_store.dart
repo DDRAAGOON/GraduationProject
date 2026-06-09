@@ -92,15 +92,20 @@ class CompanyStore extends ChangeNotifier {
     String? email,
   }) {
     if (companyId != null && companyId.isNotEmpty) _companyId = companyId;
-    if (companyName != null && companyName.isNotEmpty) _companyName = companyName;
+    if (companyName != null && companyName.isNotEmpty)
+      _companyName = companyName;
     if (customProfileImage != null) _customProfileImage = customProfileImage;
     if (commercialRegister != null) _commercialRegister = commercialRegister;
     if (nationalNumber != null) _nationalNumber = nationalNumber;
 
     if (email != null && email.isNotEmpty) {
-      final existingEmailIndex = _contacts.indexWhere((c) => c.name.toLowerCase() == 'email' || c.name == 'البريد الإلكتروني');
+      final existingEmailIndex = _contacts.indexWhere(
+        (c) => c.name.toLowerCase() == 'email' || c.name == 'البريد الإلكتروني',
+      );
       if (existingEmailIndex >= 0) {
-        _contacts[existingEmailIndex] = _contacts[existingEmailIndex].copyWith(value: email);
+        _contacts[existingEmailIndex] = _contacts[existingEmailIndex].copyWith(
+          value: email,
+        );
       } else {
         _contacts.add(ContactEntry(name: 'Email', value: email));
       }
@@ -200,7 +205,8 @@ class CompanyStore extends ChangeNotifier {
     // ✅ تحميل companyId من data
     if (data['companyId'] != null) {
       _companyId = data['companyId'].toString();
-      if (kDebugMode) debugPrint('✅ Loaded companyId from session: $_companyId');
+      if (kDebugMode)
+        debugPrint('✅ Loaded companyId from session: $_companyId');
     }
 
     // ✅ لو companyId فاضي، نجيبه من الـ jobs
@@ -208,7 +214,8 @@ class CompanyStore extends ChangeNotifier {
       final jobs = RecruitmentSyncStore.instance.jobs;
       if (jobs.isNotEmpty) {
         _companyId = jobs.first.companyId;
-        if (kDebugMode) debugPrint('✅ Extracted companyId from jobs: $_companyId');
+        if (kDebugMode)
+          debugPrint('✅ Extracted companyId from jobs: $_companyId');
       }
     }
 

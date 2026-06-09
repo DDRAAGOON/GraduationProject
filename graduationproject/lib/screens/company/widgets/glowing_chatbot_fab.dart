@@ -50,7 +50,7 @@ class _GlowingChatbotFABState extends State<GlowingChatbotFAB>
             elevation: 8,
             shape: const CircleBorder(), // Chat bubble shape (circular)
             child: const Icon(
-              Icons.chat_bubble_outline, 
+              Icons.chat_bubble_outline,
               color: Colors.white,
               size: 28,
             ),

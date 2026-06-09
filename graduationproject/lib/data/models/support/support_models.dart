@@ -28,7 +28,12 @@ class HelpArticle {
   final String? content;
   final String? categoryId;
 
-  HelpArticle({required this.id, required this.title, this.content, this.categoryId});
+  HelpArticle({
+    required this.id,
+    required this.title,
+    this.content,
+    this.categoryId,
+  });
 
   factory HelpArticle.fromJson(Map<String, dynamic> json) {
     return HelpArticle(

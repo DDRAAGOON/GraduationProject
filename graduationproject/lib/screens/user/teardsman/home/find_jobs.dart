@@ -128,7 +128,9 @@ class _FindJobsState extends State<FindJobs> {
                   j.category.toLowerCase() == 'service',
             )
             .toList();
-        final bgColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
+        final bgColor = isDark
+            ? const Color(0xFF001E3A)
+            : const Color(0xFFF8FBF4);
         return Scaffold(
           backgroundColor: bgColor,
           body: SafeArea(
@@ -316,7 +318,8 @@ class _FindJobsState extends State<FindJobs> {
                             acceptedCount: 12,
                             capacity: 20,
                             logoIcon: Icons.plumbing,
-                            specialTag: 'مميز', companyId: '',
+                            specialTag: 'مميز',
+                            companyId: '',
                           ),
                           t,
                         ),
@@ -402,9 +405,7 @@ class _FindJobsState extends State<FindJobs> {
         shadowColor: Colors.black.withValues(alpha: 0.2),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: BorderSide(
-            color: Colors.white.withValues(alpha: 0.1),
-          ),
+          side: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
         ),
         margin: const EdgeInsets.only(bottom: 12),
         child: Padding(
@@ -442,11 +443,7 @@ class _FindJobsState extends State<FindJobs> {
               const SizedBox(height: 12),
               Row(
                 children: [
-                  const Icon(
-                    Icons.business,
-                    size: 16,
-                    color: Colors.white70,
-                  ),
+                  const Icon(Icons.business, size: 16, color: Colors.white70),
                   const SizedBox(width: 4),
                   Text(
                     t.translateCompanyName(job.companyName),

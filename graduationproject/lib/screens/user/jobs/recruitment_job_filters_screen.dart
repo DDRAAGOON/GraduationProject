@@ -78,7 +78,9 @@ class _RecruitmentJobFiltersScreenState
   Widget build(BuildContext context) {
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final backgroundColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
+    final backgroundColor = isDark
+        ? const Color(0xFF001E3A)
+        : const Color(0xFFF8FBF4);
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -94,7 +96,10 @@ class _RecruitmentJobFiltersScreenState
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: isDark ? Colors.white : Colors.black),
+          icon: Icon(
+            Icons.arrow_back_ios,
+            color: isDark ? Colors.white : Colors.black,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
       ),

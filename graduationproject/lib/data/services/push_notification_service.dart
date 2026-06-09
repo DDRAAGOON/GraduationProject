@@ -21,7 +21,9 @@ class PushNotificationService {
 
   Future<List<dynamic>> getSubscriptions(String userId) async {
     try {
-      final response = await _apiClient.get(ApiConstants.pushSubscriptions(userId));
+      final response = await _apiClient.get(
+        ApiConstants.pushSubscriptions(userId),
+      );
       return response.data;
     } catch (e) {
       throw ErrorHandler.handle(e);

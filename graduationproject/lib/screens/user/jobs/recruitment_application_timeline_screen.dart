@@ -334,13 +334,16 @@ class _RecruitmentApplicationTimelineScreenState
                     itemBuilder: (context, index) {
                       final app = filteredApps[index];
                       final statusLower = app.status.toLowerCase();
-                      final isAccepted = statusLower.contains('hire') || 
-                                       statusLower.contains('accept') ||
-                                       app.status == 'تم التوظيف' ||
-                                       app.status == 'مقبول';
+                      final isAccepted =
+                          statusLower.contains('hire') ||
+                          statusLower.contains('accept') ||
+                          app.status == 'تم التوظيف' ||
+                          app.status == 'مقبول';
 
                       return InkWell(
-                        onTap: isAccepted ? () => _showRatingDialog(context, app, isAr) : null,
+                        onTap: isAccepted
+                            ? () => _showRatingDialog(context, app, isAr)
+                            : null,
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           decoration: BoxDecoration(
@@ -413,7 +416,9 @@ class _RecruitmentApplicationTimelineScreenState
                                   '${app.updatedAt.day}/${app.updatedAt.month}/${app.updatedAt.year}',
                                   style: TextStyle(
                                     fontSize: 11,
-                                    color: Theme.of(context).colorScheme.onSurface
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
                                         .withValues(alpha: 0.6),
                                   ),
                                 ),
@@ -445,16 +450,17 @@ class _RecruitmentApplicationTimelineScreenState
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
-                                    if (isAccepted) 
+                                    if (isAccepted)
                                       Padding(
                                         padding: const EdgeInsets.only(top: 6),
                                         child: Text(
                                           isAr ? 'اضغط للتقييم' : 'Tap to rate',
                                           style: const TextStyle(
-                                            fontSize: 9, 
+                                            fontSize: 9,
                                             color: Color(0xFFFF7A2A),
                                             fontWeight: FontWeight.bold,
-                                            decoration: TextDecoration.underline,
+                                            decoration:
+                                                TextDecoration.underline,
                                           ),
                                         ),
                                       ),
@@ -473,7 +479,11 @@ class _RecruitmentApplicationTimelineScreenState
     );
   }
 
-  void _showRatingDialog(BuildContext context, RecruitmentApplication app, bool isAr) {
+  void _showRatingDialog(
+    BuildContext context,
+    RecruitmentApplication app,
+    bool isAr,
+  ) {
     int localRating = 0;
     final controller = TextEditingController();
 
@@ -481,7 +491,9 @@ class _RecruitmentApplicationTimelineScreenState
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
           title: Text(
             isAr ? 'تقييم تجربة التوظيف' : 'Rate Your Experience',
             textAlign: TextAlign.center,
@@ -491,31 +503,39 @@ class _RecruitmentApplicationTimelineScreenState
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                isAr 
-                  ? 'تهانينا على قبولك في "${app.jobTitle}" مع "${app.companyName}"!\nيرجى تقييم تجربتك:'
-                  : 'Congratulations on being accepted for "${app.jobTitle}" at "${app.companyName}"!\nPlease rate your experience:',
+                isAr
+                    ? 'تهانينا على قبولك في "${app.jobTitle}" مع "${app.companyName}"!\nيرجى تقييم تجربتك:'
+                    : 'Congratulations on being accepted for "${app.jobTitle}" at "${app.companyName}"!\nPlease rate your experience:',
                 textAlign: TextAlign.center,
                 style: const TextStyle(fontSize: 14),
               ),
               const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(5, (index) => IconButton(
-                  icon: Icon(
-                    localRating > index ? Icons.star : Icons.star_border,
-                    color: Colors.orange,
-                    size: 32,
+                children: List.generate(
+                  5,
+                  (index) => IconButton(
+                    icon: Icon(
+                      localRating > index ? Icons.star : Icons.star_border,
+                      color: Colors.orange,
+                      size: 32,
+                    ),
+                    onPressed: () =>
+                        setDialogState(() => localRating = index + 1),
                   ),
-                  onPressed: () => setDialogState(() => localRating = index + 1),
-                )),
+                ),
               ),
               const SizedBox(height: 15),
               TextField(
                 controller: controller,
                 maxLines: 3,
                 decoration: InputDecoration(
-                  hintText: isAr ? 'اكتب تعليقك هنا...' : 'Write your feedback here...',
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  hintText: isAr
+                      ? 'اكتب تعليقك هنا...'
+                      : 'Write your feedback here...',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   filled: true,
                   fillColor: Colors.grey.withOpacity(0.05),
                 ),
@@ -531,20 +551,36 @@ class _RecruitmentApplicationTimelineScreenState
               onPressed: () {
                 if (localRating == 0) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(isAr ? 'يرجى اختيار التقييم أولاً' : 'Please select a rating')),
+                    SnackBar(
+                      content: Text(
+                        isAr
+                            ? 'يرجى اختيار التقييم أولاً'
+                            : 'Please select a rating',
+                      ),
+                    ),
                   );
                   return;
                 }
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(isAr ? 'شكراً لتقييمك!' : 'Thank you for your feedback!'), backgroundColor: Colors.green),
+                  SnackBar(
+                    content: Text(
+                      isAr ? 'شكراً لتقييمك!' : 'Thank you for your feedback!',
+                    ),
+                    backgroundColor: Colors.green,
+                  ),
                 );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF142C66),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
               ),
-              child: Text(isAr ? 'إرسال' : 'Submit', style: const TextStyle(color: Colors.white)),
+              child: Text(
+                isAr ? 'إرسال' : 'Submit',
+                style: const TextStyle(color: Colors.white),
+              ),
             ),
           ],
         ),

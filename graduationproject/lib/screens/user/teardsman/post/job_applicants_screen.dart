@@ -88,9 +88,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
     );
     _selectedDays = List.from(widget.initialDays ?? []);
     _editableSkills = List.from(_existingJob?.tags ?? []);
-    _postedDateLabel = _formatDate(
-      _existingJob?.publishedAt ?? DateTime.now(),
-    );
+    _postedDateLabel = _formatDate(_existingJob?.publishedAt ?? DateTime.now());
     final jobId = widget.jobId ?? '';
     _workStatus = jobId.isEmpty
         ? 'Active'
@@ -300,14 +298,18 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
             niceToHaves: _existingJob?.niceToHaves ?? const [],
             benefits: _existingJob?.benefits ?? const [],
             category: _existingJob?.category ?? 'Service',
-            companyName: _existingJob?.companyName ??
+            companyName:
+                _existingJob?.companyName ??
                 RecruitmentSyncStore.instance.currentUserName,
             type: _existingJob?.type ?? 'one-time',
             tags: _editableSkills,
             requiredCount: _existingJob?.capacity ?? 1,
             status: _workStatus,
           );
-          RecruitmentSyncStore.instance.setTradesmanJobStatus(jobId, _workStatus);
+          RecruitmentSyncStore.instance.setTradesmanJobStatus(
+            jobId,
+            _workStatus,
+          );
         } catch (_) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -326,7 +328,10 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              t.tr(en: 'Changes saved successfully', ar: 'تم حفظ التعديلات بنجاح'),
+              t.tr(
+                en: 'Changes saved successfully',
+                ar: 'تم حفظ التعديلات بنجاح',
+              ),
             ),
           ),
         );
@@ -408,9 +413,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
             onPressed: () {
               Navigator.pop(context);
               Navigator.pop(context);
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(
+              ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(t.tr(en: "Job deleted", ar: "تم حذف المنشور")),
                 ),
@@ -456,7 +459,9 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                   color: theme.cardColor,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
+                    color: Theme.of(
+                      context,
+                    ).dividerColor.withValues(alpha: 0.1),
                   ),
                 ),
                 child: IconButton(
@@ -539,7 +544,10 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                               ),
                               decoration: InputDecoration(
                                 border: InputBorder.none,
-                                hintText: t.tr(en: "Job Title", ar: "عنوان الوظيفة"),
+                                hintText: t.tr(
+                                  en: "Job Title",
+                                  ar: "عنوان الوظيفة",
+                                ),
                                 hintStyle: TextStyle(
                                   color: colorScheme.onSurface.withValues(
                                     alpha: 0.38,
@@ -578,7 +586,10 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                     children: [
                       _buildTab(t.tr(en: "Applicants", ar: "المتقدمين"), 0),
                       const SizedBox(width: 32),
-                      _buildTab(t.tr(en: "Work details", ar: "تفاصيل العمل"), 1),
+                      _buildTab(
+                        t.tr(en: "Work details", ar: "تفاصيل العمل"),
+                        1,
+                      ),
                     ],
                   ),
                 ),
@@ -660,9 +671,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w700,
-                              color: Colors.white.withValues(
-                                alpha: 0.7,
-                              ),
+                              color: Colors.white.withValues(alpha: 0.7),
                             ),
                           ),
                         ),
@@ -678,7 +687,10 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                               borderRadius: BorderRadius.circular(999),
                             ),
                             child: Text(
-                              t.tr(en: 'Demo data for preview', ar: 'بيانات تجريبية للمعاينة'),
+                              t.tr(
+                                en: 'Demo data for preview',
+                                ar: 'بيانات تجريبية للمعاينة',
+                              ),
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 11,
@@ -740,7 +752,10 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                   onChanged: (_) => setState(() {}),
                   style: TextStyle(color: colorScheme.onSurface),
                   decoration: InputDecoration(
-                    hintText: t.tr(en: 'Search applicants...', ar: 'البحث في المتقدمين...'),
+                    hintText: t.tr(
+                      en: 'Search applicants...',
+                      ar: 'البحث في المتقدمين...',
+                    ),
                     hintStyle: TextStyle(
                       fontSize: 13,
                       color: colorScheme.onSurface.withValues(alpha: 0.38),
@@ -772,7 +787,10 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    t.tr(en: 'No applicants to display', ar: 'لا يوجد متقدمين لعرضهم'),
+                    t.tr(
+                      en: 'No applicants to display',
+                      ar: 'لا يوجد متقدمين لعرضهم',
+                    ),
                     style: TextStyle(
                       color: colorScheme.onSurface.withValues(alpha: 0.38),
                       fontSize: 16,
@@ -810,7 +828,8 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
     required ThemeData theme,
     required ColorScheme colorScheme,
   }) {
-    final statusColor = app.status.toLowerCase().contains('accept') ||
+    final statusColor =
+        app.status.toLowerCase().contains('accept') ||
             app.status.toLowerCase().contains('hire')
         ? Colors.green
         : app.status.toLowerCase().contains('reject') ||
@@ -889,7 +908,11 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                         child: Text(
                           statusLabel,
                           style: TextStyle(
-                            color: statusColor == Colors.green ? Colors.greenAccent : (statusColor == Colors.red ? Colors.redAccent : Colors.cyanAccent),
+                            color: statusColor == Colors.green
+                                ? Colors.greenAccent
+                                : (statusColor == Colors.red
+                                      ? Colors.redAccent
+                                      : Colors.cyanAccent),
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
                           ),
@@ -926,9 +949,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                             style: TextStyle(
                               fontSize: 12.5,
                               fontWeight: FontWeight.w600,
-                              color: Colors.white.withValues(
-                                alpha: 0.85,
-                              ),
+                              color: Colors.white.withValues(alpha: 0.85),
                             ),
                           ),
                         ),
@@ -1093,7 +1114,9 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                               ),
                               DropdownMenuItem(
                                 value: 'Inactive',
-                                child: Text(t.tr(en: 'Inactive', ar: 'غير نشط')),
+                                child: Text(
+                                  t.tr(en: 'Inactive', ar: 'غير نشط'),
+                                ),
                               ),
                             ],
                             onChanged: (v) {
@@ -1102,7 +1125,10 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                           )
                         : Text(
                             RecruitmentSyncStore.instance
-                                .translateTradesmanWorkStatus(_workStatus, isAr),
+                                .translateTradesmanWorkStatus(
+                                  _workStatus,
+                                  isAr,
+                                ),
                             style: TextStyle(
                               color: colorScheme.onSurface,
                               fontSize: 15,
@@ -1193,10 +1219,13 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                         return InputChip(
                           label: Text(skill),
                           onDeleted: _isEditing
-                              ? () => setState(() => _editableSkills.remove(skill))
+                              ? () => setState(
+                                  () => _editableSkills.remove(skill),
+                                )
                               : null,
-                          backgroundColor:
-                              colorScheme.primary.withValues(alpha: 0.12),
+                          backgroundColor: colorScheme.primary.withValues(
+                            alpha: 0.12,
+                          ),
                           labelStyle: TextStyle(
                             color: colorScheme.primary,
                             fontSize: 11,
@@ -1330,8 +1359,8 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                             _selectedDays.isEmpty
                                 ? t.tr(en: "None selected", ar: "غير محدد")
                                 : _selectedDays
-                                    .map((day) => _getTranslatedDay(day, t))
-                                    .join(", "),
+                                      .map((day) => _getTranslatedDay(day, t))
+                                      .join(", "),
                             style: TextStyle(
                               color: colorScheme.onSurface,
                               fontSize: 15,
@@ -1363,7 +1392,10 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                   if (_isEditing)
                     TextButton.icon(
                       onPressed: _pickWorkPhotos,
-                      icon: const Icon(Icons.add_photo_alternate_outlined, size: 18),
+                      icon: const Icon(
+                        Icons.add_photo_alternate_outlined,
+                        size: 18,
+                      ),
                       label: Text(t.tr(en: 'Add photos', ar: 'إضافة صور')),
                     ),
                 ],
@@ -1431,7 +1463,9 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                             color: colorScheme.primary.withValues(alpha: 0.08),
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(
-                              color: colorScheme.primary.withValues(alpha: 0.25),
+                              color: colorScheme.primary.withValues(
+                                alpha: 0.25,
+                              ),
                             ),
                           ),
                           child: Icon(
@@ -1600,5 +1634,4 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
       ),
     );
   }
-
 }

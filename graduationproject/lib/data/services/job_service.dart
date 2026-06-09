@@ -20,7 +20,9 @@ class JobService {
 
   Future<List<Job>> getCompanyJobs(String companyId) async {
     try {
-      final response = await _apiClient.get(ApiConstants.companyJobs(companyId));
+      final response = await _apiClient.get(
+        ApiConstants.companyJobs(companyId),
+      );
       final List<dynamic> data = response.data;
       return data.map((json) => Job.fromJson(json)).toList();
     } catch (e) {

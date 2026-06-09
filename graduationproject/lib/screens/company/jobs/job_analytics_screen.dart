@@ -101,7 +101,9 @@ class _AnalyticsBodyState extends State<_AnalyticsBody> {
       String companyId = CompanyStore.instance.companyId;
       if (companyId.isEmpty) {
         try {
-          final profileResponse = await apiClient.get(ApiConstants.myCompanyProfile);
+          final profileResponse = await apiClient.get(
+            ApiConstants.myCompanyProfile,
+          );
           companyId = profileResponse.data['companyId']?.toString() ?? '';
           CompanyStore.instance.setRegistrationData(
             companyId: companyId,
@@ -155,17 +157,23 @@ class _AnalyticsBodyState extends State<_AnalyticsBody> {
         final appliedObj = summary['applied'] ?? {};
         final hiredObj = summary['hired'] ?? {};
         _totalViews = int.tryParse(viewsObj['total']?.toString() ?? '0') ?? 0;
-        _totalApplicants = int.tryParse(appliedObj['total']?.toString() ?? '0') ?? 0;
-        final totalHired = int.tryParse(hiredObj['total']?.toString() ?? '0') ?? 0;
+        _totalApplicants =
+            int.tryParse(appliedObj['total']?.toString() ?? '0') ?? 0;
+        final totalHired =
+            int.tryParse(hiredObj['total']?.toString() ?? '0') ?? 0;
 
         // Chart data from weekly stats
         final weeklyViews = statsData['views'];
         final weeklyApplied = statsData['applied'];
         if (weeklyViews is List && weeklyViews.length >= 7) {
-          _viewsData[0] = weeklyViews.map((v) => (v as num).toDouble()).toList();
+          _viewsData[0] = weeklyViews
+              .map((v) => (v as num).toDouble())
+              .toList();
         }
         if (weeklyApplied is List && weeklyApplied.length >= 7) {
-          _appsData[0] = weeklyApplied.map((v) => (v as num).toDouble()).toList();
+          _appsData[0] = weeklyApplied
+              .map((v) => (v as num).toDouble())
+              .toList();
         }
 
         // Applications breakdown
@@ -173,14 +181,19 @@ class _AnalyticsBodyState extends State<_AnalyticsBody> {
           int reviewing = 0, accepted = 0, rejected = 0;
           for (final app in appsData) {
             final status = app['status']?.toString() ?? '';
-            if (status == 'reviewing') reviewing++;
-            else if (status == 'accepted' || status == 'hired') accepted++;
-            else if (status == 'rejected') rejected++;
+            if (status == 'reviewing')
+              reviewing++;
+            else if (status == 'accepted' || status == 'hired')
+              accepted++;
+            else if (status == 'rejected')
+              rejected++;
           }
           _reviewingCount = reviewing;
           _acceptedCount = accepted + totalHired;
           _rejectedCount = rejected;
-          _totalApplicants = _totalApplicants > 0 ? _totalApplicants : (appsData as List).length;
+          _totalApplicants = _totalApplicants > 0
+              ? _totalApplicants
+              : (appsData as List).length;
         }
 
         _isLoading = false;

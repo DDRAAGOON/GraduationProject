@@ -8,7 +8,9 @@ class NotificationsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final backgroundColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
+    final backgroundColor = isDark
+        ? const Color(0xFF001E3A)
+        : const Color(0xFFF8FBF4);
     final onSurfaceColor = isDark ? Colors.white : Colors.black;
     final cardColor = isDark ? const Color(0xFF0D2D4D) : Colors.white;
 
@@ -18,19 +20,19 @@ class NotificationsScreen extends StatelessWidget {
         'title': 'تم استلام طلبك',
         'body': 'لقد استلمت شركة Nexora Solutions طلب التقديم الخاص بك بنجاح.',
         'time': 'منذ 5 دقائق',
-        'type': 'application'
+        'type': 'application',
       },
       {
         'title': 'رسالة جديدة',
         'body': 'لقد أرسل لك مساعد جوبيتو الذكي نصيحة مهنية جديدة.',
         'time': 'منذ ساعة',
-        'type': 'message'
+        'type': 'message',
       },
       {
         'title': 'وظيفة مقترحة',
         'body': 'هناك وظيفة مطور تطبيقات جديدة تناسب مهاراتك في القاهرة.',
         'time': 'منذ ساعتين',
-        'type': 'job'
+        'type': 'job',
       },
     ];
 
@@ -46,7 +48,11 @@ class NotificationsScreen extends StatelessWidget {
         ),
         title: Text(
           t.notifications,
-          style: TextStyle(color: onSurfaceColor, fontSize: 20, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: onSurfaceColor,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
       body: notifications.isEmpty
@@ -78,11 +84,19 @@ class NotificationsScreen extends StatelessWidget {
                 final note = notifications[index];
                 IconData icon;
                 Color iconColor;
-                
+
                 switch (note['type']) {
-                  case 'message': icon = Icons.chat_bubble_outline; iconColor = Colors.blue; break;
-                  case 'job': icon = Icons.work_outline; iconColor = Colors.orange; break;
-                  default: icon = Icons.check_circle_outline; iconColor = Colors.green;
+                  case 'message':
+                    icon = Icons.chat_bubble_outline;
+                    iconColor = Colors.blue;
+                    break;
+                  case 'job':
+                    icon = Icons.work_outline;
+                    iconColor = Colors.orange;
+                    break;
+                  default:
+                    icon = Icons.check_circle_outline;
+                    iconColor = Colors.green;
                 }
 
                 return Container(
@@ -96,7 +110,7 @@ class NotificationsScreen extends StatelessWidget {
                         color: Colors.black.withOpacity(0.02),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
-                      )
+                      ),
                     ],
                   ),
                   child: Row(

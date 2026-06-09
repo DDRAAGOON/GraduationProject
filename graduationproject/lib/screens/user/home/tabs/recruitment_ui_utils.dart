@@ -69,17 +69,14 @@ String translateValue(String? value, bool isAr) {
 }
 
 Widget buildWhiteTag(String t) => Container(
-      margin: const EdgeInsets.only(left: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: Colors.white10,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Text(
-        t,
-        style: const TextStyle(color: Colors.white, fontSize: 10),
-      ),
-    );
+  margin: const EdgeInsets.only(left: 8),
+  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+  decoration: BoxDecoration(
+    color: Colors.white10,
+    borderRadius: BorderRadius.circular(8),
+  ),
+  child: Text(t, style: const TextStyle(color: Colors.white, fontSize: 10)),
+);
 
 Widget buildCompanyLogo(BuildContext context, String? logoUrl) {
   final provider = getAppImageProvider(logoUrl);

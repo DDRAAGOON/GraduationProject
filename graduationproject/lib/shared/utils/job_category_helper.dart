@@ -4,7 +4,5 @@ import '../state/recruitment_sync_store.dart';
 bool isTradesmanServiceJob(RecruitmentJob job) {
   final category = job.category.toLowerCase();
   final type = job.type.toLowerCase();
-  return category == 'service' ||
-      category == 'tradesman' ||
-      type == 'one-time';
+  return category == 'service' || category == 'tradesman' || type == 'one-time';
 }

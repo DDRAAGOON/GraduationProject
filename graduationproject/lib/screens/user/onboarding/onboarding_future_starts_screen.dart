@@ -16,11 +16,15 @@ class Screen3 extends StatelessWidget {
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: ThemeController.instance.themeMode,
       builder: (context, themeMode, _) {
-        final isDark = themeMode == ThemeMode.dark || 
-                      (themeMode == ThemeMode.system && MediaQuery.platformBrightnessOf(context) == Brightness.dark);
-        
+        final isDark =
+            themeMode == ThemeMode.dark ||
+            (themeMode == ThemeMode.system &&
+                MediaQuery.platformBrightnessOf(context) == Brightness.dark);
+
         return Scaffold(
-          backgroundColor: isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4),
+          backgroundColor: isDark
+              ? const Color(0xFF001E3A)
+              : const Color(0xFFF8FBF4),
           body: Stack(
             children: [
               // The diagonal background image
@@ -38,7 +42,7 @@ class Screen3 extends StatelessWidget {
                   ),
                 ),
               ),
-              
+
               SafeArea(
                 child: Column(
                   children: [
@@ -51,11 +55,12 @@ class Screen3 extends StatelessWidget {
                           'assets/company/Onboarding/Onboarding-3.png',
                           height: size.height * 0.3,
                           fit: BoxFit.contain,
-                          errorBuilder: (context, error, stackTrace) => const Icon(
-                            Icons.rocket_launch,
-                            size: 100,
-                            color: Colors.white,
-                          ),
+                          errorBuilder: (context, error, stackTrace) =>
+                              const Icon(
+                                Icons.rocket_launch,
+                                size: 100,
+                                color: Colors.white,
+                              ),
                         ),
                       ),
                     ),
@@ -99,14 +104,19 @@ class Screen3 extends StatelessWidget {
                     const Spacer(flex: 3),
                     // Navigation Area
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 32,
+                      ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Row(
                             children: List.generate(
                               3,
-                              (index) => _buildIndicator(isActive: index == currentPage),
+                              (index) => _buildIndicator(
+                                isActive: index == currentPage,
+                              ),
                             ),
                           ),
                           _buildNextButton(onNext, t),
@@ -130,9 +140,7 @@ class Screen3 extends StatelessWidget {
         backgroundColor: const Color(0xFF142C66),
         foregroundColor: Colors.white,
         padding: const EdgeInsets.symmetric(horizontal: 45, vertical: 16),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(25),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
         elevation: 5,
       ),
       child: Text(

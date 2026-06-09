@@ -39,7 +39,10 @@ class _CompanyJobDetailsScreenState extends State<CompanyJobDetailsScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Delete Job', style: TextStyle(fontWeight: FontWeight.w800)),
+        title: const Text(
+          'Delete Job',
+          style: TextStyle(fontWeight: FontWeight.w800),
+        ),
         content: Text(
           'Are you sure you want to delete "${_job.title}"? This cannot be undone.',
         ),
@@ -50,8 +53,13 @@ class _CompanyJobDetailsScreenState extends State<CompanyJobDetailsScreen> {
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            style: TextButton.styleFrom(foregroundColor: const Color(0xFFB91C1C)),
-            child: const Text('Delete', style: TextStyle(fontWeight: FontWeight.bold)),
+            style: TextButton.styleFrom(
+              foregroundColor: const Color(0xFFB91C1C),
+            ),
+            child: const Text(
+              'Delete',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),
@@ -64,9 +72,9 @@ class _CompanyJobDetailsScreenState extends State<CompanyJobDetailsScreen> {
       Navigator.of(context).pop(); // Go back to jobs list
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to delete job: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Failed to delete job: $e')));
     } finally {
       if (mounted) setState(() => _deleting = false);
     }

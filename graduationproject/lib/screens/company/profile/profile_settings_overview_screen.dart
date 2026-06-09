@@ -35,7 +35,7 @@ class _CompanyProfileSettingsOverviewScreenState
   late final TextEditingController _about;
   late String _selectedCategory;
   late List<String> _benefits;
-  
+
   late List<String> _locations;
   late List<String> _techStack;
 
@@ -52,18 +52,27 @@ class _CompanyProfileSettingsOverviewScreenState
     final isAr = LocaleController.instance.locale.value.languageCode == 'ar';
     _companyName = TextEditingController(text: store.companyName);
     _employee = TextEditingController(text: store.employee);
-    _about = TextEditingController(text: isAr ? store.companyAboutAr : store.companyAboutEn);
+    _about = TextEditingController(
+      text: isAr ? store.companyAboutAr : store.companyAboutEn,
+    );
     _benefits = List.from(store.benefits);
-    
+
     _selectedCategory = store.category;
-    if (_selectedCategory != 'technical' && _selectedCategory != 'nontechnical') {
+    if (_selectedCategory != 'technical' &&
+        _selectedCategory != 'nontechnical') {
       _selectedCategory = 'technical';
     }
     _locations = List.from(store.locations);
     _techStack = List.from(store.techStack);
     // تحويل foundedDay/Month/Year المخزّنة إلى DateTime واحد
-    if (store.foundedYear > 0 && store.foundedMonth > 0 && store.foundedDay > 0) {
-      _foundedDate = DateTime(store.foundedYear, store.foundedMonth, store.foundedDay);
+    if (store.foundedYear > 0 &&
+        store.foundedMonth > 0 &&
+        store.foundedDay > 0) {
+      _foundedDate = DateTime(
+        store.foundedYear,
+        store.foundedMonth,
+        store.foundedDay,
+      );
     }
   }
 
@@ -83,7 +92,11 @@ class _CompanyProfileSettingsOverviewScreenState
     // Validate
     if (_companyName.text.trim().isEmpty) {
       messenger.showSnackBar(
-        SnackBar(content: Text(t.tr(en: 'Company name is required', ar: 'اسم الشركة مطلوب')))
+        SnackBar(
+          content: Text(
+            t.tr(en: 'Company name is required', ar: 'اسم الشركة مطلوب'),
+          ),
+        ),
       );
       return;
     }
@@ -124,14 +137,19 @@ class _CompanyProfileSettingsOverviewScreenState
           content: Text(t.saved),
           backgroundColor: Colors.green,
           behavior: SnackBarBehavior.floating,
-        )
+        ),
       );
     } catch (e) {
       if (!mounted) return;
       setState(() => _saveError = true);
       messenger.showSnackBar(
         SnackBar(
-          content: Text(t.tr(en: 'Save failed. Please try again.', ar: 'فشل الحفظ. يرجى المحاولة مرة أخرى.')),
+          content: Text(
+            t.tr(
+              en: 'Save failed. Please try again.',
+              ar: 'فشل الحفظ. يرجى المحاولة مرة أخرى.',
+            ),
+          ),
           backgroundColor: Theme.of(context).colorScheme.error,
           behavior: SnackBarBehavior.floating,
         ),
@@ -146,7 +164,7 @@ class _CompanyProfileSettingsOverviewScreenState
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
-    
+
     return AppScaffold(
       title: t.profileSettings,
       showBack: true,
@@ -157,17 +175,24 @@ class _CompanyProfileSettingsOverviewScreenState
             onTap: (index) {
               if (index == 1) {
                 _tabController.index = 0; // Reset to profile tab for next time
-                Navigator.of(context).pushNamed(AppRoutes.companyAccountSecurity);
+                Navigator.of(
+                  context,
+                ).pushNamed(AppRoutes.companyAccountSecurity);
               } else if (index == 2) {
                 _tabController.index = 0; // Reset to profile tab for next time
-                Navigator.of(context).pushNamed(AppRoutes.companyAppearanceLight);
+                Navigator.of(
+                  context,
+                ).pushNamed(AppRoutes.companyAppearanceLight);
               }
             },
             labelColor: Theme.of(context).colorScheme.primary,
             unselectedLabelColor: Colors.grey,
             indicatorColor: Theme.of(context).colorScheme.primary,
             indicatorWeight: 3,
-            labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+            labelStyle: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 13,
+            ),
             tabs: [
               Tab(text: t.profileSettings),
               Tab(text: t.accountSecurity),
@@ -198,23 +223,29 @@ class _CompanyProfileSettingsOverviewScreenState
       children: [
         _buildProfileHeader(),
         const SizedBox(height: 30),
-        
-        Text(t.basicInfoLabel, 
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+
+        Text(
+          t.basicInfoLabel,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
         const SizedBox(height: 8),
-        Text(t.updateIdentity,
-          style: TextStyle(color: Colors.grey.shade600, fontSize: 13)),
+        Text(
+          t.updateIdentity,
+          style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+        ),
         const Divider(height: 40),
 
         AppTextField(
-          label: t.companyName, 
+          label: t.companyName,
           controller: _companyName,
-          validatorText: _saveError && _companyName.text.isEmpty ? 'Required' : null,
+          validatorText: _saveError && _companyName.text.isEmpty
+              ? 'Required'
+              : null,
         ),
         const SizedBox(height: 20),
         AppTextField(label: t.employee, controller: _employee),
         const SizedBox(height: 20),
-        
+
         Text(t.categoryLabel, style: Theme.of(context).textTheme.labelLarge),
         const SizedBox(height: 8),
         _buildDropdown<String>(
@@ -224,23 +255,31 @@ class _CompanyProfileSettingsOverviewScreenState
           onChanged: (v) => setState(() => _selectedCategory = v!),
         ),
         const SizedBox(height: 20),
-        
-        _buildChipField(t.locationInfo, _locations, () => _addTagDialog(t.locationInfo, _locations)),
+
+        _buildChipField(
+          t.locationInfo,
+          _locations,
+          () => _addTagDialog(t.locationInfo, _locations),
+        ),
         const SizedBox(height: 20),
 
         Text(t.dateFounded, style: Theme.of(context).textTheme.labelLarge),
         const SizedBox(height: 8),
         _buildDatePickerField(),
         const SizedBox(height: 20),
-        
+
         AppTextField(label: t.aboutCompany, controller: _about, maxLines: 4),
         const SizedBox(height: 20),
-        _buildChipField(t.benefits, _benefits, () => _addTagDialog(t.benefits, _benefits)),
-        
+        _buildChipField(
+          t.benefits,
+          _benefits,
+          () => _addTagDialog(t.benefits, _benefits),
+        ),
+
         const SizedBox(height: 40),
         AppButton(
-          label: t.saveChange, 
-          loading: _loading, 
+          label: t.saveChange,
+          loading: _loading,
           onPressed: _save,
           icon: _saveSuccess ? Icons.check_circle : null,
         ),
@@ -264,13 +303,21 @@ class _CompanyProfileSettingsOverviewScreenState
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: _saveError ? Colors.red : (_saveSuccess ? Colors.green : Colors.blue.withValues(alpha: 0.2)),
-                    width: 3
+                    color: _saveError
+                        ? Colors.red
+                        : (_saveSuccess
+                              ? Colors.green
+                              : Colors.blue.withValues(alpha: 0.2)),
+                    width: 3,
                   ),
-                  image: imageProvider != null ? DecorationImage(image: imageProvider, fit: BoxFit.cover) : null,
+                  image: imageProvider != null
+                      ? DecorationImage(image: imageProvider, fit: BoxFit.cover)
+                      : null,
                   color: Colors.grey.shade100,
                 ),
-                child: imageProvider == null ? const Icon(Icons.business, size: 40, color: Colors.grey) : null,
+                child: imageProvider == null
+                    ? const Icon(Icons.business, size: 40, color: Colors.grey)
+                    : null,
               );
             },
           ),
@@ -282,13 +329,19 @@ class _CompanyProfileSettingsOverviewScreenState
               child: CircleAvatar(
                 radius: 18,
                 backgroundColor: Theme.of(context).colorScheme.primary,
-                child: const Icon(Icons.camera_alt, size: 18, color: Colors.white),
+                child: const Icon(
+                  Icons.camera_alt,
+                  size: 18,
+                  color: Colors.white,
+                ),
               ),
             ),
           ),
           if (_saveError)
             const Positioned.fill(
-              child: Center(child: Icon(Icons.error, color: Colors.red, size: 40)),
+              child: Center(
+                child: Icon(Icons.error, color: Colors.red, size: 40),
+              ),
             ),
         ],
       ),
@@ -300,7 +353,10 @@ class _CompanyProfileSettingsOverviewScreenState
     final messenger = ScaffoldMessenger.of(context);
     final picker = ImagePicker();
     try {
-      final pickedFile = await picker.pickImage(source: ImageSource.gallery, imageQuality: 50);
+      final pickedFile = await picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 50,
+      );
       if (pickedFile != null) {
         setState(() {
           _loading = true;
@@ -311,7 +367,9 @@ class _CompanyProfileSettingsOverviewScreenState
         final base64Image = 'data:image/jpeg;base64,${base64Encode(bytes)}';
 
         // Update local store first for immediate feedback
-        CompanyStore.instance.setRegistrationData(customProfileImage: base64Image);
+        CompanyStore.instance.setRegistrationData(
+          customProfileImage: base64Image,
+        );
         await SessionManager.saveCompanyPhoto(base64Image);
 
         // Sync photo with company profile endpoint: PATCH /api/companies/my/profile
@@ -325,7 +383,11 @@ class _CompanyProfileSettingsOverviewScreenState
             _saveSuccess = true;
           });
           messenger.showSnackBar(
-            SnackBar(content: Text(t.saved), backgroundColor: Colors.green, behavior: SnackBarBehavior.floating)
+            SnackBar(
+              content: Text(t.saved),
+              backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
+            ),
           );
         }
       }
@@ -337,10 +399,12 @@ class _CompanyProfileSettingsOverviewScreenState
         });
         messenger.showSnackBar(
           SnackBar(
-            content: Text(t.tr(en: 'Image upload failed', ar: 'فشل تحميل الصورة')),
+            content: Text(
+              t.tr(en: 'Image upload failed', ar: 'فشل تحميل الصورة'),
+            ),
             backgroundColor: Colors.red,
-            behavior: SnackBarBehavior.floating
-          )
+            behavior: SnackBarBehavior.floating,
+          ),
         );
       }
     } finally {
@@ -356,8 +420,14 @@ class _CompanyProfileSettingsOverviewScreenState
         title: Text(title),
         content: TextField(controller: controller, autofocus: true),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
-          FilledButton(onPressed: () => Navigator.pop(ctx, controller.text), child: const Text('Add')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, controller.text),
+            child: const Text('Add'),
+          ),
         ],
       ),
     );
@@ -423,10 +493,12 @@ class _CompanyProfileSettingsOverviewScreenState
           child: Wrap(
             spacing: 8,
             children: [
-              ...items.map((item) => Chip(
-                label: Text(item),
-                onDeleted: () => setState(() => items.remove(item)),
-              )),
+              ...items.map(
+                (item) => Chip(
+                  label: Text(item),
+                  onDeleted: () => setState(() => items.remove(item)),
+                ),
+              ),
               ActionChip(label: const Text('+ Add'), onPressed: onAdd),
             ],
           ),
@@ -451,7 +523,11 @@ class _CompanyProfileSettingsOverviewScreenState
         child: DropdownButton<T>(
           value: value,
           isExpanded: true,
-          items: items.map((e) => DropdownMenuItem(value: e, child: Text(labelBuilder(e)))).toList(),
+          items: items
+              .map(
+                (e) => DropdownMenuItem(value: e, child: Text(labelBuilder(e))),
+              )
+              .toList(),
           onChanged: onChanged,
         ),
       ),

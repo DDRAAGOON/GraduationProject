@@ -75,13 +75,15 @@ class RecruitmentJobDetailsScreen extends StatefulWidget {
   final RecruitmentJob job;
 
   @override
-  State<RecruitmentJobDetailsScreen> createState() => _RecruitmentJobDetailsScreenState();
+  State<RecruitmentJobDetailsScreen> createState() =>
+      _RecruitmentJobDetailsScreenState();
 }
 
-class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScreen> {
+class _RecruitmentJobDetailsScreenState
+    extends State<RecruitmentJobDetailsScreen> {
   final TextEditingController _commentController = TextEditingController();
-  int _userRating = 0; 
-  
+  int _userRating = 0;
+
   final List<Map<String, dynamic>> _mockReviews = [
     {
       'userName': 'أحمد محمد',
@@ -97,8 +99,6 @@ class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScree
     },
   ];
 
-
-
   @override
   void dispose() {
     _commentController.dispose();
@@ -111,7 +111,9 @@ class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScree
     final isAr = t.isAr;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final primaryColor = Theme.of(context).primaryColor;
-    final backgroundColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
+    final backgroundColor = isDark
+        ? const Color(0xFF001E3A)
+        : const Color(0xFFF8FBF4);
     final cardColor = isDark ? const Color(0xFF0D2D4D) : Colors.white;
 
     return Scaffold(
@@ -122,7 +124,10 @@ class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScree
         backgroundColor: backgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: isDark ? Colors.white : Colors.black),
+          icon: Icon(
+            Icons.arrow_back_ios,
+            color: isDark ? Colors.white : Colors.black,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -135,7 +140,9 @@ class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScree
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
                 color: cardColor,
-                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(32)),
+                borderRadius: const BorderRadius.vertical(
+                  bottom: Radius.circular(32),
+                ),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
@@ -149,7 +156,9 @@ class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScree
                   CircleAvatar(
                     radius: 40,
                     backgroundColor: primaryColor.withValues(alpha: 0.1),
-                    backgroundImage: widget.job.companyLogoUrl != null ? getAppImageProvider(widget.job.companyLogoUrl!) : null,
+                    backgroundImage: widget.job.companyLogoUrl != null
+                        ? getAppImageProvider(widget.job.companyLogoUrl!)
+                        : null,
                     child: widget.job.companyLogoUrl == null
                         ? Icon(Icons.business, size: 40, color: primaryColor)
                         : null,
@@ -159,16 +168,20 @@ class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScree
                     _translateValue(widget.job.title, isAr),
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.w900,
-                          color: isDark ? Colors.white : Colors.black,
-                        ),
+                      fontWeight: FontWeight.w900,
+                      color: isDark ? Colors.white : Colors.black,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     widget.job.companyName,
                     style: TextStyle(
                       fontSize: 16,
-                      color: isDark ? Colors.white70 : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                      color: isDark
+                          ? Colors.white70
+                          : Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withValues(alpha: 0.6),
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -177,8 +190,18 @@ class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScree
                     spacing: 8,
                     alignment: WrapAlignment.center,
                     children: [
-                      _buildHeaderTag(context, Icons.location_on_outlined, _translateValue(widget.job.location, isAr), isDark),
-                      _buildHeaderTag(context, Icons.work_outline, _translateValue(widget.job.type, isAr), isDark),
+                      _buildHeaderTag(
+                        context,
+                        Icons.location_on_outlined,
+                        _translateValue(widget.job.location, isAr),
+                        isDark,
+                      ),
+                      _buildHeaderTag(
+                        context,
+                        Icons.work_outline,
+                        _translateValue(widget.job.type, isAr),
+                        isDark,
+                      ),
                     ],
                   ),
                 ],
@@ -191,7 +214,12 @@ class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScree
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Merged About Job & Description Container
-                  _buildSectionTitle(context, t.tr(en: 'About the Job', ar: 'عن الوظيفة'), primaryColor, isDark),
+                  _buildSectionTitle(
+                    context,
+                    t.tr(en: 'About the Job', ar: 'عن الوظيفة'),
+                    primaryColor,
+                    isDark,
+                  ),
                   const SizedBox(height: 12),
                   _buildContentContainer(
                     context,
@@ -215,56 +243,76 @@ class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScree
                             style: TextStyle(
                               fontSize: 15,
                               height: 1.6,
-                              color: isDark ? Colors.white70 : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
+                              color: isDark
+                                  ? Colors.white70
+                                  : Theme.of(context).colorScheme.onSurface
+                                        .withValues(alpha: 0.8),
                             ),
                           ),
                           const SizedBox(height: 20),
-                          Divider(color: isDark ? Colors.white10 : Colors.black12),
+                          Divider(
+                            color: isDark ? Colors.white10 : Colors.black12,
+                          ),
                           const SizedBox(height: 20),
                         ],
                         _buildJobInfoRow(
-                          context, 
-                          Icons.people_outline, 
-                          t.tr(en: 'Seats (Accepted / Required)', ar: 'المقاعد (مقبول / مطلوب)'), 
-                          '${widget.job.acceptedCount} / ${widget.job.capacity}', 
+                          context,
+                          Icons.people_outline,
+                          t.tr(
+                            en: 'Seats (Accepted / Required)',
+                            ar: 'المقاعد (مقبول / مطلوب)',
+                          ),
+                          '${widget.job.acceptedCount} / ${widget.job.capacity}',
                           primaryColor,
-                          isDark
+                          isDark,
                         ),
-                        Divider(height: 32, color: isDark ? Colors.white10 : Colors.black12),
-                        _buildJobInfoRow(
-                          context, 
-                          Icons.calendar_today_outlined, 
-                          t.tr(en: 'Published Date', ar: 'تاريخ النشر'), 
-                          '${widget.job.publishedAt.day}/${widget.job.publishedAt.month}/${widget.job.publishedAt.year}', 
-                          primaryColor,
-                          isDark
+                        Divider(
+                          height: 32,
+                          color: isDark ? Colors.white10 : Colors.black12,
                         ),
-                        Divider(height: 32, color: isDark ? Colors.white10 : Colors.black12),
                         _buildJobInfoRow(
-                          context, 
-                          Icons.work_outline, 
-                          t.jobTypeLabel, 
-                          _translateValue(widget.job.type, isAr), 
+                          context,
+                          Icons.calendar_today_outlined,
+                          t.tr(en: 'Published Date', ar: 'تاريخ النشر'),
+                          '${widget.job.publishedAt.day}/${widget.job.publishedAt.month}/${widget.job.publishedAt.year}',
                           primaryColor,
-                          isDark
+                          isDark,
                         ),
-                        Divider(height: 32, color: isDark ? Colors.white10 : Colors.black12),
-                        _buildJobInfoRow(
-                          context, 
-                          Icons.location_on_outlined, 
-                          t.locationLabel, 
-                          _translateValue(widget.job.location, isAr), 
-                          primaryColor,
-                          isDark
+                        Divider(
+                          height: 32,
+                          color: isDark ? Colors.white10 : Colors.black12,
                         ),
-                        Divider(height: 32, color: isDark ? Colors.white10 : Colors.black12),
                         _buildJobInfoRow(
-                          context, 
-                          Icons.payments_outlined, 
-                          t.salaryLabel, 
-                          widget.job.salaryRange, 
+                          context,
+                          Icons.work_outline,
+                          t.jobTypeLabel,
+                          _translateValue(widget.job.type, isAr),
                           primaryColor,
-                          isDark
+                          isDark,
+                        ),
+                        Divider(
+                          height: 32,
+                          color: isDark ? Colors.white10 : Colors.black12,
+                        ),
+                        _buildJobInfoRow(
+                          context,
+                          Icons.location_on_outlined,
+                          t.locationLabel,
+                          _translateValue(widget.job.location, isAr),
+                          primaryColor,
+                          isDark,
+                        ),
+                        Divider(
+                          height: 32,
+                          color: isDark ? Colors.white10 : Colors.black12,
+                        ),
+                        _buildJobInfoRow(
+                          context,
+                          Icons.payments_outlined,
+                          t.salaryLabel,
+                          widget.job.salaryRange,
+                          primaryColor,
+                          isDark,
                         ),
                       ],
                     ),
@@ -273,7 +321,12 @@ class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScree
 
                   // Job Category (Field) Container
                   if (widget.job.category.isNotEmpty) ...[
-                    _buildSectionTitle(context, t.tr(en: 'Job Field', ar: 'مجال العمل'), primaryColor, isDark),
+                    _buildSectionTitle(
+                      context,
+                      t.tr(en: 'Job Field', ar: 'مجال العمل'),
+                      primaryColor,
+                      isDark,
+                    ),
                     const SizedBox(height: 12),
                     _buildContentContainer(
                       context,
@@ -286,7 +339,11 @@ class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScree
                               color: primaryColor.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(8),
                             ),
-                            child: Icon(Icons.category_outlined, color: primaryColor, size: 20),
+                            child: Icon(
+                              Icons.category_outlined,
+                              color: primaryColor,
+                              size: 20,
+                            ),
                           ),
                           const SizedBox(width: 16),
                           Text(
@@ -294,7 +351,9 @@ class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScree
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color: isDark ? Colors.white : Theme.of(context).colorScheme.onSurface,
+                              color: isDark
+                                  ? Colors.white
+                                  : Theme.of(context).colorScheme.onSurface,
                             ),
                           ),
                         ],
@@ -305,7 +364,12 @@ class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScree
 
                   // Tags / Skills Container
                   if (widget.job.tags.isNotEmpty) ...[
-                    _buildSectionTitle(context, t.requiredSkills, primaryColor, isDark),
+                    _buildSectionTitle(
+                      context,
+                      t.requiredSkills,
+                      primaryColor,
+                      isDark,
+                    ),
                     const SizedBox(height: 12),
                     _buildContentContainer(
                       context,
@@ -313,12 +377,21 @@ class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScree
                       Wrap(
                         spacing: 8,
                         runSpacing: 8,
-                        children: widget.job.tags.map((tag) => Chip(
-                          label: Text(_translateValue(tag, isAr)),
-                          backgroundColor: isDark ? Colors.white.withValues(alpha: 0.1) : primaryColor.withValues(alpha: 0.1),
-                          side: BorderSide.none,
-                          labelStyle: TextStyle(color: isDark ? Colors.white : primaryColor, fontWeight: FontWeight.bold),
-                        )).toList(),
+                        children: widget.job.tags
+                            .map(
+                              (tag) => Chip(
+                                label: Text(_translateValue(tag, isAr)),
+                                backgroundColor: isDark
+                                    ? Colors.white.withValues(alpha: 0.1)
+                                    : primaryColor.withValues(alpha: 0.1),
+                                side: BorderSide.none,
+                                labelStyle: TextStyle(
+                                  color: isDark ? Colors.white : primaryColor,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            )
+                            .toList(),
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -326,49 +399,102 @@ class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScree
 
                   // Responsibilities
                   if (widget.job.responsibilities.isNotEmpty) ...[
-                    _buildSectionTitle(context, t.responsibilities, primaryColor, isDark),
+                    _buildSectionTitle(
+                      context,
+                      t.responsibilities,
+                      primaryColor,
+                      isDark,
+                    ),
                     const SizedBox(height: 12),
-                    ...widget.job.responsibilities.map((item) => _buildBulletPoint(context, item, primaryColor, isDark)),
+                    ...widget.job.responsibilities.map(
+                      (item) => _buildBulletPoint(
+                        context,
+                        item,
+                        primaryColor,
+                        isDark,
+                      ),
+                    ),
                     const SizedBox(height: 24),
                   ],
 
                   // Qualifications
                   if (widget.job.qualifications.isNotEmpty) ...[
-                    _buildSectionTitle(context, t.qualifications, primaryColor, isDark),
+                    _buildSectionTitle(
+                      context,
+                      t.qualifications,
+                      primaryColor,
+                      isDark,
+                    ),
                     const SizedBox(height: 12),
-                    ...widget.job.qualifications.map((item) => _buildBulletPoint(context, item, primaryColor, isDark)),
+                    ...widget.job.qualifications.map(
+                      (item) => _buildBulletPoint(
+                        context,
+                        item,
+                        primaryColor,
+                        isDark,
+                      ),
+                    ),
                     const SizedBox(height: 24),
                   ],
 
                   // Benefits
                   if (widget.job.benefits.isNotEmpty) ...[
-                    _buildSectionTitle(context, t.perksAndBenefits, primaryColor, isDark),
+                    _buildSectionTitle(
+                      context,
+                      t.perksAndBenefits,
+                      primaryColor,
+                      isDark,
+                    ),
                     const SizedBox(height: 12),
                     Wrap(
                       spacing: 10,
                       runSpacing: 10,
-                      children: widget.job.benefits.map((item) => Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: Colors.green.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.green.withValues(alpha: 0.2)),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(Icons.check_circle, size: 16, color: Colors.green),
-                            const SizedBox(width: 8),
-                            Text(item, style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
-                          ],
-                        ),
-                      )).toList(),
+                      children: widget.job.benefits
+                          .map(
+                            (item) => Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.green.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: Colors.green.withValues(alpha: 0.2),
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(
+                                    Icons.check_circle,
+                                    size: 16,
+                                    color: Colors.green,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    item,
+                                    style: const TextStyle(
+                                      color: Colors.green,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                          .toList(),
                     ),
                     const SizedBox(height: 32),
                   ],
 
                   // Reviews & Feedback Section - MOVED TO BOTTOM
-                  _buildSectionTitle(context, t.tr(en: 'Reviews & Feedback', ar: 'التقييمات والآراء'), primaryColor, isDark),
+                  _buildSectionTitle(
+                    context,
+                    t.tr(en: 'Reviews & Feedback', ar: 'التقييمات والآراء'),
+                    primaryColor,
+                    isDark,
+                  ),
                   const SizedBox(height: 12),
                   _buildContentContainer(
                     context,
@@ -380,27 +506,36 @@ class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScree
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const SizedBox(), 
+                            const SizedBox(),
                             Row(
                               children: [
                                 Text(
                                   '4.8',
-                                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.orange[700]),
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.orange[700],
+                                  ),
                                 ),
                                 const SizedBox(width: 8),
                                 Row(
-                                  children: List.generate(5, (index) => Icon(
-                                    Icons.star, 
-                                    color: index < 4 ? Colors.orange[700] : Colors.grey[300], 
-                                    size: 20
-                                  )),
+                                  children: List.generate(
+                                    5,
+                                    (index) => Icon(
+                                      Icons.star,
+                                      color: index < 4
+                                          ? Colors.orange[700]
+                                          : Colors.grey[300],
+                                      size: 20,
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),
                           ],
                         ),
                         const SizedBox(height: 16),
-                        
+
                         /*
                         // Rating input section - ONLY visible after application
                         if (_hasApplied) ...[
@@ -450,45 +585,77 @@ class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScree
                         */
 
                         // List of comments (always visible)
-                        ..._mockReviews.map((review) => Padding(
-                          padding: const EdgeInsets.only(bottom: 16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    review['userName'],
-                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: isDark ? Colors.white : Colors.black),
-                                  ),
-                                  Text(
-                                    review['date'],
-                                    style: TextStyle(fontSize: 11, color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.5)),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 4),
-                              Row(
-                                children: List.generate(5, (index) => Icon(
-                                  Icons.star, 
-                                  size: 14, 
-                                  color: index < review['rating'] ? Colors.orange[700] : Colors.grey[300],
-                                )),
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                review['comment'],
-                                style: TextStyle(fontSize: 13, color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.8)),
-                              ),
-                              if (_mockReviews.last != review)
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 12),
-                                  child: Divider(height: 1, color: isDark ? Colors.white10 : Theme.of(context).dividerColor.withValues(alpha: 0.05)),
+                        ..._mockReviews.map(
+                          (review) => Padding(
+                            padding: const EdgeInsets.only(bottom: 16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      review['userName'],
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                        color: isDark
+                                            ? Colors.white
+                                            : Colors.black,
+                                      ),
+                                    ),
+                                    Text(
+                                      review['date'],
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color:
+                                            (isDark
+                                                    ? Colors.white
+                                                    : Colors.black)
+                                                .withValues(alpha: 0.5),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                            ],
+                                const SizedBox(height: 4),
+                                Row(
+                                  children: List.generate(
+                                    5,
+                                    (index) => Icon(
+                                      Icons.star,
+                                      size: 14,
+                                      color: index < review['rating']
+                                          ? Colors.orange[700]
+                                          : Colors.grey[300],
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  review['comment'],
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color:
+                                        (isDark ? Colors.white : Colors.black)
+                                            .withValues(alpha: 0.8),
+                                  ),
+                                ),
+                                if (_mockReviews.last != review)
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 12),
+                                    child: Divider(
+                                      height: 1,
+                                      color: isDark
+                                          ? Colors.white10
+                                          : Theme.of(context).dividerColor
+                                                .withValues(alpha: 0.05),
+                                    ),
+                                  ),
+                              ],
+                            ),
                           ),
-                        )),
+                        ),
                       ],
                     ),
                   ),
@@ -512,14 +679,22 @@ class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScree
     );
   }
 
-  Widget _buildContentContainer(BuildContext context, bool isDark, Widget child) {
+  Widget _buildContentContainer(
+    BuildContext context,
+    bool isDark,
+    Widget child,
+  ) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF0D2D4D) : Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: isDark ? Colors.white10 : Theme.of(context).dividerColor.withValues(alpha: 0.1)),
+        border: Border.all(
+          color: isDark
+              ? Colors.white10
+              : Theme.of(context).dividerColor.withValues(alpha: 0.1),
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.02),
@@ -532,11 +707,18 @@ class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScree
     );
   }
 
-  Widget _buildHeaderTag(BuildContext context, IconData icon, String label, bool isDark) {
+  Widget _buildHeaderTag(
+    BuildContext context,
+    IconData icon,
+    String label,
+    bool isDark,
+  ) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: isDark ? Colors.white.withValues(alpha: 0.05) : Theme.of(context).dividerColor.withValues(alpha: 0.05),
+        color: isDark
+            ? Colors.white.withValues(alpha: 0.05)
+            : Theme.of(context).dividerColor.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
@@ -544,23 +726,41 @@ class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScree
         children: [
           Icon(icon, size: 16, color: isDark ? Colors.white60 : Colors.grey),
           const SizedBox(width: 4),
-          Text(label, style: TextStyle(fontSize: 13, color: isDark ? Colors.white60 : Colors.grey)),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 13,
+              color: isDark ? Colors.white60 : Colors.grey,
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildSectionTitle(BuildContext context, String title, Color color, bool isDark) {
+  Widget _buildSectionTitle(
+    BuildContext context,
+    String title,
+    Color color,
+    bool isDark,
+  ) {
     return Text(
       title,
       style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: isDark ? const Color(0xFFFF7A2A) : color,
-          ),
+        fontWeight: FontWeight.bold,
+        color: isDark ? const Color(0xFFFF7A2A) : color,
+      ),
     );
   }
 
-  Widget _buildJobInfoRow(BuildContext context, IconData icon, String title, String value, Color color, bool isDark) {
+  Widget _buildJobInfoRow(
+    BuildContext context,
+    IconData icon,
+    String title,
+    String value,
+    Color color,
+    bool isDark,
+  ) {
     return Row(
       children: [
         Container(
@@ -577,21 +777,25 @@ class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScree
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                title, 
+                title,
                 style: TextStyle(
-                  color: isDark ? Colors.white60 : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5), 
+                  color: isDark
+                      ? Colors.white60
+                      : Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.5),
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                )
+                ),
               ),
               const SizedBox(height: 2),
               Text(
-                value, 
+                value,
                 style: TextStyle(
-                  fontSize: 14, 
+                  fontSize: 14,
                   fontWeight: FontWeight.bold,
                   color: isDark ? Colors.white : Colors.black,
-                )
+                ),
               ),
             ],
           ),
@@ -600,7 +804,12 @@ class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScree
     );
   }
 
-  Widget _buildBulletPoint(BuildContext context, String text, Color color, bool isDark) {
+  Widget _buildBulletPoint(
+    BuildContext context,
+    String text,
+    Color color,
+    bool isDark,
+  ) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
@@ -614,7 +823,11 @@ class _RecruitmentJobDetailsScreenState extends State<RecruitmentJobDetailsScree
           Expanded(
             child: Text(
               text,
-              style: TextStyle(fontSize: 15, height: 1.4, color: isDark ? Colors.white70 : Colors.black87),
+              style: TextStyle(
+                fontSize: 15,
+                height: 1.4,
+                color: isDark ? Colors.white70 : Colors.black87,
+              ),
             ),
           ),
         ],

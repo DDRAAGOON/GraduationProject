@@ -29,7 +29,8 @@ class _CompanyPostJobStep1InformationScreenState
   final _department = TextEditingController();
   DateTime? _deadline = DateTime.now().add(const Duration(days: 30));
   String _category = 'Technical'; // Technical, Non-Technical, Service
-  String _location = RecruitmentSyncStore.egyptGovernorates[1]; // Default to Cairo
+  String _location =
+      RecruitmentSyncStore.egyptGovernorates[1]; // Default to Cairo
   final Set<String> _types = {'Full-Time'};
   final List<String> _skills = [];
   bool _loading = false;
@@ -63,7 +64,9 @@ class _CompanyPostJobStep1InformationScreenState
         final digitsOnly = salary.replaceAll(RegExp(r'[^\d]'), '');
         if (digitsOnly.isNotEmpty) {
           _salaryController.text = digitsOnly.replaceAllMapped(
-              RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
+            RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+            (Match m) => '${m[1]},',
+          );
         } else {
           _salaryController.text = salary == 'Competitive' ? '' : salary;
         }
@@ -97,7 +100,9 @@ class _CompanyPostJobStep1InformationScreenState
       final posText = _positions.text.trim();
       final posInt = int.tryParse(posText);
       if (posText.isEmpty || posInt == null || posInt < 1) {
-        _positionsError = t.isAr ? 'يرجى إدخال رقم صحيح وموجب' : 'Please enter a valid positive number';
+        _positionsError = t.isAr
+            ? 'يرجى إدخال رقم صحيح وموجب'
+            : 'Please enter a valid positive number';
       } else {
         _positionsError = null;
       }
@@ -117,7 +122,9 @@ class _CompanyPostJobStep1InformationScreenState
         'jobId': _editingJob?.id,
         'title': _jobTitle.text.trim(),
         'employmentType': _types.join(' • '),
-        'salaryRange': _salaryController.text.trim().isEmpty ? 'Competitive' : _salaryController.text.trim(),
+        'salaryRange': _salaryController.text.trim().isEmpty
+            ? 'Competitive'
+            : _salaryController.text.trim(),
         'description': _jobDescription.text.trim(),
         'positions': int.tryParse(_positions.text) ?? 1,
         'category': _category,
@@ -267,26 +274,28 @@ class _CompanyPostJobStep1InformationScreenState
             hint: t.tr(en: "e.g. 5000", ar: "مثال: 5000"),
           ),
           const Divider(height: 48),
-          Text(
-            t.requiredSkills,
-            style: Theme.of(context).textTheme.titleSmall,
-          ),
+          Text(t.requiredSkills, style: Theme.of(context).textTheme.titleSmall),
           const SizedBox(height: 10),
           Wrap(
             spacing: 10,
             runSpacing: 10,
             children: [
               ..._skills.map(
-                    (s) => InputChip(
+                (s) => InputChip(
                   label: Text(s),
                   onDeleted: () => setState(() => _skills.remove(s)),
                 ),
               ),
               ActionChip(
-                label: Text(t.tr(en: '+ Add', ar: '+ إضافة'), style: const TextStyle(fontSize: 12)),
+                label: Text(
+                  t.tr(en: '+ Add', ar: '+ إضافة'),
+                  style: const TextStyle(fontSize: 12),
+                ),
                 onPressed: _addSkill,
                 visualDensity: VisualDensity.compact,
-                backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                backgroundColor: Theme.of(
+                  context,
+                ).colorScheme.primary.withOpacity(0.1),
                 side: BorderSide.none,
               ),
             ],
@@ -299,7 +308,10 @@ class _CompanyPostJobStep1InformationScreenState
             children: [
               Text(
                 t.positions,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w900, fontSize: 15),
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w900,
+                  fontSize: 15,
+                ),
               ),
               const SizedBox(height: 12),
               AppTextField(
@@ -320,7 +332,10 @@ class _CompanyPostJobStep1InformationScreenState
             children: [
               Text(
                 t.categoryLabel,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w900, fontSize: 15),
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w900,
+                  fontSize: 15,
+                ),
               ),
               const SizedBox(height: 12),
               SingleChildScrollView(
@@ -345,7 +360,10 @@ class _CompanyPostJobStep1InformationScreenState
             children: [
               Text(
                 t.tr(en: 'Location', ar: 'الموقع (المحافظة)'),
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w900, fontSize: 15),
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w900,
+                  fontSize: 15,
+                ),
               ),
               const SizedBox(height: 12),
               Container(
@@ -353,24 +371,36 @@ class _CompanyPostJobStep1InformationScreenState
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
+                  border: Border.all(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withOpacity(0.1),
+                  ),
                 ),
                 child: DropdownButtonHideUnderline(
                   child: DropdownButton<String>(
                     value: _location,
                     isExpanded: true,
-                    icon: Icon(Icons.location_on_outlined, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5)),
+                    icon: Icon(
+                      Icons.location_on_outlined,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withOpacity(0.5),
+                    ),
                     onChanged: (String? newValue) {
                       if (newValue != null) {
                         setState(() => _location = newValue);
                       }
                     },
-                    items: RecruitmentSyncStore.egyptGovernorates.where((g) => g != 'All').map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
+                    items: RecruitmentSyncStore.egyptGovernorates
+                        .where((g) => g != 'All')
+                        .map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        })
+                        .toList(),
                   ),
                 ),
               ),
@@ -384,7 +414,10 @@ class _CompanyPostJobStep1InformationScreenState
             children: [
               Text(
                 t.jobDepartment,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w900, fontSize: 15),
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w900,
+                  fontSize: 15,
+                ),
               ),
               const SizedBox(height: 12),
               AppTextField(
@@ -402,17 +435,27 @@ class _CompanyPostJobStep1InformationScreenState
             children: [
               Text(
                 t.deadlineLabel,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w900, fontSize: 15),
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w900,
+                  fontSize: 15,
+                ),
               ),
               const SizedBox(height: 12),
               InkWell(
                 onTap: _selectDeadline,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 14,
+                  ),
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
+                    border: Border.all(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withOpacity(0.1),
+                    ),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -421,9 +464,18 @@ class _CompanyPostJobStep1InformationScreenState
                         _deadline == null
                             ? t.whenClose
                             : "${_deadline!.month.toString().padLeft(2, '0')}/${_deadline!.day.toString().padLeft(2, '0')}/${_deadline!.year}",
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
                       ),
-                      Icon(Icons.calendar_month_outlined, size: 20, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5)),
+                      Icon(
+                        Icons.calendar_month_outlined,
+                        size: 20,
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withOpacity(0.5),
+                      ),
                     ],
                   ),
                 ),
@@ -441,7 +493,9 @@ class _CompanyPostJobStep1InformationScreenState
 
   Widget _buildRadioChip(String label, String value) {
     final selected = _category == value;
-    final color = selected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface.withOpacity(0.1);
+    final color = selected
+        ? Theme.of(context).colorScheme.primary
+        : Theme.of(context).colorScheme.onSurface.withOpacity(0.1);
     return InkWell(
       onTap: () => setState(() => _category = value),
       borderRadius: BorderRadius.circular(12),
@@ -450,7 +504,9 @@ class _CompanyPostJobStep1InformationScreenState
         decoration: BoxDecoration(
           color: selected ? color.withOpacity(0.05) : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withValues(alpha: selected ? 0.3 : 0.2)),
+          border: Border.all(
+            color: color.withValues(alpha: selected ? 0.3 : 0.2),
+          ),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -464,7 +520,9 @@ class _CompanyPostJobStep1InformationScreenState
             Text(
               label,
               style: TextStyle(
-                color: selected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface,
+                color: selected
+                    ? Theme.of(context).colorScheme.primary
+                    : Theme.of(context).colorScheme.onSurface,
                 fontSize: 12,
                 fontWeight: selected ? FontWeight.bold : FontWeight.normal,
               ),
@@ -490,9 +548,7 @@ class _TypeChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final color = selected
-        ? cs.primary
-        : cs.onSurface.withOpacity(0.12);
+    final color = selected ? cs.primary : cs.onSurface.withOpacity(0.12);
 
     return InkWell(
       onTap: onTap,
@@ -502,7 +558,9 @@ class _TypeChip extends StatelessWidget {
         decoration: BoxDecoration(
           color: selected ? color.withOpacity(0.15) : Colors.transparent,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: color.withValues(alpha: selected ? 0.3 : 0.5)),
+          border: Border.all(
+            color: color.withValues(alpha: selected ? 0.3 : 0.5),
+          ),
         ),
         child: Text(
           label,
@@ -519,7 +577,9 @@ class _TypeChip extends StatelessWidget {
 class _CommaTextInputFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
-      TextEditingValue oldValue, TextEditingValue newValue) {
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
     if (newValue.text.isEmpty) {
       return newValue;
     }
@@ -530,7 +590,9 @@ class _CommaTextInputFormatter extends TextInputFormatter {
 
     // Format with commas
     final formatted = newText.replaceAllMapped(
-        RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+      (Match m) => '${m[1]},',
+    );
 
     return TextEditingValue(
       text: formatted,

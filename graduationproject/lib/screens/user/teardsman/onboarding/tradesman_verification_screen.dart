@@ -5,7 +5,6 @@ import 'package:graduationproject/shared/l10n/app_localizations.dart';
 import 'package:graduationproject/shared/state/recruitment_sync_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 class TradesmanVerificationScreen extends StatefulWidget {
   const TradesmanVerificationScreen({super.key});
 
@@ -62,11 +61,16 @@ class _TradesmanVerificationScreenState
 
   Future<void> _submit() async {
     final t = AppLocalizations.of(context);
-    
+
     if (_fishFileName == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(t.tr(en: "Please upload your criminal record", ar: "يرجى رفع صحيفة الحالة الجنائية أولاً")),
+          content: Text(
+            t.tr(
+              en: "Please upload your criminal record",
+              ar: "يرجى رفع صحيفة الحالة الجنائية أولاً",
+            ),
+          ),
           backgroundColor: Colors.redAccent,
         ),
       );
@@ -76,7 +80,12 @@ class _TradesmanVerificationScreenState
     if (_selectedTrades.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(t.tr(en: "Please select at least one service", ar: "يرجى اختيار خدمة واحدة على الأقل")),
+          content: Text(
+            t.tr(
+              en: "Please select at least one service",
+              ar: "يرجى اختيار خدمة واحدة على الأقل",
+            ),
+          ),
           backgroundColor: Colors.redAccent,
         ),
       );
@@ -86,9 +95,12 @@ class _TradesmanVerificationScreenState
     setState(() => _isLoading = true);
     final store = RecruitmentSyncStore.instance;
     final prefs = await SharedPreferences.getInstance();
-    
+
     // Save with email-specific key
-    await prefs.setBool('is_tradesman_verified_${store.currentUserEmail}', true);
+    await prefs.setBool(
+      'is_tradesman_verified_${store.currentUserEmail}',
+      true,
+    );
 
     store.updateUserProfile(
       fullName: store.currentUserName,
@@ -114,7 +126,9 @@ class _TradesmanVerificationScreenState
     final onSurfaceColor = isDark ? Colors.white : Colors.black;
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4),
+      backgroundColor: isDark
+          ? const Color(0xFF001E3A)
+          : const Color(0xFFF8FBF4),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -145,15 +159,25 @@ class _TradesmanVerificationScreenState
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 28),
+                  const Icon(
+                    Icons.warning_amber_rounded,
+                    color: Colors.orange,
+                    size: 28,
+                  ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
                       t.tr(
                         en: "Warning: You must complete your data (Criminal Record and Services) to switch to Tradesman Mode.",
-                        ar: "تنبيه: يجب إكمال بياناتك (الصحيفة الجنائية والخدمات) لتتمكن من التبديل لوضع الحرفي."
+                        ar: "تنبيه: يجب إكمال بياناتك (الصحيفة الجنائية والخدمات) لتتمكن من التبديل لوضع الحرفي.",
                       ),
-                      style: TextStyle(color: isDark ? Colors.amber[100] : const Color(0xFF856404), fontWeight: FontWeight.w600, height: 1.4),
+                      style: TextStyle(
+                        color: isDark
+                            ? Colors.amber[100]
+                            : const Color(0xFF856404),
+                        fontWeight: FontWeight.w600,
+                        height: 1.4,
+                      ),
                     ),
                   ),
                 ],
@@ -164,8 +188,15 @@ class _TradesmanVerificationScreenState
 
             // 2. Upload Section (Criminal Record)
             Text(
-              t.tr(en: "Criminal Record (Fish)", ar: "صحيفة الحالة الجنائية (فيش و تشبيه)"),
-              style: TextStyle(color: onSurfaceColor, fontSize: 16, fontWeight: FontWeight.bold),
+              t.tr(
+                en: "Criminal Record (Fish)",
+                ar: "صحيفة الحالة الجنائية (فيش و تشبيه)",
+              ),
+              style: TextStyle(
+                color: onSurfaceColor,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 12),
             GestureDetector(
@@ -176,20 +207,34 @@ class _TradesmanVerificationScreenState
                 decoration: BoxDecoration(
                   color: isDark ? const Color(0xFF0D2D4D) : Colors.white,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: _fishFileName != null ? Colors.green : onSurfaceColor.withOpacity(0.1)),
+                  border: Border.all(
+                    color: _fishFileName != null
+                        ? Colors.green
+                        : onSurfaceColor.withOpacity(0.1),
+                  ),
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
-                      _fishFileName != null ? Icons.check_circle : Icons.cloud_upload_outlined,
-                      color: _fishFileName != null ? Colors.green : const Color(0xFF0051DD),
+                      _fishFileName != null
+                          ? Icons.check_circle
+                          : Icons.cloud_upload_outlined,
+                      color: _fishFileName != null
+                          ? Colors.green
+                          : const Color(0xFF0051DD),
                       size: 40,
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      _fishFileName ?? (isAr ? "اضغط لرفع الملف" : "Click to upload file"),
-                      style: TextStyle(color: _fishFileName != null ? Colors.green : onSurfaceColor.withOpacity(0.5), fontSize: 13),
+                      _fishFileName ??
+                          (isAr ? "اضغط لرفع الملف" : "Click to upload file"),
+                      style: TextStyle(
+                        color: _fishFileName != null
+                            ? Colors.green
+                            : onSurfaceColor.withOpacity(0.5),
+                        fontSize: 13,
+                      ),
                     ),
                   ],
                 ),
@@ -201,7 +246,11 @@ class _TradesmanVerificationScreenState
             // 3. Services Selection
             Text(
               t.tr(en: "Select Service", ar: "اختر الخدمة"),
-              style: TextStyle(color: onSurfaceColor, fontSize: 16, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                color: onSurfaceColor,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 16),
             Wrap(
@@ -210,24 +259,44 @@ class _TradesmanVerificationScreenState
               children: _tradeOptions.map((trade) {
                 final isSelected = _selectedTrades.contains(trade);
                 return GestureDetector(
-                  onTap: () => setState(() => isSelected ? _selectedTrades.remove(trade) : _selectedTrades.add(trade)),
+                  onTap: () => setState(
+                    () => isSelected
+                        ? _selectedTrades.remove(trade)
+                        : _selectedTrades.add(trade),
+                  ),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 10,
+                    ),
                     decoration: BoxDecoration(
-                      color: isSelected ? const Color(0xFF0051DD) : (isDark ? const Color(0xFF0D2D4D) : Colors.white),
+                      color: isSelected
+                          ? const Color(0xFF0051DD)
+                          : (isDark ? const Color(0xFF0D2D4D) : Colors.white),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: isSelected ? Colors.transparent : onSurfaceColor.withOpacity(0.1)),
+                      border: Border.all(
+                        color: isSelected
+                            ? Colors.transparent
+                            : onSurfaceColor.withOpacity(0.1),
+                      ),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        if (isSelected) const Icon(Icons.check, color: Colors.white, size: 16),
+                        if (isSelected)
+                          const Icon(
+                            Icons.check,
+                            color: Colors.white,
+                            size: 16,
+                          ),
                         if (isSelected) const SizedBox(width: 8),
                         Text(
                           trade,
                           style: TextStyle(
                             color: isSelected ? Colors.white : onSurfaceColor,
-                            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                            fontWeight: isSelected
+                                ? FontWeight.bold
+                                : FontWeight.normal,
                           ),
                         ),
                       ],
@@ -242,7 +311,11 @@ class _TradesmanVerificationScreenState
             // 4. Custom Service
             Text(
               t.tr(en: "Write another service", ar: "اكتب خدمة اخرى"),
-              style: TextStyle(color: onSurfaceColor, fontSize: 14, fontWeight: FontWeight.w600),
+              style: TextStyle(
+                color: onSurfaceColor,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
             ),
             const SizedBox(height: 10),
             Row(
@@ -254,16 +327,28 @@ class _TradesmanVerificationScreenState
                     decoration: InputDecoration(
                       hintText: t.tr(en: "Type here...", ar: "اكتب هنا..."),
                       filled: true,
-                      fillColor: isDark ? const Color(0xFF0D2D4D) : Colors.white,
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      fillColor: isDark
+                          ? const Color(0xFF0D2D4D)
+                          : Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
                     ),
                   ),
                 ),
                 const SizedBox(width: 10),
                 IconButton(
                   onPressed: _addCustomTrade,
-                  icon: const Icon(Icons.add_circle, color: Color(0xFF0051DD), size: 36),
+                  icon: const Icon(
+                    Icons.add_circle,
+                    color: Color(0xFF0051DD),
+                    size: 36,
+                  ),
                 ),
               ],
             ),
@@ -279,9 +364,17 @@ class _TradesmanVerificationScreenState
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       side: const BorderSide(color: Colors.grey),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
                     ),
-                    child: Text(t.cancel, style: const TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
+                    child: Text(
+                      t.cancel,
+                      style: const TextStyle(
+                        color: Colors.grey,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -291,11 +384,26 @@ class _TradesmanVerificationScreenState
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       backgroundColor: const Color(0xFF0051DD),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
                     ),
-                    child: _isLoading 
-                      ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                      : Text(t.tr(en: "Confirm", ar: "تأكيد"), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                    child: _isLoading
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : Text(
+                            t.tr(en: "Confirm", ar: "تأكيد"),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                   ),
                 ),
               ],

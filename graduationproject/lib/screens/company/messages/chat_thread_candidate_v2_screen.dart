@@ -27,7 +27,7 @@ class _CompanyChatThreadCandidateV2ScreenState
       time: DateTime.now().subtract(const Duration(minutes: 5)),
     ),
     _Bubble(
-      text: 'We want to invite you for a quick interview', 
+      text: 'We want to invite you for a quick interview',
       fromMe: true,
       time: DateTime.now().subtract(const Duration(minutes: 4)),
     ),
@@ -112,19 +112,15 @@ class _ChatBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    
-    final bg = bubble.fromMe
-        ? cs.primary
-        : cs.surfaceContainerHigh;
-        
-    final textColor = bubble.fromMe
-        ? cs.onPrimary
-        : cs.onSurface;
 
-    final align = bubble.fromMe 
-        ? AlignmentDirectional.centerEnd 
+    final bg = bubble.fromMe ? cs.primary : cs.surfaceContainerHigh;
+
+    final textColor = bubble.fromMe ? cs.onPrimary : cs.onSurface;
+
+    final align = bubble.fromMe
+        ? AlignmentDirectional.centerEnd
         : AlignmentDirectional.centerStart;
-        
+
     final borderRadius = BorderRadius.only(
       topLeft: const Radius.circular(20),
       topRight: const Radius.circular(20),
@@ -158,11 +154,7 @@ class _ChatBubble extends StatelessWidget {
           children: [
             Text(
               bubble.text,
-              style: TextStyle(
-                color: textColor,
-                fontSize: 14,
-                height: 1.4,
-              ),
+              style: TextStyle(color: textColor, fontSize: 14, height: 1.4),
             ),
             Padding(
               padding: const EdgeInsets.only(left: 8, top: 4),

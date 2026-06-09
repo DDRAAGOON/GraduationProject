@@ -32,13 +32,12 @@ class RatingService {
         if (jobId != null) 'jobId': jobId,
       };
 
-      final response = await _apiClient.post(
-        ApiConstants.ratings,
-        data: data,
-      );
+      final response = await _apiClient.post(ApiConstants.ratings, data: data);
 
       final raw = response.data;
-      final ratingData = (raw is Map && raw['data'] != null) ? raw['data'] : raw;
+      final ratingData = (raw is Map && raw['data'] != null)
+          ? raw['data']
+          : raw;
       final rating = Rating.fromMap(ratingData as Map<String, dynamic>);
 
       if (kDebugMode) debugPrint('✅ Rating created: ${rating.ratingId}');
@@ -51,11 +50,13 @@ class RatingService {
 
   /// ✅ جلب تقييمات شركة + متوسط التقييم
   Future<({List<Rating> ratings, double average, int total})>
-      getCompanyRatingsWithStats(String companyId) async {
+  getCompanyRatingsWithStats(String companyId) async {
     try {
       if (kDebugMode) debugPrint('🌟 Fetching ratings for company: $companyId');
 
-      final response = await _apiClient.get(ApiConstants.companyRatings(companyId));
+      final response = await _apiClient.get(
+        ApiConstants.companyRatings(companyId),
+      );
       final data = response.data;
 
       List<dynamic> ratingsList = [];
@@ -76,7 +77,8 @@ class RatingService {
           .map((r) => Rating.fromMap(r as Map<String, dynamic>))
           .toList();
 
-      if (kDebugMode) debugPrint('✅ Fetched ${ratings.length} ratings, avg: $average');
+      if (kDebugMode)
+        debugPrint('✅ Fetched ${ratings.length} ratings, avg: $average');
       return (ratings: ratings, average: average, total: total);
     } catch (e) {
       if (kDebugMode) debugPrint('❌ Error fetching company ratings: $e');
@@ -87,7 +89,9 @@ class RatingService {
   /// ✅ جلب التقييمات اللي أعطتها الشركة للمرشحين
   Future<List<Rating>> getCompanyGivenRatings(String companyId) async {
     try {
-      final response = await _apiClient.get(ApiConstants.companyGivenRatings(companyId));
+      final response = await _apiClient.get(
+        ApiConstants.companyGivenRatings(companyId),
+      );
       final data = response.data;
       final list = (data is Map && data['data'] is List)
           ? data['data'] as List
@@ -105,7 +109,9 @@ class RatingService {
   /// ✅ حذف تقييم
   Future<bool> deleteRating(String ratingId) async {
     try {
-      final response = await _apiClient.delete(ApiConstants.ratingById(ratingId));
+      final response = await _apiClient.delete(
+        ApiConstants.ratingById(ratingId),
+      );
       return response.statusCode == 200 || response.statusCode == 204;
     } catch (e) {
       if (kDebugMode) debugPrint('❌ Error deleting rating: $e');

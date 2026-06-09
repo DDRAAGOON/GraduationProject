@@ -7,7 +7,11 @@ class AiSmartService {
 
   AiSmartService(this._apiClient);
 
-  Future<List<dynamic>> smartSearch(String query, {String? location, String? category}) async {
+  Future<List<dynamic>> smartSearch(
+    String query, {
+    String? location,
+    String? category,
+  }) async {
     try {
       final response = await _apiClient.get(
         ApiConstants.aiSmartSearch,

@@ -47,7 +47,9 @@ class ChatMessage {
       recipientId: json['recipientId']?.toString(),
       content: json['content'] ?? json['text'] ?? '',
       type: json['type'] ?? 'text',
-      createdAt: DateTime.parse(json['createdAt'] ?? DateTime.now().toIso8601String()),
+      createdAt: DateTime.parse(
+        json['createdAt'] ?? DateTime.now().toIso8601String(),
+      ),
       isRead: json['isRead'] ?? false,
     );
   }
@@ -69,20 +71,21 @@ class UserInfo {
   });
 
   factory UserInfo.fromJson(Map<String, dynamic> json) {
-    final id = json['id']?.toString() ??
+    final id =
+        json['id']?.toString() ??
         json['userId']?.toString() ??
-        json['_id']?.toString() ?? '';
+        json['_id']?.toString() ??
+        '';
 
-    final name = json['fullName'] ??
-        json['name'] ??
-        json['username'] ??
-        'Unknown';
+    final name =
+        json['fullName'] ?? json['name'] ?? json['username'] ?? 'Unknown';
 
     final email = json['email'] ?? '';
     final role = json['role']?.toString();
 
     // ✅ معالجة صحيحة للـ photoUrl باستخدام ApiConstants
-    String? rawPhotoUrl = json['avatarUrl'] ??
+    String? rawPhotoUrl =
+        json['avatarUrl'] ??
         json['photoUrl'] ??
         json['picture'] ??
         json['avatar'];

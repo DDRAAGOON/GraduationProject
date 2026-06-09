@@ -46,8 +46,10 @@ class _CompanyAppearanceSettingsScreenState
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(t.tr(en: 'Theme', ar: 'المظهر العام'),
-                style: Theme.of(context).textTheme.titleSmall),
+            Text(
+              t.tr(en: 'Theme', ar: 'المظهر العام'),
+              style: Theme.of(context).textTheme.titleSmall,
+            ),
             const SizedBox(height: 10),
             SegmentedButton<String>(
               segments: const [
@@ -66,8 +68,10 @@ class _CompanyAppearanceSettingsScreenState
               },
             ),
             const SizedBox(height: 20),
-            Text(t.tr(en: 'Language', ar: 'اللغة'),
-                style: Theme.of(context).textTheme.titleSmall),
+            Text(
+              t.tr(en: 'Language', ar: 'اللغة'),
+              style: Theme.of(context).textTheme.titleSmall,
+            ),
             const SizedBox(height: 10),
             SegmentedButton<String>(
               segments: const [

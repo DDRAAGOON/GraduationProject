@@ -69,16 +69,15 @@ class _RecruitmentCompanySignInScreenState
       await RecruitmentSyncService.instance.startPolling();
 
       if (!mounted) return;
-      Navigator.of(context).pushNamedAndRemoveUntil(
-        AppRoutes.companyWorkspace,
-        (route) => false,
-      );
+      Navigator.of(
+        context,
+      ).pushNamedAndRemoveUntil(AppRoutes.companyWorkspace, (route) => false);
     } catch (_) {
       if (!mounted) return;
       final t = AppLocalizations.of(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(t.invalidCredentials)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(t.invalidCredentials)));
     } finally {
       if (mounted) {
         setState(() => _loading = false);
@@ -160,8 +159,9 @@ class _RecruitmentCompanySignInScreenState
             Align(
               alignment: t.isAr ? Alignment.centerLeft : Alignment.centerRight,
               child: TextButton(
-                onPressed: () =>
-                    Navigator.of(context).pushNamed(AppRoutes.companyForgotPassword),
+                onPressed: () => Navigator.of(
+                  context,
+                ).pushNamed(AppRoutes.companyForgotPassword),
                 child: Text(t.forgotPassword),
               ),
             ),
@@ -175,7 +175,8 @@ class _RecruitmentCompanySignInScreenState
             AppButton(
               label: t.createCompanyAccount,
               variant: AppButtonVariant.secondary,
-              onPressed: () => Navigator.of(context).pushNamed(AppRoutes.companySignUp),
+              onPressed: () =>
+                  Navigator.of(context).pushNamed(AppRoutes.companySignUp),
             ),
           ],
         ),
