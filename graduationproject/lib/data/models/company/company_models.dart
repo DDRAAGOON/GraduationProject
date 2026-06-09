@@ -32,3 +32,101 @@ class Company {
     );
   }
 }
+
+class CompanyProfile {
+  final String companyId;
+  final String name;
+  final String? description;
+  final String? address;
+  final String? contactEmail;
+  final String? phone;
+  final String? logoUrl;
+  final String? bannerUrl;
+  final String? website;
+  final String? industry;
+  final String? employees;
+  final int? foundedYear;
+  final int? foundedMonth;
+  final int? foundedDay;
+  final String? classification;
+  final String? verificationStatus;
+  final SocialLinks socialLinks;
+  final List<String> benefits;
+  final List<String> techStack;
+
+  CompanyProfile({
+    required this.companyId,
+    required this.name,
+    this.description,
+    this.address,
+    this.contactEmail,
+    this.phone,
+    this.logoUrl,
+    this.bannerUrl,
+    this.website,
+    this.industry,
+    this.employees,
+    this.foundedYear,
+    this.foundedMonth,
+    this.foundedDay,
+    this.classification,
+    this.verificationStatus,
+    required this.socialLinks,
+    required this.benefits,
+    required this.techStack,
+  });
+
+  factory CompanyProfile.fromMap(Map<String, dynamic> map) {
+    return CompanyProfile(
+      companyId: map['companyId']?.toString() ?? '',
+      name: map['name']?.toString() ?? '',
+      description: map['description']?.toString(),
+      address: map['address']?.toString(),
+      contactEmail: map['contactEmail']?.toString(),
+      phone: map['phone']?.toString(),
+      logoUrl: map['logoUrl']?.toString(),
+      bannerUrl: map['bannerUrl']?.toString(),
+      website: map['website']?.toString(),
+      industry: map['industry']?.toString(),
+      employees: map['employees']?.toString(),
+      foundedYear: map['foundedYear'],
+      foundedMonth: map['foundedMonth'],
+      foundedDay: map['foundedDay'],
+      classification: map['classification']?.toString(),
+      verificationStatus: map['verificationStatus']?.toString(),
+      socialLinks: SocialLinks.fromMap(map['socialLinks'] ?? {}),
+      benefits: map['benefits'] is List 
+          ? List<String>.from(map['benefits']) 
+          : [],
+      techStack: map['techStack'] is List 
+          ? List<String>.from(map['techStack']) 
+          : [],
+    );
+  }
+}
+
+class SocialLinks {
+  final String? facebook;
+  final String? twitter;
+  final String? linkedin;
+  final String? instagram;
+  final String? youtube;
+
+  SocialLinks({
+    this.facebook,
+    this.twitter,
+    this.linkedin,
+    this.instagram,
+    this.youtube,
+  });
+
+  factory SocialLinks.fromMap(Map<String, dynamic> map) {
+    return SocialLinks(
+      facebook: map['facebook']?.toString(),
+      twitter: map['twitter']?.toString(),
+      linkedin: map['linkedin']?.toString(),
+      instagram: map['instagram']?.toString(),
+      youtube: map['youtube']?.toString(),
+    );
+  }
+}

@@ -13,6 +13,7 @@ import '../../data/services/chat_service.dart';
 import '../../data/models/auth/auth_models.dart';
 import '../../data/models/job/job_models.dart';
 import '../../data/models/application/application_models.dart';
+import '../../data/models/company/company_models.dart';
 import '../state/company_store.dart';
 import '../state/recruitment_sync_store.dart';
 import 'session_manager.dart';
@@ -182,6 +183,34 @@ class RecruitmentSyncService {
       return user;
     } catch (e) {
       throw ErrorHandler.handle(e);
+    }
+  }
+
+  /// Sends a full profile payload to PUT /api/users/me and returns the raw
+  /// response map so the caller can inspect [requiresLogout] and [access_token].
+  Future<Map<String, dynamic>> completeUserProfile(
+      Map<String, dynamic> payload) async {
+    try {
+      final response = await _apiClient.put(
+        ApiConstants.userMe,
+        data: payload,
+      );
+      // response.data may contain requiresLogout and access_token
+      final data = response.data;
+      if (data is Map<String, dynamic>) return data;
+      return {};
+    } catch (e) {
+      throw ErrorHandler.handle(e);
+    }
+  }
+
+  /// Fetches the authenticated company's full profile
+  Future<CompanyProfile> getCompanyProfile() async {
+    try {
+      return await _companyService.getCompanyProfile();
+    } catch (e) {
+      if (kDebugMode) debugPrint('❌ Error fetching company profile: $e');
+      rethrow;
     }
   }
 

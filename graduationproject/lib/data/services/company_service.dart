@@ -61,4 +61,14 @@ class CompanyService {
       throw ErrorHandler.handle(e);
     }
   }
+
+  /// Fetches the authenticated company's full profile
+  Future<CompanyProfile> getCompanyProfile() async {
+    try {
+      final response = await _apiClient.get(ApiConstants.myCompanyProfile);
+      return CompanyProfile.fromMap(response.data);
+    } catch (e) {
+      throw ErrorHandler.handle(e);
+    }
+  }
 }

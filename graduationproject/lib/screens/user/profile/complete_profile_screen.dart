@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'dart:convert';
 import 'dart:io';
 import '../../../shared/l10n/app_localizations.dart';
 import '../../../shared/state/theme_controller.dart';
 import '../../../app/router/app_router.dart';
 import '../../../shared/state/recruitment_sync_store.dart';
 import '../../../shared/services/recruitment_sync_service.dart';
+import '../../../core/network/secure_storage.dart';
 import '../../../screens/user/profile/user_data.dart';
 
 class CompleteProfileScreen extends StatefulWidget {
@@ -41,6 +43,8 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   final List<Map<String, String>> _educationList = [];
   final List<Map<String, String>> _experienceList = [];
   final List<String> _skillsList = [];
+
+  bool _isSaving = false;
 
   // Controllers for adding items
   final _eduInstitution = TextEditingController();
@@ -628,90 +632,241 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     );
   }
 
+  // ─────────────────────────────────────────────
+  // حفظ البيانات وإرسالها للباك-إند
+  // ─────────────────────────────────────────────
+  Future<void> _saveProfile(AppLocalizations t) async {
+    // 1. Validate required fields
+    setState(() {
+      _fullNameError    = _fullName.text.trim().isEmpty ? t.required : null;
+      _phoneError       = _phone.text.trim().isEmpty    ? t.required : null;
+      _emailError       = _email.text.trim().isEmpty    ? t.required : null;
+      _dobError         = _dob.text.isEmpty             ? t.required : null;
+      _governorateError = _selectedGovernorate == null  ? t.required : null;
+    });
+
+    if (_fullNameError != null || _phoneError != null ||
+        _emailError != null || _dobError != null ||
+        _governorateError != null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(t.tr(
+          en: 'Please fill all required fields',
+          ar: 'يرجى ملء جميع الحقول المطلوبة',
+        )),
+        backgroundColor: Colors.redAccent,
+      ));
+      return;
+    }
+
+    // 2. Extra validation for tradesman
+    if (_selectedRole == 'Tradesman') {
+      final allServices = [
+        ..._selectedServices,
+        if (_otherServiceController.text.trim().isNotEmpty)
+          _otherServiceController.text.trim(),
+      ];
+      if (allServices.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(t.tr(
+            en: 'Please select at least one service',
+            ar: 'يرجى اختيار خدمة واحدة على الأقل',
+          )),
+          backgroundColor: Colors.redAccent,
+        ));
+        return;
+      }
+      if (_criminalRecordFile == null) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(t.tr(
+            en: 'Please upload your criminal record (Fish)',
+            ar: 'يرجى رفع الفيش الجنائي',
+          )),
+          backgroundColor: Colors.redAccent,
+        ));
+        return;
+      }
+    }
+
+    setState(() => _isSaving = true);
+
+    try {
+      // 3. Upload avatar image → get URL
+      String? avatarUrl;
+      if (_profileImage != null) {
+        final bytes = await _profileImage!.readAsBytes();
+        avatarUrl = 'data:image/jpeg;base64,${base64Encode(bytes)}';
+      }
+
+      // 4. Upload criminal record → get URL  (tradesman only)
+      String? criminalRecordUrl;
+      if (_selectedRole == 'Tradesman' && _criminalRecordFile != null) {
+        final bytes = await _criminalRecordFile!.readAsBytes();
+        criminalRecordUrl = 'data:image/jpeg;base64,${base64Encode(bytes)}';
+      }
+
+      // 5. Upload portfolio images → get URLs
+      List<String> portfolioUrls = [];
+      for (final img in _workImages) {
+        final bytes = await img.readAsBytes();
+        portfolioUrls.add('data:image/jpeg;base64,${base64Encode(bytes)}');
+      }
+
+      // 6. Build payload – field names must match the backend controller exactly
+      final isTradesman = _selectedRole == 'Tradesman';
+      final allServices = [
+        ..._selectedServices,
+        if (_otherServiceController.text.trim().isNotEmpty)
+          _otherServiceController.text.trim(),
+      ];
+
+      final Map<String, dynamic> payload = {
+        'fullName'  : _fullName.text.trim(),
+        'phone'     : _phone.text.trim(),
+        'bio'       : _aboutMe.text.trim(),
+        'dob'       : _dob.text,           // Backend: dob
+        'gender'    : _selectedGender,
+        'location'  : _selectedGovernorate,
+        'classification': isTradesman ? 'tradesman' : 'seeker',
+
+        if (_skillsList.isNotEmpty)
+          'skills' : _skillsList,          // Backend: skills
+
+        // Seeker-specific
+        if (!isTradesman && _educationList.isNotEmpty)
+          'educations' : _educationList,   // Backend: educations
+
+        if (!isTradesman && _experienceList.isNotEmpty)
+          'experiences' : _experienceList, // Backend: experiences
+
+        // Tradesman-specific
+        if (isTradesman && allServices.isNotEmpty)
+          'services' : allServices,        // Backend: services
+
+        if (isTradesman && criminalRecordUrl != null)
+          'criminalRecordUrl' : criminalRecordUrl, // Backend: criminalRecordUrl
+
+        if (portfolioUrls.isNotEmpty)
+          'portfolios' : portfolioUrls,    // Backend: portfolios
+
+        if (avatarUrl != null)
+          'avatarUrl' : avatarUrl,         // Backend: avatarUrl
+      };
+
+      // 7. Call PUT /api/users/me
+      final response = await RecruitmentSyncService.instance.completeUserProfile(payload);
+
+      if (!mounted) return;
+
+      // 8. Handle requiresLogout (tradesman pending review)
+      if (response['requiresLogout'] == true) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(t.tr(
+            en: 'Your account is under review. You will be notified once approved.',
+            ar: 'حسابك قيد المراجعة. سيتم إشعارك عند الموافقة.',
+          )),
+          backgroundColor: Colors.orange,
+          duration: const Duration(seconds: 4),
+        ));
+        // Logout and go to sign-in
+        await RecruitmentSyncService.instance.logout();
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          AppRoutes.userSignInNew,
+          (route) => false,
+        );
+        return;
+      }
+
+      // 9. Save new token if returned
+      final newToken = response['access_token'];
+      if (newToken != null && newToken is String && newToken.isNotEmpty) {
+        await SecureStorage.saveToken(newToken);
+      }
+
+      // 10. Update local store & legacy data
+      final store = RecruitmentSyncStore.instance;
+      final List<Map<String, String>> socialLinks = [];
+      if (_facebook.text.isNotEmpty)  socialLinks.add({'platform': 'Facebook',  'url': _facebook.text});
+      if (_instagram.text.isNotEmpty) socialLinks.add({'platform': 'Instagram', 'url': _instagram.text});
+      if (_whatsapp.text.isNotEmpty)  socialLinks.add({'platform': 'WhatsApp',  'url': _whatsapp.text});
+
+      store.updateUserProfile(
+        fullName   : _fullName.text.trim(),
+        title      : isTradesman
+            ? (allServices.isNotEmpty ? allServices.join(', ') : 'Tradesman')
+            : 'Job Seeker',
+        email      : _email.text.trim(),
+        phone      : _phone.text.trim(),
+        location   : _selectedGovernorate ?? '',
+        about      : _aboutMe.text.trim(),
+        skills     : _skillsList,
+        education  : _educationList,
+        experience : _experienceList,
+        socialLinks: socialLinks,
+        role               : _selectedRole,
+        backgroundImage    : _wallpaperImage?.path,
+        profileImage       : _profileImage?.path,
+        portfolioImages    : _workImages.map((e) => e.path).toList(),
+        birthDate          : _dob.text,
+        gender             : _selectedGender,
+        governorate        : _selectedGovernorate ?? '',
+        tradesmanServices  : _selectedServices,
+      );
+
+      UserProfileData.dob    = _dob.text;
+      UserProfileData.gender = _selectedGender;
+
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(t.tr(en: 'Profile saved successfully!', ar: 'تم حفظ الملف الشخصي بنجاح!')),
+        backgroundColor: Colors.green,
+      ));
+
+      // 11. Navigate to workspace
+      await Future.delayed(const Duration(milliseconds: 600));
+      if (!mounted) return;
+      if (isTradesman) {
+        Navigator.of(context).pushReplacementNamed(AppRoutes.tradesmanWorkspace);
+      } else {
+        Navigator.of(context).pushReplacementNamed(AppRoutes.userWorkspace);
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(t.tr(
+          en: 'Save failed: ${e.toString()}',
+          ar: 'فشل الحفظ: ${e.toString()}',
+        )),
+        backgroundColor: Colors.redAccent,
+      ));
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
+    }
+  }
+
   Widget _buildSaveButton(AppLocalizations t) {
     return ElevatedButton(
-      onPressed: () async {
-        setState(() {
-          _fullNameError = _fullName.text.isEmpty ? t.required : null;
-          _phoneError = _phone.text.isEmpty ? t.required : null;
-          _emailError = _email.text.isEmpty ? t.required : null;
-          _dobError = _dob.text.isEmpty ? t.required : null;
-          _governorateError = _selectedGovernorate == null ? t.required : null;
-        });
-
-        if (_fullNameError != null ||
-            _phoneError != null ||
-            _emailError != null ||
-            _dobError != null ||
-            _governorateError != null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(t.tr(
-                en: "Please fill all basic information fields",
-                ar: "يرجى ملء جميع حقول المعلومات الأساسية",
-              )),
-              backgroundColor: Colors.redAccent,
-            ),
-          );
-          return;
-        }
-
-        // Save data to Store
-        final store = RecruitmentSyncStore.instance;
-        
-        // Prepare social links
-        final List<Map<String, String>> socialLinks = [];
-        if (_facebook.text.isNotEmpty) socialLinks.add({'platform': 'Facebook', 'url': _facebook.text});
-        if (_instagram.text.isNotEmpty) socialLinks.add({'platform': 'Instagram', 'url': _instagram.text});
-        if (_whatsapp.text.isNotEmpty) socialLinks.add({'platform': 'WhatsApp', 'url': _whatsapp.text});
-
-        // Update Store
-        store.updateUserProfile(
-          fullName: _fullName.text,
-          title: _selectedRole == "Tradesman" ? (_selectedServices.isNotEmpty ? _selectedServices.join(", ") : "Tradesman") : "Job Seeker",
-          email: _email.text,
-          phone: _phone.text,
-          location: _selectedGovernorate ?? "",
-          about: _aboutMe.text,
-          skills: _skillsList,
-          education: _educationList,
-          experience: _experienceList,
-          socialLinks: socialLinks,
-          role: _selectedRole,
-          backgroundImage: _wallpaperImage?.path,
-          profileImage: _profileImage?.path,
-          portfolioImages: _workImages.map((e) => e.path).toList(),
-          birthDate: _dob.text,
-          gender: _selectedGender,
-          governorate: _selectedGovernorate ?? "",
-          tradesmanServices: _selectedServices,
-        );
-
-        // Sync with Service (optional depending on your backend state)
-        RecruitmentSyncService.instance.updateProfile(
-          name: _fullName.text,
-          photoUrl: _profileImage?.path,
-        );
-
-        // Save to static legacy data if needed
-        UserProfileData.dob = _dob.text;
-        UserProfileData.gender = _selectedGender;
-
-        if (_selectedRole == "Tradesman") {
-          Navigator.of(context).pushReplacementNamed(AppRoutes.tradesmanWorkspace);
-        } else {
-          Navigator.of(context).pushReplacementNamed(AppRoutes.userWorkspace);
-        }
-      },
+      onPressed: _isSaving ? null : () => _saveProfile(t),
       style: ElevatedButton.styleFrom(
         backgroundColor: const Color(0xFF142C66),
+        disabledBackgroundColor: Colors.grey,
         padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
       ),
-      child: Text(
-        t.tr(en: "Save Profile", ar: "حفظ الملف الشخصي"),
-        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-      ),
+      child: _isSaving
+          ? const SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: Colors.white,
+              ),
+            )
+          : Text(
+              t.tr(en: 'Save Profile', ar: 'حفظ الملف الشخصي'),
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
     );
   }
 }

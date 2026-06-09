@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:dio/io.dart';
 import 'package:flutter/foundation.dart';
 import '../constants/api_constants.dart';
 import 'api_interceptors.dart';
@@ -15,6 +17,21 @@ class ApiClient {
       sendTimeout: const Duration(seconds: 60),
     ),
   ) {
+    // 👇 إعداد تجاوز الـ SSL للـ Railway
+    (_dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient = () {
+      final client = HttpClient();
+      client.badCertificateCallback =
+          (X509Certificate cert, String host, int port) {
+        if (host.contains('railway.app') ||
+            host == 'jobito-api-production.up.railway.app') {
+          return true;
+        }
+        return false;
+      };
+      return client;
+    };
+    // 👆
+    
     _dio.interceptors.add(ApiInterceptors());
 
     if (kDebugMode) {
