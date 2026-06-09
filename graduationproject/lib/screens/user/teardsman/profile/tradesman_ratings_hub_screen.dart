@@ -6,7 +6,8 @@ import 'package:graduationproject/shared/state/recruitment_sync_store.dart';
 import 'package:graduationproject/shared/utils/rating_utils.dart';
 
 class TradesmanRatingsHubScreen extends StatefulWidget {
-  const TradesmanRatingsHubScreen({super.key});
+  final bool isTradesmanMode;
+  const TradesmanRatingsHubScreen({super.key, this.isTradesmanMode = true});
 
   @override
   State<TradesmanRatingsHubScreen> createState() =>
@@ -36,13 +37,19 @@ class _TradesmanRatingsHubScreenState extends State<TradesmanRatingsHubScreen> {
       return;
     }
 
-    final received = await RatingService.instance.getUserRatings(userId);
-    final given = await RatingService.instance.getUserGivenRatings(userId);
+    final receivedRaw = await RatingService.instance.getUserRatings(userId);
+    final givenRaw = await RatingService.instance.getUserGivenRatings(userId);
+    
     if (!mounted) return;
 
     setState(() {
-      _received = received.map(_toEntry).toList();
-      _given = given.map((r) => _toEntry(r, isGiven: true)).toList();
+      // Filter received ratings based on mode
+      _received = receivedRaw.where((r) {
+        final type = r['raterType']?.toString().toLowerCase() ?? '';
+        return widget.isTradesmanMode ? type.contains('tradesman') : !type.contains('tradesman');
+      }).map(_toEntry).toList();
+
+      _given = givenRaw.map((r) => _toEntry(r, isGiven: true)).toList();
       _isLoading = false;
     });
   }
@@ -51,6 +58,17 @@ class _TradesmanRatingsHubScreenState extends State<TradesmanRatingsHubScreen> {
     Map<String, dynamic> rating, {
     bool isGiven = false,
   }) {
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
+    
+    String subtitle = "";
+    if (isGiven) {
+      subtitle = isAr ? 'تقييمي له' : 'My rating';
+    } else {
+      subtitle = widget.isTradesmanMode 
+          ? (isAr ? 'عميل' : 'Client')
+          : (isAr ? 'شركة' : 'Company');
+    }
+
     return TradesmanRatingEntry(
       personName: isGiven
           ? RatingUtils.targetName(rating)
@@ -58,13 +76,7 @@ class _TradesmanRatingsHubScreenState extends State<TradesmanRatingsHubScreen> {
       rating: RatingUtils.value(rating),
       comment: RatingUtils.comment(rating),
       date: RatingUtils.date(rating) ?? DateTime.now(),
-      subtitle: isGiven
-          ? (Localizations.localeOf(context).languageCode == 'ar'
-                ? 'طالب خدمة'
-                : 'Service requester')
-          : (Localizations.localeOf(context).languageCode == 'ar'
-                ? 'عميل'
-                : 'Client'),
+      subtitle: subtitle,
     );
   }
 
@@ -75,6 +87,10 @@ class _TradesmanRatingsHubScreenState extends State<TradesmanRatingsHubScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bgColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
 
+    final receivedTitle = widget.isTradesmanMode 
+        ? (isAr ? 'تقييمات العملاء' : 'Client ratings')
+        : (isAr ? 'تقييمات الشركات' : 'Company ratings');
+
     return DefaultTabController(
       length: 2,
       child: Scaffold(
@@ -83,23 +99,21 @@ class _TradesmanRatingsHubScreenState extends State<TradesmanRatingsHubScreen> {
           backgroundColor: bgColor,
           elevation: 0,
           surfaceTintColor: Colors.transparent,
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back_ios, color: isDark ? Colors.white : Colors.black, size: 20),
+            onPressed: () => Navigator.pop(context),
+          ),
           title: Text(
-            t.tr(en: 'Ratings', ar: 'التقييمات'),
-            style: const TextStyle(fontWeight: FontWeight.bold),
+            t.tr(en: 'Ratings & Reviews', ar: 'التقييمات والآراء'),
+            style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black, fontSize: 18),
           ),
           bottom: TabBar(
             labelColor: Theme.of(context).colorScheme.primary,
-            unselectedLabelColor: Theme.of(
-              context,
-            ).colorScheme.onSurface.withValues(alpha: 0.5),
+            unselectedLabelColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
             indicatorColor: Theme.of(context).colorScheme.primary,
             tabs: [
-              Tab(
-                text: t.tr(en: 'Client ratings', ar: 'تقييمات العملاء'),
-              ),
-              Tab(
-                text: t.tr(en: 'My ratings', ar: 'تقييماتي للآخرين'),
-              ),
+              Tab(text: receivedTitle),
+              Tab(text: isAr ? 'تقييماتي للآخرين' : 'My ratings'),
             ],
           ),
         ),
@@ -112,8 +126,8 @@ class _TradesmanRatingsHubScreenState extends State<TradesmanRatingsHubScreen> {
                     _RatingsList(
                       entries: _received,
                       emptyMessage: isAr
-                          ? 'لا توجد تقييمات من العملاء بعد'
-                          : 'No client ratings yet',
+                          ? 'لا توجد تقييمات مستلمة بعد'
+                          : 'No received ratings yet',
                       isAr: isAr,
                     ),
                     _RatingsList(

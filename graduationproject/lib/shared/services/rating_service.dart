@@ -10,18 +10,18 @@ class RatingService {
   Future<void> createRating({
     required num ratingValue,
     String? comment,
-    int? companyId,
+    dynamic companyId,
     String? targetUserId,
-    int? jobId,
+    dynamic jobId,
     String? raterType,
   }) async {
     final body = <String, dynamic>{'ratingValue': ratingValue};
     if (comment != null && comment.isNotEmpty) body['comment'] = comment;
-    if (companyId != null) body['companyId'] = companyId;
+    if (companyId != null) body['companyId'] = int.tryParse(companyId.toString()) ?? companyId;
     if (targetUserId != null && targetUserId.isNotEmpty) {
       body['targetUserId'] = targetUserId;
     }
-    if (jobId != null) body['jobId'] = jobId;
+    if (jobId != null) body['jobId'] = int.tryParse(jobId.toString()) ?? jobId;
     if (raterType != null && raterType.isNotEmpty) body['raterType'] = raterType;
 
     final response = await ApiClient.post(

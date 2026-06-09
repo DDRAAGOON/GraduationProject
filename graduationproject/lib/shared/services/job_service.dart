@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import '../../data/api/api_client.dart';
 import '../state/recruitment_sync_store.dart';
 import 'rating_service.dart';
@@ -135,10 +137,13 @@ class JobService {
         requiresAuth: true,
         body: body,
       );
-      final data = await handleResponse(response, (map) => map);
+      
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        await handleResponse(response, (map) => map); // This will throw ApiException
+      }
 
-      // If the backend returns the job object in data['job'] or just the data map
-      final j = data['job'] ?? data;
+      final data = jsonDecode(response.body);
+      final j = data['job'] ?? data['data'] ?? data;
       return j['jobId']?.toString() ??
           j['_id']?.toString() ??
           j['id']?.toString() ??

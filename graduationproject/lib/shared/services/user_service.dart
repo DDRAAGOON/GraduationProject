@@ -1,9 +1,26 @@
+import 'dart:convert';
 import '../../data/api/api_client.dart';
+import '../models/portfolio_item.dart';
 import '../state/recruitment_sync_store.dart';
 
 class UserService {
   UserService._();
   static final UserService instance = UserService._();
+
+  Future<List<PortfolioItem>> fetchPortfolio(String userId) async {
+    try {
+      final response = await ApiClient.get('/users/$userId/portfolio', requiresAuth: true);
+      if (response.statusCode == 200) {
+        final decoded = jsonDecode(response.body);
+        final List list = decoded is List ? decoded : (decoded['data'] ?? []);
+        return list.map((item) => PortfolioItem.fromJson(item)).toList();
+      } else {
+        throw Exception('Failed to fetch portfolio');
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
 
   Future<Map<String, dynamic>> getCurrentUser() async {
     try {

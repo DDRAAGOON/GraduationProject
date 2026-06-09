@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import '../../../shared/l10n/app_localizations.dart';
+import '../../../shared/services/auth_service.dart';
 import '../../../shared/state/theme_controller.dart';
 import '../../../app/router/app_router.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
-  const ResetPasswordScreen({super.key});
+  final String? email;
+  final String? otp;
+  const ResetPasswordScreen({super.key, this.email, this.otp});
 
   @override
   State<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
@@ -15,12 +18,12 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   final _confirmPasswordController = TextEditingController();
   bool _obscureNew = true;
   bool _obscureConfirm = true;
+  bool _isLoading = false;
 
   String? _newPassError;
   String? _confirmPassError;
 
   bool _isPasswordValid(String pass) {
-    // التحقق من الطول فقط (8 على الأقل) كما طلب المستخدم
     return pass.length >= 8;
   }
 
@@ -31,163 +34,57 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
+  Future<void> _handleReset() async {
     final t = AppLocalizations.of(context);
-    
-    return ValueListenableBuilder<ThemeMode>(
-      valueListenable: ThemeController.instance.themeMode,
-      builder: (context, themeMode, _) {
-        final isDark = themeMode == ThemeMode.dark || 
-                      (themeMode == ThemeMode.system && MediaQuery.platformBrightnessOf(context) == Brightness.dark);
-        
-        final backgroundColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
-        final textColorPrimary = isDark ? Colors.white : Colors.black;
+    final newPass = _newPasswordController.text;
+    final confirmPass = _confirmPasswordController.text;
 
-        return Scaffold(
-          backgroundColor: backgroundColor,
-          appBar: AppBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            leading: IconButton(
-              icon: Icon(Icons.arrow_back_ios, color: isDark ? Colors.white70 : Colors.black54, size: 20),
-              onPressed: () => Navigator.pop(context),
-            ),
-            title: Text(
-              t.resetPassword,
-              style: const TextStyle(
-                color: Color(0xFFF77F32), 
-                fontSize: 20, 
-                fontWeight: FontWeight.bold
-              ),
-            ),
-            centerTitle: true,
-          ),
-          body: SafeArea(
-            child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20),
-              children: [
-                const SizedBox(height: 20),
-                // Main Heading
-                RichText(
-                  text: TextSpan(
-                    style: const TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      height: 1.2,
-                      fontFamily: 'Inter',
-                    ),
-                    children: [
-                      TextSpan(
-                        text: t.isAr ? 'إعادة تعيين ' : 'Reset ', 
-                        style: const TextStyle(color: Color(0xFFF77F32))
-                      ),
-                      TextSpan(
-                        text: t.isAr ? 'كلمة المرور' : 'Password', 
-                        style: const TextStyle(color: Color(0xFF0051DD))
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  t.resetPasswordSub,
-                  style: TextStyle(
-                    color: isDark ? Colors.white70 : Colors.black54,
-                    fontSize: 15,
-                    height: 1.4,
-                  ),
-                ),
-                
-                const SizedBox(height: 48),
+    setState(() {
+      _newPassError = null;
+      _confirmPassError = null;
+    });
 
-                // New Password Field
-                _buildLabel(t.newPassword, textColorPrimary),
-                const SizedBox(height: 8),
-                _buildTextField(
-                  controller: _newPasswordController,
-                  hint: '••••••••',
-                  isDark: isDark,
-                  obscureText: _obscureNew,
-                  errorText: _newPassError,
-                  suffixIcon: IconButton(
-                    onPressed: () => setState(() => _obscureNew = !_obscureNew),
-                    icon: Icon(
-                      _obscureNew ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                      color: Colors.grey,
-                      size: 20,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  t.tr(en: "Must be at least 8 characters", ar: "يجب أن تكون 8 أحرف على الأقل"),
-                  style: TextStyle(color: isDark ? Colors.white54 : Colors.black54, fontSize: 13),
-                ),
+    bool hasError = false;
 
-                const SizedBox(height: 24),
+    if (!_isPasswordValid(newPass)) {
+      _newPassError = t.isAr ? "كلمة المرور قصيرة جداً" : "Password too short";
+      hasError = true;
+    }
 
-                // Confirm Password Field
-                _buildLabel(t.confirmPassword, textColorPrimary),
-                const SizedBox(height: 8),
-                _buildTextField(
-                  controller: _confirmPasswordController,
-                  hint: '••••••••',
-                  isDark: isDark,
-                  obscureText: _obscureConfirm,
-                  errorText: _confirmPassError,
-                  suffixIcon: IconButton(
-                    onPressed: () => setState(() => _obscureConfirm = !_obscureConfirm),
-                    icon: Icon(
-                      _obscureConfirm ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                      color: Colors.grey,
-                      size: 20,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  t.mustMatch,
-                  style: TextStyle(color: isDark ? Colors.white54 : Colors.black54, fontSize: 13),
-                ),
+    if (newPass != confirmPass) {
+      _confirmPassError = t.passwordsNoMatch;
+      hasError = true;
+    }
 
-                const SizedBox(height: 60),
+    if (hasError) return;
 
-                // Verify Account Button
-                _buildLargeButton(
-                  label: t.isAr ? "إعادة تعيين" : t.verifyAccount,
-                  onPressed: () {
-                    final newPass = _newPasswordController.text;
-                    final confirmPass = _confirmPasswordController.text;
+    if (widget.email == null || widget.otp == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Missing email or OTP")),
+      );
+      return;
+    }
 
-                    setState(() {
-                      _newPassError = null;
-                      _confirmPassError = null;
-                    });
+    setState(() => _isLoading = true);
 
-                    bool hasError = false;
+    try {
+      await AuthService.instance.resetPassword(
+        email: widget.email!,
+        code: widget.otp!,
+        newPassword: newPass,
+      );
 
-                    if (!_isPasswordValid(newPass)) {
-                      _newPassError = t.isAr ? "كلمة المرور قصيرة جداً" : "Password too short";
-                      hasError = true;
-                    }
+      if (!mounted) return;
+      setState(() => _isLoading = false);
 
-                    if (newPass != confirmPass) {
-                      _confirmPassError = t.passwordsNoMatch;
-                      hasError = true;
-                    }
-
-                    if (hasError) return;
-
-                    _showSuccessBottomSheet(context, t, isDark);
-                  },
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
+      _showSuccessBottomSheet(context, t, Theme.of(context).brightness == Brightness.dark);
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString().replaceAll('Exception: ', ''))),
+      );
+    }
   }
 
   void _showSuccessBottomSheet(BuildContext context, AppLocalizations t, bool isDark) {
@@ -214,7 +111,6 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 ),
               ),
               const SizedBox(height: 40),
-              // Illustration (Check circle with decorations)
               Stack(
                 alignment: Alignment.center,
                 children: [
@@ -311,7 +207,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     );
   }
 
-  Widget _buildLargeButton({required String label, required VoidCallback onPressed}) {
+  Widget _buildLargeButton({required String label, required VoidCallback onPressed, bool isLoading = false}) {
     return Container(
       width: double.infinity,
       height: 56,
@@ -326,7 +222,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
         ],
       ),
       child: ElevatedButton(
-        onPressed: onPressed,
+        onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF142C66),
           shape: RoundedRectangleBorder(
@@ -334,15 +230,143 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
           ),
           elevation: 0,
         ),
-        child: Text(
-          label,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 17,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        child: isLoading 
+          ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+          : Text(
+              label,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 17,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
       ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
+    
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: ThemeController.instance.themeMode,
+      builder: (context, themeMode, _) {
+        final isDark = themeMode == ThemeMode.dark || 
+                      (themeMode == ThemeMode.system && MediaQuery.platformBrightnessOf(context) == Brightness.dark);
+        
+        final backgroundColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
+        final textColorPrimary = isDark ? Colors.white : Colors.black;
+
+        return Scaffold(
+          backgroundColor: backgroundColor,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back_ios, color: isDark ? Colors.white70 : Colors.black54, size: 20),
+              onPressed: () => Navigator.pop(context),
+            ),
+            title: Text(
+              t.resetPassword,
+              style: const TextStyle(
+                color: Color(0xFFF77F32), 
+                fontSize: 20, 
+                fontWeight: FontWeight.bold
+              ),
+            ),
+            centerTitle: true,
+          ),
+          body: SafeArea(
+            child: ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20),
+              children: [
+                const SizedBox(height: 20),
+                RichText(
+                  text: TextSpan(
+                    style: const TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      height: 1.2,
+                      fontFamily: 'Inter',
+                    ),
+                    children: [
+                      TextSpan(
+                        text: t.isAr ? 'إعادة تعيين ' : 'Reset ', 
+                        style: const TextStyle(color: Color(0xFFF77F32))
+                      ),
+                      TextSpan(
+                        text: t.isAr ? 'كلمة المرور' : 'Password', 
+                        style: const TextStyle(color: Color(0xFF0051DD))
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  t.resetPasswordSub,
+                  style: TextStyle(
+                    color: isDark ? Colors.white70 : Colors.black54,
+                    fontSize: 15,
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: 48),
+                _buildLabel(t.newPassword, textColorPrimary),
+                const SizedBox(height: 8),
+                _buildTextField(
+                  controller: _newPasswordController,
+                  hint: '••••••••',
+                  isDark: isDark,
+                  obscureText: _obscureNew,
+                  errorText: _newPassError,
+                  suffixIcon: IconButton(
+                    onPressed: () => setState(() => _obscureNew = !_obscureNew),
+                    icon: Icon(
+                      _obscureNew ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                      color: Colors.grey,
+                      size: 20,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  t.tr(en: "Must be at least 8 characters", ar: "يجب أن تكون 8 أحرف على الأقل"),
+                  style: TextStyle(color: isDark ? Colors.white54 : Colors.black54, fontSize: 13),
+                ),
+                const SizedBox(height: 24),
+                _buildLabel(t.confirmPassword, textColorPrimary),
+                const SizedBox(height: 8),
+                _buildTextField(
+                  controller: _confirmPasswordController,
+                  hint: '••••••••',
+                  isDark: isDark,
+                  obscureText: _obscureConfirm,
+                  errorText: _confirmPassError,
+                  suffixIcon: IconButton(
+                    onPressed: () => setState(() => _obscureConfirm = !_obscureConfirm),
+                    icon: Icon(
+                      _obscureConfirm ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                      color: Colors.grey,
+                      size: 20,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  t.mustMatch,
+                  style: TextStyle(color: isDark ? Colors.white54 : Colors.black54, fontSize: 13),
+                ),
+                const SizedBox(height: 60),
+                _buildLargeButton(
+                  label: t.isAr ? "إعادة تعيين" : t.verifyAccount,
+                  isLoading: _isLoading,
+                  onPressed: _handleReset,
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

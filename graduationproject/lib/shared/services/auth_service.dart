@@ -151,7 +151,8 @@ class AuthService {
         body: {
           'email': email.trim(),
           'code': code.trim(),
-          'newPassword': newPassword,
+          'otp': code.trim(), // إرسال otp كاحتياط بجانب code
+          'new_password': newPassword,
         },
       );
       await handleResponse(response, (map) => map);

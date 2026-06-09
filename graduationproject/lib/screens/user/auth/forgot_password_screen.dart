@@ -1,6 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:country_picker/country_picker.dart';
 import '../../../shared/l10n/app_localizations.dart';
+import '../../../shared/services/auth_service.dart';
 import '../../../shared/state/theme_controller.dart';
 import 'otp_email_verification_screen.dart';
 
@@ -17,6 +18,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   String? _emailError;
   String? _phoneError;
+  bool _isLoading = false;
 
   Country _selectedCountry = Country(
     phoneCode: "20",
@@ -32,12 +34,68 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   );
 
   bool _isValidEmail(String email) {
-    return email.toLowerCase().endsWith('@gmail.com');
+    return email.contains('@') && email.contains('.');
   }
 
   bool _isValidPhone(String phone) {
-    // التحقق من أن رقم الهاتف يتراوح بين 10 إلى 11 رقم (حسب الدولة)
     return phone.length >= 10 && phone.length <= 11;
+  }
+
+  Future<void> _handleContinue() async {
+    final t = AppLocalizations.of(context);
+    final email = _emailController.text.trim();
+    final phone = _phoneController.text.trim();
+
+    setState(() {
+      _emailError = null;
+      _phoneError = null;
+    });
+
+    bool hasError = false;
+
+    if (email.isEmpty) {
+      _emailError = t.enterYourEmail;
+      hasError = true;
+    } else if (!_isValidEmail(email)) {
+      _emailError = t.isAr ? "بريد إلكتروني غير صالح" : "Invalid email address";
+      hasError = true;
+    }
+
+    if (phone.isEmpty) {
+      _phoneError = t.enterMobileNumber;
+      hasError = true;
+    } else if (!_isValidPhone(phone)) {
+      _phoneError = t.isAr ? "رقم الهاتف غير صحيح" : "Invalid phone number";
+      hasError = true;
+    }
+
+    if (hasError) return;
+
+    setState(() => _isLoading = true);
+
+    try {
+      // Step 1: Request OTP from Server
+      await AuthService.instance.forgotPassword(email);
+
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => OtpEmailVerificationScreen(
+            email: email,
+            isForgotPassword: true,
+          ),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString().replaceAll('Exception: ', ''))),
+      );
+    }
   }
 
   @override
@@ -159,7 +217,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         height: 56,
                         padding: const EdgeInsets.symmetric(horizontal: 12),
                         decoration: BoxDecoration(
-                          color: isDark ? Colors.white.withOpacity(0.05) : Colors.white,
+                          color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.white,
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(color: isDark ? Colors.white24 : Colors.black12),
                         ),
@@ -193,45 +251,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 // Continue Button
                 _buildLargeButton(
                   label: t.tr(en: "Continue", ar: "متابعة"),
-                  onPressed: () {
-                    final email = _emailController.text.trim();
-                    final phone = _phoneController.text.trim();
-
-                    setState(() {
-                      _emailError = null;
-                      _phoneError = null;
-                    });
-
-                    bool hasError = false;
-
-                    if (email.isEmpty) {
-                      _emailError = t.enterYourEmail;
-                      hasError = true;
-                    } else if (!_isValidEmail(email)) {
-                      _emailError = t.isAr ? "يجب أن ينتهي البريد بـ @gmail.com" : "Email must end with @gmail.com";
-                      hasError = true;
-                    }
-
-                    if (phone.isEmpty) {
-                      _phoneError = t.enterMobileNumber;
-                      hasError = true;
-                    } else if (!_isValidPhone(phone)) {
-                      _phoneError = t.isAr ? "رقم الهاتف غير صحيح" : "Invalid phone number";
-                      hasError = true;
-                    }
-
-                    if (hasError) return;
-
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => OtpEmailVerificationScreen(
-                          email: email,
-                          isForgotPassword: true,
-                        ),
-                      ),
-                    );
-                  },
+                  isLoading: _isLoading,
+                  onPressed: _handleContinue,
                 ),
               ],
             ),
@@ -247,7 +268,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       style: TextStyle(
         fontSize: 14,
         fontWeight: FontWeight.w600,
-        color: color.withOpacity(0.8),
+        color: color.withValues(alpha: 0.8),
       ),
     );
   }
@@ -269,7 +290,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         hintText: hint,
         hintStyle: const TextStyle(color: Colors.black26, fontSize: 14),
         filled: true,
-        fillColor: isDark ? Colors.white.withOpacity(0.05) : Colors.white,
+        fillColor: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.white,
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
@@ -284,7 +305,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     );
   }
 
-  Widget _buildLargeButton({required String label, required VoidCallback onPressed}) {
+  Widget _buildLargeButton({required String label, required VoidCallback onPressed, bool isLoading = false}) {
     return Container(
       width: double.infinity,
       height: 56,
@@ -292,14 +313,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF142C66).withOpacity(0.3),
+            color: const Color(0xFF142C66).withValues(alpha: 0.3),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
       ),
       child: ElevatedButton(
-        onPressed: onPressed,
+        onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF142C66),
           shape: RoundedRectangleBorder(
@@ -307,14 +328,16 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           ),
           elevation: 0,
         ),
-        child: Text(
-          label,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 17,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        child: isLoading 
+          ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+          : Text(
+              label,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 17,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
       ),
     );
   }

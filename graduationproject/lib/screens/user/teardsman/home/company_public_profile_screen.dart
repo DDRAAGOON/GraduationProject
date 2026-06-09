@@ -25,10 +25,10 @@ class _CompanyPublicProfileScreenState
   bool _isSubmitting = false;
   int _userRating = 0;
 
-  int? get _companyId {
-    final raw = widget.company['id'] ?? widget.company['_id'];
-    if (raw == null) return null;
-    return int.tryParse(raw.toString());
+  dynamic get _companyId {
+    return widget.company['id'] ??
+        widget.company['_id'] ??
+        widget.company['companyId'];
   }
 
   @override
@@ -74,18 +74,34 @@ class _CompanyPublicProfileScreenState
     }
 
     final companyId = _companyId;
-    if (companyId == null) return;
+    if (companyId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            isAr ? 'خطأ: لم يتم العثور على معرف الشركة' : 'Error: Company ID not found',
+          ),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
 
     setState(() => _isSubmitting = true);
     try {
+      final store = RecruitmentSyncStore.instance;
+      
+      // Determine raterType simply
+      String role = store.userRole.toLowerCase().contains('tradesman') ? 'tradesman' : 'user';
+
       await RatingService.instance.createRating(
         ratingValue: _userRating,
         comment: _commentController.text.trim().isEmpty
             ? null
             : _commentController.text.trim(),
         companyId: companyId,
-        raterType: 'tradesman',
+        raterType: role,
       );
+      
       _commentController.clear();
       _userRating = 0;
       await _fetchRatings();
@@ -98,14 +114,22 @@ class _CompanyPublicProfileScreenState
           backgroundColor: Colors.green,
         ),
       );
-    } catch (_) {
+    } catch (e) {
       if (!mounted) return;
+      
+      // 3. Smart error handling for the "Acceptance" rule
+      String errorMsg = e.toString();
+      if (errorMsg.contains('400') || errorMsg.contains('القبول')) {
+        errorMsg = isAr 
+            ? 'عذراً، يجب أن يتم قبولك في وظيفة لدى هذه الشركة أولاً لتتمكن من تقييمها.'
+            : 'Sorry, you must be accepted for a job at this company first to be able to rate it.';
+      }
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            isAr ? 'حدث خطأ أثناء إرسال التقييم' : 'Failed to submit rating',
-          ),
+          content: Text(errorMsg),
           backgroundColor: Colors.red,
+          duration: const Duration(seconds: 4),
         ),
       );
     } finally {

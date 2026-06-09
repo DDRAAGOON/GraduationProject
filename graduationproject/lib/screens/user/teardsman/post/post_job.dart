@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:graduationproject/shared/l10n/app_localizations.dart';
 import 'package:graduationproject/shared/state/recruitment_sync_store.dart';
 import '../../../../shared/services/job_service.dart';
+import '../../../../shared/services/user_service.dart';
 import 'job_applicants_screen.dart';
 
 class PostJob extends StatefulWidget {
@@ -67,6 +68,7 @@ class _PostJobState extends State<PostJob> {
   String? _selectedGovernorate;
 
   bool _isWorkTimeExpanded = false;
+  bool _isPosting = false;
 
   final List<File> _selectedImages = [];
   final ImagePicker _picker = ImagePicker();
@@ -111,27 +113,44 @@ class _PostJobState extends State<PostJob> {
           _selectedGovernorate ?? store.currentUserLocation;
       final int capacity = int.tryParse(_capacityController.text) ?? 1;
 
+      setState(() => _isPosting = true);
       try {
+        // 1. Upload images if any
+        List<String> imageUrls = [];
+        for (final image in _selectedImages) {
+          final url = await UserService.instance.uploadImage(image.path);
+          if (url != null) imageUrls.add(url);
+        }
+
         final body = {
-          'title': _titleController.text,
+          'title': _titleController.text.trim(),
           'companyName': store.currentUserName,
           'location': selectedLocation,
+          'city': selectedLocation,
+          'address': selectedLocation,
           'salaryRange': "Negotiable",
           'type': 'one-time',
-          'category': 'Service',
+          'category': 'Tradesman', 
+          'classification': 'tradesman_work', 
+          'role': 'tradesman', // إرسال الدور بشكل صريح للتأكيد
           'tags': _skills,
-          'description': _descriptionController.text,
+          'fieldOfWork': _skills,
+          'description': _descriptionController.text.trim(),
           'responsibilities': [],
           'qualifications': [],
           'niceToHaves': [],
           'benefits': [],
           'requiredCount': capacity,
+          'slotsAvailable': capacity,
+          'images': imageUrls,
+          'workImages': imageUrls,
         };
 
         final String jobId = await JobService.instance.createJob(body);
         await JobService.instance.getJobs();
 
         if (!mounted) return;
+        setState(() => _isPosting = false);
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -157,6 +176,7 @@ class _PostJobState extends State<PostJob> {
         );
       } catch (e) {
         if (!mounted) return;
+        setState(() => _isPosting = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -611,7 +631,7 @@ class _PostJobState extends State<PostJob> {
                 width: double.infinity,
                 height: 56,
                 child: ElevatedButton(
-                  onPressed: () => _validateAndPost(t),
+                  onPressed: _isPosting ? null : () => _validateAndPost(t),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF142C66),
                     shape: RoundedRectangleBorder(
@@ -619,14 +639,23 @@ class _PostJobState extends State<PostJob> {
                     ),
                     elevation: 2,
                   ),
-                  child: Text(
-                    t.tr(en: "Publish work", ar: "نشر العمل"),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
+                  child: _isPosting
+                      ? const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : Text(
+                          t.tr(en: "Publish work", ar: "نشر العمل"),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
                 ),
               ),
               const SizedBox(height: 40),

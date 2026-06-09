@@ -5,6 +5,7 @@ import '../../../app/router/app_router.dart';
 import '../../../shared/services/auth_service.dart';
 import '../../../shared/l10n/app_localizations.dart';
 import '../../../shared/state/theme_controller.dart';
+import 'reset_password_screen.dart';
 
 class OtpEmailVerificationScreen extends StatefulWidget {
   final String email;
@@ -381,9 +382,14 @@ class _OtpEmailVerificationScreenState
                         if (!mounted) return;
                         setState(() => _isLoading = false);
                         if (widget.isForgotPassword) {
-                          Navigator.pushNamed(
+                          Navigator.push(
                             context,
-                            AppRoutes.userResetPassword,
+                            MaterialPageRoute(
+                              builder: (context) => ResetPasswordScreen(
+                                email: widget.email,
+                                otp: otp,
+                              ),
+                            ),
                           );
                         } else {
                           _showSuccessPopup(t, isDark);

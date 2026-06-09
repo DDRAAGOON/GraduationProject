@@ -3,7 +3,7 @@ import 'package:graduationproject/screens/user/teardsman/Tradesman_Messages/mess
 import 'package:graduationproject/screens/user/teardsman/home/find_jobs.dart';
 import 'package:graduationproject/screens/user/teardsman/home/tradesman_my_apps_screen.dart';
 import 'package:graduationproject/screens/user/teardsman/home/tradesman_browse_companies_screen.dart';
-import 'package:graduationproject/screens/user/teardsman/profile/tradesman_profile.dart';
+import 'package:graduationproject/screens/user/home/tabs/profile_tab.dart';
 import 'package:graduationproject/constants/app_images.dart';
 import 'package:graduationproject/screens/user/home/recruitment_user_shell_screen.dart';
 import 'package:graduationproject/shared/state/recruitment_sync_store.dart';
@@ -39,7 +39,7 @@ class _NavbottonState extends State<Navbotton> {
     const TradesmanMyAppsScreen(),
     const TradesmanBrowseCompaniesScreen(),
     const MessagesList(),
-    const TradesmanProfile(),
+    const ProfileTab(isTradesmanMode: true),
   ];
 
   @override
@@ -243,7 +243,7 @@ class _NavbottonState extends State<Navbotton> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const TradesmanRatingsHubScreen(),
+                  builder: (context) => const TradesmanRatingsHubScreen(isTradesmanMode: true),
                 ),
               );
             },

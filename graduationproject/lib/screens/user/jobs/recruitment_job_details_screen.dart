@@ -6,6 +6,7 @@ import '../../../shared/services/rating_service.dart';
 import '../../../shared/utils/rating_utils.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/l10n/app_localizations.dart';
+import '../../../shared/utils/job_category_helper.dart';
 import '../home/tabs/recruitment_ui_utils.dart';
 
 class RecruitmentJobDetailsScreen extends StatefulWidget {
@@ -289,6 +290,7 @@ class _RecruitmentJobDetailsScreenState
     final t = AppLocalizations.of(context);
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isTradesman = isTradesmanServiceJob(widget.job);
     final backgroundColor = isDark
         ? const Color(0xFF001E3A)
         : const Color(0xFFF8FBF4);
@@ -296,9 +298,13 @@ class _RecruitmentJobDetailsScreenState
     return Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
-        title: Text(t.tr(en: 'Job Details', ar: 'تفاصيل الوظيفة')),
+        title: Text(
+          isTradesman
+              ? (isAr ? 'تفاصيل الخدمة (حرفي)' : 'Service Details (Tradesman)')
+              : (isAr ? 'تفاصيل الوظيفة (شركة)' : 'Job Details (Company)'),
+        ),
         centerTitle: true,
-        backgroundColor: backgroundColor,
+        backgroundColor: isTradesman ? Colors.orange.withValues(alpha: 0.1) : backgroundColor,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         leading: IconButton(
@@ -317,6 +323,26 @@ class _RecruitmentJobDetailsScreenState
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Column(
               children: [
+                // Type Badge
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: isTradesman ? Colors.orange.withValues(alpha: 0.15) : Colors.blue.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    isTradesman
+                        ? (isAr ? '🛠️ خدمة مقدمة من حرفي' : '🛠️ Service provided by tradesman')
+                        : (isAr ? '🏢 وظيفة مقدمة من شركة' : '🏢 Job provided by company'),
+                    style: TextStyle(
+                      color: isTradesman ? Colors.orange.shade900 : Colors.blue.shade900,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
                 // 1. Header Card
                 _buildSectionCard(
                   context,
@@ -647,8 +673,10 @@ class _RecruitmentJobDetailsScreenState
 
                 const SizedBox(height: 30),
                 AppButton(
-                  label: isAr ? 'قدّم طلبك الآن' : 'Apply Now',
-                  backgroundColor: const Color(0xFF142C66),
+                  label: isTradesman
+                      ? (isAr ? 'طلب / تقييم الخدمة' : 'Request / Rate Service')
+                      : (isAr ? 'التقديم على الوظيفة' : 'Apply for Job'),
+                  backgroundColor: isTradesman ? Colors.orange : const Color(0xFF142C66),
                   onPressed: () => Navigator.of(context).pushNamed(
                     AppRoutes.userJobApplication,
                     arguments: widget.job,

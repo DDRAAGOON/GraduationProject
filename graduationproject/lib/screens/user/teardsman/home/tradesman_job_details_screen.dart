@@ -5,6 +5,7 @@ import 'package:graduationproject/shared/utils/image_helper.dart';
 import 'package:graduationproject/shared/services/rating_service.dart';
 import 'package:graduationproject/shared/utils/rating_utils.dart';
 import 'package:graduationproject/shared/widgets/app_button.dart';
+import 'package:graduationproject/shared/utils/job_category_helper.dart';
 import '../../home/tabs/recruitment_ui_utils.dart';
 import 'tradesman_apply_job_screen.dart';
 
@@ -256,11 +257,9 @@ class _TradesmanJobDetailsScreenState extends State<TradesmanJobDetailsScreen> {
     final t = AppLocalizations.of(context);
     final store = RecruitmentSyncStore.instance;
     final job = widget.job;
+    final isAr = t.isAr;
+    final isTradesman = isTradesmanServiceJob(job);
     final publishDate = job.publishedAt.toLocal().toString().split(' ').first;
-    final deadlineText = job.deadline != null
-        ? job.deadline!.format(context)
-        : 'غير محدد';
-    final availableCount = (job.capacity - job.acceptedCount).clamp(0, 9999);
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bgColor = isDark ? const Color(0xFF001E3A) : const Color(0xFFF8FBF4);
@@ -281,7 +280,9 @@ class _TradesmanJobDetailsScreenState extends State<TradesmanJobDetailsScreen> {
             ),
             const Spacer(),
             Text(
-              t.tr(en: 'Job Details', ar: 'تفاصيل الوظيفة'),
+              isTradesman
+                  ? (isAr ? 'تفاصيل الخدمة (حرفي)' : 'Service Details (Tradesman)')
+                  : (isAr ? 'تفاصيل الوظيفة (شركة)' : 'Job Details (Company)'),
               style: TextStyle(
                 color: textColor,
                 fontWeight: FontWeight.bold,
@@ -299,6 +300,27 @@ class _TradesmanJobDetailsScreenState extends State<TradesmanJobDetailsScreen> {
           return ListView(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             children: [
+              // Type Badge
+              Container(
+                alignment: Alignment.center,
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                margin: const EdgeInsets.only(bottom: 16),
+                decoration: BoxDecoration(
+                  color: isTradesman ? Colors.orange.withValues(alpha: 0.15) : Colors.blue.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  isTradesman
+                      ? (isAr ? '🛠️ خدمة مقدمة من حرفي' : '🛠️ Service provided by tradesman')
+                      : (isAr ? '🏢 وظيفة مقدمة من شركة' : '🏢 Job provided by company'),
+                  style: TextStyle(
+                    color: isTradesman ? Colors.orange.shade900 : Colors.blue.shade900,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+
               // Header Card
               _buildSectionCard(
                 context,
@@ -553,11 +575,18 @@ class _TradesmanJobDetailsScreenState extends State<TradesmanJobDetailsScreen> {
 
               AppButton(
                 label: job.acceptedCount < job.capacity
-                    ? t.tr(en: 'Apply Now', ar: 'قدّم الآن')
-                    : t.tr(en: 'Job Closed', ar: 'الوظيفة مغلقة'),
-                backgroundColor: job.acceptedCount < job.capacity ? const Color(0xFF142C66) : Colors.grey,
+                    ? (isTradesman
+                        ? (isAr ? 'طلب / تقييم الخدمة' : 'Request / Rate Service')
+                        : (isAr ? 'التقديم على الوظيفة' : 'Apply for Job'))
+                    : (isAr ? 'الوظيفة مغلقة' : 'Job Closed'),
+                backgroundColor: job.acceptedCount < job.capacity
+                    ? (isTradesman ? Colors.orange : const Color(0xFF142C66))
+                    : Colors.grey,
                 onPressed: job.acceptedCount < job.capacity
-                    ? () => Navigator.push(context, MaterialPageRoute(builder: (c) => TradesmanApplyJobScreen(job: job)))
+                    ? () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (c) => TradesmanApplyJobScreen(job: job)))
                     : null,
               ),
               const SizedBox(height: 40),
