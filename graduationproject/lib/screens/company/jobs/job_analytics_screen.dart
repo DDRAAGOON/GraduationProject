@@ -1,8 +1,10 @@
 // Charts and stats for a single job posting — mobile-first redesign.
-import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:http/http.dart' as http;
+import '../../../core/network/api_client.dart';
+import '../../../core/constants/api_constants.dart';
+import '../../../shared/state/company_store.dart';
 import '../../../shared/l10n/app_localizations.dart';
 import '../../../shared/models/job.dart';
 import '../../../shared/widgets/app_scaffold.dart';
@@ -94,40 +96,97 @@ class _AnalyticsBodyState extends State<_AnalyticsBody> {
       _errorMessage = null;
     });
     try {
-      // ⚠️ تأكد من تغيير الرابط ليتوافق مع الـ Backend الخاص بك
-      final url = Uri.parse(
-        'https://your-api.com/api/jobs/${widget.job.id}/analytics',
-      );
-
-      final response = await http.get(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-          // 'Authorization': 'Bearer YOUR_TOKEN', // أضف التوكن إذا كان مطلوباً
-        },
-      );
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        setState(() {
-          // ⚠️ قم بتغيير المفاتيح (keys) هنا لتتطابق مع الرد القادم من الـ Backend
-          _totalApplicants = data['totalApplicants'] ?? 0;
-          _totalViews = data['totalViews'] ?? 0;
-
-          _reviewingCount = data['statusBreakdown']?['reviewing'] ?? 0;
-          _acceptedCount = data['statusBreakdown']?['accepted'] ?? 0;
-          _rejectedCount = data['statusBreakdown']?['rejected'] ?? 0;
-          // إذا كانت بيانات الرسم البياني تأتي من الـ API قم بفكها هكذا:
-          // _viewsData[0] = List<double>.from(data['charts']['day']['views'].map((x) => x.toDouble()));
-          // _appsData[0] = List<double>.from(data['charts']['day']['apps'].map((x) => x.toDouble()));
-          _isLoading = false;
-        });
-      } else {
-        setState(() {
-          _errorMessage = 'حدث خطأ في السيرفر: ${response.statusCode}';
-          _isLoading = false;
-        });
+      final apiClient = ApiClient();
+      // 1. Get company ID (fetch profile if not in store)
+      String companyId = CompanyStore.instance.companyId;
+      if (companyId.isEmpty) {
+        try {
+          final profileResponse = await apiClient.get(ApiConstants.myCompanyProfile);
+          companyId = profileResponse.data['companyId']?.toString() ?? '';
+          CompanyStore.instance.setRegistrationData(
+            companyId: companyId,
+            companyName: profileResponse.data['name']?.toString() ?? '',
+            customProfileImage: profileResponse.data['logoUrl']?.toString(),
+          );
+        } catch (e) {
+          if (kDebugMode) debugPrint('❌ Could not fetch profile: $e');
+        }
       }
+
+      if (companyId.isEmpty) {
+        setState(() {
+          _errorMessage = 'لم يتم العثور على معرف الشركة';
+          _isLoading = false;
+        });
+        return;
+      }
+
+      final statsResponse = await apiClient.get(
+        ApiConstants.companyStats(companyId),
+      );
+      final statsData = statsResponse.data;
+
+      // 2. Fetch job analytics
+      dynamic jobData;
+      try {
+        final jobResponse = await apiClient.get(
+          ApiConstants.jobAnalytics(widget.job.id),
+        );
+        jobData = jobResponse.data;
+      } catch (e) {
+        if (kDebugMode) debugPrint('⚠️ Job analytics not available: $e');
+      }
+
+      // 3. Fetch job applications for status breakdown
+      dynamic appsData;
+      try {
+        final appsResponse = await apiClient.get(
+          ApiConstants.jobApplications(widget.job.id),
+        );
+        appsData = appsResponse.data;
+      } catch (e) {
+        if (kDebugMode) debugPrint('⚠️ Applications not available: $e');
+      }
+
+      setState(() {
+        // Stats from company endpoint
+        final summary = statsData['summary'] ?? {};
+        final viewsObj = summary['views'] ?? {};
+        final appliedObj = summary['applied'] ?? {};
+        final hiredObj = summary['hired'] ?? {};
+        _totalViews = int.tryParse(viewsObj['total']?.toString() ?? '0') ?? 0;
+        _totalApplicants = int.tryParse(appliedObj['total']?.toString() ?? '0') ?? 0;
+        final totalHired = int.tryParse(hiredObj['total']?.toString() ?? '0') ?? 0;
+
+        // Chart data from weekly stats
+        final weeklyViews = statsData['views'];
+        final weeklyApplied = statsData['applied'];
+        if (weeklyViews is List && weeklyViews.length >= 7) {
+          _viewsData[0] = weeklyViews.map((v) => (v as num).toDouble()).toList();
+        }
+        if (weeklyApplied is List && weeklyApplied.length >= 7) {
+          _appsData[0] = weeklyApplied.map((v) => (v as num).toDouble()).toList();
+        }
+
+        // Applications breakdown
+        if (appsData is List) {
+          int reviewing = 0, accepted = 0, rejected = 0;
+          for (final app in appsData) {
+            final status = app['status']?.toString() ?? '';
+            if (status == 'reviewing') reviewing++;
+            else if (status == 'accepted' || status == 'hired') accepted++;
+            else if (status == 'rejected') rejected++;
+          }
+          _reviewingCount = reviewing;
+          _acceptedCount = accepted + totalHired;
+          _rejectedCount = rejected;
+          _totalApplicants = _totalApplicants > 0 ? _totalApplicants : (appsData as List).length;
+        }
+
+        _isLoading = false;
+      });
     } catch (e) {
+      if (kDebugMode) debugPrint('❌ Analytics error: $e');
       setState(() {
         _errorMessage = 'حدث خطأ في الاتصال: $e';
         _isLoading = false;

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 import '../../../app/router/app_router.dart';
 import '../../../shared/state/company_store.dart';
+import '../../../shared/utils/image_helper.dart';
 
 import '../../../shared/l10n/app_localizations.dart';
 
@@ -16,13 +17,14 @@ class CompanyProfileLeading extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     final profileImage = CompanyStore.instance.companyProfileImage;
+    final imageProvider = getAppImageProvider(profileImage);
 
     return IconButton(
       tooltip: t.profile,
       onPressed: () =>
           Navigator.of(context).pushNamed(AppRoutes.companyProfileOverview),
       icon: ClipOval(
-        child: profileImage == null
+        child: imageProvider == null
             ? Container(
                 width: 32,
                 height: 32,
@@ -33,19 +35,24 @@ class CompanyProfileLeading extends StatelessWidget {
                   size: 20,
                 ),
               )
-            : profileImage.startsWith('assets/')
-                ? Image.asset(
-                    profileImage,
+            : Image(
+                image: imageProvider,
+                width: 32,
+                height: 32,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
                     width: 32,
                     height: 32,
-                    fit: BoxFit.cover,
-                  )
-                : Image.file(
-                    File(profileImage),
-                    width: 32,
-                    height: 32,
-                    fit: BoxFit.cover,
-                  ),
+                    color: Theme.of(context).colorScheme.surfaceBright,
+                    child: Icon(
+                      Icons.business,
+                      color: Theme.of(context).colorScheme.primary,
+                      size: 20,
+                    ),
+                  );
+                },
+              ),
       ),
     );
   }

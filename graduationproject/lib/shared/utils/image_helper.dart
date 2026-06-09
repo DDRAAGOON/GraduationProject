@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
+import '../../core/constants/api_constants.dart';
+
 /// Helper method to return the correct ImageProvider based on the string path.
 ImageProvider? getAppImageProvider(String? path) {
   if (path == null || path.isEmpty) {
@@ -10,6 +12,9 @@ ImageProvider? getAppImageProvider(String? path) {
   }
   if (path.startsWith('http://') || path.startsWith('https://')) {
     return NetworkImage(path);
+  }
+  if (path.startsWith('/images/') || path.startsWith('/api/')) {
+    return NetworkImage('${ApiConstants.baseUrl}$path');
   }
   if (path.startsWith('data:image')) {
     try {

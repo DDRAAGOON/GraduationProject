@@ -195,19 +195,38 @@ class ChatService {
         File? image,
       }) async {
     try {
-      final formData = FormData.fromMap({
-        'message': message,
-        if (userId != null) 'userId': userId,
-        if (image != null) 'image': await MultipartFile.fromFile(image.path),
-      });
+      dynamic requestData;
+      if (image != null) {
+        requestData = FormData.fromMap({
+          'message': message,
+          if (userId != null) 'userId': userId,
+          'image': await MultipartFile.fromFile(image.path),
+        });
+      } else {
+        requestData = {
+          'message': message,
+          if (userId != null) 'userId': userId,
+        };
+      }
 
       final response = await _apiClient.post(
         ApiConstants.aiChatbot,
-        data: formData,
+        data: requestData,
       );
-      return response.data['reply'] ?? '';
+      return response.data['response']?.toString() ?? response.data['reply']?.toString() ?? '';
     } catch (e) {
+      if (kDebugMode) debugPrint('❌ AI Chatbot error: $e');
       throw ErrorHandler.handle(e);
+    }
+  }
+
+  Future<List<dynamic>> getAiChatbotHistory(String userId) async {
+    try {
+      final response = await _apiClient.get(ApiConstants.aiChatbotHistory(userId));
+      return response.data['data'] ?? response.data ?? [];
+    } catch (e) {
+      if (kDebugMode) debugPrint('❌ Error fetching AI history: $e');
+      return [];
     }
   }
 
