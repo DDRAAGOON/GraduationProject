@@ -281,8 +281,8 @@ class _TradesmanJobDetailsScreenState extends State<TradesmanJobDetailsScreen> {
             const Spacer(),
             Text(
               isTradesman
-                  ? (isAr ? 'تفاصيل الخدمة (حرفي)' : 'Service Details (Tradesman)')
-                  : (isAr ? 'تفاصيل الوظيفة (شركة)' : 'Job Details (Company)'),
+                  ? (isAr ? 'تفاصيل الخدمة' : 'Service Details')
+                  : (isAr ? 'تفاصيل الوظيفة' : 'Job Details'),
               style: TextStyle(
                 color: textColor,
                 fontWeight: FontWeight.bold,
@@ -300,27 +300,6 @@ class _TradesmanJobDetailsScreenState extends State<TradesmanJobDetailsScreen> {
           return ListView(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             children: [
-              // Type Badge
-              Container(
-                alignment: Alignment.center,
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                margin: const EdgeInsets.only(bottom: 16),
-                decoration: BoxDecoration(
-                  color: isTradesman ? Colors.orange.withValues(alpha: 0.15) : Colors.blue.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  isTradesman
-                      ? (isAr ? '🛠️ خدمة مقدمة من حرفي' : '🛠️ Service provided by tradesman')
-                      : (isAr ? '🏢 وظيفة مقدمة من شركة' : '🏢 Job provided by company'),
-                  style: TextStyle(
-                    color: isTradesman ? Colors.orange.shade900 : Colors.blue.shade900,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
-                  ),
-                ),
-              ),
-
               // Header Card
               _buildSectionCard(
                 context,
@@ -576,11 +555,11 @@ class _TradesmanJobDetailsScreenState extends State<TradesmanJobDetailsScreen> {
               AppButton(
                 label: job.acceptedCount < job.capacity
                     ? (isTradesman
-                        ? (isAr ? 'طلب / تقييم الخدمة' : 'Request / Rate Service')
+                        ? (isAr ? 'طلب الخدمة' : 'Request Service')
                         : (isAr ? 'التقديم على الوظيفة' : 'Apply for Job'))
                     : (isAr ? 'الوظيفة مغلقة' : 'Job Closed'),
                 backgroundColor: job.acceptedCount < job.capacity
-                    ? (isTradesman ? Colors.orange : const Color(0xFF142C66))
+                    ? const Color(0xFF142C66)
                     : Colors.grey,
                 onPressed: job.acceptedCount < job.capacity
                     ? () => Navigator.push(

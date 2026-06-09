@@ -300,8 +300,8 @@ class _RecruitmentJobDetailsScreenState
       appBar: AppBar(
         title: Text(
           isTradesman
-              ? (isAr ? 'تفاصيل الخدمة (حرفي)' : 'Service Details (Tradesman)')
-              : (isAr ? 'تفاصيل الوظيفة (شركة)' : 'Job Details (Company)'),
+              ? (isAr ? 'تفاصيل الخدمة' : 'Service Details')
+              : (isAr ? 'تفاصيل الوظيفة' : 'Job Details'),
         ),
         centerTitle: true,
         backgroundColor: isTradesman ? Colors.orange.withValues(alpha: 0.1) : backgroundColor,
@@ -323,26 +323,6 @@ class _RecruitmentJobDetailsScreenState
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Column(
               children: [
-                // Type Badge
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: isTradesman ? Colors.orange.withValues(alpha: 0.15) : Colors.blue.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    isTradesman
-                        ? (isAr ? '🛠️ خدمة مقدمة من حرفي' : '🛠️ Service provided by tradesman')
-                        : (isAr ? '🏢 وظيفة مقدمة من شركة' : '🏢 Job provided by company'),
-                    style: TextStyle(
-                      color: isTradesman ? Colors.orange.shade900 : Colors.blue.shade900,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-
                 // 1. Header Card
                 _buildSectionCard(
                   context,
@@ -674,9 +654,9 @@ class _RecruitmentJobDetailsScreenState
                 const SizedBox(height: 30),
                 AppButton(
                   label: isTradesman
-                      ? (isAr ? 'طلب / تقييم الخدمة' : 'Request / Rate Service')
+                      ? (isAr ? 'طلب الخدمة' : 'Request Service')
                       : (isAr ? 'التقديم على الوظيفة' : 'Apply for Job'),
-                  backgroundColor: isTradesman ? Colors.orange : const Color(0xFF142C66),
+                  backgroundColor: const Color(0xFF142C66),
                   onPressed: () => Navigator.of(context).pushNamed(
                     AppRoutes.userJobApplication,
                     arguments: widget.job,

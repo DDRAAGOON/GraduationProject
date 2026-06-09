@@ -4,25 +4,12 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="89a40d2e-dee6-4edc-af06-e2e78f633ab0" name="Changes" comment="v2&#10;user&#10;user2&#10;user3&#10;user4&#10;&#10;التعديل قبل الاخير في ال user&#10;&#10;اخر نعديل في user من غير API&#10;اخر تعديل ان شاء الله&#10;التعديل قبل الاخير للحرفي&#10;&#10;اخر تعديل حرفي و شركة من غير API&#10;اخر تعديل في ال ui&#10;اخر تعديل ان شاء الله 2&#10;تعديل تعديل تعديل">
-      <change afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/profile/portfolio_section.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/graduationproject/lib/shared/models/portfolio_item.dart" afterDir="false" />
+    <list default="true" id="89a40d2e-dee6-4edc-af06-e2e78f633ab0" name="Changes" comment="v2&#10;user&#10;user2&#10;user3&#10;user4&#10;&#10;التعديل قبل الاخير في ال user&#10;&#10;اخر نعديل في user من غير API&#10;اخر تعديل ان شاء الله&#10;التعديل قبل الاخير للحرفي&#10;&#10;اخر تعديل حرفي و شركة من غير API&#10;اخر تعديل في ال ui&#10;اخر تعديل ان شاء الله 2&#10;تعديل تعديل تعديل&#10;&#10;اخر تعديل الحمدالله خلصانا">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/auth/forgot_password_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/auth/forgot_password_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/auth/otp_email_verification_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/auth/otp_email_verification_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/auth/reset_password_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/auth/reset_password_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/home/tabs/profile_tab.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/home/tabs/profile_tab.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/auth/recruitment_user_sign_in_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/auth/recruitment_user_sign_in_screen.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/jobs/recruitment_job_details_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/jobs/recruitment_job_details_screen.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/profile/edit_profile_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/profile/edit_profile_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/home/company_public_profile_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/home/company_public_profile_screen.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/home/tradesman_job_details_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/home/tradesman_job_details_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/nav_Botton_bar/nav_bottom_bar.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/nav_Botton_bar/nav_bottom_bar.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/post/post_job.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/post/post_job.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/profile/tradesman_ratings_hub_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/screens/user/teardsman/profile/tradesman_ratings_hub_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/shared/services/auth_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/shared/services/auth_service.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/shared/services/job_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/shared/services/job_service.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/shared/services/rating_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/shared/services/rating_service.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graduationproject/lib/shared/services/user_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/graduationproject/lib/shared/services/user_service.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -449,7 +436,15 @@
       <option name="project" value="LOCAL؜" />
       <updated>1780957652771</updated>
     </task>
-    <option name="localTasksCounter" value="43" />
+    <task id="LOCAL؜-٠٠٠٤٣" summary="v2&#10;user&#10;user2&#10;user3&#10;user4&#10;&#10;التعديل قبل الاخير في ال user&#10;&#10;اخر نعديل في user من غير API&#10;اخر تعديل ان شاء الله&#10;التعديل قبل الاخير للحرفي&#10;&#10;اخر تعديل حرفي و شركة من غير API&#10;اخر تعديل في ال ui&#10;اخر تعديل ان شاء الله 2&#10;تعديل تعديل تعديل&#10;&#10;اخر تعديل الحمدالله خلصانا">
+      <option name="closed" value="true" />
+      <created>1780976490564</created>
+      <option name="number" value="٠٠٠٤٣" />
+      <option name="presentableId" value="LOCAL؜-٠٠٠٤٣" />
+      <option name="project" value="LOCAL؜" />
+      <updated>1780976490565</updated>
+    </task>
+    <option name="localTasksCounter" value="44" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -487,7 +482,8 @@
     <MESSAGE value="v2&#10;user&#10;user2&#10;user3&#10;user4&#10;&#10;التعديل قبل الاخير في ال user&#10;&#10;اخر نعديل في user من غير API&#10;اخر تعديل ان شاء الله&#10;التعديل قبل الاخير للحرفي&#10;&#10;اخر تعديل حرفي و شركة من غير API&#10;اخر تعديل في ال ui" />
     <MESSAGE value="v2&#10;user&#10;user2&#10;user3&#10;user4&#10;&#10;التعديل قبل الاخير في ال user&#10;&#10;اخر نعديل في user من غير API&#10;اخر تعديل ان شاء الله&#10;التعديل قبل الاخير للحرفي&#10;&#10;اخر تعديل حرفي و شركة من غير API&#10;اخر تعديل في ال ui&#10;اخر تعديل ان شاء الله 2" />
     <MESSAGE value="v2&#10;user&#10;user2&#10;user3&#10;user4&#10;&#10;التعديل قبل الاخير في ال user&#10;&#10;اخر نعديل في user من غير API&#10;اخر تعديل ان شاء الله&#10;التعديل قبل الاخير للحرفي&#10;&#10;اخر تعديل حرفي و شركة من غير API&#10;اخر تعديل في ال ui&#10;اخر تعديل ان شاء الله 2&#10;تعديل تعديل تعديل" />
-    <option name="LAST_COMMIT_MESSAGE" value="v2&#10;user&#10;user2&#10;user3&#10;user4&#10;&#10;التعديل قبل الاخير في ال user&#10;&#10;اخر نعديل في user من غير API&#10;اخر تعديل ان شاء الله&#10;التعديل قبل الاخير للحرفي&#10;&#10;اخر تعديل حرفي و شركة من غير API&#10;اخر تعديل في ال ui&#10;اخر تعديل ان شاء الله 2&#10;تعديل تعديل تعديل" />
+    <MESSAGE value="v2&#10;user&#10;user2&#10;user3&#10;user4&#10;&#10;التعديل قبل الاخير في ال user&#10;&#10;اخر نعديل في user من غير API&#10;اخر تعديل ان شاء الله&#10;التعديل قبل الاخير للحرفي&#10;&#10;اخر تعديل حرفي و شركة من غير API&#10;اخر تعديل في ال ui&#10;اخر تعديل ان شاء الله 2&#10;تعديل تعديل تعديل&#10;&#10;اخر تعديل الحمدالله خلصانا" />
+    <option name="LAST_COMMIT_MESSAGE" value="v2&#10;user&#10;user2&#10;user3&#10;user4&#10;&#10;التعديل قبل الاخير في ال user&#10;&#10;اخر نعديل في user من غير API&#10;اخر تعديل ان شاء الله&#10;التعديل قبل الاخير للحرفي&#10;&#10;اخر تعديل حرفي و شركة من غير API&#10;اخر تعديل في ال ui&#10;اخر تعديل ان شاء الله 2&#10;تعديل تعديل تعديل&#10;&#10;اخر تعديل الحمدالله خلصانا" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

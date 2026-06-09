@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:icons_plus/icons_plus.dart';
 import 'package:dio/dio.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../../app/router/app_router.dart';
 import '../../../shared/services/session_manager.dart';
@@ -26,10 +24,6 @@ class _RecruitmentUserSignInScreenState
   bool _loading = false;
   String? _emailError;
   String? _passError;
-
-  final GoogleSignIn _googleSignInInstance = GoogleSignIn(
-    scopes: ['email', 'profile'],
-  );
 
   @override
   void dispose() {
@@ -101,46 +95,6 @@ class _RecruitmentUserSignInScreenState
   }
 
   Future<void> _handleGoogleSignIn() async {
-    setState(() => _loading = true);
-    try {
-      final GoogleSignInAccount? googleUser = await _googleSignInInstance
-          .signIn();
-      if (googleUser == null) {
-        setState(() => _loading = false);
-        return;
-      }
-
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
-      final String? idToken = googleAuth.idToken;
-
-      if (idToken == null) {
-        throw Exception('Failed to get Google ID Token');
-      }
-
-      final user = await AuthService.instance.googleLogin(idToken);
-      final role = user['role']?.toString().toLowerCase() ?? 'user';
-
-      if (!mounted) return;
-      setState(() => _loading = false);
-
-      if (role == 'tradesman') {
-        Navigator.of(context).pushNamedAndRemoveUntil(
-          AppRoutes.tradesmanWorkspace,
-          (route) => false,
-        );
-      } else {
-        Navigator.of(
-          context,
-        ).pushNamedAndRemoveUntil(AppRoutes.userWorkspace, (route) => false);
-      }
-    } catch (e) {
-      if (!mounted) return;
-      setState(() => _loading = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Google Sign-In failed: ${e.toString()}')),
-      );
-    }
   }
 
   @override
@@ -276,16 +230,6 @@ class _RecruitmentUserSignInScreenState
 
                 const SizedBox(height: 32),
 
-                // Divider
-                _buildDivider(t, textColorPrimary),
-
-                const SizedBox(height: 32),
-
-                // Google Button
-                _buildGoogleButton(t),
-
-                const SizedBox(height: 24),
-
                 // Sign up footer
                 _buildFooter(t, isDark),
               ],
@@ -410,91 +354,6 @@ class _RecruitmentUserSignInScreenState
                   fontWeight: FontWeight.bold,
                 ),
               ),
-      ),
-    );
-  }
-
-  Widget _buildDivider(AppLocalizations t, Color textColor) {
-    return Row(
-      children: [
-        const Expanded(child: Divider(color: Colors.black26)),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Text(
-            t.tr(en: "Or sign in with", ar: "أو سجل دخولك عبر"),
-            style: TextStyle(
-              color: textColor.withOpacity(0.6),
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ),
-        const Expanded(child: Divider(color: Colors.black26)),
-      ],
-    );
-  }
-
-  Widget _buildGoogleButton(AppLocalizations t) {
-    return SizedBox(
-      width: double.infinity,
-      height: 54,
-      child: ElevatedButton(
-        onPressed: _loading ? null : _handleGoogleSignIn,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.black,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          elevation: 0,
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (_loading)
-              const CircularProgressIndicator(color: Colors.white)
-            else ...[
-              const Text(
-                'Continue with ',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              RichText(
-                text: const TextSpan(
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                  children: [
-                    TextSpan(
-                      text: 'G',
-                      style: TextStyle(color: Color(0xFF4285F4)),
-                    ),
-                    TextSpan(
-                      text: 'o',
-                      style: TextStyle(color: Color(0xFFEA4335)),
-                    ),
-                    TextSpan(
-                      text: 'o',
-                      style: TextStyle(color: Color(0xFFFBBC05)),
-                    ),
-                    TextSpan(
-                      text: 'g',
-                      style: TextStyle(color: Color(0xFF4285F4)),
-                    ),
-                    TextSpan(
-                      text: 'l',
-                      style: TextStyle(color: Color(0xFF34A853)),
-                    ),
-                    TextSpan(
-                      text: 'e',
-                      style: TextStyle(color: Color(0xFFEA4335)),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ],
-        ),
       ),
     );
   }
