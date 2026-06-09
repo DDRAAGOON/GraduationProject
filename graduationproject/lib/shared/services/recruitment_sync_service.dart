@@ -206,14 +206,14 @@ class RecruitmentSyncService {
 
   /// Fetches the authenticated company's full profile
   Future<CompanyProfile> getCompanyProfile() async {
-    try {
-      return await _companyService.getCompanyProfile();
-    } catch (e) {
-      if (kDebugMode) debugPrint('❌ Error fetching company profile: $e');
-      rethrow;
-    }
+    return _companyService.getCompanyProfile();
   }
 
+  Future<CompanyStatistics> getCompanyStatistics(String companyId) async {
+    return _companyService.getCompanyStatistics(companyId);
+  }
+
+  /// --------------------------------------------------------------------------
   /// Updates the company profile via PATCH /api/companies/my/profile
   /// and synchronises the local [CompanyStore] and [SessionManager] on success.
   Future<void> updateCompanyProfile({

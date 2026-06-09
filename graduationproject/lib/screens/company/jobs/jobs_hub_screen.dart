@@ -107,11 +107,17 @@ class _CompanyJobsHubScreenState extends State<CompanyJobsHubScreen> {
           final displayJobs = companyJobs;
 
           final filteredJobs = displayJobs.where((j) {
-            final matchesStatus =
-                _selectedStatuses.isEmpty ||
-                    _selectedStatuses.contains(j.status);
-            final matchesType =
-                _selectedTypes.isEmpty || _selectedTypes.contains(j.type);
+            final jobStatus = j.status.toLowerCase().trim();
+            final matchesStatus = _selectedStatuses.isEmpty ||
+                _selectedStatuses.any((s) => s.toLowerCase() == jobStatus);
+
+            final jobTypes = j.type
+                .split(RegExp(r'[•,;]'))
+                .map((t) => t.trim().toLowerCase())
+                .toList();
+            final matchesType = _selectedTypes.isEmpty ||
+                _selectedTypes.any((t) => jobTypes.contains(t.toLowerCase()));
+
             return matchesStatus && matchesType;
           }).toList();
 
@@ -131,7 +137,7 @@ class _CompanyJobsHubScreenState extends State<CompanyJobsHubScreen> {
                               .applications
                               .where((a) => a.jobId == j.id)
                               .length;
-                          final isOpen = j.status == 'Open';
+                          final isOpen = j.status.toLowerCase().trim() == 'open';
 
                           const cardColor = Color(0xFF213E75);
                           return Card(

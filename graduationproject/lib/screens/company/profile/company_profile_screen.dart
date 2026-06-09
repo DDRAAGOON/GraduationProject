@@ -1,9 +1,13 @@
 // Public-style company profile with tabs and store data.
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../data/models/company/company_models.dart';
 import '../../../shared/l10n/app_localizations.dart';
+import '../../../shared/models/contact_entry.dart';
+import '../../../shared/services/recruitment_sync_service.dart';
 import '../../../shared/state/company_store.dart';
 import '../../../shared/widgets/app_scaffold.dart';
 import '../../../shared/widgets/section_title.dart';
@@ -21,6 +25,88 @@ class CompanyCompanyProfileScreen extends StatefulWidget {
 class _CompanyCompanyProfileScreenState
     extends State<CompanyCompanyProfileScreen> {
   final _store = CompanyStore.instance;
+  bool _isLoading = true;
+  CompanyStatistics? _stats;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchProfileData();
+  }
+
+  Future<void> _fetchProfileData() async {
+    if (!mounted) return;
+    setState(() => _isLoading = true);
+
+    try {
+      final syncService = RecruitmentSyncService.instance;
+      // 1. Fetch Profile
+      final profile = await syncService.getCompanyProfile();
+      
+      // 2. Fetch Stats
+      CompanyStatistics? stats;
+      if (profile.companyId.isNotEmpty) {
+        try {
+          stats = await syncService.getCompanyStatistics(profile.companyId);
+        } catch (e) {
+          if (kDebugMode) debugPrint('⚠️ Could not fetch stats: $e');
+        }
+      }
+
+      // 3. Update Store
+      _store.setRegistrationData(
+        companyId: profile.companyId,
+        companyName: profile.name,
+        customProfileImage: profile.logoUrl,
+      );
+
+      _store.updateProfile(
+        name: profile.name,
+        website: profile.website ?? '',
+        employee: profile.employees ?? '',
+        industry: profile.industry ?? '',
+        aboutEn: profile.description ?? '',
+        aboutAr: profile.description ?? '',
+        locations: profile.address != null ? [profile.address!] : [],
+        techStack: profile.techStack,
+        foundedDay: profile.foundedDay ?? 0,
+        foundedMonth: profile.foundedMonth ?? 0,
+        foundedYear: profile.foundedYear ?? 0,
+        category: profile.classification ?? '',
+        benefits: profile.benefits,
+        commercialRegister: '',
+        nationalNumber: '',
+      );
+
+      // Add contacts to store
+      while (_store.contacts.isNotEmpty) {
+        _store.removeContact(0);
+      }
+      if (profile.contactEmail?.isNotEmpty == true) _store.addContact(ContactEntry(name: 'Email', value: profile.contactEmail!));
+      if (profile.phone?.isNotEmpty == true) _store.addContact(ContactEntry(name: 'Phone', value: profile.phone!));
+      if (profile.socialLinks.linkedin?.isNotEmpty == true) _store.addContact(ContactEntry(name: 'LinkedIn', value: profile.socialLinks.linkedin!));
+      if (profile.socialLinks.facebook?.isNotEmpty == true) _store.addContact(ContactEntry(name: 'Facebook', value: profile.socialLinks.facebook!));
+      if (profile.socialLinks.twitter?.isNotEmpty == true) _store.addContact(ContactEntry(name: 'Twitter', value: profile.socialLinks.twitter!));
+
+      if (mounted) {
+        setState(() {
+          _stats = stats;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (kDebugMode) debugPrint('❌ Error fetching profile: $e');
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('حدث خطأ في تحميل البيانات: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,95 +117,169 @@ class _CompanyCompanyProfileScreenState
       leading: const CompanyProfileLeading(),
       actions: const [CompanyAppBarActions()],
       showAppBarDivider: true,
-      body: AnimatedBuilder(
-        animation: _store,
-        builder: (context, _) {
-          return ListView(
-            padding: const EdgeInsets.all(16),
-            children: [
-              _CompanyStatsBar(
-                foundedDay: _store.foundedDay,
-                foundedMonth: _store.foundedMonth,
-                foundedYear: _store.foundedYear,
-                countriesCount: _store.locations.length,
-                employee: _store.employee,
-                industry: _store.industry,
-                category: _store.category,
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : RefreshIndicator(
+              onRefresh: _fetchProfileData,
+              child: AnimatedBuilder(
+                animation: _store,
+                builder: (context, _) {
+                  return ListView(
+                    padding: const EdgeInsets.all(16),
+                    children: [
+                      _CompanyStatsBar(
+                        foundedDay: _store.foundedDay,
+                        foundedMonth: _store.foundedMonth,
+                        foundedYear: _store.foundedYear,
+                        countriesCount: _store.locations.length,
+                        employee: _store.employee,
+                        industry: _store.industry,
+                        category: _store.category,
+                      ),
+                      const SizedBox(height: 14),
+                      Divider(
+                        height: 1,
+                        thickness: 1,
+                        color: Theme.of(context).dividerColor.withOpacity(0.2),
+                      ),
+                      const SizedBox(height: 16),
+                      // Statistics UI
+                      if (_stats != null) ...[
+                        SectionTitle(t.isAr ? 'الإحصائيات' : 'Statistics'),
+                        const SizedBox(height: 10),
+                        _buildStatsCard(t.isAr),
+                        const SizedBox(height: 16),
+                      ],
+                      SectionTitle(t.about),
+                      const SizedBox(height: 10),
+                      Text(
+                        t.isAr
+                            ? (_store.companyAboutAr.trim().isNotEmpty
+                                ? _store.companyAboutAr
+                                : (_store.companyAboutEn.trim().isNotEmpty ? _store.companyAboutEn : t.notYet))
+                            : (_store.companyAboutEn.trim().isNotEmpty ? _store.companyAboutEn : t.notYet),
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: (_store.companyAboutAr.isEmpty && _store.companyAboutEn.isEmpty)
+                              ? Theme.of(context).colorScheme.onSurface.withOpacity(0.4)
+                              : null,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      SectionTitle(t.benefits),
+                      const SizedBox(height: 10),
+                      _store.benefits.isEmpty
+                          ? Text(t.notYet, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)))
+                          : Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: _store.benefits.map((item) => Chip(
+                                label: Text(item, style: const TextStyle(fontSize: 12)),
+                                visualDensity: VisualDensity.compact,
+                                backgroundColor: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.3),
+                              )).toList(),
+                            ),
+                      const SizedBox(height: 16),
+                      if (_store.commercialRegister.isNotEmpty || _store.nationalNumber.isNotEmpty) ...[
+                        SectionTitle(t.tr(en: 'Registration Info', ar: 'بيانات التسجيل')),
+                        const SizedBox(height: 10),
+                        if (_store.commercialRegister.isNotEmpty)
+                          _RegistrationInfoTile(
+                            icon: Icons.assignment_outlined,
+                            title: t.tr(en: 'Commercial Register', ar: 'السجل التجاري'),
+                            value: _store.commercialRegister,
+                          ),
+                        if (_store.nationalNumber.isNotEmpty)
+                          _RegistrationInfoTile(
+                            icon: Icons.badge_outlined,
+                            title: t.tr(en: 'National Number', ar: 'الرقم القومي'),
+                            value: _store.nationalNumber,
+                          ),
+                        const SizedBox(height: 16),
+                      ],
+                      if (_store.contacts.isNotEmpty) ...[
+                        SectionTitle(t.contactSectionLabel),
+                        const SizedBox(height: 10),
+                        ..._store.contacts.asMap().entries.map(
+                          (entry) => _EditableLinkTile(
+                            icon: entry.value.name.toLowerCase().contains('email') 
+                                ? Icons.email_outlined 
+                                : Icons.link_outlined,
+                            title: entry.value.name,
+                            value: entry.value.value,
+                          ),
+                        ),
+                      ],
+                    ],
+                  );
+                },
               ),
-              const SizedBox(height: 14),
-              Divider(
-                height: 1,
-                thickness: 1,
-                color: Theme.of(context).dividerColor.withOpacity(0.2),
-              ),
-              const SizedBox(height: 16),
-              SectionTitle(t.about),
-              const SizedBox(height: 10),
-              Text(
-                t.isAr
-                    ? (_store.companyAboutAr.trim().isNotEmpty
-                        ? _store.companyAboutAr
-                        : (_store.companyAboutEn.trim().isNotEmpty ? _store.companyAboutEn : t.notYet))
-                    : (_store.companyAboutEn.trim().isNotEmpty ? _store.companyAboutEn : t.notYet),
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: (_store.companyAboutAr.isEmpty && _store.companyAboutEn.isEmpty)
-                      ? Theme.of(context).colorScheme.onSurface.withOpacity(0.4)
-                      : null,
-                ),
-              ),
-              const SizedBox(height: 16),
-              const SizedBox(height: 16),
-              SectionTitle(t.benefits),
-              const SizedBox(height: 10),
-              _store.benefits.isEmpty
-                  ? Text(t.notYet, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)))
-                  : Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: _store.benefits.map((item) => Chip(
-                        label: Text(item, style: const TextStyle(fontSize: 12)),
-                        visualDensity: VisualDensity.compact,
-                        backgroundColor: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.3),
-                      )).toList(),
-                    ),
-              const SizedBox(height: 16),
-              if (_store.commercialRegister.isNotEmpty || _store.nationalNumber.isNotEmpty) ...[
-                SectionTitle(t.tr(en: 'Registration Info', ar: 'بيانات التسجيل')),
-                const SizedBox(height: 10),
-                if (_store.commercialRegister.isNotEmpty)
-                  _RegistrationInfoTile(
-                    icon: Icons.assignment_outlined,
-                    title: t.tr(en: 'Commercial Register', ar: 'السجل التجاري'),
-                    value: _store.commercialRegister,
-                  ),
-                if (_store.nationalNumber.isNotEmpty)
-                  _RegistrationInfoTile(
-                    icon: Icons.badge_outlined,
-                    title: t.tr(en: 'National Number', ar: 'الرقم القومي'),
-                    value: _store.nationalNumber,
-                  ),
-                const SizedBox(height: 16),
-              ],
-              if (_store.contacts.isNotEmpty) ...[
-                SectionTitle(t.contactSectionLabel),
-                const SizedBox(height: 10),
-                ..._store.contacts.asMap().entries.map(
-                  (entry) => _EditableLinkTile(
-                    icon: entry.value.name.toLowerCase().contains('email') 
-                        ? Icons.email_outlined 
-                        : Icons.link_outlined,
-                    title: entry.value.name,
-                    value: entry.value.value,
-                  ),
-                ),
-              ],
-            ],
-          );
-        },
-      ),
+            ),
+
       bottomNavigationBar: const CompanyBottomNav(
         current: CompanyTab.profile,
       ),
+    );
+  }
+
+  Widget _buildStatsCard(bool isAr) {
+    if (_stats == null) return const SizedBox.shrink();
+
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            _buildStatRow(
+              isAr ? 'إجمالي الوظائف' : 'Total Jobs',
+              _stats!.totalJobs.toString(),
+            ),
+            const SizedBox(height: 12),
+            _buildStatRow(
+              isAr ? 'إجمالي المتقدمين' : 'Total Applications',
+              _stats!.totalApplications.toString(),
+            ),
+            const SizedBox(height: 12),
+            _buildStatRow(
+              isAr ? 'تم التوظيف' : 'Total Hired',
+              _stats!.totalHired.toString(),
+            ),
+            const SizedBox(height: 12),
+            _buildStatRow(
+              isAr ? 'المشاهدات' : 'Total Views',
+              _stats!.totalViews.toString(),
+            ),
+            if (_stats!.averageRating > 0) ...[
+              const SizedBox(height: 12),
+              _buildStatRow(
+                isAr ? 'التقييم' : 'Rating',
+                '⭐ ${_stats!.averageRating.toStringAsFixed(1)}',
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatRow(String label, String value) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+        ),
+        Text(
+          value,
+          style: TextStyle(
+            fontWeight: FontWeight.bold, 
+            fontSize: 15,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+        ),
+      ],
     );
   }
 }

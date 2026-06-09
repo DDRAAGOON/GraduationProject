@@ -71,4 +71,14 @@ class CompanyService {
       throw ErrorHandler.handle(e);
     }
   }
+
+  /// Fetches statistics for a specific company
+  Future<CompanyStatistics> getCompanyStatistics(String companyId) async {
+    try {
+      final response = await _apiClient.get(ApiConstants.companyStats(companyId));
+      return CompanyStatistics.fromMap(response.data);
+    } catch (e) {
+      throw ErrorHandler.handle(e);
+    }
+  }
 }
